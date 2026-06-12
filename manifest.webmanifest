@@ -1,0 +1,15 @@
+{
+  "name": "Mon Carnet de Voyage",
+  "short_name": "Voyages",
+  "description": "Planifiez vos voyages, suivez vos dépenses, partagez vos photos et gardez vos documents importants à portée de main.",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#FFF8EE",
+  "theme_color": "#0A7EA4",
+  "lang": "fr",
+  "icons": [
+    { "src": "icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }
+  ]
+}

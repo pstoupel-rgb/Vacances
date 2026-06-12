@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mes Vacances</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <nav class="navbar">
+    <div class="nav-brand">✈️ MesVacances</div>
+    <div class="nav-links">
+      <a href="index.html" class="active">Accueil</a>
+      <a href="planner.html">Planifier</a>
+      <a href="activites.html">Activités</a>
+    </div>
+  </nav>
+
+  <header class="hero">
+    <div class="hero-content">
+      <h1>Votre prochaine aventure commence ici</h1>
+      <p>Planifiez, organisez et profitez de vos vacances de rêve</p>
+      <a href="planner.html" class="btn-primary">Créer un voyage</a>
+    </div>
+  </header>
+
+  <main class="container">
+    <section class="stats">
+      <div class="stat-card">
+        <span class="stat-icon">🗺️</span>
+        <span class="stat-value" id="total-voyages">0</span>
+        <span class="stat-label">Voyages planifiés</span>
+      </div>
+      <div class="stat-card">
+        <span class="stat-icon">📅</span>
+        <span class="stat-value" id="total-jours">0</span>
+        <span class="stat-label">Jours de vacances</span>
+      </div>
+      <div class="stat-card">
+        <span class="stat-icon">🎯</span>
+        <span class="stat-value" id="total-activites">0</span>
+        <span class="stat-label">Activités prévues</span>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="section-header">
+        <h2>Mes voyages</h2>
+        <a href="planner.html" class="btn-secondary">+ Nouveau voyage</a>
+      </div>
+      <div class="voyages-grid" id="voyages-list">
+        <div class="empty-state">
+          <span>🌍</span>
+          <p>Aucun voyage planifié pour l'instant</p>
+          <a href="planner.html" class="btn-primary">Planifier mon premier voyage</a>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2>Destinations populaires</h2>
+      <div class="destinations-grid">
+        <div class="dest-card" onclick="quickAdd('Paris', '🗼')">
+          <div class="dest-img" style="background: linear-gradient(135deg, #667eea, #764ba2)">🗼</div>
+          <h3>Paris</h3>
+          <p>France</p>
+        </div>
+        <div class="dest-card" onclick="quickAdd('Barcelone', '🏖️')">
+          <div class="dest-img" style="background: linear-gradient(135deg, #f093fb, #f5576c)">🏖️</div>
+          <h3>Barcelone</h3>
+          <p>Espagne</p>
+        </div>
+        <div class="dest-card" onclick="quickAdd('Rome', '🏛️')">
+          <div class="dest-img" style="background: linear-gradient(135deg, #4facfe, #00f2fe)">🏛️</div>
+          <h3>Rome</h3>
+          <p>Italie</p>
+        </div>
+        <div class="dest-card" onclick="quickAdd('Tokyo', '🗾')">
+          <div class="dest-img" style="background: linear-gradient(135deg, #43e97b, #38f9d7)">🗾</div>
+          <h3>Tokyo</h3>
+          <p>Japon</p>
+        </div>
+        <div class="dest-card" onclick="quickAdd('New York', '🗽')">
+          <div class="dest-img" style="background: linear-gradient(135deg, #fa709a, #fee140)">🗽</div>
+          <h3>New York</h3>
+          <p>États-Unis</p>
+        </div>
+        <div class="dest-card" onclick="quickAdd('Bali', '🌺')">
+          <div class="dest-img" style="background: linear-gradient(135deg, #a18cd1, #fbc2eb)">🌺</div>
+          <h3>Bali</h3>
+          <p>Indonésie</p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <p>✈️ MesVacances — Votre compagnon de voyage</p>
+  </footer>
+
+  <script src="app.js"></script>
+  <script>
+    renderVoyages();
+    updateStats();
+
+    function quickAdd(dest, emoji) {
+      localStorage.setItem('quick-dest', JSON.stringify({ destination: dest, emoji }));
+      window.location.href = 'planner.html';
+    }
+  </script>
+</body>
+</html>

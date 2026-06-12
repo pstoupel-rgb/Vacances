@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Planifier un voyage — MesVacances</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <nav class="navbar">
+    <div class="nav-brand">✈️ MesVacances</div>
+    <div class="nav-links">
+      <a href="index.html">Accueil</a>
+      <a href="planner.html" class="active">Planifier</a>
+      <a href="activites.html">Activités</a>
+    </div>
+  </nav>
+
+  <div class="page-header">
+    <div class="container">
+      <h1>Planifier un voyage</h1>
+      <p>Remplissez les détails de votre prochain voyage</p>
+    </div>
+  </div>
+
+  <main class="container">
+    <div class="planner-layout">
+      <!-- Formulaire -->
+      <div class="form-card">
+        <h2>Nouveau voyage</h2>
+        <form id="voyage-form">
+          <div class="form-group">
+            <label for="destination">🌍 Destination</label>
+            <input type="text" id="destination" placeholder="Ex: Paris, Tokyo, Barcelone..." required>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="date-depart">📅 Date de départ</label>
+              <input type="date" id="date-depart" required>
+            </div>
+            <div class="form-group">
+              <label for="date-retour">📅 Date de retour</label>
+              <input type="date" id="date-retour" required>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="budget">💶 Budget total (€)</label>
+            <input type="number" id="budget" placeholder="Ex: 2000" min="0">
+          </div>
+
+          <div class="form-group">
+            <label for="nb-personnes">👥 Nombre de personnes</label>
+            <input type="number" id="nb-personnes" value="1" min="1" max="20">
+          </div>
+
+          <div class="form-group">
+            <label for="type-voyage">🎭 Type de voyage</label>
+            <select id="type-voyage">
+              <option value="plage">🏖️ Plage &amp; Détente</option>
+              <option value="culture">🏛️ Culture &amp; Histoire</option>
+              <option value="aventure">🏔️ Aventure &amp; Nature</option>
+              <option value="gastronomie">🍽️ Gastronomie</option>
+              <option value="city">🏙️ City-break</option>
+              <option value="autre">🌟 Autre</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="notes">📝 Notes &amp; Idées</label>
+            <textarea id="notes" rows="3" placeholder="Hôtels à visiter, restaurants, activités souhaitées..."></textarea>
+          </div>
+
+          <button type="submit" class="btn-primary btn-full">Enregistrer le voyage</button>
+        </form>
+      </div>
+
+      <!-- Liste des voyages -->
+      <div class="sidebar">
+        <h2>Mes voyages <span class="badge" id="count-badge">0</span></h2>
+        <div id="voyages-sidebar"></div>
+      </div>
+    </div>
+
+    <!-- Détail d'un voyage -->
+    <div id="voyage-detail" class="voyage-detail hidden">
+      <div class="detail-header">
+        <h2 id="detail-titre"></h2>
+        <button class="btn-close" onclick="closeDetail()">✕</button>
+      </div>
+      <div id="detail-content"></div>
+    </div>
+  </main>
+
+  <footer class="footer">
+    <p>✈️ MesVacances — Votre compagnon de voyage</p>
+  </footer>
+
+  <script src="app.js"></script>
+  <script>
+    const form = document.getElementById('voyage-form');
+
+    // Pré-remplir depuis quickAdd de l'accueil
+    const quickDest = localStorage.getItem('quick-dest');
+    if (quickDest) {
+      const { destination } = JSON.parse(quickDest);
+      document.getElementById('destination').value = destination;
+      localStorage.removeItem('quick-dest');
+    }
+
+    form.addEventListener('submit', function(e) {
+      e.preventDefault();
+      const voyage = {
+        id: Date.now(),
+        destination: document.getElementById('destination').value,
+        dateDepart: document.getElementById('date-depart').value,
+        dateRetour: document.getElementById('date-retour').value,
+        budget: document.getElementById('budget').value || 0,
+        nbPersonnes: document.getElementById('nb-personnes').value,
+        type: document.getElementById('type-voyage').value,
+        notes: document.getElementById('notes').value,
+        activites: []
+      };
+      saveVoyage(voyage);
+      form.reset();
+      document.getElementById('nb-personnes').value = 1;
+      renderSidebar();
+      showToast('Voyage enregistré !');
+    });
+
+    function renderSidebar() {
+      const voyages = getVoyages();
+      const sidebar = document.getElementById('voyages-sidebar');
+      document.getElementById('count-badge').textContent = voyages.length;
+
+      if (voyages.length === 0) {
+        sidebar.innerHTML = '<p class="empty-text">Aucun voyage pour l\'instant</p>';
+        return;
+      }
+
+      sidebar.innerHTML = voyages.map(v => `
+        <div class="voyage-item" onclick="showDetail(${v.id})">
+          <div class="voyage-item-header">
+            <strong>${typeEmoji(v.type)} ${v.destination}</strong>
+            <button class="btn-delete" onclick="event.stopPropagation(); deleteVoyage(${v.id})">🗑️</button>
+          </div>
+          <small>${formatDate(v.dateDepart)} → ${formatDate(v.dateRetour)}</small>
+          <div class="voyage-item-meta">
+            <span>👥 ${v.nbPersonnes}</span>
+            ${v.budget > 0 ? `<span>💶 ${Number(v.budget).toLocaleString()}€</span>` : ''}
+            <span>${duree(v.dateDepart, v.dateRetour)} jours</span>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function showDetail(id) {
+      const voyages = getVoyages();
+      const v = voyages.find(x => x.id === id);
+      if (!v) return;
+
+      document.getElementById('detail-titre').textContent = `${typeEmoji(v.type)} ${v.destination}`;
+      document.getElementById('detail-content').innerHTML = `
+        <div class="detail-grid">
+          <div class="detail-item"><span class="detail-label">Départ</span><span>${formatDate(v.dateDepart)}</span></div>
+          <div class="detail-item"><span class="detail-label">Retour</span><span>${formatDate(v.dateRetour)}</span></div>
+          <div class="detail-item"><span class="detail-label">Durée</span><span>${duree(v.dateDepart, v.dateRetour)} jours</span></div>
+          <div class="detail-item"><span class="detail-label">Personnes</span><span>${v.nbPersonnes}</span></div>
+          ${v.budget > 0 ? `<div class="detail-item"><span class="detail-label">Budget</span><span>${Number(v.budget).toLocaleString()} €</span></div>` : ''}
+          ${v.budget > 0 && v.nbPersonnes > 1 ? `<div class="detail-item"><span class="detail-label">Par personne</span><span>${Math.round(v.budget / v.nbPersonnes).toLocaleString()} €</span></div>` : ''}
+        </div>
+        ${v.notes ? `<div class="detail-notes"><h4>Notes</h4><p>${v.notes}</p></div>` : ''}
+        <a href="activites.html?id=${v.id}" class="btn-primary">Gérer les activités</a>
+      `;
+      document.getElementById('voyage-detail').classList.remove('hidden');
+    }
+
+    function closeDetail() {
+      document.getElementById('voyage-detail').classList.add('hidden');
+    }
+
+    function deleteVoyage(id) {
+      if (!confirm('Supprimer ce voyage ?')) return;
+      let voyages = getVoyages();
+      voyages = voyages.filter(v => v.id !== id);
+      localStorage.setItem('voyages', JSON.stringify(voyages));
+      renderSidebar();
+      showToast('Voyage supprimé');
+    }
+
+    renderSidebar();
+  </script>
+</body>
+</html>

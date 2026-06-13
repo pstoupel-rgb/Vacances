@@ -296,6 +296,57 @@
   .row-actions { display:flex; gap:10px; margin-top:6px; }
   .muted-link { background:none; border:none; color:var(--muted); font-size:.82rem; font-weight:600; text-decoration:underline; padding:6px; }
   .danger-link { color:var(--coral); }
+
+  /* ===================== WEATHER ===================== */
+  .weather-widget { background:linear-gradient(135deg,#0A2540 0%,#0A7EA4 80%,#1490b8 100%); border-radius:var(--radius); padding:14px 14px 12px; margin-bottom:12px; position:relative; overflow:hidden; }
+  .weather-widget::before { content:''; position:absolute; right:-20px; top:-20px; width:90px; height:90px; border-radius:50%; background:rgba(255,255,255,.05); }
+  .weather-dest { font-size:.68rem; color:rgba(255,255,255,.72); font-weight:700; margin-bottom:10px; text-transform:uppercase; letter-spacing:.6px; }
+  .weather-strip { display:flex; gap:7px; overflow-x:auto; scroll-snap-type:x mandatory; scrollbar-width:none; padding-bottom:2px; }
+  .weather-strip::-webkit-scrollbar { display:none; }
+  .w-day { flex-shrink:0; background:rgba(255,255,255,.1); border-radius:13px; padding:9px 11px; text-align:center; min-width:62px; color:#fff; scroll-snap-align:start; border:1.5px solid transparent; }
+  .w-day.in-trip { background:rgba(245,166,35,.25); border-color:rgba(245,166,35,.5); }
+  .w-day .wn { font-size:.58rem; font-weight:700; opacity:.8; text-transform:uppercase; }
+  .w-day .wi { font-size:1.35rem; margin:3px 0; line-height:1; }
+  .w-day .wh { font-size:.84rem; font-weight:800; }
+  .w-day .wl { font-size:.66rem; opacity:.72; margin-top:1px; }
+  .w-day .wr { font-size:.58rem; opacity:.75; margin-top:3px; }
+  .skel { background:linear-gradient(90deg,rgba(255,255,255,.06) 25%,rgba(255,255,255,.14) 50%,rgba(255,255,255,.06) 75%); background-size:300% 100%; animation:shimmer 1.5s infinite; border-radius:8px; }
+  @keyframes shimmer { to { background-position:-100% 0; } }
+  .weather-error { color:rgba(255,255,255,.7); font-size:.8rem; text-align:center; padding:12px 0; }
+
+  /* ===================== MAP OVERLAY ===================== */
+  #map-overlay { position:fixed; inset:0; z-index:500; background:#eae6de; display:flex; flex-direction:column; transform:translateY(100%); transition:transform .35s cubic-bezier(.2,.9,.3,1); }
+  #map-overlay.open { transform:none; }
+  #map-topbar { display:flex; align-items:center; gap:10px; flex-shrink:0; padding:calc(14px + env(safe-area-inset-top)) 14px 12px; background:#fff; box-shadow:0 2px 10px rgba(0,0,0,.07); }
+  #map-title { flex:1; font-weight:800; font-size:1.05rem; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  #map-container { flex:1; min-height:0; }
+  #map-day-filters { display:flex; gap:8px; overflow-x:auto; scrollbar-width:none; flex-shrink:0; padding:10px 14px calc(10px + env(safe-area-inset-bottom)); background:rgba(255,255,255,.96); backdrop-filter:blur(8px); border-top:1px solid var(--line); }
+  #map-day-filters::-webkit-scrollbar { display:none; }
+  .map-chip { flex-shrink:0; padding:7px 14px; border-radius:20px; border:none; font-size:.74rem; font-weight:700; background:#F2F6F8; color:var(--night); cursor:pointer; transition:all .15s; white-space:nowrap; }
+  .map-chip.active { background:var(--night); color:#fff; }
+  .icon-btn-dark { width:38px; height:38px; border:none; border-radius:12px; background:#F2F6F8; color:var(--night); font-size:1.1rem; display:grid; place-items:center; flex-shrink:0; cursor:pointer; }
+  .icon-btn-dark:active { background:#E4ECEF; }
+
+  /* ===================== CHECKLIST ===================== */
+  .cl-card { background:var(--card); border-radius:var(--radius); padding:14px 16px; box-shadow:var(--shadow); margin-bottom:12px; }
+  .cl-hdr { display:flex; align-items:center; justify-content:space-between; margin-bottom:8px; }
+  .cl-ttl { font-weight:800; font-size:.95rem; }
+  .cl-pct { font-size:.82rem; font-weight:800; color:var(--sea); }
+  .cl-bar { height:8px; border-radius:10px; background:#EEF3F5; overflow:hidden; margin-bottom:10px; }
+  .cl-bar i { display:block; height:100%; background:linear-gradient(90deg,var(--sea),#00B4D8); border-radius:10px; transition:width .5s; }
+  .cl-cat-hd { font-size:.64rem; font-weight:800; text-transform:uppercase; letter-spacing:1px; color:var(--muted); margin:12px 0 4px; display:flex; align-items:center; gap:7px; }
+  .cl-item { display:flex; align-items:center; gap:10px; padding:9px 0; border-bottom:1px solid #F4EFE4; cursor:pointer; user-select:none; }
+  .cl-item:last-child { border-bottom:none; }
+  .cl-chk { width:22px; height:22px; border-radius:7px; border:2px solid var(--line); flex-shrink:0; display:grid; place-items:center; font-size:.7rem; transition:all .18s; background:#fff; color:transparent; }
+  .cl-item.done .cl-chk { background:var(--sea); border-color:var(--sea); color:#fff; }
+  .cl-item.done .cl-lbl { text-decoration:line-through; color:var(--muted); }
+  .cl-lbl { font-size:.9rem; font-weight:500; flex:1; }
+  .cl-tpl-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:10px; }
+  .cl-tpl { background:var(--card); border-radius:14px; padding:13px; border:2px solid var(--line); text-align:center; cursor:pointer; transition:transform .12s; box-shadow:var(--shadow); }
+  .cl-tpl:active { transform:scale(.96); }
+  .cl-tpl .te { font-size:1.9rem; display:block; margin-bottom:5px; }
+  .cl-tpl .tn { font-size:.82rem; font-weight:700; }
+  .cl-tpl .tc { font-size:.68rem; color:var(--muted); margin-top:1px; }
 </style>
 </head>
 <body>
@@ -341,6 +392,7 @@
           <h1 id="th-name">Voyage</h1>
           <div class="sub" id="th-sub"></div>
         </div>
+        <button class="icon-btn" onclick="openMap()" title="Carte">🗺️</button>
         <button class="icon-btn" onclick="editCurrentTrip()">✎</button>
       </div>
       <div class="th-count" id="th-count"></div>
@@ -381,6 +433,16 @@
   </div>
   <div class="lb-body" id="lb-body"></div>
   <div class="lb-cap" id="lb-cap"></div>
+</div>
+
+<!-- map overlay -->
+<div id="map-overlay">
+  <div id="map-topbar">
+    <button class="icon-btn-dark" onclick="closeMap()">✕</button>
+    <div id="map-title">Carte du voyage</div>
+  </div>
+  <div id="map-container"></div>
+  <div id="map-day-filters"></div>
 </div>
 
 <div id="toast"></div>
@@ -614,6 +676,7 @@ function renderResume(){
   const parts = t.participants||[];
 
   document.getElementById('tab-resume').innerHTML = `
+    <div id="weather-widget"></div>
     ${t.budget>0 ? `
     <div class="card">
       <div style="display:flex;justify-content:space-between;align-items:baseline;">
@@ -655,6 +718,7 @@ function renderResume(){
       </div>
     </div>
   `;
+  loadWeather(t);
 }
 function saveNotes(v){ const t=trip(); if(t){ t.notes=v; save(); } }
 
@@ -817,6 +881,46 @@ function renderDocuments(){
   const docs = DATA.docs.filter(d=>d.tripId===t.id);
   let html = '';
 
+  // checklist
+  const cl = t.checklist||[];
+  if (!cl.length) {
+    html += `<div class="block-title">✅ Check-list</div>
+    <div class="cl-card">
+      <div class="cl-ttl" style="margin-bottom:10px">Choisissez un modèle</div>
+      <div class="cl-tpl-grid">
+        ${Object.entries(CL_TEMPLATES).map(([k,tpl])=>`
+          <div class="cl-tpl" onclick="applyTemplate('${k}')">
+            <span class="te">${tpl.emoji}</span>
+            <div class="tn">${esc(tpl.name)}</div>
+            <div class="tc">${tpl.items.length} éléments</div>
+          </div>`).join('')}
+      </div>
+      <button class="btn ghost sm" onclick="openAddChecklistItem()">＋ Liste perso</button>
+    </div>`;
+  } else {
+    const done = cl.filter(i=>i.done).length;
+    const pct = Math.round((done/cl.length)*100);
+    const byCat = {};
+    cl.forEach(i=>{ (byCat[i.c]=byCat[i.c]||[]).push(i); });
+    html += `<div class="block-title">✅ Check-list</div>
+    <div class="cl-card">
+      <div class="cl-hdr"><span class="cl-ttl">Préparation du voyage</span><span class="cl-pct">${done}/${cl.length}</span></div>
+      <div class="cl-bar"><i style="width:${pct}%"></i></div>
+      ${Object.entries(byCat).map(([cat,items])=>`
+        <div class="cl-cat-hd"><span style="width:8px;height:8px;border-radius:50%;background:${CL_CAT[cat]||'#6B7A8D'};display:inline-block"></span>${cat}</div>
+        ${items.map(item=>`
+          <div class="cl-item ${item.done?'done':''}" onclick="toggleCL('${item.id}')">
+            <div class="cl-chk">${item.done?'✓':''}</div>
+            <div class="cl-lbl">${esc(item.l)}</div>
+          </div>`).join('')}
+      `).join('')}
+    </div>
+    <div class="row-actions" style="margin-bottom:14px">
+      <button class="btn ghost sm" onclick="openAddChecklistItem()">＋ Ajouter</button>
+      <button class="muted-link" onclick="resetCL()">Réinitialiser</button>
+    </div>`;
+  }
+
   // assurance SOS card
   const ass = t.assurance||{};
   if (ass.compagnie || ass.telUrgence || ass.contrat){
@@ -940,7 +1044,8 @@ function saveTrip(id){
     couleur: existing ? existing.couleur : COLORS[DATA.trips.length % COLORS.length],
     notes: existing ? existing.notes : '',
     jours: existing ? existing.jours||[] : [],
-    assurance: existing ? existing.assurance||{} : {}
+    assurance: existing ? existing.assurance||{} : {},
+    checklist: existing ? (existing.checklist||[]) : []
   };
   if (existing){ Object.assign(existing, obj); } else { DATA.trips.push(obj); }
   _emoji = null;
@@ -1307,6 +1412,187 @@ function importData(input){
   };
   reader.readAsText(file);
   input.value='';
+}
+
+/* =====================================================================
+   CHECKLIST
+   ===================================================================== */
+const CL_TEMPLATES = {
+  plage:    { emoji:'🏖️', name:'Plage & Mer', items:[
+    {c:'Documents',l:"Carte d'identité / Passeport"},{c:'Documents',l:"Billet d'avion"},
+    {c:'Documents',l:"Assurance voyage"},{c:'Documents',l:"Carte Vitale / CEAM"},
+    {c:'Vêtements',l:"Maillot de bain ×2"},{c:'Vêtements',l:"Shorts et t-shirts"},
+    {c:'Vêtements',l:"Lunettes de soleil"},{c:'Vêtements',l:"Chapeau / casquette"},{c:'Vêtements',l:"Tongs"},
+    {c:'Toilette',l:"Crème solaire SPF 50+"},{c:'Toilette',l:"After-sun"},{c:'Toilette',l:"Anti-moustiques"},{c:'Toilette',l:"Trousse de toilette"},
+    {c:'Électronique',l:"Chargeur téléphone"},{c:'Électronique',l:"Adaptateur de prise"},{c:'Électronique',l:"Powerbank"},
+    {c:'Santé',l:"Médicaments + ordonnances"},{c:'Santé',l:"Trousse premiers secours"},
+    {c:'Plage',l:"Serviette de plage"},{c:'Plage',l:"Masque et tuba"},{c:'Plage',l:"Sac étanche"},
+  ]},
+  city:     { emoji:'🏙️', name:'City-break', items:[
+    {c:'Documents',l:"Carte d'identité / Passeport"},{c:'Documents',l:"Billet transport"},
+    {c:'Documents',l:"Confirmation hôtel"},{c:'Documents',l:"Assurance voyage"},{c:'Documents',l:"Carte bancaire"},
+    {c:'Vêtements',l:"Tenues variées"},{c:'Vêtements',l:"Veste légère"},{c:'Vêtements',l:"Chaussures confortables"},{c:'Vêtements',l:"Tenue soirée"},
+    {c:'Toilette',l:"Trousse de toilette compacte"},{c:'Toilette',l:"Crème solaire"},
+    {c:'Électronique',l:"Chargeur + câbles"},{c:'Électronique',l:"Adaptateur de prise"},{c:'Électronique',l:"Appareil photo"},
+    {c:'Santé',l:"Médicaments essentiels"},{c:'Bagages',l:"Cadenas valise"},{c:'Bagages',l:"Sac à dos journée"},
+  ]},
+  montagne: { emoji:'🏔️', name:'Montagne', items:[
+    {c:'Documents',l:"Carte d'identité"},{c:'Documents',l:"Assurance rapatriement"},
+    {c:'Vêtements',l:"Veste imperméable"},{c:'Vêtements',l:"Sous-couches thermiques"},{c:'Vêtements',l:"Polaire"},
+    {c:'Vêtements',l:"Pantalon de randonnée"},{c:'Vêtements',l:"Chaussettes de rando ×3"},{c:'Vêtements',l:"Bonnet + gants"},
+    {c:'Équipement',l:"Chaussures de randonnée"},{c:'Équipement',l:"Bâtons"},{c:'Équipement',l:"Sac à dos 30-40L"},
+    {c:'Équipement',l:"Lampe frontale + piles"},{c:'Équipement',l:"Gourde"},{c:'Équipement',l:"Carte / topo-guide"},
+    {c:'Santé',l:"Crème solaire SPF 50+"},{c:'Santé',l:"Trousse premiers secours"},{c:'Santé',l:"Anti-ampoules"},
+  ]},
+  ski:      { emoji:'⛷️', name:'Ski & Hiver', items:[
+    {c:'Documents',l:"Carte d'identité"},{c:'Documents',l:"Forfait ski"},{c:'Documents',l:"Assurance ski"},
+    {c:'Vêtements',l:"Veste de ski"},{c:'Vêtements',l:"Pantalon de ski"},{c:'Vêtements',l:"Sous-couches ×2"},
+    {c:'Vêtements',l:"Chaussettes de ski ×3"},{c:'Vêtements',l:"Bonnet + tour de cou"},{c:'Vêtements',l:"Gants de ski"},
+    {c:'Équipement',l:"Casque de ski"},{c:'Équipement',l:"Masque"},{c:'Équipement',l:"Chaussures / location"},
+    {c:'Santé',l:"Crème solaire + stick lèvres"},{c:'Santé',l:"Protection dorsale"},
+  ]},
+  roadtrip: { emoji:'🚗', name:'Road Trip', items:[
+    {c:'Documents',l:"Permis de conduire"},{c:'Documents',l:"Carte d'identité / Passeport"},
+    {c:'Documents',l:"Assurance véhicule"},{c:'Documents',l:"Réservations hébergements"},
+    {c:'Véhicule',l:"GPS / carte routière"},{c:'Véhicule',l:"Triangle + gilet"},{c:'Véhicule',l:"Trousse premiers secours"},
+    {c:'Véhicule',l:"Vignettes pays traversés"},
+    {c:'Vêtements',l:"Vêtements pour tous les temps"},{c:'Électronique',l:"Chargeur voiture USB"},{c:'Électronique',l:"Support téléphone"},
+    {c:'Confort',l:"Oreiller de voyage"},{c:'Confort',l:"Couverture / plaid"},{c:'Confort',l:"Snacks et boissons"},
+  ]},
+};
+const CL_CAT = {
+  'Documents':'#0A7EA4','Vêtements':'#6C5CE7','Toilette':'#2E7D52',
+  'Électronique':'#F5A623','Santé':'#E8503A','Plage':'#00B4D8',
+  'Équipement':'#0D5C7A','Bagages':'#d6336c','Véhicule':'#0aa','Confort':'#6B7A8D','Perso':'#1A2332',
+};
+function applyTemplate(key) {
+  const t = trip(); const tpl = CL_TEMPLATES[key]; if (!tpl) return;
+  if ((t.checklist||[]).length && !confirm(`Remplacer la check-list par "${tpl.name}" ?`)) return;
+  t.checklist = tpl.items.map(i=>({ id:uid(), c:i.c, l:i.l, done:false }));
+  save(); renderDocuments(); toast(`Check-list "${tpl.name}" appliquée ✅`);
+}
+function toggleCL(id) {
+  const t = trip(); const item = (t.checklist||[]).find(i=>i.id===id); if (!item) return;
+  item.done = !item.done; save();
+  if (item.done && navigator.vibrate) navigator.vibrate(10);
+  renderDocuments();
+}
+function resetCL() {
+  if (!confirm('Remettre à zéro la check-list ?')) return;
+  const t = trip(); t.checklist = []; save(); renderDocuments(); toast('Check-list remise à zéro');
+}
+function openAddChecklistItem() {
+  openSheet(`<h2>Ajouter un élément</h2>
+    <div class="field"><label>Élément</label><input id="cl-inp" placeholder="Ex: Crème solaire"></div>
+    <button class="btn" onclick="addCLItem()">Ajouter</button>`);
+  setTimeout(()=>document.getElementById('cl-inp')?.focus(), 300);
+}
+function addCLItem() {
+  const t = trip(); const lbl = (document.getElementById('cl-inp')?.value||'').trim();
+  if (!lbl) { toast('Entrez un élément'); return; }
+  t.checklist = t.checklist||[];
+  t.checklist.push({ id:uid(), c:'Perso', l:lbl, done:false });
+  save(); closeSheet(); renderDocuments(); toast('Ajouté ✅');
+}
+
+/* =====================================================================
+   MÉTÉO (Open-Meteo + Nominatim, sans clé API)
+   ===================================================================== */
+const _wCache = {};
+const WMO = {0:'☀️',1:'🌤️',2:'⛅',3:'☁️',45:'🌫️',48:'🌫️',51:'🌦️',53:'🌦️',55:'🌧️',61:'🌧️',63:'🌧️',65:'🌊',71:'❄️',73:'❄️',75:'❄️',80:'🌦️',81:'🌧️',82:'⛈️',85:'🌨️',95:'⛈️',96:'⛈️',99:'⛈️'};
+function wmoE(code) {
+  if (WMO[code]) return WMO[code];
+  const keys = Object.keys(WMO).map(Number).sort((a,b)=>a-b);
+  let best = keys[0]; for (const k of keys) { if (k<=code) best=k; } return WMO[best]||'🌈';
+}
+async function fetchT(url, opts, ms) {
+  const ctrl = new AbortController(); const t = setTimeout(()=>ctrl.abort(), ms||5000);
+  try { return await fetch(url, {...(opts||{}), signal:ctrl.signal}); } finally { clearTimeout(t); }
+}
+async function loadWeather(t) {
+  if (!t.destination) return;
+  const el = document.getElementById('weather-widget'); if (!el) return;
+  el.innerHTML = `<div class="weather-widget"><div class="weather-dest">🌤️ Météo · ${esc(t.destination)}</div><div class="weather-strip">${[...Array(7)].map(()=>`<div class="w-day"><div class="skel" style="height:10px;width:32px;margin:0 auto 5px"></div><div class="skel" style="height:22px;width:22px;border-radius:50%;margin:0 auto 5px"></div><div class="skel" style="height:10px;width:26px;margin:0 auto"></div></div>`).join('')}</div></div>`;
+  try {
+    let c = _wCache[t.id];
+    if (!c || Date.now()-c.ts > 3*3600*1000) {
+      const gr = await fetchT(`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(t.destination)}&format=json&limit=1`,{headers:{'Accept-Language':'fr','User-Agent':'CarnetVoyage/1.0'}},5000);
+      const gd = await gr.json();
+      if (!gd||!gd[0]) throw new Error('geo');
+      const lat = +gd[0].lat, lng = +gd[0].lon;
+      const wr = await fetchT(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lng}&daily=weathercode,temperature_2m_max,temperature_2m_min,precipitation_probability_max&timezone=auto&forecast_days=8`,{},6000);
+      if (!wr.ok) throw new Error('api');
+      c = { ts:Date.now(), data:await wr.json() };
+      _wCache[t.id] = c;
+    }
+    const el2 = document.getElementById('weather-widget'); if (!el2) return;
+    const d = c.data.daily; const n = (d.time||[]).length;
+    const ts = t.dateDebut ? new Date(t.dateDebut+'T00:00:00') : null;
+    const te = t.dateFin   ? new Date(t.dateFin  +'T00:00:00') : null;
+    const DN = ['Dim','Lun','Mar','Mer','Jeu','Ven','Sam'];
+    let h = `<div class="weather-widget"><div class="weather-dest">🌤️ Météo · ${esc(t.destination)}</div><div class="weather-strip">`;
+    for (let i=0;i<n;i++) {
+      const dt = new Date(d.time[i]+'T00:00:00');
+      const inT = ts && te && dt>=ts && dt<=te;
+      h += `<div class="w-day${inT?' in-trip':''}"><div class="wn">${DN[dt.getDay()]}</div><div class="wi">${wmoE(d.weathercode[i])}</div><div class="wh">${Math.round(d.temperature_2m_max[i])}°</div><div class="wl">${Math.round(d.temperature_2m_min[i])}°</div><div class="wr">💧${d.precipitation_probability_max[i]||0}%</div></div>`;
+    }
+    h += `</div></div>`;
+    el2.innerHTML = h;
+  } catch(e) {
+    const el2 = document.getElementById('weather-widget'); if (!el2) return;
+    el2.innerHTML = `<div class="weather-widget"><div class="weather-error">🌐 Météo non disponible (connexion requise)</div></div>`;
+  }
+}
+
+/* =====================================================================
+   CARTE (Leaflet lazy-load depuis CDN)
+   ===================================================================== */
+let _map=null, _lfLoaded=false, _mMarkers=[], _mLines=[];
+function loadScript(src){ return new Promise((res,rej)=>{ if(document.querySelector(`script[src="${src}"]`)){res();return;} const s=document.createElement('script');s.src=src;s.onload=res;s.onerror=rej;document.head.appendChild(s); }); }
+function loadCSS(href){ if(document.querySelector(`link[href="${href}"]`))return; const l=document.createElement('link');l.rel='stylesheet';l.href=href;document.head.appendChild(l); }
+async function initLeaflet(){ if(_lfLoaded)return; loadCSS('https://unpkg.com/leaflet@1.9.4/dist/leaflet.css'); await loadScript('https://unpkg.com/leaflet@1.9.4/dist/leaflet.js'); _lfLoaded=true; }
+
+async function openMap() {
+  const t=trip(); if(!t) return;
+  document.getElementById('map-title').textContent = 'Carte — '+t.nom;
+  document.getElementById('map-overlay').classList.add('open');
+  try { await initLeaflet(); } catch(e) {
+    document.getElementById('map-container').innerHTML='<div style="height:100%;display:grid;place-items:center;text-align:center;padding:24px;color:var(--muted)">🌐 Connexion requise pour afficher la carte.</div>'; return;
+  }
+  if (_map) { _map.off(); _map.remove(); _map=null; }
+  _mMarkers=[]; _mLines=[];
+  const mapEl = document.getElementById('map-container');
+  _map = L.map(mapEl,{zoomControl:false}).setView([46.2,2.2],5);
+  L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png',{attribution:'© OpenStreetMap © CARTO',subdomains:'abcd',maxZoom:19}).addTo(_map);
+  L.control.zoom({position:'topright'}).addTo(_map);
+  const jours=[...(t.jours||[])].sort((a,b)=>(a.date||'').localeCompare(b.date||''));
+  const DC=['#0A7EA4','#E8503A','#2E7D52','#F5A623','#6C5CE7','#0aa','#d6336c','#1f7a8c'];
+  const EI={vol:'✈️',transport:'🚗',hotel:'🏠',repas:'🍽️',activite:'🎯',visite:'🏛️',plage:'🏖️',libre:'🌤️'};
+  const bounds=[]; let chips=`<button class="map-chip active" onclick="filterMapDay(-1,this)">Tous</button>`;
+  jours.forEach((j,idx)=>{
+    const col=DC[idx%DC.length];
+    const evs=(j.events||[]).filter(ev=>ev.lat&&ev.lng);
+    if(evs.length) chips+=`<button class="map-chip" data-di="${idx}" onclick="filterMapDay(${idx},this)">${idx+1} — ${esc(j.titre||'Jour')}</button>`;
+    const pts=[];
+    evs.forEach(ev=>{
+      const ll=[+ev.lat,+ev.lng]; bounds.push(ll); pts.push(ll);
+      const icon=L.divIcon({className:'',html:`<div style="width:32px;height:32px;border-radius:50%;background:${col};border:3px solid #fff;box-shadow:0 2px 8px rgba(0,0,0,.3);display:grid;place-items:center;font-size:.95rem">${EI[ev.type]||'📍'}</div>`,iconSize:[32,32],iconAnchor:[16,16],popupAnchor:[0,-18]});
+      const m=L.marker(ll,{icon}).addTo(_map).bindPopup(`<div style="font-family:-apple-system,sans-serif;min-width:130px"><b style="font-size:.9rem">${esc(ev.titre)}</b>${ev.sousTitre?`<div style="font-size:.76rem;color:#666;margin:3px 0">${esc(ev.sousTitre)}</div>`:''}<div style="margin-top:6px;display:flex;gap:5px"><a href="https://waze.com/ul?ll=${ev.lat},${ev.lng}&navigate=yes" target="_blank" style="background:#0A7EA4;color:#fff;padding:3px 8px;border-radius:5px;text-decoration:none;font-size:.7rem;font-weight:700">🗺️ Waze</a><a href="https://maps.google.com/maps?q=${ev.lat},${ev.lng}" target="_blank" style="background:#EAF4F8;color:#0A7EA4;padding:3px 8px;border-radius:5px;text-decoration:none;font-size:.7rem;font-weight:700">Maps</a></div></div>`);
+      _mMarkers.push({m,di:idx});
+    });
+    if(pts.length>1){ const line=L.polyline(pts,{color:col,weight:2.5,opacity:.65,dashArray:'6,6'}).addTo(_map); _mLines.push({line,di:idx}); }
+  });
+  document.getElementById('map-day-filters').innerHTML=chips;
+  if(bounds.length) { _map.fitBounds(bounds,{padding:[30,30],maxZoom:13}); }
+  else { fetchT(`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(t.destination||'')}&format=json&limit=1`,{headers:{'Accept-Language':'fr','User-Agent':'CarnetVoyage/1.0'}},5000).then(r=>r.json()).then(d=>{ if(d&&d[0]&&_map) _map.setView([+d[0].lat,+d[0].lon],9); }); }
+  setTimeout(()=>{ if(_map) _map.invalidateSize(); },350);
+}
+function closeMap(){ document.getElementById('map-overlay').classList.remove('open'); }
+function filterMapDay(di,btn) {
+  document.querySelectorAll('.map-chip').forEach(b=>b.classList.remove('active'));
+  if(btn) btn.classList.add('active');
+  _mMarkers.forEach(({m,di:d})=>{ if(di===-1||d===di) m.addTo(_map); else _map.removeLayer(m); });
+  _mLines.forEach(({line,di:d})=>{ if(di===-1||d===di) line.addTo(_map); else _map.removeLayer(line); });
 }
 
 /* =====================================================================

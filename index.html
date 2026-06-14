@@ -380,7 +380,7 @@
       </div>
       <button class="ci-cam-btn" onclick="showPage('photos',null)" aria-label="Photos">📷</button>
     </div>
-    <div class="hero-title"><h1>Corse 2026</h1><p>14 jours d'évasion ✴️</p></div>
+    <div class="hero-title"><h1>Corse 2026</h1></div>
   </div>
 
   <div class="countdown-card">
@@ -1464,7 +1464,10 @@ renderFrais();
 
 /* PWA + auto-update */
 if('serviceWorker' in navigator&&location.protocol==='https:'){
-  navigator.serviceWorker.register('sw.js').catch(()=>{});
+  navigator.serviceWorker.register('sw.js').then(reg=>{
+    reg.update();
+    setInterval(()=>reg.update(),5*60*1000);
+  }).catch(()=>{});
   navigator.serviceWorker.addEventListener('controllerchange',()=>window.location.reload());
 }
 </script>

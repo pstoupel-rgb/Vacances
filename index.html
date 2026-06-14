@@ -259,22 +259,18 @@
   footer strong{color:var(--brown);}
 
   /* ===== PHOTOS ===== */
-  .album-card{margin-bottom:14px;}
-  .album-empty{background:var(--card);border:2px dashed var(--caramel);border-radius:var(--radius);padding:18px 16px;text-align:center;box-shadow:var(--shadow);}
-  .album-emoji{font-size:2.2rem;}
-  .album-txt{font-size:.82rem;color:var(--text);line-height:1.5;margin:8px 0 6px;}
-  .album-txt b{color:var(--brown);}
-  .album-steps{text-align:left;font-size:.78rem;color:var(--text);line-height:1.7;margin:6px 0 12px;}
-  .album-steps b{color:var(--brown);}
+  .fb-ok{background:#e8f5e9;border:1.5px solid #4caf50;border-radius:var(--radius);padding:12px 14px;font-size:.82rem;color:#2a7d4f;display:flex;align-items:center;gap:6px;margin-bottom:14px;line-height:1.4;}
+  .fb-ok b{font-weight:700;}
+  .fb-cfg-btn{background:none;border:none;cursor:pointer;font-size:1rem;margin-left:auto;opacity:.7;padding:2px 4px;}
+  .fb-connecting{background:#fff3e0;border:1.5px solid #ff9800;border-radius:var(--radius);padding:12px 14px;font-size:.82rem;color:#e65100;margin-bottom:14px;}
+  .fb-setup{background:var(--card);border:2px dashed var(--caramel);border-radius:var(--radius);padding:18px 16px;text-align:center;box-shadow:var(--shadow);margin-bottom:14px;}
+  .fb-setup-icon{font-size:2.2rem;}
+  .fb-setup-title{font-size:.92rem;font-weight:700;color:var(--brown);margin:6px 0 4px;}
+  .fb-setup-desc{font-size:.78rem;color:var(--muted);line-height:1.5;margin-bottom:12px;}
   .album-set{background:var(--brown);color:#fff;padding:10px 18px;border-radius:13px;font-size:.85rem;font-weight:700;border:none;cursor:pointer;}
-  .album-open{display:block;background:var(--brown);color:#fff;text-align:center;text-decoration:none;font-weight:700;font-size:.95rem;padding:14px;border-radius:var(--radius);}
-  .album-sub{font-size:.74rem;color:var(--muted);text-align:center;margin-top:8px;line-height:1.5;}
-  .album-sub b{color:#2a7d4f;}
-  .album-edit{display:block;margin:8px auto 0;background:none;border:none;color:var(--muted);text-decoration:underline;font-size:.78rem;cursor:pointer;}
   .btn-add{width:100%;background:var(--bg2);border:1.5px solid var(--caramel);color:var(--brown);border-radius:var(--radius);padding:14px;font-family:'Inter',sans-serif;font-weight:700;font-size:.95rem;cursor:pointer;}
   .btn-add:active{background:var(--border);}
-  .btn-share-all{width:100%;background:var(--brown);color:#fff;border:none;border-radius:var(--radius);padding:13px;font-family:'Inter',sans-serif;font-weight:700;font-size:.92rem;cursor:pointer;margin-top:8px;}
-  .btn-share-all:active{opacity:.9;}
+  .btn-add:disabled{opacity:.5;cursor:not-allowed;}
   .photo-hint{font-size:.74rem;color:var(--muted);text-align:center;line-height:1.5;margin:12px 4px 14px;}
   .photo-hint b{color:var(--brown);}
   .photo-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;}
@@ -788,11 +784,8 @@
 <div class="page page-content" id="page-photos">
   <div class="page-hero"><h2>Souvenirs</h2><p>Photos de la Team Corse 2026</p></div>
   <div class="section" style="padding-top:0">
-    <div class="album-card" id="album-card"></div>
-
-    <div class="frais-label" style="margin-top:16px">📱 Galerie dans l'app</div>
-    <button class="btn-add" onclick="addPhotos()">＋ Ajouter une photo dans l'app</button>
-    <p class="photo-hint">⚠️ Ces photos restent <b>dans l'app, sur ton téléphone</b> — l'iPhone n'autorise pas une app web à les déposer toute seule dans l'album partagé. Pour les envoyer à la Team : ouvre une photo et touche <b>⤴</b>, ou ajoute-les directement dans l'<b>album partagé</b> ci-dessus.</p>
+    <div id="fb-card"></div>
+    <button class="btn-add" id="btn-add-photo" onclick="addPhotos()">＋ Ajouter une photo</button>
     <div class="photo-grid" id="photo-grid"></div>
   </div>
   <div class="wave">🌊🌴☀️🌊🌴</div>
@@ -818,7 +811,7 @@ function showPage(name,btn,filter){
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
   document.getElementById('page-'+name).classList.add('active');
   if(btn){document.querySelectorAll('.app-nav-btn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');}
-  if(name==='photos'){renderAlbum();renderPhotos();}
+  if(name==='photos'){initPhotos();}
   if(name==='carte'){initMap();filterCarte(filter);}
   if(name==='home'){renderProgram();}
   if(name==='maison'){renderHouse();}
@@ -950,45 +943,131 @@ async function initMap(){
   }
 }
 
+/* ===== FIREBASE SYNC ===== */
+let _fbDb=null,_fbSt=null,_fbUnsub=null,_fbSdkLoaded=false;
+function _isFbReady(){return!!_fbDb;}
+function _loadFbSDK(){
+  if(_fbSdkLoaded||typeof firebase!=='undefined'){_fbSdkLoaded=true;return Promise.resolve();}
+  const S=['https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js','https://www.gstatic.com/firebasejs/10.14.1/firebase-storage-compat.js','https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js'];
+  return Promise.all(S.map(src=>new Promise((ok,ko)=>{const s=document.createElement('script');s.src=src;s.onload=()=>{_fbSdkLoaded=true;ok();};s.onerror=ko;document.head.appendChild(s);})));
+}
+async function _initFbAsync(){
+  if(_fbDb)return true;
+  const raw=localStorage.getItem('fb-config');if(!raw)return false;
+  try{
+    await _loadFbSDK();
+    const cfg=JSON.parse(raw);
+    try{firebase.app();}catch(e){firebase.initializeApp(cfg);}
+    _fbDb=firebase.firestore();_fbSt=firebase.storage();
+    return true;
+  }catch(e){console.warn('Firebase init',e);return false;}
+}
+function renderFbCard(){
+  const el=document.getElementById('fb-card');if(!el)return;
+  if(_isFbReady()){
+    el.innerHTML='<div class="fb-ok">🔥 <b>Galerie partagée</b> — toute la Team voit les mêmes photos en temps réel <button class="fb-cfg-btn" onclick="configureFb()" title="Configurer">⚙️</button></div>';
+  }else if(localStorage.getItem('fb-config')){
+    el.innerHTML='<div class="fb-connecting">⏳ Connexion Firebase en cours...</div>';
+  }else{
+    el.innerHTML='<div class="fb-setup"><div class="fb-setup-icon">🔥</div><div class="fb-setup-title">Partage automatique avec la Team</div><div class="fb-setup-desc">Configure Firebase gratuitement pour que toute la Team voie les mêmes photos en temps réel — même depuis Corte ou Bonifacio !</div><button class="album-set" onclick="configureFb()">⚙️ Connecter Firebase</button></div>';
+  }
+}
+async function configureFb(){
+  const ex=localStorage.getItem('fb-config')||'';
+  const v=prompt('Colle ici ton firebaseConfig JSON\n(Firebase Console → ⚙️ → Paramètres du projet → Config app web) :',ex);
+  if(v===null)return;
+  const m=v.match(/\{[\s\S]*\}/);
+  if(!m){alert('Format invalide — colle uniquement l\'objet JSON { apiKey:..., ... }');return;}
+  try{JSON.parse(m[0]);}catch(e){alert('JSON invalide — vérifie la syntaxe.');return;}
+  localStorage.setItem('fb-config',m[0]);
+  _fbDb=null;_fbSt=null;_fbSdkLoaded=false;
+  renderFbCard();
+  const ok=await _initFbAsync();
+  if(ok){await subscribePhotos();}else{alert('Connexion Firebase échouée.\nVérifie la config et active Firestore + Storage dans la console Firebase.');}
+  renderFbCard();
+}
+async function subscribePhotos(){
+  if(!_isFbReady())return;
+  if(_fbUnsub){_fbUnsub();_fbUnsub=null;}
+  _fbUnsub=_fbDb.collection('photos').orderBy('date','desc')
+    .onSnapshot(snap=>{PHOTOS=snap.docs.map(d=>d.data());renderPhotos();},
+    err=>console.warn('FB snapshot',err));
+}
+async function initPhotos(){
+  renderFbCard();
+  const ok=await _initFbAsync();
+  renderFbCard();
+  if(ok){await subscribePhotos();}else{renderPhotos();}
+}
+
 /* ===== PHOTOS ===== */
-const PKEY='corse2026-photos',AKEY='corse2026-album';
-let PHOTOS=[];try{PHOTOS=JSON.parse(localStorage.getItem(PKEY)||'[]');}catch(e){PHOTOS=[];}
-function savePhotos(){try{localStorage.setItem(PKEY,JSON.stringify(PHOTOS));}catch(e){alert('Stockage plein.');}}
+const PKEY='corse2026-photos';
+let PHOTOS=[];
+if(!localStorage.getItem('fb-config')){try{PHOTOS=JSON.parse(localStorage.getItem(PKEY)||'[]');}catch(e){PHOTOS=[];}}
+function savePhotos(){try{localStorage.setItem(PKEY,JSON.stringify(PHOTOS));}catch(e){}}
 const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,7);
 const FileDB=(()=>{let p;
   function open(){if(p)return p;p=new Promise((res,rej)=>{const r=indexedDB.open('corse-photos',1);r.onupgradeneeded=e=>{const db=e.target.result;if(!db.objectStoreNames.contains('files'))db.createObjectStore('files',{keyPath:'id'});};r.onsuccess=()=>res(r.result);r.onerror=()=>rej(r.error);});return p;}
   function tx(mode,fn){return open().then(db=>new Promise((res,rej)=>{const t=db.transaction('files',mode);const s=t.objectStore('files');const rq=fn(s);t.oncomplete=()=>res(rq&&rq.result);t.onerror=()=>rej(t.error);}));}
   return{put:f=>tx('readwrite',s=>s.put(f)),get:id=>tx('readonly',s=>s.get(id)),del:id=>tx('readwrite',s=>s.delete(id))};
 })();
-function renderAlbum(){const link=localStorage.getItem(AKEY)||'';const el=document.getElementById('album-card');if(!el)return;if(link){el.innerHTML='<a class="album-open" href="'+link+'" target="_blank" rel="noopener">📲 Ouvrir l\'album partagé de la Team</a><div class="album-sub">✅ <b>La seule vraie synchro Team.</b> Ouvre l\'album, touche <b>➕</b> dans Photos et choisis tes photos : elles apparaissent automatiquement pour tout le monde.</div><button class="album-edit" onclick="setAlbum()">Modifier le lien</button>';}else{el.innerHTML='<div class="album-empty"><div class="album-emoji">📲</div><div class="album-txt">Pour partager les photos avec toute la Team, colle le lien de ton <b>album partagé iCloud</b> :</div><div class="album-steps">1. App <b>Photos</b> → onglet <b>Albums</b> → <b>+</b> → <b>Nouvel album partagé</b><br>2. Invite la Team<br>3. Dans l\'album → <b>···</b> → <b>Lien public</b><br>4. Colle-le ici 👇</div><button class="album-set" onclick="setAlbum()">＋ Ajouter le lien de l\'album</button></div>';}}
-function setAlbum(){const cur=localStorage.getItem(AKEY)||'';const v=prompt('Lien album partagé iCloud :',cur);if(v===null)return;if(v.trim())localStorage.setItem(AKEY,v.trim());else localStorage.removeItem(AKEY);renderAlbum();}
 function pickFiles(){return new Promise(res=>{const i=document.createElement('input');i.type='file';i.accept='image/*';i.multiple=true;i.onchange=()=>res([...i.files]);i.click();});}
 function downscale(file,max){return new Promise(res=>{const img=new Image();img.onload=()=>{let w=img.width,h=img.height;if(Math.max(w,h)>max){const r=max/Math.max(w,h);w=Math.round(w*r);h=Math.round(h*r);}const c=document.createElement('canvas');c.width=w;c.height=h;c.getContext('2d').drawImage(img,0,0,w,h);c.toBlob(b=>res(b||file),'image/jpeg',.85);};img.onerror=()=>res(file);img.src=URL.createObjectURL(file);});}
 async function addPhotos(){
   const files=await pickFiles();if(!files.length)return;
-  for(const f of files){const id=uid();const blob=await downscale(f,1800);await FileDB.put({id,blob});PHOTOS.unshift({id,date:Date.now()});}
-  savePhotos();renderPhotos();
+  const btn=document.getElementById('btn-add-photo');
+  if(btn){btn.disabled=true;btn.textContent='Envoi en cours...';}
+  try{
+    if(_isFbReady()){
+      for(const f of files){
+        const id=uid();
+        const blob=await downscale(f,1800);
+        const ref=_fbSt.ref('photos/'+id+'.jpg');
+        await ref.put(blob,{contentType:'image/jpeg'});
+        const url=await ref.getDownloadURL();
+        await _fbDb.collection('photos').doc(id).set({id,url,date:Date.now()});
+      }
+      /* listener auto-updates grid */
+    }else{
+      for(const f of files){const id=uid();const blob=await downscale(f,1800);await FileDB.put({id,blob});PHOTOS.unshift({id,date:Date.now()});}
+      savePhotos();renderPhotos();
+    }
+  }catch(e){alert('Erreur : '+e.message);}
+  finally{if(btn){btn.disabled=false;btn.textContent='＋ Ajouter une photo';}}
 }
 let _urls=[];
-async function renderPhotos(){const grid=document.getElementById('photo-grid');if(!grid)return;_urls.forEach(u=>URL.revokeObjectURL(u));_urls=[];if(!PHOTOS.length){grid.innerHTML='<div class="photo-empty">Aucune photo pour l\'instant 📷<br>Ajoutez vos plus beaux souvenirs !</div>';return;}grid.innerHTML=PHOTOS.map(p=>'<div class="photo-cell" data-id="'+p.id+'"><img loading="lazy" alt=""></div>').join('');for(const p of PHOTOS){const f=await FileDB.get(p.id);if(!f)continue;const url=URL.createObjectURL(f.blob);_urls.push(url);const cell=grid.querySelector('.photo-cell[data-id="'+p.id+'"]');if(cell){cell.querySelector('img').src=url;cell.onclick=()=>openLightbox(p.id,url);}}}
+async function renderPhotos(){
+  const grid=document.getElementById('photo-grid');if(!grid)return;
+  if(!PHOTOS.length){grid.innerHTML='<div class="photo-empty">Aucune photo pour l\'instant 📷<br>Soyez les premiers à immortaliser la Corse !</div>';return;}
+  if(_isFbReady()){
+    grid.innerHTML=PHOTOS.map(p=>'<div class="photo-cell" data-id="'+p.id+'"><img loading="lazy" src="'+p.url+'" alt=""></div>').join('');
+    grid.querySelectorAll('.photo-cell').forEach(cell=>{const id=cell.dataset.id;const p=PHOTOS.find(x=>x.id===id);if(p)cell.onclick=()=>openLightbox(p.id,p.url);});
+  }else{
+    _urls.forEach(u=>URL.revokeObjectURL(u));_urls=[];
+    grid.innerHTML=PHOTOS.map(p=>'<div class="photo-cell" data-id="'+p.id+'"><img loading="lazy" alt=""></div>').join('');
+    for(const p of PHOTOS){const f=await FileDB.get(p.id);if(!f)continue;const url=URL.createObjectURL(f.blob);_urls.push(url);const cell=grid.querySelector('.photo-cell[data-id="'+p.id+'"]');if(cell){cell.querySelector('img').src=url;cell.onclick=()=>openLightbox(p.id,url);}}
+  }
+}
 let _cur=null;
 function openLightbox(id,url,col){_cur={id,url,col:col||'photos'};document.getElementById('lb-img').innerHTML='<img src="'+url+'" alt="">';document.getElementById('lightbox').classList.add('open');}
 function closeLightbox(){document.getElementById('lightbox').classList.remove('open');document.getElementById('lb-img').innerHTML='';_cur=null;}
-async function blobOf(id){const f=await FileDB.get(id);return f?f.blob:null;}
+async function blobOf(id){
+  if(_isFbReady()){
+    const ph=PHOTOS.find(x=>x.id===id)||(_cur&&_cur.id===id?_cur:null);
+    if(ph&&ph.url){try{const r=await fetch(ph.url);if(r.ok)return await r.blob();}catch(e){}}
+    return null;
+  }
+  const f=await FileDB.get(id);return f?f.blob:null;
+}
 async function downloadCurrent(){if(!_cur)return;const b=await blobOf(_cur.id);if(!b)return;const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='corse-'+_cur.id+'.jpg';document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),1500);}
 async function shareCurrent(){if(!_cur)return;const b=await blobOf(_cur.id);if(!b)return;try{const file=new File([b],'corse-'+_cur.id+'.jpg',{type:'image/jpeg'});if(navigator.canShare&&navigator.canShare({files:[file]})){await navigator.share({files:[file]});return;}}catch(e){if(e.name==='AbortError')return;}downloadCurrent();}
-async function shareAll(){
-  if(!PHOTOS.length){alert('Ajoutez d\'abord des photos dans l\'app.');return;}
-  try{
-    const files=[];
-    for(const p of PHOTOS){const b=await blobOf(p.id);if(b)files.push(new File([b],'corse-'+p.id+'.jpg',{type:'image/jpeg'}));}
-    if(navigator.canShare&&navigator.canShare({files})){await navigator.share({files,title:'Photos Corse 2026'});return;}
-  }catch(e){if(e.name==='AbortError')return;}
-  alert('Le partage groupé n\'est pas dispo ici — ouvrez une photo et utilisez ⤴ pour l\'envoyer dans l\'album.');
-}
-async function deleteCurrent(){if(!_cur)return;if(!confirm('Supprimer cette photo ?'))return;await FileDB.del(_cur.id);
-  if(_cur.col==='maison'){HOUSE_PHOTOS=HOUSE_PHOTOS.filter(p=>p.id!==_cur.id);saveHouse();closeLightbox();renderHouse();}
-  else{PHOTOS=PHOTOS.filter(p=>p.id!==_cur.id);savePhotos();closeLightbox();renderPhotos();}
+async function deleteCurrent(){if(!_cur)return;if(!confirm('Supprimer cette photo ?'))return;
+  if(_cur.col==='maison'){await FileDB.del(_cur.id);HOUSE_PHOTOS=HOUSE_PHOTOS.filter(p=>p.id!==_cur.id);saveHouse();closeLightbox();renderHouse();}
+  else if(_isFbReady()){
+    try{await _fbDb.collection('photos').doc(_cur.id).delete();try{await _fbSt.ref('photos/'+_cur.id+'.jpg').delete();}catch(e){}}
+    catch(e){alert('Erreur suppression.');}
+    closeLightbox();/* listener auto-updates grid */
+  }else{await FileDB.del(_cur.id);PHOTOS=PHOTOS.filter(p=>p.id!==_cur.id);savePhotos();closeLightbox();renderPhotos();}
 }
 window.addEventListener('keydown',e=>{if(e.key==='Escape')closeLightbox();});
 

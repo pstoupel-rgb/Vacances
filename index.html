@@ -789,8 +789,10 @@
   <div class="page-hero"><h2>Souvenirs</h2><p>Photos de la Team Corse 2026</p></div>
   <div class="section" style="padding-top:0">
     <div class="album-card" id="album-card"></div>
-    <button class="btn-add" onclick="addPhotos()">＋ Ajouter une photo</button>
-    <p class="photo-hint">Après la sélection, la feuille de partage s'ouvre automatiquement — touche <b>l'album partagé</b> et c'est synchronisé pour toute la Team.<br><span style="font-size:.68rem;color:#aaa">Photos stockées localement sur cet appareil.</span></p>
+
+    <div class="frais-label" style="margin-top:16px">📱 Galerie dans l'app</div>
+    <button class="btn-add" onclick="addPhotos()">＋ Ajouter une photo dans l'app</button>
+    <p class="photo-hint">⚠️ Ces photos restent <b>dans l'app, sur ton téléphone</b> — l'iPhone n'autorise pas une app web à les déposer toute seule dans l'album partagé. Pour les envoyer à la Team : ouvre une photo et touche <b>⤴</b>, ou ajoute-les directement dans l'<b>album partagé</b> ci-dessus.</p>
     <div class="photo-grid" id="photo-grid"></div>
   </div>
   <div class="wave">🌊🌴☀️🌊🌴</div>
@@ -958,22 +960,14 @@ const FileDB=(()=>{let p;
   function tx(mode,fn){return open().then(db=>new Promise((res,rej)=>{const t=db.transaction('files',mode);const s=t.objectStore('files');const rq=fn(s);t.oncomplete=()=>res(rq&&rq.result);t.onerror=()=>rej(t.error);}));}
   return{put:f=>tx('readwrite',s=>s.put(f)),get:id=>tx('readonly',s=>s.get(id)),del:id=>tx('readwrite',s=>s.delete(id))};
 })();
-function renderAlbum(){const link=localStorage.getItem(AKEY)||'';const el=document.getElementById('album-card');if(!el)return;if(link){el.innerHTML='<a class="album-open" href="'+link+'" target="_blank" rel="noopener">📲 Ouvrir l\'album partagé</a><div class="album-sub">📸 Dès que tu ajoutes une photo, la feuille de partage s\'ouvre — touche l\'<b>album partagé</b> et toute la Team la voit instantanément.</div><button class="album-edit" onclick="setAlbum()">Modifier le lien</button>';}else{el.innerHTML='<div class="album-empty"><div class="album-emoji">📲</div><div class="album-txt">Colle le lien de ton <b>album partagé iCloud</b> pour que les photos soient visibles par toute la Team :</div><button class="album-set" onclick="setAlbum()">＋ Ajouter le lien de l\'album</button></div>';}}
+function renderAlbum(){const link=localStorage.getItem(AKEY)||'';const el=document.getElementById('album-card');if(!el)return;if(link){el.innerHTML='<a class="album-open" href="'+link+'" target="_blank" rel="noopener">📲 Ouvrir l\'album partagé de la Team</a><div class="album-sub">✅ <b>La seule vraie synchro Team.</b> Ouvre l\'album, touche <b>➕</b> dans Photos et choisis tes photos : elles apparaissent automatiquement pour tout le monde.</div><button class="album-edit" onclick="setAlbum()">Modifier le lien</button>';}else{el.innerHTML='<div class="album-empty"><div class="album-emoji">📲</div><div class="album-txt">Pour partager les photos avec toute la Team, colle le lien de ton <b>album partagé iCloud</b> :</div><div class="album-steps">1. App <b>Photos</b> → onglet <b>Albums</b> → <b>+</b> → <b>Nouvel album partagé</b><br>2. Invite la Team<br>3. Dans l\'album → <b>···</b> → <b>Lien public</b><br>4. Colle-le ici 👇</div><button class="album-set" onclick="setAlbum()">＋ Ajouter le lien de l\'album</button></div>';}}
 function setAlbum(){const cur=localStorage.getItem(AKEY)||'';const v=prompt('Lien album partagé iCloud :',cur);if(v===null)return;if(v.trim())localStorage.setItem(AKEY,v.trim());else localStorage.removeItem(AKEY);renderAlbum();}
 function pickFiles(){return new Promise(res=>{const i=document.createElement('input');i.type='file';i.accept='image/*';i.multiple=true;i.onchange=()=>res([...i.files]);i.click();});}
 function downscale(file,max){return new Promise(res=>{const img=new Image();img.onload=()=>{let w=img.width,h=img.height;if(Math.max(w,h)>max){const r=max/Math.max(w,h);w=Math.round(w*r);h=Math.round(h*r);}const c=document.createElement('canvas');c.width=w;c.height=h;c.getContext('2d').drawImage(img,0,0,w,h);c.toBlob(b=>res(b||file),'image/jpeg',.85);};img.onerror=()=>res(file);img.src=URL.createObjectURL(file);});}
 async function addPhotos(){
   const files=await pickFiles();if(!files.length)return;
-  const added=[];
-  for(const f of files){const id=uid();const blob=await downscale(f,1800);await FileDB.put({id,blob});PHOTOS.unshift({id,date:Date.now()});added.push({id,blob});}
+  for(const f of files){const id=uid();const blob=await downscale(f,1800);await FileDB.put({id,blob});PHOTOS.unshift({id,date:Date.now()});}
   savePhotos();renderPhotos();
-  /* Partage automatique vers l'album partagé dès l'ajout */
-  if(navigator.canShare){
-    try{
-      const shareFiles=added.map(({id,blob})=>new File([blob],'corse-'+id+'.jpg',{type:'image/jpeg'}));
-      if(navigator.canShare({files:shareFiles})){await navigator.share({files:shareFiles,title:'Corse 2026 📸'});}
-    }catch(e){}
-  }
 }
 let _urls=[];
 async function renderPhotos(){const grid=document.getElementById('photo-grid');if(!grid)return;_urls.forEach(u=>URL.revokeObjectURL(u));_urls=[];if(!PHOTOS.length){grid.innerHTML='<div class="photo-empty">Aucune photo pour l\'instant 📷<br>Ajoutez vos plus beaux souvenirs !</div>';return;}grid.innerHTML=PHOTOS.map(p=>'<div class="photo-cell" data-id="'+p.id+'"><img loading="lazy" alt=""></div>').join('');for(const p of PHOTOS){const f=await FileDB.get(p.id);if(!f)continue;const url=URL.createObjectURL(f.blob);_urls.push(url);const cell=grid.querySelector('.photo-cell[data-id="'+p.id+'"]');if(cell){cell.querySelector('img').src=url;cell.onclick=()=>openLightbox(p.id,url);}}}

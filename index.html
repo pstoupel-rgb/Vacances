@@ -143,6 +143,24 @@
   .reco-tile span{position:absolute;bottom:7px;left:9px;color:#fff;font-size:.74rem;font-weight:600;z-index:1;}
   .home-link{width:100%;background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:13px 16px;font-family:'Inter',sans-serif;font-weight:700;font-size:.92rem;color:var(--brown);text-align:left;box-shadow:var(--shadow);cursor:pointer;display:flex;justify-content:space-between;align-items:center;}
   .home-link:active{transform:scale(.98);}
+  /* ===== LISTE DE COURSES ===== */
+  .courses-days{display:flex;gap:7px;overflow-x:auto;padding:0 16px 2px;scrollbar-width:none;-webkit-overflow-scrolling:touch;scroll-snap-type:x mandatory;}
+  .courses-days::-webkit-scrollbar{display:none;}
+  .cd-tab{flex:0 0 auto;scroll-snap-align:start;background:var(--card);border:1.5px solid var(--border);border-radius:20px;padding:6px 13px;font-family:'Inter',sans-serif;font-size:.78rem;font-weight:600;color:var(--muted);cursor:pointer;white-space:nowrap;transition:background .14s,color .14s,border-color .14s;}
+  .cd-tab.active{background:var(--brown);border-color:var(--brown);color:#fff;}
+  .courses-list{margin:14px 0 10px;display:flex;flex-direction:column;gap:8px;min-height:80px;}
+  .courses-empty{text-align:center;color:var(--muted);font-size:.82rem;padding:28px 10px;line-height:1.6;}
+  .courses-item{display:flex;align-items:center;gap:10px;background:var(--card);border:1px solid var(--border);border-radius:12px;padding:11px 10px 11px 12px;box-shadow:var(--shadow);}
+  .courses-item.done .ci-text{text-decoration:line-through;color:var(--muted);}
+  .ci-check{background:none;border:none;font-size:1.15rem;cursor:pointer;flex-shrink:0;line-height:1;}
+  .ci-text{flex:1;font-size:.9rem;color:var(--text);word-break:break-word;-webkit-user-select:text;user-select:text;}
+  .ci-del{background:none;border:none;font-size:1.3rem;color:#ccc;cursor:pointer;padding:0 2px;flex-shrink:0;line-height:1;}
+  .ci-del:active{color:#e25;}
+  .courses-add{display:flex;gap:8px;margin-top:6px;}
+  .courses-add input{flex:1;background:var(--card);border:1.5px solid var(--border);border-radius:12px;padding:11px 14px;font-family:'Inter',sans-serif;font-size:.9rem;color:var(--text);outline:none;-webkit-user-select:text;user-select:text;}
+  .courses-add input:focus{border-color:var(--caramel);}
+  .courses-add button{background:var(--brown);color:#fff;border:none;border-radius:12px;padding:11px 16px;font-size:1.2rem;font-weight:700;cursor:pointer;}
+  .ci-cam-btn{background:rgba(255,255,255,.55);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);border:none;color:#3a3a3a;font-size:1.2rem;cursor:pointer;width:38px;height:38px;border-radius:50%;display:grid;place-items:center;box-shadow:0 2px 8px rgba(0,0,0,.12);}
 
   /* ===== MÉTÉO ===== */
   .weather-wrap{padding:16px 16px 0;}
@@ -360,7 +378,7 @@
           <button class="menu-item" onclick="openTeam()"><span class="mi-ico">👥</span>LA TEAM</button>
         </div>
       </div>
-      <span>🔔</span>
+      <button class="ci-cam-btn" onclick="showPage('photos',null)" aria-label="Photos">📷</button>
     </div>
     <div class="hero-title"><h1>Corse 2026</h1><p>14 jours d'évasion ✴️</p></div>
   </div>
@@ -390,9 +408,24 @@
   </div>
 
   <div class="reco-section">
-    <button class="home-link" onclick="showPage('photos',null)"><span>📸 Nos souvenirs photos</span><span>→</span></button>
+    <button class="home-link" onclick="showPage('courses',null)"><span>🛒 Liste de courses</span><span>→</span></button>
   </div>
 
+  <div class="wave">🌊🌴☀️🌊🌴</div>
+  <footer>Fait avec ❤️ pour la <strong>Team Corse 2026</strong></footer>
+</div>
+
+<!-- ========== LISTE DE COURSES ========== -->
+<div class="page page-content" id="page-courses">
+  <div class="page-hero"><h2>Liste de courses</h2><p>Par jour · modifiable par toute la Team</p></div>
+  <div class="courses-days" id="courses-days"></div>
+  <div class="section" style="padding-top:10px">
+    <div class="courses-list" id="courses-list"></div>
+    <div class="courses-add">
+      <input id="courses-input" type="text" placeholder="Ajouter un article…" autocomplete="off" onkeydown="if(event.key==='Enter')addCourse()">
+      <button onclick="addCourse()">＋</button>
+    </div>
+  </div>
   <div class="wave">🌊🌴☀️🌊🌴</div>
   <footer>Fait avec ❤️ pour la <strong>Team Corse 2026</strong></footer>
 </div>
@@ -1003,7 +1036,7 @@ function cropConfirm(){
 function cropCancel(){const c=_crop;_cropClose();if(c)c.resolve(null);}
 function _cropClose(){const ov=document.getElementById('crop-overlay');if(ov)ov.classList.remove('open');if(_crop&&_crop.url)URL.revokeObjectURL(_crop.url);_crop=null;}
 
-const NAV_TITLES={home:'Corse 2026',planning:'Planning',carte:'Carte',profil:'Profil',photos:'Souvenirs',maison:'La Maison'};
+const NAV_TITLES={home:'Corse 2026',planning:'Planning',carte:'Carte',profil:'Profil',photos:'Souvenirs',maison:'La Maison',courses:'Liste de courses'};
 function showPage(name,btn,filter){
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
   document.getElementById('page-'+name).classList.add('active');
@@ -1013,6 +1046,7 @@ function showPage(name,btn,filter){
   if(name==='home'){renderProgram();}
   if(name==='maison'){renderHouse();}
   if(name==='profil'){renderFrais();}
+  if(name==='courses'){initCourses();}
   window.__page=name;
   const nb=document.getElementById('navbar');
   if(nb){nb.classList.remove('show');document.getElementById('navbar-title').textContent=NAV_TITLES[name]||'Corse 2026';}
@@ -1138,6 +1172,47 @@ async function initMap(){
   }catch(e){
     document.getElementById('map').innerHTML='<div style="display:grid;place-items:center;height:100%;color:#888;font-size:.82rem;text-align:center;padding:16px">🌐 Carte indisponible hors-ligne.<br>Les adresses ci-dessous restent accessibles.</div>';
   }
+}
+
+/* ===== LISTE DE COURSES ===== */
+const CKEY='corse2026-courses';
+let CDATA={};try{CDATA=JSON.parse(localStorage.getItem(CKEY)||'{}');}catch(e){CDATA={};}
+let CDAY=0;
+const C_DAYS=['Sam 4/7','Dim 5/7','Lun 6/7','Mar 7/7','Mer 8/7','Jeu 9/7','Ven 10/7','Sam 11/7','Dim 12/7','Lun 13/7','Mar 14/7','Mer 15/7','Jeu 16/7','Ven 17/7','Sam 18/7'];
+const C_START=new Date('2026-07-04T00:00:00');
+function saveCourses(){try{localStorage.setItem(CKEY,JSON.stringify(CDATA));}catch(e){}}
+function initCourses(){
+  const bar=document.getElementById('courses-days');if(!bar)return;
+  const today=new Date();const diff=Math.floor((today-C_START)/(864e5));
+  CDAY=Math.max(0,Math.min(14,diff));
+  bar.innerHTML=C_DAYS.map((d,i)=>'<button class="cd-tab'+(i===CDAY?' active':'')+'" onclick="selectDay('+i+')">'+d+'</button>').join('');
+  renderCoursesList();
+  requestAnimationFrame(()=>{const t=bar.children[CDAY];if(t)t.scrollIntoView({behavior:'smooth',block:'nearest',inline:'center'});});
+}
+function selectDay(i){
+  CDAY=i;
+  document.querySelectorAll('#courses-days .cd-tab').forEach((t,j)=>t.classList.toggle('active',j===i));
+  renderCoursesList();
+}
+function renderCoursesList(){
+  const el=document.getElementById('courses-list');if(!el)return;
+  const items=CDATA[CDAY]||[];
+  if(!items.length){el.innerHTML='<div class="courses-empty">Aucun article pour ce jour 🛒<br>Ajoutez les courses à faire !</div>';return;}
+  el.innerHTML=items.map(it=>'<div class="courses-item'+(it.done?' done':'')+'" data-id="'+it.id+'"><button class="ci-check" onclick="toggleCourse(\''+it.id+'\')">'+(it.done?'✅':'⬜')+'</button><span class="ci-text">'+escHtml(it.text)+'</span><button class="ci-del" onclick="delCourse(\''+it.id+'\')">×</button></div>').join('');
+}
+function addCourse(){
+  const inp=document.getElementById('courses-input');const text=inp.value.trim();if(!text)return;
+  if(!CDATA[CDAY])CDATA[CDAY]=[];
+  CDATA[CDAY].push({id:uid(),text,done:false});
+  saveCourses();inp.value='';renderCoursesList();
+}
+function toggleCourse(id){
+  const items=CDATA[CDAY]||[];const it=items.find(x=>x.id===id);if(it)it.done=!it.done;
+  saveCourses();renderCoursesList();
+}
+function delCourse(id){
+  if(!CDATA[CDAY])return;CDATA[CDAY]=CDATA[CDAY].filter(x=>x.id!==id);
+  saveCourses();renderCoursesList();
 }
 
 /* ===== FIREBASE SYNC ===== */

@@ -1,5 +1,5 @@
-/* Service Worker — cache l'app pour un usage 100% hors-ligne.
-   Actif uniquement quand l'app est hébergée en HTTPS (GitHub Pages, etc.). */
+/* Service Worker — network-first pour HTML (toujours la dernière version),
+   cache-first pour les assets statiques (offline OK). */
 const CACHE = 'corse-2026-v5';
 const ASSETS = [
   './',
@@ -21,6 +21,21 @@ self.addEventListener('activate', e => {
 
 self.addEventListener('fetch', e => {
   if (e.request.method !== 'GET') return;
+
+  /* Navigation (HTML) → network-first : toujours la dernière version si connexion,
+     sinon fallback cache pour l'offline. */
+  if (e.request.mode === 'navigate') {
+    e.respondWith(
+      fetch(e.request).then(res => {
+        const copy = res.clone();
+        caches.open(CACHE).then(c => c.put(e.request, copy));
+        return res;
+      }).catch(() => caches.match(e.request))
+    );
+    return;
+  }
+
+  /* Autres assets (icône, manifest, images…) → cache-first. */
   e.respondWith(
     caches.match(e.request).then(cached => {
       const fetched = fetch(e.request).then(res => {

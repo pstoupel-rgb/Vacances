@@ -208,23 +208,40 @@
   .fam-flight .fl-ic{font-size:1rem;flex-shrink:0;}
   .fam-flight b{color:var(--text);font-weight:600;}
 
-  /* ===== WISE + SOLDES ===== */
-  .wise-row{display:flex;align-items:center;gap:12px;}
-  .wise-num{font-size:.98rem;font-weight:700;color:var(--brown);letter-spacing:.5px;word-break:break-all;flex:1;}
-  .wise-num.empty{color:var(--muted);font-weight:400;font-size:.85rem;}
-  .wise-copy-btn{background:var(--brown);color:#fff;border:none;border-radius:10px;padding:9px 15px;font-size:.78rem;font-weight:700;cursor:pointer;flex-shrink:0;transition:opacity .15s;}
-  .wise-copy-btn:active{opacity:.85;}
-  .wise-edit{display:block;background:none;border:none;color:var(--muted);text-decoration:underline;font-size:.75rem;cursor:pointer;margin-top:8px;font-family:'Inter',sans-serif;}
-  .balance-table{width:100%;border-collapse:collapse;}
-  .balance-table th{font-size:.66rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.4px;padding:0 4px 8px;}
-  .balance-table th:last-child{text-align:right;}
-  .balance-table td{padding:10px 4px;border-top:1px solid var(--border);font-size:.88rem;vertical-align:middle;}
-  .balance-table td:last-child{text-align:right;font-weight:700;font-size:.95rem;cursor:pointer;}
-  .balance-table td:last-child:active{opacity:.6;}
-  .amt-due{color:#c0392b;}
-  .amt-ok{color:#2a7d4f;}
-  .amt-zero{color:var(--muted);font-weight:400!important;}
-  .bal-dot{width:10px;height:10px;border-radius:50%;display:inline-block;margin-right:7px;vertical-align:middle;}
+  /* ===== PARTAGE DES FRAIS ===== */
+  .wise-box{display:flex;align-items:center;gap:10px;background:#e4f3ec;border-color:#c7e6d6;}
+  .wise-label{font-size:.7rem;color:#0f6e56;font-weight:600;}
+  .wise-iban{font-size:1rem;font-weight:700;color:#085041;letter-spacing:.05em;font-family:ui-monospace,Menlo,monospace;margin-top:2px;-webkit-user-select:text;user-select:text;}
+  .copy-btn{margin-left:auto;font-size:.72rem;font-weight:700;color:#fff;background:#1d9e75;border:none;border-radius:8px;padding:9px 14px;cursor:pointer;white-space:nowrap;flex-shrink:0;}
+  .copy-btn:active{opacity:.85;}
+  .frais-label{font-size:.7rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin:4px 2px 8px;}
+  .frais-table{width:100%;border-collapse:collapse;font-size:.76rem;}
+  .frais-table th{font-size:.58rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.03em;padding:9px 6px;text-align:right;border-bottom:1px solid var(--border);}
+  .frais-table th:first-child{text-align:left;}
+  .frais-table td{padding:9px 6px;text-align:right;border-bottom:1px solid var(--border);}
+  .frais-table td:first-child{text-align:left;font-weight:600;}
+  .frais-table tbody tr:last-child td{border-bottom:none;}
+  .frais-table .total-row td{font-weight:700;border-top:1.5px solid var(--caramel);background:var(--bg);}
+  .neg{color:#c0392b;font-weight:700;}
+  .ok{color:#2a7d4f;font-weight:700;}
+  .ftag{display:inline-block;font-size:.56rem;font-weight:700;padding:2px 5px;border-radius:5px;margin-left:4px;vertical-align:middle;}
+  .ftag-s1{background:#e6f1fb;color:#185fa5;}
+  .ftag-s2{background:#fef3e2;color:#854f0b;}
+  .ftag-both{background:#f0ebf8;color:#5e3a8c;}
+  .compte-row{display:grid;grid-template-columns:1fr auto auto;align-items:center;gap:8px;font-size:.84rem;padding:9px 0;border-bottom:1px solid var(--border);}
+  .compte-row:last-of-type{border-bottom:none;}
+  .compte-label{color:var(--text);}
+  .compte-montant{text-align:right;font-variant-numeric:tabular-nums;font-weight:600;}
+  .del-btn{background:none;border:none;color:var(--border);cursor:pointer;font-size:1.15rem;line-height:1;padding:0 2px;}
+  .del-btn:active{color:#c0392b;}
+  .compte-final{display:grid;grid-template-columns:1fr auto;font-size:1.05rem;font-weight:700;padding-top:12px;margin-top:6px;border-top:1.5px solid var(--caramel);}
+  .compte-final span:last-child{text-align:right;font-variant-numeric:tabular-nums;}
+  .add-title{font-size:.85rem;font-weight:700;margin-bottom:10px;}
+  .add-form{display:flex;gap:8px;flex-wrap:wrap;}
+  .add-form input{flex:1;min-width:110px;padding:10px;border:1px solid var(--border);border-radius:9px;font-size:.84rem;background:var(--bg);font-family:'Inter',sans-serif;-webkit-user-select:text;user-select:text;}
+  .add-form input:focus{outline:none;border-color:#1d9e75;background:#fff;}
+  .add-btn{padding:10px 18px;background:var(--brown);color:#fff;border:none;border-radius:9px;font-size:.84rem;font-weight:700;cursor:pointer;white-space:nowrap;font-family:'Inter',sans-serif;}
+  .add-btn:active{opacity:.85;}
 
   .wave{text-align:center;font-size:1.5rem;margin:14px 0 4px;letter-spacing:4px;opacity:.6;}
   footer{text-align:center;padding:12px 16px;font-size:.78rem;color:var(--muted);}
@@ -674,23 +691,43 @@
   </div>
 
   <div class="section">
-    <div class="section-hdr">💳 Compte Wise — remboursements</div>
-    <div class="fam-card">
-      <div class="wise-row">
-        <span style="font-size:1.5rem">💳</span>
-        <div style="flex:1;min-width:0">
-          <div style="font-size:.68rem;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.4px;margin-bottom:4px">Numéro de compte</div>
-          <div class="wise-num" id="wise-num">Non défini</div>
-        </div>
-        <button class="wise-copy-btn" onclick="copyWise()">Copier</button>
+    <div class="section-hdr">💳 Partage des frais</div>
+
+    <div class="fam-card wise-box">
+      <div style="min-width:0">
+        <div class="wise-label">Virement Wise</div>
+        <div class="wise-iban" id="wise-iban">BE85 9677 5015 3506</div>
       </div>
-      <button class="wise-edit" onclick="editWise()">✏️ Modifier le numéro</button>
+      <button class="copy-btn" onclick="copyIban(this)">Copier</button>
+    </div>
+
+    <div class="frais-label">Familles</div>
+    <div class="fam-card" style="padding:0;overflow:hidden">
+      <table class="frais-table">
+        <thead><tr><th>Famille</th><th>Dû</th><th>Payé</th><th>Reste</th></tr></thead>
+        <tbody>
+          <tr><td>Philou <span class="ftag ftag-both">S1+S2</span></td><td>11 000 €</td><td>11 000 €</td><td class="ok">✓</td></tr>
+          <tr><td>Oliver <span class="ftag ftag-s1">S1</span></td><td>5 500 €</td><td>3 333 €</td><td class="neg">2 167 €</td></tr>
+          <tr><td>Paulet <span class="ftag ftag-both">S1+S2</span></td><td>10 000 €</td><td>6 320 €</td><td class="neg">3 680 €</td></tr>
+          <tr><td>Greg <span class="ftag ftag-s2">S2</span></td><td>5 500 €</td><td>1 833 €</td><td class="neg">3 667 €</td></tr>
+          <tr class="total-row"><td>Total</td><td>32 000 €</td><td>22 486 €</td><td class="neg">9 514 €</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="frais-label">💰 Solde du compte Wise</div>
+    <div class="fam-card">
+      <div id="depenses-list"></div>
+      <div class="compte-final"><span>Solde actuel</span><span class="ok" id="solde">—</span></div>
     </div>
 
     <div class="fam-card">
-      <div style="font-weight:700;font-size:.88rem;color:var(--brown);margin-bottom:12px">💰 Montants dûs</div>
-      <table class="balance-table" id="balance-table"></table>
-      <button class="wise-edit" onclick="editAllAmts()">✏️ Modifier les soldes</button>
+      <div class="add-title">➕ Ajouter une dépense</div>
+      <div class="add-form">
+        <input type="text" id="dep-label" placeholder="Description (ex: courses)">
+        <input type="number" id="dep-montant" placeholder="Montant (€)" min="0" inputmode="decimal">
+        <button class="add-btn" onclick="ajouterDep()">Ajouter</button>
+      </div>
     </div>
   </div>
 
@@ -746,7 +783,7 @@ function showPage(name,btn){
   if(name==='photos'){renderAlbum();renderPhotos();}
   if(name==='carte'){initMap();}
   if(name==='home'){renderProgram();}
-  if(name==='profil'){renderWise();renderBalance();}
+  if(name==='profil'){renderFrais();}
   window.__page=name;
   const nb=document.getElementById('navbar');
   if(nb){nb.classList.remove('show');document.getElementById('navbar-title').textContent=NAV_TITLES[name]||'Corse 2026';}
@@ -935,65 +972,50 @@ async function loadWeather(){
 }
 loadWeather();
 
-/* 💳 WISE + SOLDES */
-const WKEY='corse2026-wise',BKEY='corse2026-balance';
-const FAM_COLORS={Stoupel:'#13A89E',Carniol:'#FF6B4A',Delhauteur:'#3FA66A',Etienne:'#FFB23E'};
-let BALANCE;
-try{BALANCE=JSON.parse(localStorage.getItem(BKEY))||null;}catch(e){BALANCE=null;}
-if(!BALANCE)BALANCE=[{fam:'Stoupel',amt:0},{fam:'Carniol',amt:0},{fam:'Delhauteur',amt:0},{fam:'Etienne',amt:0}];
-
-function renderWise(){
-  const n=localStorage.getItem(WKEY)||'';
-  const el=document.getElementById('wise-num');if(!el)return;
-  el.textContent=n||'Non défini — appuyez pour ajouter';
-  el.className='wise-num'+(n?'':' empty');
+/* 💳 PARTAGE DES FRAIS */
+const RECUS=22486;
+const DKEY='corse2026-depenses';
+const DEFAULT_DEPENSES=[
+  {label:'Maison payée',montant:11000},
+  {label:'Vin (2 × 540 €)',montant:1080},
+  {label:'Canyoning (2 × 100 €)',montant:200},
+  {label:'Bateau (2 × 1 000 €)',montant:2000},
+  {label:'Amazon',montant:296}
+];
+let DEPENSES;
+try{DEPENSES=JSON.parse(localStorage.getItem(DKEY));}catch(e){DEPENSES=null;}
+if(!Array.isArray(DEPENSES))DEPENSES=DEFAULT_DEPENSES.slice();
+function saveDepenses(){try{localStorage.setItem(DKEY,JSON.stringify(DEPENSES));}catch(e){}}
+const eur=n=>n.toLocaleString('fr-FR')+' €';
+function escHtml(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+function renderFrais(){
+  const list=document.getElementById('depenses-list');if(!list)return;
+  let html='<div class="compte-row"><span class="compte-label">Total reçu</span><span class="ok compte-montant">+ '+eur(RECUS)+'</span><span></span></div>';
+  DEPENSES.forEach((d,i)=>{
+    html+='<div class="compte-row"><span class="compte-label">'+escHtml(d.label)+'</span><span class="neg compte-montant">− '+eur(d.montant)+'</span><button class="del-btn" onclick="supprimerDep('+i+')" title="Supprimer">×</button></div>';
+  });
+  list.innerHTML=html;
+  const total=DEPENSES.reduce((s,d)=>s+(+d.montant||0),0);
+  const solde=RECUS-total;
+  const el=document.getElementById('solde');
+  if(el){el.textContent=eur(solde);el.className=solde>=0?'ok':'neg';}
 }
-function copyWise(){
-  const n=localStorage.getItem(WKEY)||'';
-  if(!n){editWise();return;}
-  const btn=document.querySelector('.wise-copy-btn');
-  if(navigator.clipboard){
-    navigator.clipboard.writeText(n).then(()=>{if(btn){const old=btn.textContent;btn.textContent='✓ Copié!';setTimeout(()=>btn.textContent=old,1600);}});
-  }else{
-    const ta=document.createElement('textarea');ta.value=n;document.body.appendChild(ta);ta.select();document.execCommand('copy');ta.remove();
-    if(btn){const old=btn.textContent;btn.textContent='✓ Copié!';setTimeout(()=>btn.textContent=old,1600);}
-  }
+function supprimerDep(i){if(!confirm('Supprimer cette dépense ?'))return;DEPENSES.splice(i,1);saveDepenses();renderFrais();}
+function ajouterDep(){
+  const li=document.getElementById('dep-label'),mi=document.getElementById('dep-montant');
+  const label=li.value.trim();const montant=parseFloat(String(mi.value).replace(',','.'));
+  if(!label||isNaN(montant)||montant<=0)return;
+  DEPENSES.push({label,montant:Math.round(montant*100)/100});saveDepenses();
+  li.value='';mi.value='';renderFrais();li.focus();
 }
-function editWise(){
-  const cur=localStorage.getItem(WKEY)||'';
-  const v=prompt('Numéro de compte Wise\n(ex: BE12 3456 7890 1234 ou email)',cur);
-  if(v===null)return;
-  if(v.trim())localStorage.setItem(WKEY,v.trim());else localStorage.removeItem(WKEY);
-  renderWise();
+function copyIban(btn){
+  const iban='BE85967750153506';
+  const done=()=>{const o=btn.textContent;btn.textContent='Copié ✓';setTimeout(()=>btn.textContent=o,2000);};
+  if(navigator.clipboard){navigator.clipboard.writeText(iban).then(done).catch(()=>{});}
+  else{const ta=document.createElement('textarea');ta.value=iban;document.body.appendChild(ta);ta.select();try{document.execCommand('copy');}catch(e){}ta.remove();done();}
 }
-function renderBalance(){
-  const tbl=document.getElementById('balance-table');if(!tbl)return;
-  tbl.innerHTML='<thead><tr><th style="text-align:left">Famille</th><th>Montant dû</th></tr></thead><tbody>'+
-    BALANCE.map((b,i)=>{
-      const cls=b.amt>0?'amt-due':b.amt<0?'amt-ok':'amt-zero';
-      const txt=b.amt>0?'+'+b.amt+' €':b.amt<0?b.amt+' €':'soldé ✓';
-      return '<tr><td><span class="bal-dot" style="background:'+FAM_COLORS[b.fam]+'"></span>'+b.fam+'</td><td class="'+cls+'" onclick="editAmt('+i+')">'+txt+'</td></tr>';
-    }).join('')+'</tbody>';
-}
-function editAmt(i){
-  const b=BALANCE[i];
-  const v=prompt('Montant dû par '+b.fam+' (€)\n+ = doit de l\'argent\n− = on lui doit\n0 = soldé',b.amt);
-  if(v===null)return;
-  const n=parseFloat(v.replace(',','.'));
-  if(!isNaN(n)){BALANCE[i].amt=Math.round(n*100)/100;try{localStorage.setItem(BKEY,JSON.stringify(BALANCE));}catch(e){}}
-  renderBalance();
-}
-function editAllAmts(){
-  for(let i=0;i<BALANCE.length;i++){
-    const b=BALANCE[i];
-    const v=prompt('Montant dû par '+b.fam+' (€) :',b.amt);
-    if(v===null)break;
-    const n=parseFloat(v.replace(',','.'));
-    if(!isNaN(n))BALANCE[i].amt=Math.round(n*100)/100;
-  }
-  try{localStorage.setItem(BKEY,JSON.stringify(BALANCE));}catch(e){}
-  renderBalance();
-}
+(function(){const mi=document.getElementById('dep-montant');if(mi)mi.addEventListener('keydown',e=>{if(e.key==='Enter')ajouterDep();});})();
+renderFrais();
 
 /* PWA + auto-update */
 if('serviceWorker' in navigator&&location.protocol==='https:'){

@@ -38,23 +38,35 @@
                      radial-gradient(circle at 90% 12%, rgba(19,168,158,.08), transparent 38%);
   }
 
-  /* ========== APP NAV (haut de page) ========== */
+  /* ========== TAB BAR (bas de page — style app iOS) ========== */
   .app-nav {
-    position:sticky; top:0; left:0; right:0;
-    background:var(--sunset); display:flex; z-index:100;
-    box-shadow:0 3px 14px rgba(230,79,46,.28);
+    position:fixed; bottom:0; left:0; right:0;
+    background:rgba(255,255,255,.86);
+    -webkit-backdrop-filter:saturate(180%) blur(18px);
+    backdrop-filter:saturate(180%) blur(18px);
+    display:flex; z-index:100;
+    border-top:1px solid rgba(241,226,207,.9);
+    box-shadow:0 -6px 24px rgba(180,110,60,.12);
+    padding-bottom:env(safe-area-inset-bottom);
   }
   .app-nav-btn {
-    flex:1; display:flex; flex-direction:column; align-items:center; gap:3px;
-    background:none; border:none; cursor:pointer; padding:11px 4px 9px;
-    color:rgba(255,255,255,.72); font-family:'Baloo 2','Inter',sans-serif;
-    border-bottom:3px solid transparent; transition:all .15s;
+    flex:1; display:flex; flex-direction:column; align-items:center; gap:4px;
+    background:none; border:none; cursor:pointer; padding:8px 4px 7px;
+    color:var(--muted); font-family:'Baloo 2','Inter',sans-serif;
+    transition:color .18s;
   }
-  .app-nav-btn.active { color:#fff; border-bottom-color:#fff; }
-  .app-nav-btn .nav-icon { font-size:1.35rem; }
-  .app-nav-btn .nav-label { font-size:.68rem; font-weight:700; letter-spacing:.3px; }
+  .app-nav-btn .nav-icon {
+    font-size:1.3rem; line-height:1; width:52px; height:30px;
+    display:flex; align-items:center; justify-content:center;
+    border-radius:16px; transition:transform .2s, background .2s;
+  }
+  .app-nav-btn.active { color:var(--coral-d); }
+  .app-nav-btn.active .nav-icon { background:var(--sand-2); transform:translateY(-1px) scale(1.06); }
+  .app-nav-btn:active .nav-icon { transform:scale(.92); }
+  .app-nav-btn .nav-label { font-size:.66rem; font-weight:800; letter-spacing:.2px; }
 
-  .page-content { padding-bottom:20px; }
+  /* place pour la tab bar fixe */
+  .page-content { padding-bottom:calc(78px + env(safe-area-inset-bottom)); }
 
   /* ========== HEADER ========== */
   header {
@@ -252,7 +264,7 @@
   </button>
   <button class="app-nav-btn" id="nav-gps" onclick="showPage('gps', this)">
     <span class="nav-icon">🗺️</span>
-    <span class="nav-label">Restos & Adresses</span>
+    <span class="nav-label">Adresses</span>
   </button>
   <button class="app-nav-btn" id="nav-photos" onclick="showPage('photos', this)">
     <span class="nav-icon">📸</span>
@@ -275,8 +287,8 @@
   <div class="weather-wrap">
     <div class="weather-card" id="weather-card">
       <div class="weather-head">
-        <span class="weather-title">☀️ Météo</span>
-        <span class="weather-loc">Zonza · Corse-du-Sud</span>
+        <span class="weather-title">☀️ Météo · 15 jours</span>
+        <span class="weather-loc">Porto-Vecchio →</span>
       </div>
       <div class="weather-strip" id="weather-strip"></div>
     </div>
@@ -733,15 +745,15 @@ async function deleteCurrent(){ if(!_cur) return; if(!confirm('Supprimer cette p
 window.addEventListener('keydown',e=>{ if(e.key==='Escape') closeLightbox(); });
 
 
-/* ☀️ MÉTÉO — Open-Meteo (gratuit, sans clé). Maison à Zonza. */
-const HOUSE = { lat:41.6532, lng:9.3511 };
+/* ☀️ MÉTÉO — Open-Meteo (gratuit, sans clé). Porto-Vecchio, prévision 15 jours. */
+const HOUSE = { lat:41.5912, lng:9.2795 };
 const WMO = {0:'☀️',1:'🌤️',2:'⛅',3:'☁️',45:'🌫️',48:'🌫️',51:'🌦️',53:'🌦️',55:'🌧️',61:'🌧️',63:'🌧️',65:'🌧️',71:'❄️',73:'❄️',75:'❄️',80:'🌦️',81:'🌧️',82:'⛈️',85:'🌨️',95:'⛈️',96:'⛈️',99:'⛈️'};
 function wmoE(c){ if(WMO[c]!=null) return WMO[c]; const ks=Object.keys(WMO).map(Number).sort((a,b)=>a-b); let b=ks[0]; for(const k of ks){ if(k<=c) b=k; } return WMO[b]||'🌈'; }
 async function loadWeather(){
   const strip = document.getElementById('weather-strip');
-  strip.innerHTML = Array.from({length:7}).map(()=>`<div class="w-day"><div class="skel" style="height:10px;width:30px;margin:0 auto 6px"></div><div class="skel" style="height:22px;width:22px;border-radius:50%;margin:0 auto 6px"></div><div class="skel" style="height:10px;width:26px;margin:0 auto"></div></div>`).join('');
+  strip.innerHTML = Array.from({length:8}).map(()=>`<div class="w-day"><div class="skel" style="height:10px;width:30px;margin:0 auto 6px"></div><div class="skel" style="height:22px;width:22px;border-radius:50%;margin:0 auto 6px"></div><div class="skel" style="height:10px;width:26px;margin:0 auto"></div></div>`).join('');
   try {
-    const url = `https://api.open-meteo.com/v1/forecast?latitude=${HOUSE.lat}&longitude=${HOUSE.lng}&daily=weathercode,temperature_2m_max,temperature_2m_min,precipitation_probability_max&timezone=auto&forecast_days=7`;
+    const url = `https://api.open-meteo.com/v1/forecast?latitude=${HOUSE.lat}&longitude=${HOUSE.lng}&daily=weathercode,temperature_2m_max,temperature_2m_min,precipitation_probability_max&timezone=auto&forecast_days=16`;
     const ctrl = new AbortController(); const to = setTimeout(()=>ctrl.abort(), 6000);
     const r = await fetch(url, { signal:ctrl.signal }); clearTimeout(to);
     if (!r.ok) throw new Error('api');
@@ -751,7 +763,7 @@ async function loadWeather(){
     strip.innerHTML = d.time.map((t,i)=>{
       const dt = new Date(t+'T00:00:00');
       return `<div class="w-day${t===today?' today':''}">
-        <div class="wn">${t===today?"Auj.":DN[dt.getDay()]}</div>
+        <div class="wn">${t===today?"Auj.":DN[dt.getDay()]+' '+dt.getDate()}</div>
         <div class="wi">${wmoE(d.weathercode[i])}</div>
         <div class="wh">${Math.round(d.temperature_2m_max[i])}°</div>
         <div class="wl">${Math.round(d.temperature_2m_min[i])}°</div>

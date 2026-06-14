@@ -1,6 +1,6 @@
 /* Service Worker — cache l'app pour un usage 100% hors-ligne.
    Actif uniquement quand l'app est hébergée en HTTPS (GitHub Pages, etc.). */
-const CACHE = 'corse-2026-v2';
+const CACHE = 'corse-2026-v3';
 const ASSETS = [
   './',
   './index.html',

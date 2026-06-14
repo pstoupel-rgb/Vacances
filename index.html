@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <title>Corse 2026 🏝️</title>
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
@@ -19,11 +19,37 @@
     --text:#222; --muted:#888; --brown:#8B5E3C; --caramel:#c8a882;
     --radius:15px; --shadow:0 5px 20px rgba(0,0,0,.07);
   }
-  body{font-family:'Inter',-apple-system,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;padding-top:env(safe-area-inset-top);}
+  html{-webkit-text-size-adjust:100%;}
+  body{font-family:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;padding-top:env(safe-area-inset-top);
+    -webkit-touch-callout:none;-webkit-user-select:none;user-select:none;overscroll-behavior-y:none;-webkit-overflow-scrolling:touch;}
+  a{-webkit-user-select:none;}
+
+  /* ===== SPLASH (écran de lancement, façon app native) ===== */
+  #splash{position:fixed;inset:0;z-index:9999;background:var(--bg);display:flex;align-items:center;justify-content:center;transition:opacity .45s ease;}
+  #splash.hide{opacity:0;pointer-events:none;}
+  .splash-inner{text-align:center;}
+  .splash-icon{font-size:4rem;animation:splashpop .6s cubic-bezier(.2,.8,.2,1);}
+  .splash-name{font-family:'Playfair Display',serif;font-size:1.9rem;font-weight:700;color:var(--brown);margin-top:6px;}
+  .splash-sub{font-size:.78rem;color:var(--muted);margin-top:2px;}
+  .splash-dots{display:flex;gap:6px;justify-content:center;margin-top:20px;}
+  .splash-dots span{width:7px;height:7px;border-radius:50%;background:var(--caramel);animation:splashdot 1s infinite;}
+  .splash-dots span:nth-child(2){animation-delay:.15s;}
+  .splash-dots span:nth-child(3){animation-delay:.3s;}
+  @keyframes splashpop{from{transform:scale(.6);opacity:0}to{transform:scale(1);opacity:1}}
+  @keyframes splashdot{0%,100%{opacity:.3;transform:translateY(0)}50%{opacity:1;transform:translateY(-4px)}}
+
+  /* ===== NAV BAR translucide (apparaît au scroll — réflexe iOS) ===== */
+  #navbar{position:fixed;top:0;left:0;right:0;z-index:150;padding-top:env(safe-area-inset-top);
+    height:calc(46px + env(safe-area-inset-top));display:flex;align-items:center;justify-content:center;
+    background:rgba(245,242,237,.8);-webkit-backdrop-filter:saturate(180%) blur(20px);backdrop-filter:saturate(180%) blur(20px);
+    border-bottom:1px solid rgba(0,0,0,.06);opacity:0;transform:translateY(-6px);transition:opacity .25s,transform .25s;pointer-events:none;}
+  #navbar.show{opacity:1;transform:none;}
+  #navbar-title{font-family:'Playfair Display',serif;font-weight:700;font-size:1.05rem;color:var(--text);}
 
   /* ===== BOTTOM NAV ===== */
-  .app-nav{position:fixed;bottom:0;left:0;right:0;height:65px;background:var(--bg);border-top:1px solid var(--border);display:flex;justify-content:space-around;align-items:center;z-index:200;padding-bottom:env(safe-area-inset-bottom);}
-  .app-nav-btn{background:none;border:none;cursor:pointer;text-align:center;color:var(--muted);display:flex;flex-direction:column;align-items:center;gap:3px;transition:color .15s;}
+  .app-nav{position:fixed;bottom:0;left:0;right:0;height:calc(56px + env(safe-area-inset-bottom));background:rgba(245,242,237,.82);-webkit-backdrop-filter:saturate(180%) blur(20px);backdrop-filter:saturate(180%) blur(20px);border-top:1px solid rgba(0,0,0,.08);display:flex;justify-content:space-around;align-items:flex-start;z-index:200;padding:7px 0 env(safe-area-inset-bottom);}
+  .app-nav-btn{background:none;border:none;cursor:pointer;text-align:center;color:var(--muted);display:flex;flex-direction:column;align-items:center;gap:3px;transition:transform .15s,color .15s;}
+  .app-nav-btn:active{transform:scale(.88);}
   .app-nav-btn .nav-icon{font-size:1.3rem;line-height:1;}
   .app-nav-btn .nav-label{font-size:.65rem;font-weight:600;}
   .app-nav-btn.active{color:var(--brown);}
@@ -79,9 +105,10 @@
   .weather-msg{color:var(--muted);font-size:.78rem;text-align:center;padding:10px 0;}
 
   /* ===== WEEK NAV ===== */
-  .week-nav{display:flex;gap:7px;padding:16px 16px 10px;position:sticky;top:0;background:rgba(245,242,237,.95);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);z-index:20;}
-  .week-btn{flex:1;padding:8px 2px;border:1.5px solid var(--brown);border-radius:12px;background:transparent;color:var(--brown);font-family:'Inter',sans-serif;font-weight:600;font-size:.74rem;cursor:pointer;transition:all .15s;}
-  .week-btn.active{background:var(--brown);color:#fff;box-shadow:0 4px 12px rgba(139,94,60,.25);}
+  .week-nav{padding:10px 16px;position:sticky;top:calc(46px + env(safe-area-inset-top));background:rgba(245,242,237,.85);-webkit-backdrop-filter:saturate(180%) blur(18px);backdrop-filter:saturate(180%) blur(18px);z-index:20;}
+  .week-seg{display:flex;background:var(--bg2);border-radius:11px;padding:3px;}
+  .week-btn{flex:1;padding:7px 2px;border:none;border-radius:9px;background:transparent;color:var(--text);font-family:'Inter',sans-serif;font-weight:600;font-size:.78rem;cursor:pointer;transition:background .2s,color .2s,box-shadow .2s;}
+  .week-btn.active{background:#fff;color:var(--brown);box-shadow:0 2px 6px rgba(0,0,0,.1);}
   .week{display:none;padding:4px 16px 12px;}
   .week.active{display:block;}
 
@@ -186,6 +213,19 @@
 </head>
 <body>
 
+<!-- ========== SPLASH ========== -->
+<div id="splash">
+  <div class="splash-inner">
+    <div class="splash-icon">🌴</div>
+    <div class="splash-name">Corse 2026</div>
+    <div class="splash-sub">Team Corse · 4 → 18 juillet</div>
+    <div class="splash-dots"><span></span><span></span><span></span></div>
+  </div>
+</div>
+
+<!-- ========== NAV BAR (titre au scroll) ========== -->
+<div id="navbar"><span id="navbar-title">Corse 2026</span></div>
+
 <!-- ========== BOTTOM NAV ========== -->
 <nav class="app-nav">
   <button class="app-nav-btn active" id="nav-planning" onclick="showPage('planning',this)">
@@ -255,9 +295,11 @@
 
   <!-- WEEK NAV -->
   <div class="week-nav">
-    <button class="week-btn active" onclick="showWeek(1,this)">✈️ Arr.</button>
-    <button class="week-btn" onclick="showWeek(2,this)">🌊 S1</button>
-    <button class="week-btn" onclick="showWeek(3,this)">🌴 S2</button>
+    <div class="week-seg">
+      <button class="week-btn active" onclick="showWeek(1,this)">✈️ Arr.</button>
+      <button class="week-btn" onclick="showWeek(2,this)">🌊 S1</button>
+      <button class="week-btn" onclick="showWeek(3,this)">🌴 S2</button>
+    </div>
   </div>
 
   <!-- ===== ARRIVÉES ===== -->
@@ -575,14 +617,28 @@
 </div>
 
 <script>
+const NAV_TITLES={planning:'Corse 2026',gps:'Adresses & Restos',photos:'Souvenirs'};
 function showPage(name,btn){
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
   document.querySelectorAll('.app-nav-btn').forEach(b=>b.classList.remove('active'));
   document.getElementById('page-'+name).classList.add('active');
   btn.classList.add('active');
   if(name==='photos'){renderAlbum();renderPhotos();}
+  window.__page=name;
+  const nb=document.getElementById('navbar');
+  if(nb){nb.classList.remove('show');document.getElementById('navbar-title').textContent=NAV_TITLES[name]||'Corse 2026';}
   window.scrollTo({top:0,behavior:'smooth'});
 }
+
+/* Barre de titre translucide qui apparaît au scroll (réflexe iOS) */
+(function(){
+  const nb=document.getElementById('navbar');window.__page='planning';
+  function upd(){const th=window.__page==='planning'?210:56;if(window.scrollY>th)nb.classList.add('show');else nb.classList.remove('show');}
+  window.addEventListener('scroll',upd,{passive:true});
+})();
+
+/* Splash : disparaît une fois l'app prête */
+window.addEventListener('load',()=>setTimeout(()=>{const s=document.getElementById('splash');if(s)s.classList.add('hide');},700));
 function showWeek(n,btn){
   document.querySelectorAll('#page-planning .week').forEach(w=>w.classList.remove('active'));
   document.querySelectorAll('#page-planning .week-btn').forEach(b=>b.classList.remove('active'));

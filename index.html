@@ -65,7 +65,32 @@
   .hero-wrap{position:relative;}
   .hero-img{width:100%;height:165px;object-fit:cover;display:block;background:var(--bg2);}
   .hero-overlay{position:absolute;inset:0;background:linear-gradient(to bottom,rgba(245,242,237,.15) 0%,rgba(245,242,237,0) 30%,rgba(245,242,237,.55) 72%,var(--bg) 100%);}
-  .hero-icons{position:absolute;top:14px;left:16px;right:16px;display:flex;justify-content:space-between;font-size:1.25rem;color:#3a3a3a;}
+  .hero-icons{position:absolute;top:14px;left:16px;right:16px;display:flex;justify-content:space-between;font-size:1.25rem;color:#3a3a3a;z-index:20;}
+  .hero-menu-btn{background:none;border:none;color:#3a3a3a;font-size:1.25rem;cursor:pointer;line-height:1;padding:0;}
+  .hero-menu-wrap{position:relative;}
+  .menu-drop{position:absolute;top:30px;left:0;min-width:160px;background:var(--card);border:1px solid var(--border);border-radius:13px;box-shadow:0 10px 30px rgba(0,0,0,.18);overflow:hidden;opacity:0;transform:translateY(-6px) scale(.97);pointer-events:none;transition:opacity .18s,transform .18s;transform-origin:top left;}
+  .menu-drop.open{opacity:1;transform:none;pointer-events:auto;}
+  .menu-item{display:flex;align-items:center;gap:9px;width:100%;background:none;border:none;padding:13px 16px;font-family:'Inter',sans-serif;font-size:.9rem;font-weight:700;color:var(--text);cursor:pointer;text-align:left;letter-spacing:.02em;}
+  .menu-item:active{background:var(--bg2);}
+  .menu-item .mi-ico{font-size:1.05rem;}
+  /* ===== TEAM MODAL ===== */
+  .team-overlay{position:fixed;inset:0;background:rgba(20,15,10,.5);-webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px);z-index:500;display:none;align-items:flex-end;justify-content:center;}
+  .team-overlay.open{display:flex;animation:fade .2s ease;}
+  .team-sheet{background:var(--bg);width:100%;max-width:480px;border-radius:22px 22px 0 0;padding:8px 18px calc(26px + env(safe-area-inset-bottom));max-height:88vh;overflow-y:auto;box-shadow:0 -10px 40px rgba(0,0,0,.2);animation:sheetup .28s cubic-bezier(.2,.8,.2,1);}
+  @keyframes sheetup{from{transform:translateY(100%)}to{transform:none}}
+  .team-grip{width:38px;height:4px;background:var(--border);border-radius:2px;margin:6px auto 14px;}
+  .team-head{text-align:center;margin-bottom:16px;}
+  .team-head h2{font-family:'Playfair Display',serif;font-size:1.45rem;font-weight:700;color:var(--brown);}
+  .team-head p{font-size:.8rem;color:var(--muted);margin-top:2px;}
+  .team-member{display:flex;align-items:center;gap:13px;background:var(--card);border:1px solid var(--border);border-radius:15px;padding:13px 15px;margin-bottom:10px;box-shadow:var(--shadow);}
+  .team-ava{width:46px;height:46px;border-radius:50%;display:grid;place-items:center;font-size:1.2rem;font-weight:700;color:#fff;flex-shrink:0;}
+  .team-info{flex:1;min-width:0;}
+  .team-info .tm-name{font-size:1rem;font-weight:700;color:var(--text);}
+  .team-info .tm-sub{font-size:.76rem;color:var(--muted);margin-top:1px;}
+  .team-badge{font-size:.7rem;font-weight:700;padding:4px 10px;border-radius:20px;white-space:nowrap;}
+  .tb-both{background:#ede4d3;color:#8B5E3C;}
+  .tb-s1{background:#dcefe4;color:#2a7d4f;}
+  .tb-s2{background:#e2e4f0;color:#4a4f8b;}
   .hero-title{position:absolute;bottom:50px;left:20px;right:20px;text-align:center;}
   .hero-title h1{font-family:'Playfair Display',serif;font-size:1.7rem;font-weight:700;color:var(--text);line-height:1.1;text-shadow:0 1px 10px rgba(245,242,237,.5);}
   .hero-title p{font-size:.82rem;color:#5a5249;margin-top:3px;font-weight:500;}
@@ -315,7 +340,15 @@
   <div class="hero-wrap">
     <img class="hero-img" src="https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=900&q=80" alt="Corse plage" loading="eager">
     <div class="hero-overlay"></div>
-    <div class="hero-icons"><span>☰</span><span>🔔</span></div>
+    <div class="hero-icons">
+      <div class="hero-menu-wrap">
+        <button class="hero-menu-btn" onclick="toggleMenu(event)" aria-label="Menu">☰</button>
+        <div class="menu-drop" id="menu-drop">
+          <button class="menu-item" onclick="openTeam()"><span class="mi-ico">👥</span>LA TEAM</button>
+        </div>
+      </div>
+      <span>🔔</span>
+    </div>
     <div class="hero-title"><h1>Corse 2026</h1><p>14 jours d'évasion ✴️</p></div>
   </div>
 
@@ -805,7 +838,26 @@
   <div class="lb-img" id="lb-img"></div>
 </div>
 
+<!-- TEAM MODAL -->
+<div class="team-overlay" id="team-overlay" onclick="if(event.target===this)closeTeam()">
+  <div class="team-sheet">
+    <div class="team-grip"></div>
+    <div class="team-head"><h2>La Team 🌴</h2><p>Corse 2026 · 4 → 18 juillet</p></div>
+    <div class="team-member"><div class="team-ava" style="background:#8B5E3C">P</div><div class="team-info"><div class="tm-name">Philou</div><div class="tm-sub">Les 2 semaines</div></div><span class="team-badge tb-both">S1+S2</span></div>
+    <div class="team-member"><div class="team-ava" style="background:#2a7d4f">O</div><div class="team-info"><div class="tm-name">Oliver</div><div class="tm-sub">Semaine 1</div></div><span class="team-badge tb-s1">S1</span></div>
+    <div class="team-member"><div class="team-ava" style="background:#c8a882">P</div><div class="team-info"><div class="tm-name">Paulet</div><div class="tm-sub">Les 2 semaines</div></div><span class="team-badge tb-both">S1+S2</span></div>
+    <div class="team-member"><div class="team-ava" style="background:#4a4f8b">G</div><div class="team-info"><div class="tm-name">Greg</div><div class="tm-sub">Semaine 2</div></div><span class="team-badge tb-s2">S2</span></div>
+  </div>
+</div>
+
 <script>
+/* ===== MENU DÉROULANT ACCUEIL ===== */
+function toggleMenu(e){if(e)e.stopPropagation();document.getElementById('menu-drop').classList.toggle('open');}
+function closeMenu(){const d=document.getElementById('menu-drop');if(d)d.classList.remove('open');}
+document.addEventListener('click',e=>{const w=e.target.closest('.hero-menu-wrap');if(!w)closeMenu();});
+function openTeam(){closeMenu();document.getElementById('team-overlay').classList.add('open');}
+function closeTeam(){document.getElementById('team-overlay').classList.remove('open');}
+
 const NAV_TITLES={home:'Corse 2026',planning:'Planning',carte:'Carte',profil:'Profil',photos:'Souvenirs',maison:'La Maison'};
 function showPage(name,btn,filter){
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
@@ -1069,7 +1121,7 @@ async function deleteCurrent(){if(!_cur)return;if(!confirm('Supprimer cette phot
     closeLightbox();/* listener auto-updates grid */
   }else{await FileDB.del(_cur.id);PHOTOS=PHOTOS.filter(p=>p.id!==_cur.id);savePhotos();closeLightbox();renderPhotos();}
 }
-window.addEventListener('keydown',e=>{if(e.key==='Escape')closeLightbox();});
+window.addEventListener('keydown',e=>{if(e.key==='Escape'){closeLightbox();closeTeam();closeMenu();}});
 
 /* 🏠 GALERIE MAISON (intérieur / extérieur) */
 const MKEY='corse2026-maison';

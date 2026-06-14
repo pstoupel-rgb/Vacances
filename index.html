@@ -333,9 +333,9 @@
   <div class="reco-section">
     <div class="reco-label">Nos recommandations</div>
     <div class="reco-grid">
-      <div class="reco-tile" onclick="showPage('carte',document.getElementById('nav-carte'))"><img src="https://images.unsplash.com/photo-1568605114967-8130f3a36994?w=240&q=70" loading="lazy" alt=""><span>Maison</span></div>
-      <div class="reco-tile" onclick="showPage('carte',document.getElementById('nav-carte'))"><img src="https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=240&q=70" loading="lazy" alt=""><span>Restaurants</span></div>
-      <div class="reco-tile" onclick="showPage('carte',document.getElementById('nav-carte'))"><img src="https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?w=240&q=70" loading="lazy" alt=""><span>Activités</span></div>
+      <div class="reco-tile" onclick="showPage('carte',document.getElementById('nav-carte'),'maison')"><img src="https://images.unsplash.com/photo-1568605114967-8130f3a36994?w=240&q=70" loading="lazy" alt=""><span>Maison</span></div>
+      <div class="reco-tile" onclick="showPage('carte',document.getElementById('nav-carte'),'restaurants')"><img src="https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=240&q=70" loading="lazy" alt=""><span>Restaurants</span></div>
+      <div class="reco-tile" onclick="showPage('carte',document.getElementById('nav-carte'),'activites')"><img src="https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?w=240&q=70" loading="lazy" alt=""><span>Activités</span></div>
     </div>
   </div>
 
@@ -566,7 +566,7 @@
   <div class="page-hero"><h2>Carte</h2><p>Tous les lieux du séjour épinglés</p></div>
   <div id="map"></div>
 
-  <div class="section">
+  <div class="section" id="section-maison">
     <div class="section-hdr">🏠 La maison</div>
     <div class="card home-card">
       <div class="card-icon icon-home">🏠</div>
@@ -580,7 +580,7 @@
     </div>
   </div>
 
-  <div class="section">
+  <div class="section" id="section-activites">
     <div class="section-hdr">🏄 Activités</div>
     <div class="card">
       <div class="card-icon icon-golf">⛳</div>
@@ -614,7 +614,7 @@
     </div>
   </div>
 
-  <div class="section">
+  <div class="section" id="section-restaurants">
     <div class="section-hdr">🍽️ Restaurants — midi 12h30</div>
     <div class="card">
       <div class="card-icon icon-food">🍺</div>
@@ -785,18 +785,23 @@
 
 <script>
 const NAV_TITLES={home:'Corse 2026',planning:'Planning',carte:'Carte',profil:'Profil',photos:'Souvenirs'};
-function showPage(name,btn){
+function showPage(name,btn,filter){
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
   document.getElementById('page-'+name).classList.add('active');
   if(btn){document.querySelectorAll('.app-nav-btn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');}
   if(name==='photos'){renderAlbum();renderPhotos();}
-  if(name==='carte'){initMap();}
+  if(name==='carte'){initMap();filterCarte(filter);}
   if(name==='home'){renderProgram();}
   if(name==='profil'){renderFrais();}
   window.__page=name;
   const nb=document.getElementById('navbar');
   if(nb){nb.classList.remove('show');document.getElementById('navbar-title').textContent=NAV_TITLES[name]||'Corse 2026';}
   window.scrollTo({top:0,behavior:'smooth'});
+}
+function filterCarte(f){
+  const map={maison:'section-maison',activites:'section-activites',restaurants:'section-restaurants'};
+  const ids=Object.values(map);
+  ids.forEach(id=>{const e=document.getElementById(id);if(e)e.style.display=(!f||id===map[f])?'':'none';});
 }
 function showWeek(n,btn){
   document.querySelectorAll('#page-planning .week').forEach(w=>w.classList.remove('active'));

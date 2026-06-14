@@ -3,154 +3,123 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<title>Corse 2026 🌴</title>
+<title>Corse 2026 🏝️</title>
 <meta name="description" content="Le carnet de voyage de la Team Corse 2026 — planning jour par jour, restos, adresses et météo.">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Corse 2026">
 <meta name="mobile-web-app-capable" content="yes">
-<meta name="theme-color" content="#FF6B4A">
+<meta name="theme-color" content="#0b0f1a">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="icon.svg">
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Pacifico&family=Baloo+2:wght@500;600;700;800&family=Inter:wght@400;500;600;700&display=swap');
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
   * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
   :root {
-    /* 🌅 palette chaleureuse vacances */
-    --sun:#FFB23E; --sun-d:#F59425;
-    --coral:#FF6B4A; --coral-d:#E64F2E;
-    --terracotta:#E07856;
-    --sea:#13A89E; --sea-d:#0E7C7B;   /* turquoise lagon */
-    --green:#3FA66A;
-    --sand:#FFF6EA; --sand-2:#FBE9D2;
-    --night:#3A2A22;                  /* brun chaud (texte) */
-    --muted:#A18A78;
-    --card:#FFFFFF; --line:#F1E2CF;
+    --bg:#0b0f1a; --bg-2:#0f1424; --card:#151b2c; --card-2:#1b2236; --line:#262f49;
+    --text:#fff; --muted:#9aa3bd;
+    --pink:#ff4d7d; --pink-d:#dd2476; --orange:#ff7a45;
+    --teal:#2dd4bf; --teal-d:#14b8a6; --green:#34d399; --sky:#38bdf8; --gold:#fbbf24; --purple:#a78bfa;
     --radius:18px;
-    --shadow:0 4px 16px rgba(180,110,60,.10);
-    --shadow-lg:0 10px 30px rgba(180,110,60,.18);
-    --sunset:linear-gradient(135deg,#FF8A5B 0%,#FF6B4A 45%,#FFB23E 100%);
+    --grad:linear-gradient(135deg,#ff7a18,#dd2476 90%);
+    --shadow:0 10px 30px rgba(0,0,0,.35);
   }
   body {
-    font-family:'Inter',-apple-system,sans-serif; background:var(--sand); color:var(--night); min-height:100vh;
+    font-family:'Inter',-apple-system,sans-serif; background:var(--bg); color:var(--text); min-height:100vh;
     padding-top:env(safe-area-inset-top); padding-bottom:env(safe-area-inset-bottom);
-    background-image:radial-gradient(circle at 15% 0%, rgba(255,178,62,.10), transparent 40%),
-                     radial-gradient(circle at 90% 12%, rgba(19,168,158,.08), transparent 38%);
+    background-image:radial-gradient(circle at 12% -5%, rgba(221,36,118,.18), transparent 45%),
+                     radial-gradient(circle at 95% 8%, rgba(45,212,191,.12), transparent 42%);
+    background-attachment:fixed;
   }
 
-  /* ========== TAB BAR (bas de page — style app iOS) ========== */
+  /* ========== TOP BAR ========== */
+  .topbar {
+    position:sticky; top:0; z-index:200;
+    display:flex; align-items:center; justify-content:space-between; padding:13px 18px;
+    background:rgba(11,15,26,.72); -webkit-backdrop-filter:saturate(160%) blur(16px); backdrop-filter:saturate(160%) blur(16px);
+    border-bottom:1px solid rgba(255,255,255,.06);
+  }
+  .topbar h1 { font-size:1.05rem; font-weight:800; letter-spacing:.2px; }
+  .badge { background:var(--grad); padding:6px 13px; border-radius:20px; font-size:.78rem; font-weight:700; box-shadow:0 6px 16px rgba(221,36,118,.35); }
+
+  /* ========== TAB BAR (bas — style app iOS) ========== */
   .app-nav {
-    position:fixed; bottom:0; left:0; right:0;
-    background:rgba(255,255,255,.86);
-    -webkit-backdrop-filter:saturate(180%) blur(18px);
-    backdrop-filter:saturate(180%) blur(18px);
-    display:flex; z-index:100;
-    border-top:1px solid rgba(241,226,207,.9);
-    box-shadow:0 -6px 24px rgba(180,110,60,.12);
+    position:fixed; bottom:0; left:0; right:0; z-index:100; display:flex;
+    background:rgba(15,20,36,.86); -webkit-backdrop-filter:saturate(160%) blur(18px); backdrop-filter:saturate(160%) blur(18px);
+    border-top:1px solid rgba(255,255,255,.07); box-shadow:0 -8px 28px rgba(0,0,0,.4);
     padding-bottom:env(safe-area-inset-bottom);
   }
   .app-nav-btn {
     flex:1; display:flex; flex-direction:column; align-items:center; gap:4px;
-    background:none; border:none; cursor:pointer; padding:8px 4px 7px;
-    color:var(--muted); font-family:'Baloo 2','Inter',sans-serif;
-    transition:color .18s;
+    background:none; border:none; cursor:pointer; padding:9px 4px 8px; color:var(--muted); transition:color .18s;
   }
   .app-nav-btn .nav-icon {
-    font-size:1.3rem; line-height:1; width:52px; height:30px;
-    display:flex; align-items:center; justify-content:center;
-    border-radius:16px; transition:transform .2s, background .2s;
+    font-size:1.3rem; line-height:1; width:54px; height:30px;
+    display:flex; align-items:center; justify-content:center; border-radius:16px; transition:transform .2s, background .2s;
   }
-  .app-nav-btn.active { color:var(--coral-d); }
-  .app-nav-btn.active .nav-icon { background:var(--sand-2); transform:translateY(-1px) scale(1.06); }
+  .app-nav-btn.active { color:var(--pink); }
+  .app-nav-btn.active .nav-icon { background:rgba(255,77,125,.16); transform:translateY(-1px) scale(1.06); }
   .app-nav-btn:active .nav-icon { transform:scale(.92); }
-  .app-nav-btn .nav-label { font-size:.66rem; font-weight:800; letter-spacing:.2px; }
+  .app-nav-btn .nav-label { font-size:.66rem; font-weight:700; letter-spacing:.2px; }
 
-  /* place pour la tab bar fixe */
-  .page-content { padding-bottom:calc(78px + env(safe-area-inset-bottom)); }
-
-  /* ========== HEADER ========== */
-  header {
-    background:var(--sunset);
-    padding:30px 20px 38px; text-align:center; position:relative; overflow:hidden;
-  }
-  header::after {
-    content:'☀️'; position:absolute; top:14px; right:18px; font-size:2.6rem; opacity:.85;
-    filter:drop-shadow(0 2px 6px rgba(0,0,0,.15)); animation:floaty 5s ease-in-out infinite;
-  }
-  @keyframes floaty { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-6px)} }
-  header::before {
-    content:''; position:absolute; bottom:-2px; left:0; right:0; height:26px;
-    background:var(--sand); clip-path:ellipse(60% 100% at 50% 100%);
-  }
-  .header-emoji { font-size:2.4rem; display:block; margin-bottom:2px; }
-  header h1 { font-family:'Pacifico',cursive; font-size:2.3rem; color:#fff; text-shadow:0 3px 10px rgba(0,0,0,.22); }
-  .header-sub { color:rgba(255,255,255,.92); font-size:.86rem; font-weight:600; margin-top:6px; }
-  .dates-badge {
-    display:inline-block; background:#fff; color:var(--coral-d); font-weight:800; font-size:.8rem;
-    padding:5px 16px; border-radius:20px; margin-top:12px; box-shadow:0 3px 10px rgba(0,0,0,.12);
-  }
-
-  /* ========== PAGES ========== */
+  .page-content { padding-bottom:calc(80px + env(safe-area-inset-bottom)); }
   .page { display:none; }
   .page.active { display:block; animation:fade .25s ease; }
-  @keyframes fade { from{opacity:0; transform:translateY(6px);} to{opacity:1; transform:none;} }
+  @keyframes fade { from{opacity:0; transform:translateY(8px);} to{opacity:1; transform:none;} }
+
+  /* ========== HERO ========== */
+  .hero {
+    margin:16px 14px 4px; background:var(--grad); border-radius:24px;
+    padding:22px 20px 20px; position:relative; overflow:hidden; box-shadow:var(--shadow);
+  }
+  .hero::after { content:'🏝️'; position:absolute; right:-6px; bottom:-12px; font-size:5rem; opacity:.22; }
+  .hero-emoji { font-size:2rem; }
+  .hero h2 { font-size:1.5rem; font-weight:900; margin-top:4px; }
+  .hero p { opacity:.92; margin-top:5px; font-size:.9rem; font-weight:500; }
+  .countdown { margin-top:14px; display:inline-flex; align-items:center; gap:7px; background:rgba(0,0,0,.22); padding:8px 14px; border-radius:14px; font-weight:800; font-size:.92rem; }
+  .hero-dates { display:block; margin-top:10px; font-size:.78rem; font-weight:600; opacity:.85; }
 
   /* ========== MÉTÉO ========== */
-  .weather-wrap { padding:14px 12px 0; }
+  .weather-wrap { padding:14px 14px 0; }
   .weather-card {
-    background:linear-gradient(135deg,#FF9E5E 0%,#FF7E5F 55%,#FFB23E 100%);
-    border-radius:var(--radius); padding:14px 14px 12px; position:relative; overflow:hidden;
-    box-shadow:var(--shadow);
+    background:linear-gradient(135deg,#10243f,#0c3b46); border:1px solid rgba(255,255,255,.07);
+    border-radius:var(--radius); padding:14px; position:relative; overflow:hidden; box-shadow:var(--shadow);
   }
-  .weather-card::before { content:''; position:absolute; right:-24px; top:-24px; width:96px; height:96px; border-radius:50%; background:rgba(255,255,255,.16); }
-  .weather-head { display:flex; align-items:center; justify-content:space-between; margin-bottom:11px; position:relative; z-index:1; }
-  .weather-title { font-family:'Baloo 2',sans-serif; font-weight:800; font-size:.98rem; color:#fff; display:flex; align-items:center; gap:6px; }
-  .weather-loc { font-size:.66rem; color:rgba(255,255,255,.85); font-weight:600; }
-  .weather-strip { display:flex; gap:7px; overflow-x:auto; scroll-snap-type:x mandatory; scrollbar-width:none; padding-bottom:2px; position:relative; z-index:1; }
+  .weather-head { display:flex; align-items:center; justify-content:space-between; margin-bottom:11px; }
+  .weather-title { font-weight:800; font-size:.95rem; }
+  .weather-loc { font-size:.72rem; color:var(--muted); font-weight:600; }
+  .weather-strip { display:flex; gap:7px; overflow-x:auto; scrollbar-width:none; padding-bottom:2px; }
   .weather-strip::-webkit-scrollbar { display:none; }
-  .w-day { flex-shrink:0; background:rgba(255,255,255,.18); border-radius:14px; padding:9px 11px; text-align:center; min-width:60px; color:#fff; scroll-snap-align:start; border:1.5px solid transparent; backdrop-filter:blur(3px); }
-  .w-day.today { background:rgba(255,255,255,.34); border-color:rgba(255,255,255,.7); }
-  .w-day .wn { font-size:.6rem; font-weight:800; opacity:.95; text-transform:uppercase; }
+  .w-day { flex-shrink:0; background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.06); border-radius:14px; padding:9px 11px; text-align:center; min-width:62px; }
+  .w-day.today { background:rgba(255,77,125,.18); border-color:rgba(255,77,125,.5); }
+  .w-day .wn { font-size:.6rem; font-weight:800; color:var(--muted); text-transform:uppercase; }
+  .w-day.today .wn { color:#fff; }
   .w-day .wi { font-size:1.4rem; margin:3px 0; line-height:1; }
   .w-day .wh { font-size:.86rem; font-weight:800; }
-  .w-day .wl { font-size:.66rem; opacity:.8; }
-  .w-day .wr { font-size:.58rem; opacity:.85; margin-top:3px; }
-  .skel { background:linear-gradient(90deg,rgba(255,255,255,.12) 25%,rgba(255,255,255,.28) 50%,rgba(255,255,255,.12) 75%); background-size:300% 100%; animation:shim 1.4s infinite; border-radius:8px; }
+  .w-day .wl { font-size:.66rem; color:var(--muted); }
+  .w-day .wr { font-size:.58rem; color:var(--sky); margin-top:3px; }
+  .skel { background:linear-gradient(90deg,rgba(255,255,255,.06) 25%,rgba(255,255,255,.16) 50%,rgba(255,255,255,.06) 75%); background-size:300% 100%; animation:shim 1.4s infinite; border-radius:8px; }
   @keyframes shim { to{ background-position:-100% 0; } }
-  .weather-msg { color:rgba(255,255,255,.92); font-size:.78rem; text-align:center; padding:10px 0; position:relative; z-index:1; }
+  .weather-msg { color:var(--muted); font-size:.78rem; text-align:center; padding:10px 0; }
 
   /* ========== PLANNING — WEEK NAV ========== */
   .week-nav {
-    display:flex; gap:6px; padding:14px 12px 10px;
-    position:sticky; top:0; background:var(--sand); z-index:20;
+    display:flex; gap:7px; padding:14px 14px 10px;
+    position:sticky; top:52px; z-index:20; background:rgba(11,15,26,.9); -webkit-backdrop-filter:blur(8px); backdrop-filter:blur(8px);
   }
   .week-btn {
-    flex:1; padding:9px 2px; border:2px solid var(--coral); border-radius:14px;
-    background:transparent; color:var(--coral-d); font-family:'Baloo 2',sans-serif; font-weight:700; font-size:.74rem; cursor:pointer; transition:all .15s;
+    flex:1; padding:9px 2px; border:1.5px solid rgba(255,77,125,.5); border-radius:14px;
+    background:transparent; color:var(--pink); font-weight:700; font-size:.74rem; cursor:pointer; transition:all .15s;
   }
-  .week-btn.active { background:var(--coral); color:#fff; box-shadow:0 4px 12px rgba(255,107,74,.3); }
-  .week { display:none; padding:6px 12px 12px; }
+  .week-btn.active { background:var(--grad); border-color:transparent; color:#fff; box-shadow:0 6px 16px rgba(221,36,118,.35); }
+  .week { display:none; padding:4px 14px 12px; }
   .week.active { display:block; }
 
-  /* ========== WHATSAPP BANNER ========== */
-  .wa-banner {
-    background:linear-gradient(135deg,#25D366,#1ebe5a); border-radius:15px; padding:12px 14px;
-    display:flex; align-items:center; gap:12px; margin-bottom:12px;
-    cursor:pointer; transition:transform .12s, opacity .15s; box-shadow:0 4px 14px rgba(37,211,102,.28);
-  }
-  .wa-banner:active { transform:scale(.985); opacity:.92; }
-  .wa-icon { font-size:1.6rem; flex-shrink:0; }
-  .wa-text { flex:1; }
-  .wa-title { font-weight:700; font-size:.88rem; color:#fff; }
-  .wa-sub { font-size:.72rem; color:rgba(255,255,255,.9); margin-top:2px; }
-  .wa-arrow { color:#fff; font-size:1.1rem; }
-
   /* ========== DAY CARD ========== */
-  .day-card { background:var(--card); border-radius:var(--radius); margin-bottom:12px; overflow:hidden; box-shadow:var(--shadow); }
-  .day-header { padding:13px 16px 11px; display:flex; align-items:center; gap:11px; border-bottom:1px solid var(--line);
-    background:linear-gradient(180deg,#FFFBF4,#fff); }
-  .day-number { font-family:'Pacifico',cursive; font-size:1.7rem; line-height:1; color:var(--coral); min-width:38px; }
-  .day-name { font-family:'Baloo 2',sans-serif; font-weight:700; font-size:.98rem; }
+  .day-card { background:var(--card); border:1px solid var(--line); border-radius:var(--radius); margin-bottom:12px; overflow:hidden; box-shadow:var(--shadow); }
+  .day-header { padding:13px 16px 11px; display:flex; align-items:center; gap:12px; border-bottom:1px solid var(--line); background:linear-gradient(180deg,rgba(255,255,255,.03),transparent); }
+  .day-number { font-size:1.7rem; font-weight:900; line-height:1; color:var(--pink); min-width:34px; }
+  .day-name { font-weight:800; font-size:.98rem; }
   .day-date { font-size:.72rem; color:var(--muted); margin-top:1px; }
   .day-vibe { margin-left:auto; font-size:1.55rem; }
 
@@ -158,97 +127,94 @@
   .timeline { padding:13px 16px 15px; }
   .tl-item { display:flex; gap:12px; margin-bottom:11px; position:relative; }
   .tl-item:last-child { margin-bottom:0; }
-  .tl-item:not(:last-child)::after {
-    content:''; position:absolute; left:50px; top:26px; bottom:-11px; width:2px; background:var(--line);
-  }
+  .tl-item:not(:last-child)::after { content:''; position:absolute; left:50px; top:26px; bottom:-11px; width:2px; background:var(--line); }
   .tl-time { font-size:.68rem; font-weight:700; color:var(--muted); width:40px; flex-shrink:0; padding-top:3px; text-align:right; }
   .tl-dot { width:21px; height:21px; border-radius:50%; flex-shrink:0; display:flex; align-items:center; justify-content:center; font-size:.66rem; margin-top:1px; z-index:1; }
-  .dot-plane{background:#E3F4F2;} .dot-food{background:#FFEDE6;} .dot-home{background:#FFF1D6;}
-  .dot-activity{background:#E7F6EC;} .dot-boat{background:#E0F2F0;} .dot-free{background:#FBEEDD;}
+  .dot-plane{background:rgba(45,212,191,.2);} .dot-food{background:rgba(255,77,125,.2);} .dot-home{background:rgba(251,191,36,.2);}
+  .dot-activity{background:rgba(52,211,153,.2);} .dot-boat{background:rgba(56,189,248,.2);} .dot-free{background:rgba(167,139,250,.2);}
   .tl-title { font-weight:600; font-size:.88rem; }
   .tl-sub { font-size:.74rem; color:var(--muted); margin-top:2px; line-height:1.4; }
   .tl-row { display:flex; align-items:center; gap:8px; margin-top:6px; flex-wrap:wrap; }
 
   /* ========== TAGS ========== */
-  .tag { font-size:.65rem; font-weight:700; padding:3px 8px; border-radius:7px; background:#E3F4F2; color:var(--sea-d); }
-  .tag.green{background:#E7F6EC;color:var(--green);} .tag.orange{background:#FFF0DA;color:#C07000;}
-  .tag.coral{background:#FFEAE3;color:var(--coral-d);} .tag.yellow{background:#FFF6D6;color:#9A7400;}
+  .tag { font-size:.65rem; font-weight:700; padding:3px 8px; border-radius:7px; background:rgba(45,212,191,.16); color:#5eead4; }
+  .tag.green{background:rgba(52,211,153,.16);color:#6ee7b7;} .tag.orange{background:rgba(255,159,67,.16);color:#fdba74;}
+  .tag.coral{background:rgba(255,77,125,.18);color:#fda4c0;} .tag.yellow{background:rgba(250,204,21,.16);color:#fde047;}
 
   /* ========== WAZE INLINE ========== */
   .waze-inline {
-    background:var(--sea); color:#fff; border:none; border-radius:10px;
+    background:rgba(45,212,191,.16); color:#5eead4; border:none; border-radius:10px;
     padding:5px 11px; font-size:.68rem; font-weight:700; cursor:pointer;
     text-decoration:none; display:inline-flex; align-items:center; gap:4px; flex-shrink:0;
   }
-  .waze-inline:active{background:var(--sea-d);}
+  .waze-inline:active{ background:rgba(45,212,191,.3); }
 
   /* ========== LEGEND ========== */
-  .legend { background:var(--card); border-radius:var(--radius); padding:14px 16px; margin-bottom:12px; box-shadow:var(--shadow); }
-  .legend-title { font-family:'Baloo 2',sans-serif; font-size:.82rem; font-weight:800; color:var(--coral-d); margin-bottom:10px; }
+  .legend { background:var(--card); border:1px solid var(--line); border-radius:var(--radius); padding:14px 16px; margin-bottom:12px; box-shadow:var(--shadow); }
+  .legend-title { font-size:.82rem; font-weight:800; color:var(--pink); margin-bottom:10px; }
   .legend-grid { display:grid; grid-template-columns:1fr 1fr; gap:7px; }
-  .legend-item { display:flex; align-items:center; gap:8px; font-size:.78rem; }
+  .legend-item { display:flex; align-items:center; gap:8px; font-size:.78rem; color:var(--muted); }
+  .legend-item strong { color:var(--text); }
   .legend-dot { width:11px; height:11px; border-radius:50%; flex-shrink:0; }
 
   /* ========== GPS PAGE ========== */
   .gps-intro { padding:16px 16px 4px; text-align:center; font-size:.82rem; color:var(--muted); line-height:1.5; }
   .section { padding:16px 16px 0; }
-  .section-title {
-    font-family:'Baloo 2',sans-serif; font-size:.82rem; font-weight:800;
-    color:var(--coral-d); margin-bottom:12px; display:flex; align-items:center; gap:8px;
-  }
-  .section-title::after { content:''; flex:1; height:2px; border-radius:2px; background:var(--sand-2); }
+  .section-title { font-size:.82rem; font-weight:800; color:var(--pink); margin-bottom:12px; display:flex; align-items:center; gap:8px; }
+  .section-title::after { content:''; flex:1; height:1px; border-radius:2px; background:var(--line); }
 
   .card {
-    background:var(--card); border-radius:var(--radius); padding:14px 16px; margin-bottom:10px;
+    background:var(--card); border:1px solid var(--line); border-radius:var(--radius); padding:14px 16px; margin-bottom:10px;
     display:flex; align-items:center; gap:14px; box-shadow:var(--shadow);
     text-decoration:none; color:inherit; transition:transform .15s; position:relative;
   }
   .card:active { transform:scale(.98); }
-  .card-icon { font-size:1.8rem; width:50px; height:50px; display:flex; align-items:center; justify-content:center; border-radius:14px; flex-shrink:0; }
-  .icon-home{background:#FFF1D6;} .icon-plane{background:#E3F4F2;} .icon-canyon{background:#E7F6EC;}
-  .icon-food{background:#FFEDE6;} .icon-boat{background:#E0F2F0;} .icon-golf{background:#E7F6EC;}
+  .card-icon { font-size:1.7rem; width:50px; height:50px; display:flex; align-items:center; justify-content:center; border-radius:14px; flex-shrink:0; }
+  .icon-home{background:rgba(251,191,36,.16);} .icon-plane{background:rgba(45,212,191,.16);} .icon-canyon{background:rgba(52,211,153,.16);}
+  .icon-food{background:rgba(255,77,125,.16);} .icon-boat{background:rgba(56,189,248,.16);} .icon-golf{background:rgba(52,211,153,.16);}
   .card-body { flex:1; min-width:0; }
-  .card-name { font-family:'Baloo 2',sans-serif; font-weight:700; font-size:.96rem; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .card-name { font-weight:800; font-size:.96rem; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
   .card-meta { font-size:.75rem; color:var(--muted); margin-top:2px; }
   .card-tags { display:flex; flex-wrap:wrap; gap:4px; margin-top:5px; }
 
   .waze-btn {
-    background:var(--sea); color:#fff; border:none; border-radius:13px; padding:10px 14px;
+    background:rgba(45,212,191,.16); color:#5eead4; border:none; border-radius:13px; padding:10px 14px;
     font-size:.75rem; font-weight:700; cursor:pointer; display:flex; flex-direction:column;
     align-items:center; gap:2px; flex-shrink:0; text-decoration:none; transition:background .15s; min-width:58px;
   }
-  .waze-btn:active{background:var(--sea-d);}
-  .waze-btn .waze-logo{font-size:1.3rem;}
-  .waze-btn span{font-size:.65rem; letter-spacing:.3px;}
-  .waze-btn.coral{background:var(--coral);} .waze-btn.coral:active{background:var(--coral-d);}
-  .waze-btn.green-btn{background:var(--green);} .waze-btn.green-btn:active{background:#2e7d4f;}
-  .waze-btn.disabled{background:#D8C9B6; cursor:default; pointer-events:none;}
-  .card.home-card { background:linear-gradient(135deg,#FFF6EA 0%,#FFE6C2 100%); border:2px solid var(--sun); }
+  .waze-btn:active{ background:rgba(45,212,191,.3); }
+  .waze-btn .waze-logo{ font-size:1.3rem; }
+  .waze-btn span{ font-size:.65rem; letter-spacing:.3px; }
+  .waze-btn.coral{ background:var(--grad); color:#fff; }
+  .waze-btn.green-btn{ background:rgba(52,211,153,.18); color:#6ee7b7; }
+  .waze-btn.disabled{ background:rgba(255,255,255,.06); color:var(--muted); cursor:default; pointer-events:none; }
+  .card.home-card { background:linear-gradient(135deg,rgba(255,122,24,.18),rgba(221,36,118,.18)); border:1px solid rgba(255,122,24,.4); }
 
-  .wave { text-align:center; font-size:1.6rem; margin:10px 0 4px; letter-spacing:4px; }
+  .wave { text-align:center; font-size:1.6rem; margin:10px 0 4px; letter-spacing:4px; opacity:.8; }
   footer { text-align:center; padding:14px 16px 12px; font-size:.78rem; color:var(--muted); }
-  footer strong { color:var(--coral-d); }
+  footer strong { color:var(--pink); }
+
   /* ===== 📸 PHOTOS ===== */
   .album-card { margin-bottom:14px; }
-  .album-empty { background:var(--card); border:2px dashed var(--sun); border-radius:var(--radius); padding:18px 16px; text-align:center; box-shadow:var(--shadow); }
+  .album-empty { background:var(--card); border:1.5px dashed rgba(255,77,125,.5); border-radius:var(--radius); padding:18px 16px; text-align:center; box-shadow:var(--shadow); }
   .album-emoji { font-size:2.2rem; }
-  .album-txt { font-size:.82rem; color:var(--night); line-height:1.5; margin:8px 0 12px; }
-  .album-txt b { color:var(--coral-d); }
-  .album-set { background:var(--coral); color:#fff; padding:10px 18px; border-radius:14px; font-size:.85rem; font-family:'Baloo 2',sans-serif; font-weight:700; border:none; cursor:pointer; box-shadow:0 4px 12px rgba(255,107,74,.3); }
-  .album-open { display:block; background:var(--sunset); color:#fff; text-align:center; text-decoration:none; font-family:'Baloo 2',sans-serif; font-weight:800; font-size:.95rem; padding:14px; border-radius:var(--radius); box-shadow:0 6px 16px rgba(255,107,74,.32); }
+  .album-txt { font-size:.82rem; color:var(--text); line-height:1.5; margin:8px 0 12px; }
+  .album-txt b { color:var(--pink); }
+  .album-set { background:var(--grad); color:#fff; padding:10px 18px; border-radius:14px; font-size:.85rem; font-weight:800; border:none; cursor:pointer; box-shadow:0 6px 16px rgba(221,36,118,.35); }
+  .album-open { display:block; background:var(--grad); color:#fff; text-align:center; text-decoration:none; font-weight:800; font-size:.95rem; padding:14px; border-radius:var(--radius); box-shadow:0 6px 16px rgba(221,36,118,.35); }
   .album-edit { display:block; margin:8px auto 0; background:none; border:none; color:var(--muted); text-decoration:underline; font-size:.78rem; cursor:pointer; }
-  .btn-add { width:100%; background:var(--sea); color:#fff; border:none; border-radius:var(--radius); padding:14px; font-family:'Baloo 2',sans-serif; font-weight:800; font-size:.95rem; cursor:pointer; box-shadow:0 4px 14px rgba(19,168,158,.3); }
-  .btn-add:active { background:var(--sea-d); }
+  .btn-add { width:100%; background:rgba(45,212,191,.16); color:#5eead4; border:1px solid rgba(45,212,191,.3); border-radius:var(--radius); padding:14px; font-weight:800; font-size:.95rem; cursor:pointer; }
+  .btn-add:active { background:rgba(45,212,191,.3); }
   .photo-hint { font-size:.74rem; color:var(--muted); text-align:center; line-height:1.5; margin:12px 4px 14px; }
   .photo-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:6px; }
-  .photo-cell { position:relative; aspect-ratio:1; border-radius:13px; overflow:hidden; background:var(--sand-2); cursor:pointer; }
+  .photo-cell { position:relative; aspect-ratio:1; border-radius:13px; overflow:hidden; background:var(--card-2); cursor:pointer; }
   .photo-cell img { width:100%; height:100%; object-fit:cover; display:block; }
   .photo-cell:active img { opacity:.85; }
   .photo-empty { grid-column:1/-1; text-align:center; color:var(--muted); font-size:.82rem; padding:30px 10px; line-height:1.6; }
-  .lightbox { position:fixed; inset:0; background:rgba(20,12,8,.95); z-index:600; display:none; flex-direction:column; }
+  .lightbox { position:fixed; inset:0; background:rgba(5,7,12,.96); z-index:600; display:none; flex-direction:column; }
   .lightbox.open { display:flex; }
   .lb-bar { display:flex; justify-content:space-between; align-items:center; padding:calc(12px + env(safe-area-inset-top)) 16px 12px; }
-  .lb-bar button { background:rgba(255,255,255,.16); border:none; color:#fff; width:42px; height:42px; border-radius:50%; font-size:1.15rem; cursor:pointer; }
+  .lb-bar button { background:rgba(255,255,255,.12); border:none; color:#fff; width:42px; height:42px; border-radius:50%; font-size:1.15rem; cursor:pointer; }
   .lb-actions { display:flex; gap:10px; }
   .lb-img { flex:1; display:grid; place-items:center; overflow:hidden; padding:8px; }
   .lb-img img { max-width:100%; max-height:100%; object-fit:contain; border-radius:10px; }
@@ -256,32 +222,23 @@
 </head>
 <body>
 
-<!-- ========== TOP NAV ========== -->
-<nav class="app-nav">
-  <button class="app-nav-btn active" id="nav-planning" onclick="showPage('planning', this)">
-    <span class="nav-icon">📅</span>
-    <span class="nav-label">Planning</span>
-  </button>
-  <button class="app-nav-btn" id="nav-gps" onclick="showPage('gps', this)">
-    <span class="nav-icon">🗺️</span>
-    <span class="nav-label">Adresses</span>
-  </button>
-  <button class="app-nav-btn" id="nav-photos" onclick="showPage('photos', this)">
-    <span class="nav-icon">📸</span>
-    <span class="nav-label">Photos</span>
-  </button>
-</nav>
+<!-- ========== TOP BAR ========== -->
+<div class="topbar">
+  <h1>🏝️ Corse 2026</h1>
+  <span class="badge">14 jours</span>
+</div>
 
 
 <!-- ========== PAGE 1 : PLANNING ========== -->
 <div class="page active page-content" id="page-planning">
 
-  <header>
-    <span class="header-emoji">🌴</span>
-    <h1>Corse 2026</h1>
-    <div class="header-sub">14 jours au paradis · Team Corse</div>
-    <span class="dates-badge">4 → 18 juillet 2026</span>
-  </header>
+  <div class="hero">
+    <span class="hero-emoji">🌴</span>
+    <h2>Mode vacances activé</h2>
+    <p>Plage · Golf · Canyoning · Soirées · Team Corse</p>
+    <div class="countdown" id="countdown">⏳ …</div>
+    <span class="hero-dates">4 → 18 juillet 2026</span>
+  </div>
 
   <!-- ☀️ Météo -->
   <div class="weather-wrap">
@@ -590,12 +547,12 @@
     <div class="section-title">🏄 Activités</div>
     <div class="card">
       <div class="card-icon icon-golf">⛳</div>
-      <div class="card-body"><div class="card-name">Golf de Spérone</div><div class="card-meta">Bonifacio · 18 trous · ⭐ 4.6</div><div class="card-tags"><span class="tag orange">~1h</span><span class="tag">Lun 6/07</span></div><div class="card-meta" style="margin-top:4px"><a href="tel:+33495731713" style="color:var(--sea-d);font-weight:600;text-decoration:none">📞 04 95 73 17 13</a></div></div>
+      <div class="card-body"><div class="card-name">Golf de Spérone</div><div class="card-meta">Bonifacio · 18 trous · ⭐ 4.6</div><div class="card-tags"><span class="tag orange">~1h</span><span class="tag">Lun 6/07</span></div><div class="card-meta" style="margin-top:4px"><a href="tel:+33495731713" style="color:var(--teal);font-weight:600;text-decoration:none">📞 04 95 73 17 13</a></div></div>
       <a class="waze-btn green-btn" href="https://waze.com/ul?ll=41.3729733,9.2101607&navigate=yes" target="_blank"><span class="waze-logo">🗺️</span><span>Waze</span></a>
     </div>
     <div class="card">
       <div class="card-icon icon-canyon">🏔️</div>
-      <div class="card-body"><div class="card-name">Corsica Canyon</div><div class="card-meta">Canyoning — départ 7h20</div><div class="card-tags"><span class="tag orange">~1h</span><span class="tag">Ven 10/07</span><span class="tag">Jeu 16/07</span></div><div class="card-meta" style="margin-top:4px"><a href="tel:+33622916144" style="color:var(--sea-d);font-weight:600;text-decoration:none">📞 06 22 91 61 44</a></div></div>
+      <div class="card-body"><div class="card-name">Corsica Canyon</div><div class="card-meta">Canyoning — départ 7h20</div><div class="card-tags"><span class="tag orange">~1h</span><span class="tag">Ven 10/07</span><span class="tag">Jeu 16/07</span></div><div class="card-meta" style="margin-top:4px"><a href="tel:+33622916144" style="color:var(--teal);font-weight:600;text-decoration:none">📞 06 22 91 61 44</a></div></div>
       <a class="waze-btn green-btn" href="https://waze.com/ul?ll=41.8248008,9.2629071&navigate=yes" target="_blank"><span class="waze-logo">🗺️</span><span>Waze</span></a>
     </div>
     <div class="card">
@@ -609,47 +566,47 @@
     <div class="section-title">🍽️ Restaurants — midi 12h30</div>
     <div class="card">
       <div class="card-icon icon-food">🍺</div>
-      <div class="card-body"><div class="card-name">Playarellu</div><div class="card-meta">Zonza · ⭐ 4.3</div><div class="card-tags"><span class="tag green">~10 min</span><span class="tag">S1 Dim 5/07</span><span class="tag">S2 Dim 12/07</span></div><div class="card-meta" style="margin-top:4px"><a href="tel:+33789432456" style="color:var(--sea-d);font-weight:600;text-decoration:none">📞 07 89 43 24 56</a></div></div>
+      <div class="card-body"><div class="card-name">Playarellu</div><div class="card-meta">Zonza · ⭐ 4.3</div><div class="card-tags"><span class="tag green">~10 min</span><span class="tag">S1 Dim 5/07</span><span class="tag">S2 Dim 12/07</span></div><div class="card-meta" style="margin-top:4px"><a href="tel:+33789432456" style="color:var(--teal);font-weight:600;text-decoration:none">📞 07 89 43 24 56</a></div></div>
       <a class="waze-btn" href="https://waze.com/ul?ll=41.6764273,9.3725932&navigate=yes" target="_blank"><span class="waze-logo">🗺️</span><span>Waze</span></a>
     </div>
     <div class="card">
       <div class="card-icon icon-food">🌴</div>
-      <div class="card-body"><div class="card-name">Le Tiki</div><div class="card-meta">Plage de St Cyprien · ⭐ 3.9</div><div class="card-tags"><span class="tag green">~10 min</span><span class="tag">S1 Jeu 9/07</span><span class="tag">S2 Ven 17/07</span></div><div class="card-meta" style="margin-top:4px"><a href="tel:+33630230268" style="color:var(--sea-d);font-weight:600;text-decoration:none">📞 06 30 23 02 68</a></div></div>
+      <div class="card-body"><div class="card-name">Le Tiki</div><div class="card-meta">Plage de St Cyprien · ⭐ 3.9</div><div class="card-tags"><span class="tag green">~10 min</span><span class="tag">S1 Jeu 9/07</span><span class="tag">S2 Ven 17/07</span></div><div class="card-meta" style="margin-top:4px"><a href="tel:+33630230268" style="color:var(--teal);font-weight:600;text-decoration:none">📞 06 30 23 02 68</a></div></div>
       <a class="waze-btn" href="https://waze.com/ul?ll=41.6312841,9.3456628&navigate=yes" target="_blank"><span class="waze-logo">🗺️</span><span>Waze</span></a>
     </div>
     <div class="card">
       <div class="card-icon icon-food">🐚</div>
-      <div class="card-body"><div class="card-name">Le Cabanon Bleu</div><div class="card-meta">Baie de St Cyprien · ⭐ 3.9</div><div class="card-tags"><span class="tag green">~15 min</span><span class="tag">S1 Mar 7/07</span><span class="tag">S2 Lun 13/07</span></div><div class="card-meta" style="margin-top:4px"><a href="tel:+33611690056" style="color:var(--sea-d);font-weight:600;text-decoration:none">📞 06 11 69 00 56</a></div></div>
+      <div class="card-body"><div class="card-name">Le Cabanon Bleu</div><div class="card-meta">Baie de St Cyprien · ⭐ 3.9</div><div class="card-tags"><span class="tag green">~15 min</span><span class="tag">S1 Mar 7/07</span><span class="tag">S2 Lun 13/07</span></div><div class="card-meta" style="margin-top:4px"><a href="tel:+33611690056" style="color:var(--teal);font-weight:600;text-decoration:none">📞 06 11 69 00 56</a></div></div>
       <a class="waze-btn" href="https://waze.com/ul?ll=41.6411233,9.3566431&navigate=yes" target="_blank"><span class="waze-logo">🗺️</span><span>Waze</span></a>
     </div>
     <div class="card">
       <div class="card-icon icon-food">🌊</div>
-      <div class="card-body"><div class="card-name">RENA — Cala Rossa</div><div class="card-meta">Plage de Cala Rossa · ⭐ 4.6</div><div class="card-tags"><span class="tag green">~20 min</span><span class="tag">S1 Dim 5/07</span><span class="tag">S2 Mar 14/07</span></div><div class="card-meta" style="margin-top:4px"><a href="tel:+33420130091" style="color:var(--sea-d);font-weight:600;text-decoration:none">📞 04 20 13 00 91</a></div></div>
+      <div class="card-body"><div class="card-name">RENA — Cala Rossa</div><div class="card-meta">Plage de Cala Rossa · ⭐ 4.6</div><div class="card-tags"><span class="tag green">~20 min</span><span class="tag">S1 Dim 5/07</span><span class="tag">S2 Mar 14/07</span></div><div class="card-meta" style="margin-top:4px"><a href="tel:+33420130091" style="color:var(--teal);font-weight:600;text-decoration:none">📞 04 20 13 00 91</a></div></div>
       <a class="waze-btn" href="https://waze.com/ul?ll=41.6200909,9.3318116&navigate=yes" target="_blank"><span class="waze-logo">🗺️</span><span>Waze</span></a>
     </div>
     <div class="card">
       <div class="card-icon icon-food">🍹</div>
-      <div class="card-body"><div class="card-name">Bar Plage — Santa Giulia</div><div class="card-meta">Baie de Santa Giulia · ⭐ 4.3</div><div class="card-tags"><span class="tag orange">~40 min</span><span class="tag">S1 Dim 5/07</span><span class="tag">S2 Mar 14/07</span></div><div class="card-meta" style="margin-top:4px"><a href="tel:+33644373770" style="color:var(--sea-d);font-weight:600;text-decoration:none">📞 06 44 37 37 70</a></div></div>
+      <div class="card-body"><div class="card-name">Bar Plage — Santa Giulia</div><div class="card-meta">Baie de Santa Giulia · ⭐ 4.3</div><div class="card-tags"><span class="tag orange">~40 min</span><span class="tag">S1 Dim 5/07</span><span class="tag">S2 Mar 14/07</span></div><div class="card-meta" style="margin-top:4px"><a href="tel:+33644373770" style="color:var(--teal);font-weight:600;text-decoration:none">📞 06 44 37 37 70</a></div></div>
       <a class="waze-btn" href="https://waze.com/ul?ll=41.5318654,9.2744203&navigate=yes" target="_blank"><span class="waze-logo">🗺️</span><span>Waze</span></a>
     </div>
     <div class="card">
       <div class="card-icon icon-food">🤠</div>
-      <div class="card-body"><div class="card-name">Ranch'O Plage</div><div class="card-meta">Grande Plage de Cala Rossa · ⭐ 4.4</div><div class="card-tags"><span class="tag green">~20 min</span><span class="tag">S2 Sam 11/07</span></div><div class="card-meta" style="margin-top:4px"><a href="tel:+33495716267" style="color:var(--sea-d);font-weight:600;text-decoration:none">📞 04 95 71 62 67</a></div></div>
+      <div class="card-body"><div class="card-name">Ranch'O Plage</div><div class="card-meta">Grande Plage de Cala Rossa · ⭐ 4.4</div><div class="card-tags"><span class="tag green">~20 min</span><span class="tag">S2 Sam 11/07</span></div><div class="card-meta" style="margin-top:4px"><a href="tel:+33495716267" style="color:var(--teal);font-weight:600;text-decoration:none">📞 04 95 71 62 67</a></div></div>
       <a class="waze-btn" href="https://waze.com/ul?ll=41.6206819,9.3326507&navigate=yes" target="_blank"><span class="waze-logo">🗺️</span><span>Waze</span></a>
     </div>
     <div class="card">
       <div class="card-icon icon-food">🏖️</div>
-      <div class="card-body"><div class="card-name">Tamaricciu</div><div class="card-meta">Route de Palombaggia · ⭐ 4.3</div><div class="card-tags"><span class="tag orange">~40 min</span><span class="tag">S1 Lun 6/07</span></div><div class="card-meta" style="margin-top:4px"><a href="tel:+33495704989" style="color:var(--sea-d);font-weight:600;text-decoration:none">📞 04 95 70 49 89</a></div></div>
+      <div class="card-body"><div class="card-name">Tamaricciu</div><div class="card-meta">Route de Palombaggia · ⭐ 4.3</div><div class="card-tags"><span class="tag orange">~40 min</span><span class="tag">S1 Lun 6/07</span></div><div class="card-meta" style="margin-top:4px"><a href="tel:+33495704989" style="color:var(--teal);font-weight:600;text-decoration:none">📞 04 95 70 49 89</a></div></div>
       <a class="waze-btn" href="https://waze.com/ul?ll=41.553447,9.3181647&navigate=yes" target="_blank"><span class="waze-logo">🗺️</span><span>Waze</span></a>
     </div>
     <div class="card">
       <div class="card-icon icon-food">⛵</div>
-      <div class="card-body"><div class="card-name">La Voile Rouge</div><div class="card-meta">Scaffa Rossa — Solaro · ⭐ 4.4</div><div class="card-tags"><span class="tag orange">~45 min</span><span class="tag">S1 Ven 10/07</span><span class="tag">S2 Jeu 16/07</span></div><div class="card-meta" style="margin-top:4px"><a href="tel:+33495366003" style="color:var(--sea-d);font-weight:600;text-decoration:none">📞 04 95 36 60 03</a></div></div>
+      <div class="card-body"><div class="card-name">La Voile Rouge</div><div class="card-meta">Scaffa Rossa — Solaro · ⭐ 4.4</div><div class="card-tags"><span class="tag orange">~45 min</span><span class="tag">S1 Ven 10/07</span><span class="tag">S2 Jeu 16/07</span></div><div class="card-meta" style="margin-top:4px"><a href="tel:+33495366003" style="color:var(--teal);font-weight:600;text-decoration:none">📞 04 95 36 60 03</a></div></div>
       <a class="waze-btn" href="https://waze.com/ul?ll=41.8659172,9.3986435&navigate=yes" target="_blank"><span class="waze-logo">🗺️</span><span>Waze</span></a>
     </div>
     <div class="card">
       <div class="card-icon icon-boat">⚓</div>
-      <div class="card-body"><div class="card-name">Capu Biancu — Bonifacio</div><div class="card-meta">Accès en bateau uniquement 🚢</div><div class="card-tags"><span class="tag">S1 Mer 8/07</span><span class="tag">S2 Mer 15/07</span></div><div class="card-meta" style="margin-top:4px"><a href="tel:+33495730558" style="color:var(--sea-d);font-weight:600;text-decoration:none">📞 04 95 73 05 58</a></div></div>
+      <div class="card-body"><div class="card-name">Capu Biancu — Bonifacio</div><div class="card-meta">Accès en bateau uniquement 🚢</div><div class="card-tags"><span class="tag">S1 Mer 8/07</span><span class="tag">S2 Mer 15/07</span></div><div class="card-meta" style="margin-top:4px"><a href="tel:+33495730558" style="color:var(--teal);font-weight:600;text-decoration:none">📞 04 95 73 05 58</a></div></div>
       <a class="waze-btn disabled"><span class="waze-logo">⚓</span><span>Bateau</span></a>
     </div>
   </div>
@@ -672,6 +629,22 @@
   <div class="wave">🌊🌴☀️🌊🌴</div>
   <footer>Fait avec ❤️ pour la <strong>Team Corse 2026</strong></footer>
 </div>
+
+<!-- ========== TAB BAR (bas) ========== -->
+<nav class="app-nav">
+  <button class="app-nav-btn active" id="nav-planning" onclick="showPage('planning', this)">
+    <span class="nav-icon">📅</span>
+    <span class="nav-label">Planning</span>
+  </button>
+  <button class="app-nav-btn" id="nav-gps" onclick="showPage('gps', this)">
+    <span class="nav-icon">🗺️</span>
+    <span class="nav-label">Adresses</span>
+  </button>
+  <button class="app-nav-btn" id="nav-photos" onclick="showPage('photos', this)">
+    <span class="nav-icon">📸</span>
+    <span class="nav-label">Photos</span>
+  </button>
+</nav>
 
 <!-- lightbox photo -->
 <div class="lightbox" id="lightbox">
@@ -701,6 +674,21 @@ function showWeek(n, btn) {
   document.getElementById('week'+n).classList.add('active');
   btn.classList.add('active');
 }
+
+/* ⏳ COMPTE À REBOURS jusqu'au départ */
+(function(){
+  const el = document.getElementById('countdown'); if(!el) return;
+  const target = new Date('2026-07-04T11:20:00').getTime();
+  function tick(){
+    const diff = target - Date.now();
+    if (diff <= 0){ el.textContent = '🎉 C’est les vacances !'; return; }
+    const d = Math.floor(diff/86400000);
+    const h = Math.floor((diff%86400000)/3600000);
+    const m = Math.floor((diff%3600000)/60000);
+    el.textContent = `⏳ J-${d} · ${h}h${String(m).padStart(2,'0')}`;
+  }
+  tick(); setInterval(tick, 60000);
+})();
 
 
 /* ===== 📸 PHOTOS (stockées uniquement sur l'appareil) ===== */

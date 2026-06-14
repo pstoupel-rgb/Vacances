@@ -91,6 +91,19 @@
   .team-ava .ava-cam{position:absolute;bottom:-1px;right:-1px;width:20px;height:20px;border-radius:50%;background:var(--card);display:grid;place-items:center;font-size:.62rem;box-shadow:0 1px 4px rgba(0,0,0,.2);}
   .team-cell .tm-name{font-size:.78rem;font-weight:600;color:var(--text);text-align:center;}
   .team-hint{font-size:.74rem;color:var(--muted);text-align:center;margin-top:18px;line-height:1.4;}
+  /* ===== CROPPER ===== */
+  .crop-overlay{position:fixed;inset:0;z-index:700;background:rgba(8,6,4,.97);display:none;flex-direction:column;}
+  .crop-overlay.open{display:flex;}
+  .crop-stage{flex:1;position:relative;overflow:hidden;touch-action:none;display:grid;place-items:center;}
+  #crop-img{position:absolute;left:50%;top:50%;will-change:transform;-webkit-user-drag:none;user-select:none;pointer-events:none;}
+  .crop-hole{position:relative;border-radius:50%;box-shadow:0 0 0 9999px rgba(0,0,0,.62);border:2px solid #fff;pointer-events:none;}
+  .crop-zoom{display:flex;align-items:center;gap:12px;padding:14px 28px 2px;}
+  .crop-zoom span{color:#fff;font-size:1rem;}
+  .crop-zoom input{flex:1;accent-color:#c8a882;}
+  .crop-bar{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:8px 20px calc(18px + env(safe-area-inset-bottom));}
+  .crop-bar button{background:none;border:none;color:#fff;font-size:1rem;font-weight:700;cursor:pointer;padding:8px 4px;}
+  .crop-bar .cb-ok{color:#ffd479;}
+  .crop-bar .cb-hint{font-size:.72rem;color:rgba(255,255,255,.55);text-align:center;flex:1;font-weight:400;}
   .hero-title{position:absolute;bottom:50px;left:20px;right:20px;text-align:center;}
   .hero-title h1{font-family:'Playfair Display',serif;font-size:1.7rem;font-weight:700;color:var(--text);line-height:1.1;text-shadow:0 1px 10px rgba(245,242,237,.5);}
   .hero-title p{font-size:.82rem;color:#5a5249;margin-top:3px;font-weight:500;}
@@ -851,6 +864,20 @@
   </div>
 </div>
 
+<!-- CROPPER -->
+<div class="crop-overlay" id="crop-overlay">
+  <div class="crop-stage" id="crop-stage">
+    <img id="crop-img" alt="">
+    <div class="crop-hole" id="crop-hole"></div>
+  </div>
+  <div class="crop-zoom"><span>－</span><input id="crop-range" type="range" min="1" max="5" step="0.01" value="1" oninput="cropSlider(this.value)"><span>＋</span></div>
+  <div class="crop-bar">
+    <button onclick="cropCancel()">Annuler</button>
+    <span class="cb-hint">Pince ou glisse le curseur pour zoomer · déplace l'image</span>
+    <button class="cb-ok" onclick="cropConfirm()">Valider</button>
+  </div>
+</div>
+
 <script>
 /* ===== MENU DÉROULANT ACCUEIL ===== */
 function toggleMenu(e){if(e)e.stopPropagation();document.getElementById('menu-drop').classList.toggle('open');}
@@ -900,7 +927,8 @@ function paintTeam(){
 }
 async function setTeamPhoto(id){
   const files=await pickFiles();if(!files.length)return;
-  const blob=await downscale(files[0],600);
+  const blob=await openCropper(files[0]);
+  if(!blob)return;
   if(typeof _isFbReady==='function'&&_isFbReady()){
     try{const ref=_fbSt.ref('team/'+id+'.jpg');await ref.put(blob,{contentType:'image/jpeg'});const url=await ref.getDownloadURL();await _fbDb.collection('team').doc(id).set({id,url});TEAM_PHOTOS[id]=url;}
     catch(e){alert('Erreur envoi : '+e.message);return;}
@@ -909,6 +937,71 @@ async function setTeamPhoto(id){
   }
   paintTeam();
 }
+
+/* ===== CROPPER (pince/zoom + recadrage) ===== */
+let _crop=null;
+function openCropper(file){
+  return new Promise(resolve=>{
+    const S=Math.round(Math.min(window.innerWidth*0.82,320));
+    const hole=document.getElementById('crop-hole');hole.style.width=hole.style.height=S+'px';
+    const url=URL.createObjectURL(file);
+    const im=new Image();
+    im.onload=()=>{
+      const natW=im.naturalWidth,natH=im.naturalHeight;
+      const ratio=Math.max(S/natW,S/natH);
+      const baseW=natW*ratio,baseH=natH*ratio;
+      const imgEl=document.getElementById('crop-img');
+      imgEl.src=url;imgEl.style.width=baseW+'px';imgEl.style.height=baseH+'px';
+      _crop={S,natW,natH,baseW,baseH,scale:1,tx:0,ty:0,url,resolve,pointers:new Map(),g:null};
+      document.getElementById('crop-range').value=1;
+      applyCrop();
+      document.getElementById('crop-overlay').classList.add('open');
+    };
+    im.onerror=()=>{URL.revokeObjectURL(url);resolve(null);};
+    im.src=url;
+  });
+}
+function applyCrop(){
+  const c=_crop;if(!c)return;
+  const halfX=Math.max(0,(c.baseW*c.scale-c.S)/2),halfY=Math.max(0,(c.baseH*c.scale-c.S)/2);
+  c.tx=Math.max(-halfX,Math.min(halfX,c.tx));c.ty=Math.max(-halfY,Math.min(halfY,c.ty));
+  const img=document.getElementById('crop-img');
+  img.style.transform='translate(-50%,-50%) translate('+c.tx+'px,'+c.ty+'px) scale('+c.scale+')';
+  const r=document.getElementById('crop-range');if(r)r.value=c.scale;
+}
+function cropSlider(v){if(!_crop)return;_crop.scale=parseFloat(v)||1;applyCrop();}
+function _cropReset(){const c=_crop;if(!c)return;const pts=[...c.pointers.values()];
+  c.g={tx:c.tx,ty:c.ty,scale:c.scale,
+    x:pts[0]?pts[0].x:0,y:pts[0]?pts[0].y:0,
+    dist:pts.length>=2?Math.hypot(pts[0].x-pts[1].x,pts[0].y-pts[1].y):0,
+    mx:pts.length>=2?(pts[0].x+pts[1].x)/2:0,my:pts.length>=2?(pts[0].y+pts[1].y)/2:0};
+}
+(function cropSetup(){
+  const stage=document.getElementById('crop-stage');if(!stage)return;
+  stage.addEventListener('pointerdown',e=>{if(!_crop)return;stage.setPointerCapture(e.pointerId);_crop.pointers.set(e.pointerId,{x:e.clientX,y:e.clientY});_cropReset();});
+  stage.addEventListener('pointermove',e=>{const c=_crop;if(!c||!c.pointers.has(e.pointerId))return;e.preventDefault();
+    c.pointers.set(e.pointerId,{x:e.clientX,y:e.clientY});
+    const pts=[...c.pointers.values()],g=c.g;if(!g)return;
+    if(pts.length===1){c.tx=g.tx+(pts[0].x-g.x);c.ty=g.ty+(pts[0].y-g.y);}
+    else{const dist=Math.hypot(pts[0].x-pts[1].x,pts[0].y-pts[1].y);const mx=(pts[0].x+pts[1].x)/2,my=(pts[0].y+pts[1].y)/2;
+      let s=g.scale*(dist/(g.dist||dist));s=Math.max(1,Math.min(5,s));c.scale=s;c.tx=g.tx+(mx-g.mx);c.ty=g.ty+(my-g.my);}
+    applyCrop();
+  });
+  const up=e=>{const c=_crop;if(!c)return;c.pointers.delete(e.pointerId);_cropReset();};
+  stage.addEventListener('pointerup',up);stage.addEventListener('pointercancel',up);
+})();
+function cropConfirm(){
+  const c=_crop;if(!c)return;
+  const OUT=600,dispW=c.baseW*c.scale;
+  const fx=dispW/2-c.S/2-c.tx,fy=(c.baseH*c.scale)/2-c.S/2-c.ty;
+  const f=c.natW/dispW,srcX=fx*f,srcY=fy*f,srcS=c.S*f;
+  const cv=document.createElement('canvas');cv.width=OUT;cv.height=OUT;
+  const ctx=cv.getContext('2d');ctx.imageSmoothingQuality='high';
+  ctx.drawImage(document.getElementById('crop-img'),srcX,srcY,srcS,srcS,0,0,OUT,OUT);
+  const res=c.resolve;cv.toBlob(b=>{_cropClose();res(b||null);},'image/jpeg',.9);
+}
+function cropCancel(){const c=_crop;_cropClose();if(c)c.resolve(null);}
+function _cropClose(){const ov=document.getElementById('crop-overlay');if(ov)ov.classList.remove('open');if(_crop&&_crop.url)URL.revokeObjectURL(_crop.url);_crop=null;}
 
 const NAV_TITLES={home:'Corse 2026',planning:'Planning',carte:'Carte',profil:'Profil',photos:'Souvenirs',maison:'La Maison'};
 function showPage(name,btn,filter){
@@ -1173,7 +1266,7 @@ async function deleteCurrent(){if(!_cur)return;if(!confirm('Supprimer cette phot
     closeLightbox();/* listener auto-updates grid */
   }else{await FileDB.del(_cur.id);PHOTOS=PHOTOS.filter(p=>p.id!==_cur.id);savePhotos();closeLightbox();renderPhotos();}
 }
-window.addEventListener('keydown',e=>{if(e.key==='Escape'){closeLightbox();closeTeam();closeMenu();}});
+window.addEventListener('keydown',e=>{if(e.key==='Escape'){closeLightbox();closeTeam();closeMenu();cropCancel();}});
 
 /* 🏠 GALERIE MAISON (intérieur / extérieur) */
 const MKEY='corse2026-maison';

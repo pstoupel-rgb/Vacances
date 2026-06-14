@@ -341,7 +341,7 @@
   <div class="reco-section">
     <div class="reco-label">Nos recommandations</div>
     <div class="reco-grid">
-      <div class="reco-tile" onclick="showPage('carte',document.getElementById('nav-carte'),'maison')"><img src="https://images.unsplash.com/photo-1568605114967-8130f3a36994?w=240&q=70" loading="lazy" alt=""><span>Maison</span></div>
+      <div class="reco-tile" onclick="showPage('maison',null)"><img src="https://images.unsplash.com/photo-1568605114967-8130f3a36994?w=240&q=70" loading="lazy" alt=""><span>Maison</span></div>
       <div class="reco-tile" onclick="showPage('carte',document.getElementById('nav-carte'),'restaurants')"><img src="https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=240&q=70" loading="lazy" alt=""><span>Restaurants</span></div>
       <div class="reco-tile" onclick="showPage('carte',document.getElementById('nav-carte'),'activites')"><img src="https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?w=240&q=70" loading="lazy" alt=""><span>Activités</span></div>
     </div>
@@ -765,6 +765,25 @@
   <footer>Fait avec ❤️ pour la <strong>Team Corse 2026</strong></footer>
 </div>
 
+<!-- ========== MAISON (galerie) ========== -->
+<div class="page page-content" id="page-maison">
+  <div class="page-hero"><h2>La Maison</h2><p>Photos intérieur & extérieur</p></div>
+  <div style="padding:6px 16px 0">
+    <div class="week-seg">
+      <button class="week-btn active" onclick="houseFilter('all',this)">Toutes</button>
+      <button class="week-btn" onclick="houseFilter('int',this)">🛋️ Intérieur</button>
+      <button class="week-btn" onclick="houseFilter('ext',this)">🌿 Extérieur</button>
+    </div>
+  </div>
+  <div class="section" style="padding-top:12px">
+    <button class="btn-add" onclick="addHousePhotos()">＋ Ajouter des photos</button>
+    <p class="photo-hint">À l'ajout, choisis <b>intérieur</b> ou <b>extérieur</b> — puis filtre avec les onglets ci-dessus.</p>
+    <div class="photo-grid" id="maison-grid"></div>
+  </div>
+  <div class="wave">🌊🌴☀️🌊🌴</div>
+  <footer>Fait avec ❤️ pour la <strong>Team Corse 2026</strong></footer>
+</div>
+
 <!-- ========== PHOTOS ========== -->
 <div class="page page-content" id="page-photos">
   <div class="page-hero"><h2>Souvenirs</h2><p>Photos de la Team Corse 2026</p></div>
@@ -792,7 +811,7 @@
 </div>
 
 <script>
-const NAV_TITLES={home:'Corse 2026',planning:'Planning',carte:'Carte',profil:'Profil',photos:'Souvenirs'};
+const NAV_TITLES={home:'Corse 2026',planning:'Planning',carte:'Carte',profil:'Profil',photos:'Souvenirs',maison:'La Maison'};
 function showPage(name,btn,filter){
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
   document.getElementById('page-'+name).classList.add('active');
@@ -800,6 +819,7 @@ function showPage(name,btn,filter){
   if(name==='photos'){renderAlbum();renderPhotos();}
   if(name==='carte'){initMap();filterCarte(filter);}
   if(name==='home'){renderProgram();}
+  if(name==='maison'){renderHouse();}
   if(name==='profil'){renderFrais();}
   window.__page=name;
   const nb=document.getElementById('navbar');
@@ -958,7 +978,7 @@ async function addPhotos(){
 let _urls=[];
 async function renderPhotos(){const grid=document.getElementById('photo-grid');if(!grid)return;_urls.forEach(u=>URL.revokeObjectURL(u));_urls=[];if(!PHOTOS.length){grid.innerHTML='<div class="photo-empty">Aucune photo pour l\'instant 📷<br>Ajoutez vos plus beaux souvenirs !</div>';return;}grid.innerHTML=PHOTOS.map(p=>'<div class="photo-cell" data-id="'+p.id+'"><img loading="lazy" alt=""></div>').join('');for(const p of PHOTOS){const f=await FileDB.get(p.id);if(!f)continue;const url=URL.createObjectURL(f.blob);_urls.push(url);const cell=grid.querySelector('.photo-cell[data-id="'+p.id+'"]');if(cell){cell.querySelector('img').src=url;cell.onclick=()=>openLightbox(p.id,url);}}}
 let _cur=null;
-function openLightbox(id,url){_cur={id,url};document.getElementById('lb-img').innerHTML='<img src="'+url+'" alt="">';document.getElementById('lightbox').classList.add('open');}
+function openLightbox(id,url,col){_cur={id,url,col:col||'photos'};document.getElementById('lb-img').innerHTML='<img src="'+url+'" alt="">';document.getElementById('lightbox').classList.add('open');}
 function closeLightbox(){document.getElementById('lightbox').classList.remove('open');document.getElementById('lb-img').innerHTML='';_cur=null;}
 async function blobOf(id){const f=await FileDB.get(id);return f?f.blob:null;}
 async function downloadCurrent(){if(!_cur)return;const b=await blobOf(_cur.id);if(!b)return;const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='corse-'+_cur.id+'.jpg';document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),1500);}
@@ -972,8 +992,33 @@ async function shareAll(){
   }catch(e){if(e.name==='AbortError')return;}
   alert('Le partage groupé n\'est pas dispo ici — ouvrez une photo et utilisez ⤴ pour l\'envoyer dans l\'album.');
 }
-async function deleteCurrent(){if(!_cur)return;if(!confirm('Supprimer cette photo ?'))return;await FileDB.del(_cur.id);PHOTOS=PHOTOS.filter(p=>p.id!==_cur.id);savePhotos();closeLightbox();renderPhotos();}
+async function deleteCurrent(){if(!_cur)return;if(!confirm('Supprimer cette photo ?'))return;await FileDB.del(_cur.id);
+  if(_cur.col==='maison'){HOUSE_PHOTOS=HOUSE_PHOTOS.filter(p=>p.id!==_cur.id);saveHouse();closeLightbox();renderHouse();}
+  else{PHOTOS=PHOTOS.filter(p=>p.id!==_cur.id);savePhotos();closeLightbox();renderPhotos();}
+}
 window.addEventListener('keydown',e=>{if(e.key==='Escape')closeLightbox();});
+
+/* 🏠 GALERIE MAISON (intérieur / extérieur) */
+const MKEY='corse2026-maison';
+let HOUSE_PHOTOS=[];try{HOUSE_PHOTOS=JSON.parse(localStorage.getItem(MKEY)||'[]');}catch(e){HOUSE_PHOTOS=[];}
+function saveHouse(){try{localStorage.setItem(MKEY,JSON.stringify(HOUSE_PHOTOS));}catch(e){alert('Stockage plein.');}}
+let HOUSE_FILTER='all',_hurls=[];
+function houseFilter(c,btn){HOUSE_FILTER=c;if(btn){document.querySelectorAll('#page-maison .week-btn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');}renderHouse();}
+async function addHousePhotos(){
+  let cat=HOUSE_FILTER;
+  if(cat==='all')cat=confirm('Ces photos sont-elles à l\'INTÉRIEUR ?\n\nOK = Intérieur · Annuler = Extérieur')?'int':'ext';
+  const files=await pickFiles();if(!files.length)return;
+  for(const f of files){const id=uid();const blob=await downscale(f,1800);await FileDB.put({id,blob});HOUSE_PHOTOS.unshift({id,cat,date:Date.now()});}
+  saveHouse();renderHouse();
+}
+async function renderHouse(){
+  const grid=document.getElementById('maison-grid');if(!grid)return;
+  _hurls.forEach(u=>URL.revokeObjectURL(u));_hurls=[];
+  const list=HOUSE_PHOTOS.filter(p=>HOUSE_FILTER==='all'||p.cat===HOUSE_FILTER);
+  if(!list.length){grid.innerHTML='<div class="photo-empty">Aucune photo ici 🏠<br>Ajoutez les photos de la maison !</div>';return;}
+  grid.innerHTML=list.map(p=>'<div class="photo-cell" data-id="'+p.id+'"><img loading="lazy" alt=""></div>').join('');
+  for(const p of list){const f=await FileDB.get(p.id);if(!f)continue;const url=URL.createObjectURL(f.blob);_hurls.push(url);const cell=grid.querySelector('.photo-cell[data-id="'+p.id+'"]');if(cell){cell.querySelector('img').src=url;cell.onclick=()=>openLightbox(p.id,url,'maison');}}
+}
 
 /* ☀️ MÉTÉO — Porto-Vecchio 15 jours */
 const HOUSE={lat:41.5912,lng:9.2795};

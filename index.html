@@ -196,6 +196,12 @@
   .album-edit{display:block;margin:8px auto 0;background:none;border:none;color:var(--muted);text-decoration:underline;font-size:.78rem;cursor:pointer;}
   .btn-add{width:100%;background:var(--bg2);border:1.5px solid var(--caramel);color:var(--brown);border-radius:var(--radius);padding:14px;font-family:'Inter',sans-serif;font-weight:700;font-size:.95rem;cursor:pointer;}
   .btn-add:active{background:var(--border);}
+  .btn-share-all{width:100%;background:var(--brown);color:#fff;border:none;border-radius:var(--radius);padding:13px;font-family:'Inter',sans-serif;font-weight:700;font-size:.92rem;cursor:pointer;margin-top:8px;}
+  .btn-share-all:active{opacity:.9;}
+  .album-sub{font-size:.74rem;color:var(--muted);text-align:center;margin-top:8px;line-height:1.5;}
+  .album-sub b{color:#2a7d4f;}
+  .album-steps{text-align:left;font-size:.78rem;color:var(--text);line-height:1.7;margin:6px 0 12px;}
+  .album-steps b{color:var(--brown);}
   .photo-hint{font-size:.74rem;color:var(--muted);text-align:center;line-height:1.5;margin:12px 4px 14px;}
   .photo-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;}
   .photo-cell{position:relative;aspect-ratio:1;border-radius:12px;overflow:hidden;background:var(--bg2);cursor:pointer;}
@@ -595,8 +601,9 @@
   </div>
   <div class="section" style="padding-top:0">
     <div class="album-card" id="album-card"></div>
-    <button class="btn-add" onclick="addPhotos()">＋ Ajouter des photos</button>
-    <p class="photo-hint">🔒 Vos photos restent sur votre appareil.<br>Téléchargez (⤓) ou partagez (⤴) pour les envoyer dans l'album partagé.</p>
+    <button class="btn-add" onclick="addPhotos()">＋ Ajouter des photos à l'app</button>
+    <button class="btn-share-all" onclick="shareAll()">📤 Tout envoyer vers Photos / l'album</button>
+    <p class="photo-hint">🔒 Vos photos restent sur votre appareil.<br>Le bouton ci-dessus ouvre le partage iPhone : choisissez <b>l'album partagé</b> une seule fois et toute la Team les verra automatiquement.</p>
     <div class="photo-grid" id="photo-grid"></div>
   </div>
   <div class="wave">🌊🌴☀️🌊🌴</div>
@@ -670,7 +677,7 @@ const FileDB=(()=>{let p;
   function tx(mode,fn){return open().then(db=>new Promise((res,rej)=>{const t=db.transaction('files',mode);const s=t.objectStore('files');const rq=fn(s);t.oncomplete=()=>res(rq&&rq.result);t.onerror=()=>rej(t.error);}));}
   return{put:f=>tx('readwrite',s=>s.put(f)),get:id=>tx('readonly',s=>s.get(id)),del:id=>tx('readwrite',s=>s.delete(id))};
 })();
-function renderAlbum(){const link=localStorage.getItem(AKEY)||'';const el=document.getElementById('album-card');if(!el)return;if(link){el.innerHTML='<a class="album-open" href="'+link+'" target="_blank" rel="noopener">📲 Ouvrir l\'album partagé Apple Photos</a><button class="album-edit" onclick="setAlbum()">Modifier le lien</button>';}else{el.innerHTML='<div class="album-empty"><div class="album-emoji">📲</div><div class="album-txt">Créez un <b>album partagé</b> dans Apple Photos, puis collez ici son lien pour que toute la Team y accède en un tap.</div><button class="album-set" onclick="setAlbum()">＋ Ajouter le lien de l\'album</button></div>';}}
+function renderAlbum(){const link=localStorage.getItem(AKEY)||'';const el=document.getElementById('album-card');if(!el)return;if(link){el.innerHTML='<a class="album-open" href="'+link+'" target="_blank" rel="noopener">📲 Ouvrir l\'album partagé Apple Photos</a><div class="album-sub">✅ <b>Synchro automatique</b> : les photos de cet album sont visibles par toute la Team, sans rien faire.</div><button class="album-edit" onclick="setAlbum()">Modifier le lien</button>';}else{el.innerHTML='<div class="album-empty"><div class="album-emoji">📲</div><div class="album-txt">Pour que les photos soient <b>visibles automatiquement</b> par tout le monde :</div><div class="album-steps">1. Dans <b>Photos</b> → créez un <b>Album partagé</b> « Corse 2026 »<br>2. Invitez la Team<br>3. <b>Partagez le lien public</b> de l\'album<br>4. Collez-le ici 👇</div><button class="album-set" onclick="setAlbum()">＋ Ajouter le lien de l\'album</button></div>';}}
 function setAlbum(){const cur=localStorage.getItem(AKEY)||'';const v=prompt('Lien album partagé iCloud :',cur);if(v===null)return;if(v.trim())localStorage.setItem(AKEY,v.trim());else localStorage.removeItem(AKEY);renderAlbum();}
 function pickFiles(){return new Promise(res=>{const i=document.createElement('input');i.type='file';i.accept='image/*';i.multiple=true;i.onchange=()=>res([...i.files]);i.click();});}
 function downscale(file,max){return new Promise(res=>{const img=new Image();img.onload=()=>{let w=img.width,h=img.height;if(Math.max(w,h)>max){const r=max/Math.max(w,h);w=Math.round(w*r);h=Math.round(h*r);}const c=document.createElement('canvas');c.width=w;c.height=h;c.getContext('2d').drawImage(img,0,0,w,h);c.toBlob(b=>res(b||file),'image/jpeg',.85);};img.onerror=()=>res(file);img.src=URL.createObjectURL(file);});}
@@ -683,6 +690,15 @@ function closeLightbox(){document.getElementById('lightbox').classList.remove('o
 async function blobOf(id){const f=await FileDB.get(id);return f?f.blob:null;}
 async function downloadCurrent(){if(!_cur)return;const b=await blobOf(_cur.id);if(!b)return;const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='corse-'+_cur.id+'.jpg';document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),1500);}
 async function shareCurrent(){if(!_cur)return;const b=await blobOf(_cur.id);if(!b)return;try{const file=new File([b],'corse-'+_cur.id+'.jpg',{type:'image/jpeg'});if(navigator.canShare&&navigator.canShare({files:[file]})){await navigator.share({files:[file]});return;}}catch(e){if(e.name==='AbortError')return;}downloadCurrent();}
+async function shareAll(){
+  if(!PHOTOS.length){alert('Ajoutez d\'abord des photos dans l\'app.');return;}
+  try{
+    const files=[];
+    for(const p of PHOTOS){const b=await blobOf(p.id);if(b)files.push(new File([b],'corse-'+p.id+'.jpg',{type:'image/jpeg'}));}
+    if(navigator.canShare&&navigator.canShare({files})){await navigator.share({files,title:'Photos Corse 2026'});return;}
+  }catch(e){if(e.name==='AbortError')return;}
+  alert('Le partage groupé n\'est pas dispo ici — ouvrez une photo et utilisez ⤴ pour l\'envoyer dans l\'album.');
+}
 async function deleteCurrent(){if(!_cur)return;if(!confirm('Supprimer cette photo ?'))return;await FileDB.del(_cur.id);PHOTOS=PHOTOS.filter(p=>p.id!==_cur.id);savePhotos();closeLightbox();renderPhotos();}
 window.addEventListener('keydown',e=>{if(e.key==='Escape')closeLightbox();});
 

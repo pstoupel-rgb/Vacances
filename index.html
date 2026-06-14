@@ -24,7 +24,7 @@
     -webkit-touch-callout:none;-webkit-user-select:none;user-select:none;overscroll-behavior-y:none;-webkit-overflow-scrolling:touch;}
   a{-webkit-user-select:none;}
 
-  /* ===== SPLASH (écran de lancement, façon app native) ===== */
+  /* ===== SPLASH ===== */
   #splash{position:fixed;inset:0;z-index:9999;background:var(--bg);display:flex;align-items:center;justify-content:center;transition:opacity .45s ease;}
   #splash.hide{opacity:0;pointer-events:none;}
   .splash-inner{text-align:center;}
@@ -38,7 +38,7 @@
   @keyframes splashpop{from{transform:scale(.6);opacity:0}to{transform:scale(1);opacity:1}}
   @keyframes splashdot{0%,100%{opacity:.3;transform:translateY(0)}50%{opacity:1;transform:translateY(-4px)}}
 
-  /* ===== NAV BAR translucide (apparaît au scroll — réflexe iOS) ===== */
+  /* ===== NAV BAR translucide ===== */
   #navbar{position:fixed;top:0;left:0;right:0;z-index:150;padding-top:env(safe-area-inset-top);
     height:calc(46px + env(safe-area-inset-top));display:flex;align-items:center;justify-content:center;
     background:rgba(245,242,237,.8);-webkit-backdrop-filter:saturate(180%) blur(20px);backdrop-filter:saturate(180%) blur(20px);
@@ -55,32 +55,46 @@
   .app-nav-btn.active{color:var(--brown);}
   .page-content{padding-bottom:calc(80px + env(safe-area-inset-bottom));}
   .page{display:none;}
-  .page.active{display:block;animation:fade .2s ease;}
-  @keyframes fade{from{opacity:0}to{opacity:1}}
+  .page.active{display:block;animation:fade .25s ease;}
+  @keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
 
-  /* ===== PLANNING HERO ===== */
+  /* ===== HERO ===== */
   .hero-wrap{position:relative;}
-  .hero-img{width:100%;height:270px;object-fit:cover;display:block;}
-  .hero-overlay{position:absolute;inset:0;background:linear-gradient(to bottom,rgba(245,242,237,0) 20%,rgba(245,242,237,.7) 70%,var(--bg) 100%);}
-  .hero-icons{position:absolute;top:14px;left:16px;right:16px;display:flex;justify-content:space-between;font-size:1.2rem;color:#333;}
-  .hero-title{position:absolute;bottom:90px;left:20px;right:20px;}
-  .hero-title h1{font-family:'Playfair Display',serif;font-size:1.9rem;font-weight:700;color:var(--text);line-height:1.15;}
-  .hero-title p{font-size:.82rem;color:var(--muted);margin-top:5px;}
-  .countdown-card{margin:-42px 16px 0;position:relative;z-index:10;background:var(--bg2);border-radius:var(--radius);padding:14px 18px;box-shadow:0 10px 28px rgba(0,0,0,.12);}
+  .hero-img{width:100%;height:280px;object-fit:cover;display:block;background:var(--bg2);}
+  .hero-overlay{position:absolute;inset:0;background:linear-gradient(to bottom,rgba(245,242,237,.15) 0%,rgba(245,242,237,0) 30%,rgba(245,242,237,.55) 72%,var(--bg) 100%);}
+  .hero-icons{position:absolute;top:14px;left:16px;right:16px;display:flex;justify-content:space-between;font-size:1.25rem;color:#3a3a3a;}
+  .hero-title{position:absolute;bottom:96px;left:20px;right:20px;text-align:center;}
+  .hero-title h1{font-family:'Playfair Display',serif;font-size:2.1rem;font-weight:700;color:var(--text);line-height:1.1;text-shadow:0 1px 10px rgba(245,242,237,.5);}
+  .hero-title p{font-size:.84rem;color:#5a5249;margin-top:6px;font-weight:500;}
+  .countdown-card{margin:-46px 16px 0;position:relative;z-index:10;background:var(--bg2);border-radius:var(--radius);padding:14px 18px;box-shadow:0 10px 28px rgba(0,0,0,.12);}
   .cd-label{font-size:.75rem;color:var(--muted);text-align:center;margin-bottom:8px;}
   .cd-nums{display:flex;justify-content:space-around;}
   .cd-block{text-align:center;}
   .cd-block strong{font-size:1.5rem;font-weight:700;color:var(--brown);}
   .cd-block span{display:block;font-size:.65rem;color:var(--muted);margin-top:1px;}
 
+  /* ===== PROGRAMME DU JOUR ===== */
+  .reco-section{padding:20px 16px 0;}
+  .reco-label{font-size:.82rem;font-weight:600;color:var(--text);}
+  .prog-head{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:11px;}
+  .prog-day{font-size:.74rem;color:var(--muted);font-weight:500;}
+  .program{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:4px 14px;box-shadow:var(--shadow);}
+  .prog-item{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:11px 0;border-bottom:1px solid var(--border);}
+  .prog-item:last-child{border-bottom:none;}
+  .prog-left{display:flex;align-items:center;gap:11px;min-width:0;}
+  .prog-ic{font-size:1.3rem;width:32px;text-align:center;flex-shrink:0;}
+  .prog-name{font-weight:600;font-size:.9rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .prog-time{font-size:.75rem;color:var(--muted);margin-top:1px;}
+  .prog-thumb{width:62px;height:50px;border-radius:11px;object-fit:cover;flex-shrink:0;background:var(--bg2);}
+
   /* ===== RECO TILES ===== */
-  .reco-section{padding:20px 16px 4px;}
-  .reco-label{font-size:.82rem;font-weight:600;margin-bottom:10px;color:var(--text);}
-  .reco-grid{display:flex;gap:10px;}
+  .reco-grid{display:flex;gap:10px;margin-top:11px;}
   .reco-tile{flex:1;position:relative;border-radius:13px;overflow:hidden;cursor:pointer;}
-  .reco-tile img{width:100%;height:80px;object-fit:cover;display:block;}
-  .reco-tile::after{content:'';position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,.55),transparent);}
-  .reco-tile span{position:absolute;bottom:6px;left:8px;color:#fff;font-size:.72rem;font-weight:600;z-index:1;}
+  .reco-tile img{width:100%;height:84px;object-fit:cover;display:block;background:var(--bg2);}
+  .reco-tile::after{content:'';position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,.6),transparent 70%);}
+  .reco-tile span{position:absolute;bottom:7px;left:9px;color:#fff;font-size:.74rem;font-weight:600;z-index:1;}
+  .home-link{width:100%;background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:16px;font-family:'Inter',sans-serif;font-weight:700;font-size:.92rem;color:var(--brown);text-align:left;box-shadow:var(--shadow);cursor:pointer;display:flex;justify-content:space-between;align-items:center;}
+  .home-link:active{transform:scale(.98);}
 
   /* ===== MÉTÉO ===== */
   .weather-wrap{padding:16px 16px 0;}
@@ -104,7 +118,7 @@
   @keyframes shim{to{background-position:-100% 0}}
   .weather-msg{color:var(--muted);font-size:.78rem;text-align:center;padding:10px 0;}
 
-  /* ===== WEEK NAV ===== */
+  /* ===== WEEK NAV (segmenté iOS) ===== */
   .week-nav{padding:10px 16px;position:sticky;top:calc(46px + env(safe-area-inset-top));background:rgba(245,242,237,.85);-webkit-backdrop-filter:saturate(180%) blur(18px);backdrop-filter:saturate(180%) blur(18px);z-index:20;}
   .week-seg{display:flex;background:var(--bg2);border-radius:11px;padding:3px;}
   .week-btn{flex:1;padding:7px 2px;border:none;border-radius:9px;background:transparent;color:var(--text);font-family:'Inter',sans-serif;font-weight:600;font-size:.78rem;cursor:pointer;transition:background .2s,color .2s,box-shadow .2s;}
@@ -154,12 +168,16 @@
   .waze-inline{background:var(--brown);color:#fff;border:none;border-radius:9px;padding:5px 11px;font-size:.68rem;font-weight:700;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;gap:4px;flex-shrink:0;}
   .waze-inline:active{opacity:.85;}
 
-  /* ===== PAGE HERO (GPS + Photos) ===== */
+  /* ===== PAGE HERO ===== */
   .page-hero{padding:22px 16px 16px;}
   .page-hero h2{font-family:'Playfair Display',serif;font-size:1.7rem;color:var(--brown);}
   .page-hero p{font-size:.82rem;color:var(--muted);margin-top:5px;}
 
-  /* ===== GPS PAGE ===== */
+  /* ===== CARTE ===== */
+  #map{height:300px;margin:0 16px 4px;border-radius:var(--radius);overflow:hidden;border:1px solid var(--border);box-shadow:var(--shadow);background:var(--bg2);z-index:0;}
+  .leaflet-container{font-family:'Inter',sans-serif;}
+
+  /* ===== CARDS (adresses) ===== */
   .section{padding:14px 16px 0;}
   .section-hdr{font-size:.78rem;font-weight:700;color:var(--brown);margin-bottom:10px;display:flex;align-items:center;gap:8px;text-transform:uppercase;letter-spacing:.5px;}
   .section-hdr::after{content:'';flex:1;height:1px;background:var(--border);}
@@ -181,7 +199,16 @@
   .waze-btn.green-btn{background:#27ae60;}
   .waze-btn.disabled{background:var(--border);color:var(--muted);cursor:default;pointer-events:none;}
 
-  .wave{text-align:center;font-size:1.5rem;margin:10px 0 4px;letter-spacing:4px;opacity:.6;}
+  /* ===== PROFIL ===== */
+  .fam-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:14px 16px;margin-bottom:10px;box-shadow:var(--shadow);}
+  .fam-top{display:flex;align-items:center;gap:10px;margin-bottom:8px;}
+  .fam-dot{width:13px;height:13px;border-radius:50%;flex-shrink:0;}
+  .fam-name{font-weight:700;font-size:1rem;}
+  .fam-flight{display:flex;align-items:flex-start;gap:9px;font-size:.8rem;color:var(--muted);padding:5px 0;line-height:1.4;}
+  .fam-flight .fl-ic{font-size:1rem;flex-shrink:0;}
+  .fam-flight b{color:var(--text);font-weight:600;}
+
+  .wave{text-align:center;font-size:1.5rem;margin:14px 0 4px;letter-spacing:4px;opacity:.6;}
   footer{text-align:center;padding:12px 16px;font-size:.78rem;color:var(--muted);}
   footer strong{color:var(--brown);}
 
@@ -189,20 +216,21 @@
   .album-card{margin-bottom:14px;}
   .album-empty{background:var(--card);border:2px dashed var(--caramel);border-radius:var(--radius);padding:18px 16px;text-align:center;box-shadow:var(--shadow);}
   .album-emoji{font-size:2.2rem;}
-  .album-txt{font-size:.82rem;color:var(--text);line-height:1.5;margin:8px 0 12px;}
+  .album-txt{font-size:.82rem;color:var(--text);line-height:1.5;margin:8px 0 6px;}
   .album-txt b{color:var(--brown);}
+  .album-steps{text-align:left;font-size:.78rem;color:var(--text);line-height:1.7;margin:6px 0 12px;}
+  .album-steps b{color:var(--brown);}
   .album-set{background:var(--brown);color:#fff;padding:10px 18px;border-radius:13px;font-size:.85rem;font-weight:700;border:none;cursor:pointer;}
   .album-open{display:block;background:var(--brown);color:#fff;text-align:center;text-decoration:none;font-weight:700;font-size:.95rem;padding:14px;border-radius:var(--radius);}
+  .album-sub{font-size:.74rem;color:var(--muted);text-align:center;margin-top:8px;line-height:1.5;}
+  .album-sub b{color:#2a7d4f;}
   .album-edit{display:block;margin:8px auto 0;background:none;border:none;color:var(--muted);text-decoration:underline;font-size:.78rem;cursor:pointer;}
   .btn-add{width:100%;background:var(--bg2);border:1.5px solid var(--caramel);color:var(--brown);border-radius:var(--radius);padding:14px;font-family:'Inter',sans-serif;font-weight:700;font-size:.95rem;cursor:pointer;}
   .btn-add:active{background:var(--border);}
   .btn-share-all{width:100%;background:var(--brown);color:#fff;border:none;border-radius:var(--radius);padding:13px;font-family:'Inter',sans-serif;font-weight:700;font-size:.92rem;cursor:pointer;margin-top:8px;}
   .btn-share-all:active{opacity:.9;}
-  .album-sub{font-size:.74rem;color:var(--muted);text-align:center;margin-top:8px;line-height:1.5;}
-  .album-sub b{color:#2a7d4f;}
-  .album-steps{text-align:left;font-size:.78rem;color:var(--text);line-height:1.7;margin:6px 0 12px;}
-  .album-steps b{color:var(--brown);}
   .photo-hint{font-size:.74rem;color:var(--muted);text-align:center;line-height:1.5;margin:12px 4px 14px;}
+  .photo-hint b{color:var(--brown);}
   .photo-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;}
   .photo-cell{position:relative;aspect-ratio:1;border-radius:12px;overflow:hidden;background:var(--bg2);cursor:pointer;}
   .photo-cell img{width:100%;height:100%;object-fit:cover;display:block;}
@@ -219,7 +247,7 @@
 </head>
 <body>
 
-<!-- ========== SPLASH ========== -->
+<!-- SPLASH -->
 <div id="splash">
   <div class="splash-inner">
     <div class="splash-icon">🌴</div>
@@ -229,37 +257,26 @@
   </div>
 </div>
 
-<!-- ========== NAV BAR (titre au scroll) ========== -->
+<!-- NAV BAR -->
 <div id="navbar"><span id="navbar-title">Corse 2026</span></div>
 
-<!-- ========== BOTTOM NAV ========== -->
+<!-- BOTTOM NAV -->
 <nav class="app-nav">
-  <button class="app-nav-btn active" id="nav-planning" onclick="showPage('planning',this)">
-    <span class="nav-icon">📅</span><span class="nav-label">Planning</span>
-  </button>
-  <button class="app-nav-btn" id="nav-gps" onclick="showPage('gps',this)">
-    <span class="nav-icon">🗺️</span><span class="nav-label">Adresses</span>
-  </button>
-  <button class="app-nav-btn" id="nav-photos" onclick="showPage('photos',this)">
-    <span class="nav-icon">📸</span><span class="nav-label">Photos</span>
-  </button>
+  <button class="app-nav-btn active" id="nav-home" onclick="showPage('home',this)"><span class="nav-icon">🏠</span><span class="nav-label">Accueil</span></button>
+  <button class="app-nav-btn" id="nav-planning" onclick="showPage('planning',this)"><span class="nav-icon">📅</span><span class="nav-label">Planning</span></button>
+  <button class="app-nav-btn" id="nav-carte" onclick="showPage('carte',this)"><span class="nav-icon">📍</span><span class="nav-label">Carte</span></button>
+  <button class="app-nav-btn" id="nav-profil" onclick="showPage('profil',this)"><span class="nav-icon">👤</span><span class="nav-label">Profil</span></button>
 </nav>
 
-<!-- ========== PAGE 1 : PLANNING ========== -->
-<div class="page active page-content" id="page-planning">
-
-  <!-- HERO HEADER -->
+<!-- ========== ACCUEIL ========== -->
+<div class="page active page-content" id="page-home">
   <div class="hero-wrap">
-    <img class="hero-img" src="https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=800&q=80" alt="Corse plage" loading="eager">
+    <img class="hero-img" src="https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=900&q=80" alt="Corse plage" loading="eager">
     <div class="hero-overlay"></div>
-    <div class="hero-icons">☰ &nbsp; 🔔</div>
-    <div class="hero-title">
-      <h1>Corse 2026</h1>
-      <p>14 jours d'évasion · Team Corse ✴️</p>
-    </div>
+    <div class="hero-icons"><span>☰</span><span>🔔</span></div>
+    <div class="hero-title"><h1>Corse 2026</h1><p>14 jours d'évasion ✴️</p></div>
   </div>
 
-  <!-- COUNTDOWN -->
   <div class="countdown-card">
     <div class="cd-label">Départ dans</div>
     <div class="cd-nums">
@@ -269,26 +286,32 @@
     </div>
   </div>
 
-  <!-- RECO TILES -->
   <div class="reco-section">
-    <div class="reco-label">Nos incontournables</div>
+    <div class="prog-head"><span class="reco-label" id="program-title">Programme du jour</span><span class="prog-day" id="program-day"></span></div>
+    <div class="program" id="program"></div>
+  </div>
+
+  <div class="reco-section">
+    <div class="reco-label">Nos recommandations</div>
     <div class="reco-grid">
-      <div class="reco-tile">
-        <img src="https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=200&q=70" loading="lazy" alt="">
-        <span>Plages</span>
-      </div>
-      <div class="reco-tile" onclick="showPage('gps',document.getElementById('nav-gps'))">
-        <img src="https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=200&q=70" loading="lazy" alt="">
-        <span>Restaurants</span>
-      </div>
-      <div class="reco-tile" onclick="showPage('gps',document.getElementById('nav-gps'))">
-        <img src="https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?w=200&q=70" loading="lazy" alt="">
-        <span>Activités</span>
-      </div>
+      <div class="reco-tile" onclick="showPage('carte',document.getElementById('nav-carte'))"><img src="https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=240&q=70" loading="lazy" alt=""><span>Plages</span></div>
+      <div class="reco-tile" onclick="showPage('carte',document.getElementById('nav-carte'))"><img src="https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=240&q=70" loading="lazy" alt=""><span>Restaurants</span></div>
+      <div class="reco-tile" onclick="showPage('planning',document.getElementById('nav-planning'))"><img src="https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?w=240&q=70" loading="lazy" alt=""><span>Activités</span></div>
     </div>
   </div>
 
-  <!-- MÉTÉO -->
+  <div class="reco-section">
+    <button class="home-link" onclick="showPage('photos',null)"><span>📸 Nos souvenirs photos</span><span>→</span></button>
+  </div>
+
+  <div class="wave">🌊🌴☀️🌊🌴</div>
+  <footer>Fait avec ❤️ pour la <strong>Team Corse 2026</strong></footer>
+</div>
+
+<!-- ========== PLANNING ========== -->
+<div class="page page-content" id="page-planning">
+  <div class="page-hero"><h2>Planning</h2><p>Jour par jour · 4 → 18 juillet 2026</p></div>
+
   <div class="weather-wrap">
     <div class="weather-card">
       <div class="weather-head">
@@ -299,7 +322,6 @@
     </div>
   </div>
 
-  <!-- WEEK NAV -->
   <div class="week-nav">
     <div class="week-seg">
       <button class="week-btn active" onclick="showWeek(1,this)">✈️ Arr.</button>
@@ -308,7 +330,7 @@
     </div>
   </div>
 
-  <!-- ===== ARRIVÉES ===== -->
+  <!-- ARRIVÉES -->
   <div class="week active" id="week1">
     <div class="legend">
       <div class="legend-title">👨‍👩‍👧 Les familles</div>
@@ -360,7 +382,7 @@
     </div>
   </div>
 
-  <!-- ===== SEMAINE 1 ===== -->
+  <!-- SEMAINE 1 -->
   <div class="week" id="week2">
     <div class="day-card">
       <div class="day-header"><div class="day-number">5</div><div class="day-info"><div class="day-name">Dimanche — Farniente</div><div class="day-date">5 juillet 2026</div></div><div class="day-vibe">🍹</div></div>
@@ -420,7 +442,7 @@
     </div>
   </div>
 
-  <!-- ===== SEMAINE 2 ===== -->
+  <!-- SEMAINE 2 -->
   <div class="week" id="week3">
     <div class="day-card">
       <div class="day-header"><div class="day-number">11</div><div class="day-info"><div class="day-name">Samedi — Départ Carniol</div><div class="day-date">11 juillet 2026</div></div><div class="day-vibe">👋</div></div>
@@ -500,12 +522,10 @@
   <footer>Fait avec ❤️ pour la <strong>Team Corse 2026</strong></footer>
 </div>
 
-<!-- ========== PAGE 2 : ADRESSES ========== -->
-<div class="page page-content" id="page-gps">
-  <div class="page-hero">
-    <h2>Adresses & Restos</h2>
-    <p>Navigation GPS · Toutes les adresses du séjour</p>
-  </div>
+<!-- ========== CARTE ========== -->
+<div class="page page-content" id="page-carte">
+  <div class="page-hero"><h2>Carte</h2><p>Tous les lieux du séjour épinglés</p></div>
+  <div id="map"></div>
 
   <div class="section">
     <div class="section-hdr">🏠 La maison</div>
@@ -593,12 +613,62 @@
   <footer>Fait avec ❤️ pour la <strong>Team Corse 2026</strong></footer>
 </div>
 
-<!-- ========== PAGE 3 : PHOTOS ========== -->
-<div class="page page-content" id="page-photos">
-  <div class="page-hero">
-    <h2>Souvenirs</h2>
-    <p>Photos de la Team Corse 2026</p>
+<!-- ========== PROFIL ========== -->
+<div class="page page-content" id="page-profil">
+  <div class="page-hero"><h2>La Team Corse</h2><p>Familles, vols & infos pratiques</p></div>
+
+  <div class="section">
+    <div class="section-hdr">👨‍👩‍👧 Les familles & leurs vols</div>
+
+    <div class="fam-card">
+      <div class="fam-top"><div class="fam-dot" style="background:#13A89E"></div><div class="fam-name">Stoupel</div></div>
+      <div class="fam-flight"><span class="fl-ic">🛫</span><div>Aller — <b>Sam 4/07</b> · Volotea <b>V72526</b><br>Lille 11h20 → Figari 13h25</div></div>
+      <div class="fam-flight"><span class="fl-ic">🛬</span><div>Retour — <b>Sam 18/07</b> · Volotea <b>V72527</b><br>Figari ~13h55 → Lille</div></div>
+    </div>
+
+    <div class="fam-card">
+      <div class="fam-top"><div class="fam-dot" style="background:#FF6B4A"></div><div class="fam-name">Carniol</div></div>
+      <div class="fam-flight"><span class="fl-ic">🛫</span><div>Aller — <b>Sam 4/07</b> · Volotea <b>V72526</b><br>Lille 11h20 → Figari 13h25</div></div>
+      <div class="fam-flight"><span class="fl-ic">🛬</span><div>Retour — <b>Sam 11/07</b> · Volotea <b>V72527</b><br>Figari → Lille</div></div>
+    </div>
+
+    <div class="fam-card">
+      <div class="fam-top"><div class="fam-dot" style="background:#3FA66A"></div><div class="fam-name">Delhauteur</div></div>
+      <div class="fam-flight"><span class="fl-ic">🛫</span><div>Aller — <b>Sam 4/07</b> · Ryanair <b>FR4566</b><br>Charleroi 14h40 → Figari 16h45</div></div>
+      <div class="fam-flight"><span class="fl-ic">🛬</span><div>Retour — <b>Sam 18/07</b> · Ryanair <b>FR4567</b><br>Figari ~15h05 → Charleroi</div></div>
+    </div>
+
+    <div class="fam-card">
+      <div class="fam-top"><div class="fam-dot" style="background:#FFB23E"></div><div class="fam-name">Etienne</div></div>
+      <div class="fam-flight"><span class="fl-ic">🛫</span><div>Aller — <b>Ven 10/07</b> · Ryanair <b>FR4566</b><br>Charleroi 14h40 → Figari</div></div>
+      <div class="fam-flight"><span class="fl-ic">🛬</span><div>Retour — <b>Sam 18/07</b> · Ryanair <b>FR4567</b><br>Figari ~15h05 → Charleroi</div></div>
+    </div>
   </div>
+
+  <div class="section">
+    <div class="section-hdr">📞 Numéros utiles</div>
+    <a class="card" href="tel:+33495731713" style="text-decoration:none">
+      <div class="card-icon icon-golf">⛳</div>
+      <div class="card-body"><div class="card-name">Golf de Spérone</div><div class="card-meta">04 95 73 17 13</div></div>
+    </a>
+    <a class="card" href="tel:+33622916144" style="text-decoration:none">
+      <div class="card-icon icon-canyon">🏔️</div>
+      <div class="card-body"><div class="card-name">Corsica Canyon</div><div class="card-meta">06 22 91 61 44</div></div>
+    </a>
+  </div>
+
+  <div class="section">
+    <div class="section-hdr">📸 Souvenirs</div>
+    <button class="home-link" onclick="showPage('photos',null)"><span>📸 Voir & partager les photos</span><span>→</span></button>
+  </div>
+
+  <div class="wave">🌊🌴☀️🌊🌴</div>
+  <footer>Fait avec ❤️ pour la <strong>Team Corse 2026</strong></footer>
+</div>
+
+<!-- ========== PHOTOS ========== -->
+<div class="page page-content" id="page-photos">
+  <div class="page-hero"><h2>Souvenirs</h2><p>Photos de la Team Corse 2026</p></div>
   <div class="section" style="padding-top:0">
     <div class="album-card" id="album-card"></div>
     <button class="btn-add" onclick="addPhotos()">＋ Ajouter des photos à l'app</button>
@@ -624,34 +694,35 @@
 </div>
 
 <script>
-const NAV_TITLES={planning:'Corse 2026',gps:'Adresses & Restos',photos:'Souvenirs'};
+const NAV_TITLES={home:'Corse 2026',planning:'Planning',carte:'Carte',profil:'Profil',photos:'Souvenirs'};
 function showPage(name,btn){
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
-  document.querySelectorAll('.app-nav-btn').forEach(b=>b.classList.remove('active'));
   document.getElementById('page-'+name).classList.add('active');
-  btn.classList.add('active');
+  if(btn){document.querySelectorAll('.app-nav-btn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');}
   if(name==='photos'){renderAlbum();renderPhotos();}
+  if(name==='carte'){initMap();}
+  if(name==='home'){renderProgram();}
   window.__page=name;
   const nb=document.getElementById('navbar');
   if(nb){nb.classList.remove('show');document.getElementById('navbar-title').textContent=NAV_TITLES[name]||'Corse 2026';}
   window.scrollTo({top:0,behavior:'smooth'});
 }
-
-/* Barre de titre translucide qui apparaît au scroll (réflexe iOS) */
-(function(){
-  const nb=document.getElementById('navbar');window.__page='planning';
-  function upd(){const th=window.__page==='planning'?210:56;if(window.scrollY>th)nb.classList.add('show');else nb.classList.remove('show');}
-  window.addEventListener('scroll',upd,{passive:true});
-})();
-
-/* Splash : disparaît une fois l'app prête */
-window.addEventListener('load',()=>setTimeout(()=>{const s=document.getElementById('splash');if(s)s.classList.add('hide');},700));
 function showWeek(n,btn){
   document.querySelectorAll('#page-planning .week').forEach(w=>w.classList.remove('active'));
   document.querySelectorAll('#page-planning .week-btn').forEach(b=>b.classList.remove('active'));
   document.getElementById('week'+n).classList.add('active');
   btn.classList.add('active');
 }
+
+/* Barre de titre au scroll */
+(function(){
+  const nb=document.getElementById('navbar');window.__page='home';
+  function upd(){const th=window.__page==='home'?210:56;if(window.scrollY>th)nb.classList.add('show');else nb.classList.remove('show');}
+  window.addEventListener('scroll',upd,{passive:true});
+})();
+
+/* Splash */
+window.addEventListener('load',()=>setTimeout(()=>{const s=document.getElementById('splash');if(s)s.classList.add('hide');},700));
 
 /* ⏳ COMPTE À REBOURS */
 (function(){
@@ -666,6 +737,86 @@ function showWeek(n,btn){
   }
   tick();setInterval(tick,60000);
 })();
+
+/* 📅 PROGRAMME DU JOUR */
+const IMG={
+  plane:'https://images.unsplash.com/photo-1436491865332-7a61a109cc05?w=160&h=130&fit=crop&q=70',
+  car:'https://images.unsplash.com/photo-1502877338535-766e1452684a?w=160&h=130&fit=crop&q=70',
+  food:'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=160&h=130&fit=crop&q=70',
+  beach:'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=160&h=130&fit=crop&q=70',
+  golf:'https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?w=160&h=130&fit=crop&q=70',
+  boat:'https://images.unsplash.com/photo-1505577058444-a3dab90d4253?w=160&h=130&fit=crop&q=70',
+  canyon:'https://images.unsplash.com/photo-1551632811-561732d1e306?w=160&h=130&fit=crop&q=70',
+  sunset:'https://images.unsplash.com/photo-1471922694854-ff1b63b20054?w=160&h=130&fit=crop&q=70',
+  home:'https://images.unsplash.com/photo-1564013799919-ab600027ffc6?w=160&h=130&fit=crop&q=70',
+  water:'https://images.unsplash.com/photo-1530870110042-98b2cb110834?w=160&h=130&fit=crop&q=70'
+};
+const DAYS=[
+  {date:'2026-07-04',name:'Arrivée — 3 familles',short:'Sam 4/07',items:[{ic:'✈️',t:'Vol Lille → Figari',time:'11h20',img:IMG.plane},{ic:'🚗',t:'Location voiture (Sixt)',time:'13h30',img:IMG.car},{ic:'🥂',t:'Apéro de bienvenue',time:'18h30',img:IMG.sunset}]},
+  {date:'2026-07-05',name:'Dimanche — Farniente',short:'Dim 5/07',items:[{ic:'🌅',t:'Premier réveil en Corse',time:'Matin',img:IMG.beach},{ic:'🍽️',t:'Déjeuner — Playarellu',time:'12h30',img:IMG.food},{ic:'🏠',t:'Soirée maison',time:'Soir',img:IMG.home}]},
+  {date:'2026-07-06',name:'Lundi — Golf',short:'Lun 6/07',items:[{ic:'⛳',t:'Golf de Spérone — 18 trous',time:'09h00',img:IMG.golf},{ic:'🍽️',t:'Déjeuner — Tamaricciu',time:'12h30',img:IMG.food},{ic:'🏠',t:'Soirée maison',time:'Soir',img:IMG.home}]},
+  {date:'2026-07-07',name:'Mardi — Plage',short:'Mar 7/07',items:[{ic:'🌊',t:'Plage libre',time:'Matin',img:IMG.beach},{ic:'🍽️',t:'Déjeuner — Le Cabanon Bleu',time:'12h30',img:IMG.food},{ic:'🏠',t:'Soirée maison',time:'Soir',img:IMG.home}]},
+  {date:'2026-07-08',name:'Mercredi — Bateau',short:'Mer 8/07',items:[{ic:'⚓',t:'Départ Port de Pinarellu',time:'Matin',img:IMG.boat},{ic:'🍽️',t:'Déjeuner — Capu Biancu',time:'12h30',img:IMG.boat},{ic:'🏠',t:'Soirée',time:'Soir',img:IMG.home}]},
+  {date:'2026-07-09',name:'Jeudi — Ski Nautique',short:'Jeu 9/07',items:[{ic:'🏄',t:'Ski Nautique',time:'11h00',img:IMG.water},{ic:'🍽️',t:'Déjeuner — Le Tiki',time:'12h30',img:IMG.food},{ic:'🏠',t:'Soirée maison',time:'Soir',img:IMG.home}]},
+  {date:'2026-07-10',name:'Vendredi — Canyoning',short:'Ven 10/07',items:[{ic:'🏔️',t:'Canyoning — Corsica Canyon',time:'08h45',img:IMG.canyon},{ic:'🍽️',t:'Déjeuner — La Voile Rouge',time:'12h30',img:IMG.food},{ic:'🎉',t:'Arrivée Etienne',time:'18h20',img:IMG.sunset}]},
+  {date:'2026-07-11',name:'Samedi — Départ Carniol',short:'Sam 11/07',items:[{ic:'✈️',t:'Départ Carniol — Figari',time:'Matin',img:IMG.plane},{ic:'🍽️',t:"Déjeuner — Ranch'O Plage",time:'12h30',img:IMG.food},{ic:'🏠',t:'Soirée maison',time:'Soir',img:IMG.home}]},
+  {date:'2026-07-12',name:'Dimanche — Farniente',short:'Dim 12/07',items:[{ic:'🌊',t:'Plage — Farniente total',time:'Matin',img:IMG.beach},{ic:'🍽️',t:'Déjeuner — Playarellu',time:'12h30',img:IMG.food},{ic:'🏠',t:'Soirée maison',time:'Soir',img:IMG.home}]},
+  {date:'2026-07-13',name:'Lundi — Balade',short:'Lun 13/07',items:[{ic:'🥾',t:'Balade / activité libre',time:'Matin',img:IMG.beach},{ic:'🍽️',t:'Déjeuner — Le Cabanon Bleu',time:'12h30',img:IMG.food},{ic:'🏛️',t:'Bonifacio (option)',time:'16h00',img:IMG.sunset}]},
+  {date:'2026-07-14',name:'Mardi — Fête Nationale',short:'Mar 14/07',items:[{ic:'🍽️',t:'Déjeuner — RENA / Bar Plage',time:'12h30',img:IMG.food},{ic:'🎆',t:"Feux d'artifice",time:'Soir',img:IMG.sunset}]},
+  {date:'2026-07-15',name:'Mercredi — Bateau',short:'Mer 15/07',items:[{ic:'⚓',t:'Départ Port de Pinarellu',time:'Matin',img:IMG.boat},{ic:'🍽️',t:'Déjeuner — Capu Biancu',time:'12h30',img:IMG.boat},{ic:'🏠',t:'Soirée',time:'Soir',img:IMG.home}]},
+  {date:'2026-07-16',name:'Jeudi — Canyoning',short:'Jeu 16/07',items:[{ic:'🏔️',t:'Canyoning — Corsica Canyon',time:'08h45',img:IMG.canyon},{ic:'🍽️',t:'Déjeuner — La Voile Rouge',time:'12h30',img:IMG.food},{ic:'🏠',t:'Soirée maison',time:'Soir',img:IMG.home}]},
+  {date:'2026-07-17',name:'Vendredi — Ski Nautique',short:'Ven 17/07',items:[{ic:'🏄',t:'Ski Nautique',time:'11h00',img:IMG.water},{ic:'🍽️',t:'Déjeuner — Le Tiki',time:'12h30',img:IMG.food},{ic:'🌅',t:'Dernier soir ensemble',time:'Soir',img:IMG.sunset}]},
+  {date:'2026-07-18',name:'Samedi — Retour',short:'Sam 18/07',items:[{ic:'🏠',t:'Rangement, derniers cafés',time:'Matin',img:IMG.home},{ic:'✈️',t:'Vol Figari → Lille',time:'13h55',img:IMG.plane},{ic:'✈️',t:'Vol Figari → Charleroi',time:'15h05',img:IMG.plane}]}
+];
+function renderProgram(){
+  const host=document.getElementById('program');if(!host)return;
+  const tk=new Date().toISOString().slice(0,10);
+  let day=DAYS.find(d=>d.date===tk),title;
+  if(day){title='Programme du jour';}
+  else{day=DAYS.find(d=>d.date>tk)||DAYS[DAYS.length-1];title='Prochaine étape';}
+  document.getElementById('program-title').textContent=title;
+  document.getElementById('program-day').textContent=day.short+' · '+day.name;
+  host.innerHTML=day.items.map(it=>'<div class="prog-item"><div class="prog-left"><div class="prog-ic">'+it.ic+'</div><div><div class="prog-name">'+it.t+'</div><div class="prog-time">'+(it.time||'')+'</div></div></div><img class="prog-thumb" src="'+it.img+'" loading="lazy" alt=""></div>').join('');
+}
+renderProgram();
+
+/* 📍 CARTE Leaflet (chargée à la 1re ouverture) */
+const PLACES=[
+  {n:'🏠 Maison — Zonza',lat:41.6532357,lng:9.3511},
+  {n:'✈️ Aéroport Figari',lat:41.498692,lng:9.098273},
+  {n:'⛳ Golf de Spérone',lat:41.3729733,lng:9.2101607},
+  {n:'🏔️ Corsica Canyon',lat:41.8248008,lng:9.2629071},
+  {n:'⚓ Port de Pinarellu',lat:41.6819974,lng:9.3738209},
+  {n:'🍺 Playarellu',lat:41.6764273,lng:9.3725932},
+  {n:'🌴 Le Tiki',lat:41.6312841,lng:9.3456628},
+  {n:'🐚 Le Cabanon Bleu',lat:41.6411233,lng:9.3566431},
+  {n:'🌊 RENA — Cala Rossa',lat:41.6200909,lng:9.3318116},
+  {n:'🍹 Bar Plage Santa Giulia',lat:41.5318654,lng:9.2744203},
+  {n:"🤠 Ranch'O Plage",lat:41.6206819,lng:9.3326507},
+  {n:'🏖️ Tamaricciu',lat:41.553447,lng:9.3181647},
+  {n:'⛵ La Voile Rouge',lat:41.8659172,lng:9.3986435}
+];
+let _map=null,_mapInit=false;
+function loadCSS(href){return new Promise(r=>{const l=document.createElement('link');l.rel='stylesheet';l.href=href;l.onload=r;l.onerror=r;document.head.appendChild(l);});}
+function loadScript(src){return new Promise(r=>{const s=document.createElement('script');s.src=src;s.onload=r;s.onerror=r;document.head.appendChild(s);});}
+async function initMap(){
+  if(_mapInit){if(_map)setTimeout(()=>_map.invalidateSize(),150);return;}
+  _mapInit=true;
+  try{
+    await loadCSS('https://unpkg.com/leaflet@1.9.4/dist/leaflet.css');
+    await loadScript('https://unpkg.com/leaflet@1.9.4/dist/leaflet.js');
+    if(typeof L==='undefined')throw new Error('leaflet');
+    const map=L.map('map',{zoomControl:true,attributionControl:false});
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:18}).addTo(map);
+    const pts=[];
+    PLACES.forEach(p=>{L.marker([p.lat,p.lng]).addTo(map).bindPopup('<b>'+p.n+'</b>');pts.push([p.lat,p.lng]);});
+    map.fitBounds(pts,{padding:[28,28]});
+    _map=map;
+    setTimeout(()=>map.invalidateSize(),200);
+  }catch(e){
+    document.getElementById('map').innerHTML='<div style="display:grid;place-items:center;height:100%;color:#888;font-size:.82rem;text-align:center;padding:16px">🌐 Carte indisponible hors-ligne.<br>Les adresses ci-dessous restent accessibles.</div>';
+  }
+}
 
 /* ===== PHOTOS ===== */
 const PKEY='corse2026-photos',AKEY='corse2026-album';
@@ -708,9 +859,9 @@ const WMO={0:'☀️',1:'🌤️',2:'⛅',3:'☁️',45:'🌫️',48:'🌫️',5
 function wmoE(c){if(WMO[c]!=null)return WMO[c];const ks=Object.keys(WMO).map(Number).sort((a,b)=>a-b);let b=ks[0];for(const k of ks){if(k<=c)b=k;}return WMO[b]||'🌈';}
 async function loadWeather(){
   const strip=document.getElementById('weather-strip');
-  strip.innerHTML=Array.from({length:8}).map(()=>`<div class="w-day"><div class="skel" style="height:10px;width:30px;margin:0 auto 6px"></div><div class="skel" style="height:22px;width:22px;border-radius:50%;margin:0 auto 6px"></div><div class="skel" style="height:10px;width:26px;margin:0 auto"></div></div>`).join('');
+  strip.innerHTML=Array.from({length:8}).map(()=>'<div class="w-day"><div class="skel" style="height:10px;width:30px;margin:0 auto 6px"></div><div class="skel" style="height:22px;width:22px;border-radius:50%;margin:0 auto 6px"></div><div class="skel" style="height:10px;width:26px;margin:0 auto"></div></div>').join('');
   try{
-    const url=`https://api.open-meteo.com/v1/forecast?latitude=${HOUSE.lat}&longitude=${HOUSE.lng}&daily=weathercode,temperature_2m_max,temperature_2m_min,precipitation_probability_max&timezone=auto&forecast_days=16`;
+    const url='https://api.open-meteo.com/v1/forecast?latitude='+HOUSE.lat+'&longitude='+HOUSE.lng+'&daily=weathercode,temperature_2m_max,temperature_2m_min,precipitation_probability_max&timezone=auto&forecast_days=16';
     const ctrl=new AbortController();const to=setTimeout(()=>ctrl.abort(),6000);
     const r=await fetch(url,{signal:ctrl.signal});clearTimeout(to);
     if(!r.ok)throw new Error('api');
@@ -719,15 +870,15 @@ async function loadWeather(){
     const today=new Date().toISOString().slice(0,10);
     strip.innerHTML=d.time.map((t,i)=>{
       const dt=new Date(t+'T00:00:00');
-      return`<div class="w-day${t===today?' today':''}"><div class="wn">${t===today?'Auj.':DN[dt.getDay()]+' '+dt.getDate()}</div><div class="wi">${wmoE(d.weathercode[i])}</div><div class="wh">${Math.round(d.temperature_2m_max[i])}°</div><div class="wl">${Math.round(d.temperature_2m_min[i])}°</div><div class="wr">💧${d.precipitation_probability_max[i]||0}%</div></div>`;
+      return '<div class="w-day'+(t===today?' today':'')+'"><div class="wn">'+(t===today?'Auj.':DN[dt.getDay()]+' '+dt.getDate())+'</div><div class="wi">'+wmoE(d.weathercode[i])+'</div><div class="wh">'+Math.round(d.temperature_2m_max[i])+'°</div><div class="wl">'+Math.round(d.temperature_2m_min[i])+'°</div><div class="wr">💧'+(d.precipitation_probability_max[i]||0)+'%</div></div>';
     }).join('');
   }catch(e){strip.innerHTML='<div class="weather-msg">🌐 Météo indisponible — vérifiez la connexion.</div>';}
 }
 loadWeather();
 
+/* PWA + auto-update */
 if('serviceWorker' in navigator&&location.protocol==='https:'){
   navigator.serviceWorker.register('sw.js').catch(()=>{});
-  /* Recharge auto quand une nouvelle version du SW prend le contrôle */
   navigator.serviceWorker.addEventListener('controllerchange',()=>window.location.reload());
 }
 </script>

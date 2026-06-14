@@ -82,15 +82,15 @@
   .team-head{text-align:center;margin-bottom:16px;}
   .team-head h2{font-family:'Playfair Display',serif;font-size:1.45rem;font-weight:700;color:var(--brown);}
   .team-head p{font-size:.8rem;color:var(--muted);margin-top:2px;}
-  .team-member{display:flex;align-items:center;gap:13px;background:var(--card);border:1px solid var(--border);border-radius:15px;padding:13px 15px;margin-bottom:10px;box-shadow:var(--shadow);}
-  .team-ava{width:46px;height:46px;border-radius:50%;display:grid;place-items:center;font-size:1.2rem;font-weight:700;color:#fff;flex-shrink:0;}
-  .team-info{flex:1;min-width:0;}
-  .team-info .tm-name{font-size:1rem;font-weight:700;color:var(--text);}
-  .team-info .tm-sub{font-size:.76rem;color:var(--muted);margin-top:1px;}
-  .team-badge{font-size:.7rem;font-weight:700;padding:4px 10px;border-radius:20px;white-space:nowrap;}
-  .tb-both{background:#ede4d3;color:#8B5E3C;}
-  .tb-s1{background:#dcefe4;color:#2a7d4f;}
-  .tb-s2{background:#e2e4f0;color:#4a4f8b;}
+  .team-section-label{font-size:.8rem;font-weight:700;color:var(--brown);margin:0 2px 12px;letter-spacing:.02em;}
+  .team-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px 8px;}
+  .team-cell{display:flex;flex-direction:column;align-items:center;gap:6px;cursor:pointer;}
+  .team-cell:active{transform:scale(.94);}
+  .team-ava{position:relative;width:62px;height:62px;border-radius:50%;display:grid;place-items:center;font-size:1.4rem;font-weight:700;color:#fff;overflow:hidden;box-shadow:0 3px 10px rgba(0,0,0,.12);}
+  .team-ava img{width:100%;height:100%;object-fit:cover;}
+  .team-ava .ava-cam{position:absolute;bottom:-1px;right:-1px;width:20px;height:20px;border-radius:50%;background:var(--card);display:grid;place-items:center;font-size:.62rem;box-shadow:0 1px 4px rgba(0,0,0,.2);}
+  .team-cell .tm-name{font-size:.78rem;font-weight:600;color:var(--text);text-align:center;}
+  .team-hint{font-size:.74rem;color:var(--muted);text-align:center;margin-top:18px;line-height:1.4;}
   .hero-title{position:absolute;bottom:50px;left:20px;right:20px;text-align:center;}
   .hero-title h1{font-family:'Playfair Display',serif;font-size:1.7rem;font-weight:700;color:var(--text);line-height:1.1;text-shadow:0 1px 10px rgba(245,242,237,.5);}
   .hero-title p{font-size:.82rem;color:#5a5249;margin-top:3px;font-weight:500;}
@@ -843,10 +843,11 @@
   <div class="team-sheet">
     <div class="team-grip"></div>
     <div class="team-head"><h2>La Team 🌴</h2><p>Corse 2026 · 4 → 18 juillet</p></div>
-    <div class="team-member"><div class="team-ava" style="background:#8B5E3C">P</div><div class="team-info"><div class="tm-name">Philou</div><div class="tm-sub">Les 2 semaines</div></div><span class="team-badge tb-both">S1+S2</span></div>
-    <div class="team-member"><div class="team-ava" style="background:#2a7d4f">O</div><div class="team-info"><div class="tm-name">Oliver</div><div class="tm-sub">Semaine 1</div></div><span class="team-badge tb-s1">S1</span></div>
-    <div class="team-member"><div class="team-ava" style="background:#c8a882">P</div><div class="team-info"><div class="tm-name">Paulet</div><div class="tm-sub">Les 2 semaines</div></div><span class="team-badge tb-both">S1+S2</span></div>
-    <div class="team-member"><div class="team-ava" style="background:#4a4f8b">G</div><div class="team-info"><div class="tm-name">Greg</div><div class="tm-sub">Semaine 2</div></div><span class="team-badge tb-s2">S2</span></div>
+    <div class="team-section-label">👨‍👩‍👧 Les adultes</div>
+    <div class="team-grid" id="team-grid-adultes"></div>
+    <div class="team-section-label" style="margin-top:18px">🧒 Les kids</div>
+    <div class="team-grid" id="team-grid-kids"></div>
+    <p class="team-hint">Touche un visage pour ajouter ou changer sa photo 📸</p>
   </div>
 </div>
 
@@ -855,8 +856,59 @@
 function toggleMenu(e){if(e)e.stopPropagation();document.getElementById('menu-drop').classList.toggle('open');}
 function closeMenu(){const d=document.getElementById('menu-drop');if(d)d.classList.remove('open');}
 document.addEventListener('click',e=>{const w=e.target.closest('.hero-menu-wrap');if(!w)closeMenu();});
-function openTeam(){closeMenu();document.getElementById('team-overlay').classList.add('open');}
+function openTeam(){closeMenu();document.getElementById('team-overlay').classList.add('open');renderTeam();}
 function closeTeam(){document.getElementById('team-overlay').classList.remove('open');}
+
+/* ===== LA TEAM (roster + photos) ===== */
+const TEAM=[
+  {id:'oliver',name:'Oliver',g:'a'},{id:'eline',name:'Eline',g:'a'},
+  {id:'tony',name:'Tony',g:'a'},{id:'isa',name:'Isa',g:'a'},
+  {id:'chloe',name:'Chloe',g:'a'},{id:'armelle',name:'Armelle',g:'a'},
+  {id:'greg',name:'Greg',g:'a'},{id:'philou',name:'Philou',g:'a'},
+  {id:'rose',name:'Rose',g:'k'},{id:'sam',name:'Sam',g:'k'},
+  {id:'vic',name:'Vic',g:'k'},{id:'clea',name:'Clea',g:'k'},
+  {id:'victor',name:'Victor',g:'k'},{id:'gatien',name:'Gatien',g:'k'},
+  {id:'lele',name:'Lélé',g:'k'}
+];
+const TEAM_COLORS=['#8B5E3C','#2a7d4f','#c8a882','#4a4f8b','#b5544e','#3f7d8b','#9b6a3f','#6a8b3f'];
+function teamColor(id){let h=0;for(let i=0;i<id.length;i++)h=(h*31+id.charCodeAt(i))>>>0;return TEAM_COLORS[h%TEAM_COLORS.length];}
+let TEAM_PHOTOS={};try{TEAM_PHOTOS=JSON.parse(localStorage.getItem('corse2026-team')||'{}');}catch(e){TEAM_PHOTOS={};}
+let _teamUrls=[],_teamFbUnsub=null;
+async function renderTeam(){
+  /* Firebase : écoute partagée des photos d'équipe si configuré */
+  if(typeof _initFbAsync==='function'){const ok=await _initFbAsync();if(ok&&!_teamFbUnsub){
+    _teamFbUnsub=_fbDb.collection('team').onSnapshot(snap=>{snap.forEach(d=>{const v=d.data();if(v&&v.url)TEAM_PHOTOS[d.id]=v.url;});paintTeam();},err=>console.warn('team fb',err));
+  }}
+  paintTeam();
+}
+function paintTeam(){
+  _teamUrls.forEach(u=>URL.revokeObjectURL(u));_teamUrls=[];
+  ['a','k'].forEach(g=>{
+    const grid=document.getElementById(g==='a'?'team-grid-adultes':'team-grid-kids');if(!grid)return;
+    grid.innerHTML=TEAM.filter(m=>m.g===g).map(m=>
+      '<div class="team-cell" onclick="setTeamPhoto(\''+m.id+'\')"><div class="team-ava" id="ava-'+m.id+'" style="background:'+teamColor(m.id)+'">'+m.name.charAt(0)+'<span class="ava-cam">📷</span></div><div class="tm-name">'+m.name+'</div></div>'
+    ).join('');
+  });
+  TEAM.forEach(async m=>{
+    const ava=document.getElementById('ava-'+m.id);if(!ava)return;
+    const p=TEAM_PHOTOS[m.id];if(!p)return;
+    let src=null;
+    if(typeof p==='string'){src=p;}
+    else{const f=await FileDB.get('team-'+m.id);if(f){src=URL.createObjectURL(f.blob);_teamUrls.push(src);}}
+    if(src)ava.innerHTML='<img src="'+src+'" alt=""><span class="ava-cam">📷</span>';
+  });
+}
+async function setTeamPhoto(id){
+  const files=await pickFiles();if(!files.length)return;
+  const blob=await downscale(files[0],600);
+  if(typeof _isFbReady==='function'&&_isFbReady()){
+    try{const ref=_fbSt.ref('team/'+id+'.jpg');await ref.put(blob,{contentType:'image/jpeg'});const url=await ref.getDownloadURL();await _fbDb.collection('team').doc(id).set({id,url});TEAM_PHOTOS[id]=url;}
+    catch(e){alert('Erreur envoi : '+e.message);return;}
+  }else{
+    await FileDB.put({id:'team-'+id,blob});TEAM_PHOTOS[id]=true;localStorage.setItem('corse2026-team',JSON.stringify(TEAM_PHOTOS));
+  }
+  paintTeam();
+}
 
 const NAV_TITLES={home:'Corse 2026',planning:'Planning',carte:'Carte',profil:'Profil',photos:'Souvenirs',maison:'La Maison'};
 function showPage(name,btn,filter){

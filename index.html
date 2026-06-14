@@ -60,12 +60,12 @@
 
   /* ===== HERO ===== */
   .hero-wrap{position:relative;}
-  .hero-img{width:100%;height:280px;object-fit:cover;display:block;background:var(--bg2);}
+  .hero-img{width:100%;height:190px;object-fit:cover;display:block;background:var(--bg2);}
   .hero-overlay{position:absolute;inset:0;background:linear-gradient(to bottom,rgba(245,242,237,.15) 0%,rgba(245,242,237,0) 30%,rgba(245,242,237,.55) 72%,var(--bg) 100%);}
   .hero-icons{position:absolute;top:14px;left:16px;right:16px;display:flex;justify-content:space-between;font-size:1.25rem;color:#3a3a3a;}
-  .hero-title{position:absolute;bottom:96px;left:20px;right:20px;text-align:center;}
-  .hero-title h1{font-family:'Playfair Display',serif;font-size:2.1rem;font-weight:700;color:var(--text);line-height:1.1;text-shadow:0 1px 10px rgba(245,242,237,.5);}
-  .hero-title p{font-size:.84rem;color:#5a5249;margin-top:6px;font-weight:500;}
+  .hero-title{position:absolute;bottom:56px;left:20px;right:20px;text-align:center;}
+  .hero-title h1{font-family:'Playfair Display',serif;font-size:1.8rem;font-weight:700;color:var(--text);line-height:1.1;text-shadow:0 1px 10px rgba(245,242,237,.5);}
+  .hero-title p{font-size:.84rem;color:#5a5249;margin-top:4px;font-weight:500;}
   .countdown-card{margin:-46px 16px 0;position:relative;z-index:10;background:var(--bg2);border-radius:var(--radius);padding:14px 18px;box-shadow:0 10px 28px rgba(0,0,0,.12);}
   .cd-label{font-size:.75rem;color:var(--muted);text-align:center;margin-bottom:8px;}
   .cd-nums{display:flex;justify-content:space-around;}
@@ -207,6 +207,24 @@
   .fam-flight{display:flex;align-items:flex-start;gap:9px;font-size:.8rem;color:var(--muted);padding:5px 0;line-height:1.4;}
   .fam-flight .fl-ic{font-size:1rem;flex-shrink:0;}
   .fam-flight b{color:var(--text);font-weight:600;}
+
+  /* ===== WISE + SOLDES ===== */
+  .wise-row{display:flex;align-items:center;gap:12px;}
+  .wise-num{font-size:.98rem;font-weight:700;color:var(--brown);letter-spacing:.5px;word-break:break-all;flex:1;}
+  .wise-num.empty{color:var(--muted);font-weight:400;font-size:.85rem;}
+  .wise-copy-btn{background:var(--brown);color:#fff;border:none;border-radius:10px;padding:9px 15px;font-size:.78rem;font-weight:700;cursor:pointer;flex-shrink:0;transition:opacity .15s;}
+  .wise-copy-btn:active{opacity:.85;}
+  .wise-edit{display:block;background:none;border:none;color:var(--muted);text-decoration:underline;font-size:.75rem;cursor:pointer;margin-top:8px;font-family:'Inter',sans-serif;}
+  .balance-table{width:100%;border-collapse:collapse;}
+  .balance-table th{font-size:.66rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.4px;padding:0 4px 8px;}
+  .balance-table th:last-child{text-align:right;}
+  .balance-table td{padding:10px 4px;border-top:1px solid var(--border);font-size:.88rem;vertical-align:middle;}
+  .balance-table td:last-child{text-align:right;font-weight:700;font-size:.95rem;cursor:pointer;}
+  .balance-table td:last-child:active{opacity:.6;}
+  .amt-due{color:#c0392b;}
+  .amt-ok{color:#2a7d4f;}
+  .amt-zero{color:var(--muted);font-weight:400!important;}
+  .bal-dot{width:10px;height:10px;border-radius:50%;display:inline-block;margin-right:7px;vertical-align:middle;}
 
   .wave{text-align:center;font-size:1.5rem;margin:14px 0 4px;letter-spacing:4px;opacity:.6;}
   footer{text-align:center;padding:12px 16px;font-size:.78rem;color:var(--muted);}
@@ -646,6 +664,27 @@
   </div>
 
   <div class="section">
+    <div class="section-hdr">💳 Compte Wise — remboursements</div>
+    <div class="fam-card">
+      <div class="wise-row">
+        <span style="font-size:1.5rem">💳</span>
+        <div style="flex:1;min-width:0">
+          <div style="font-size:.68rem;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.4px;margin-bottom:4px">Numéro de compte</div>
+          <div class="wise-num" id="wise-num">Non défini</div>
+        </div>
+        <button class="wise-copy-btn" onclick="copyWise()">Copier</button>
+      </div>
+      <button class="wise-edit" onclick="editWise()">✏️ Modifier le numéro</button>
+    </div>
+
+    <div class="fam-card">
+      <div style="font-weight:700;font-size:.88rem;color:var(--brown);margin-bottom:12px">💰 Montants dûs</div>
+      <table class="balance-table" id="balance-table"></table>
+      <button class="wise-edit" onclick="editAllAmts()">✏️ Modifier les soldes</button>
+    </div>
+  </div>
+
+  <div class="section">
     <div class="section-hdr">📞 Numéros utiles</div>
     <a class="card" href="tel:+33495731713" style="text-decoration:none">
       <div class="card-icon icon-golf">⛳</div>
@@ -702,6 +741,7 @@ function showPage(name,btn){
   if(name==='photos'){renderAlbum();renderPhotos();}
   if(name==='carte'){initMap();}
   if(name==='home'){renderProgram();}
+  if(name==='profil'){renderWise();renderBalance();}
   window.__page=name;
   const nb=document.getElementById('navbar');
   if(nb){nb.classList.remove('show');document.getElementById('navbar-title').textContent=NAV_TITLES[name]||'Corse 2026';}
@@ -875,6 +915,66 @@ async function loadWeather(){
   }catch(e){strip.innerHTML='<div class="weather-msg">🌐 Météo indisponible — vérifiez la connexion.</div>';}
 }
 loadWeather();
+
+/* 💳 WISE + SOLDES */
+const WKEY='corse2026-wise',BKEY='corse2026-balance';
+const FAM_COLORS={Stoupel:'#13A89E',Carniol:'#FF6B4A',Delhauteur:'#3FA66A',Etienne:'#FFB23E'};
+let BALANCE;
+try{BALANCE=JSON.parse(localStorage.getItem(BKEY))||null;}catch(e){BALANCE=null;}
+if(!BALANCE)BALANCE=[{fam:'Stoupel',amt:0},{fam:'Carniol',amt:0},{fam:'Delhauteur',amt:0},{fam:'Etienne',amt:0}];
+
+function renderWise(){
+  const n=localStorage.getItem(WKEY)||'';
+  const el=document.getElementById('wise-num');if(!el)return;
+  el.textContent=n||'Non défini — appuyez pour ajouter';
+  el.className='wise-num'+(n?'':' empty');
+}
+function copyWise(){
+  const n=localStorage.getItem(WKEY)||'';
+  if(!n){editWise();return;}
+  const btn=document.querySelector('.wise-copy-btn');
+  if(navigator.clipboard){
+    navigator.clipboard.writeText(n).then(()=>{if(btn){const old=btn.textContent;btn.textContent='✓ Copié!';setTimeout(()=>btn.textContent=old,1600);}});
+  }else{
+    const ta=document.createElement('textarea');ta.value=n;document.body.appendChild(ta);ta.select();document.execCommand('copy');ta.remove();
+    if(btn){const old=btn.textContent;btn.textContent='✓ Copié!';setTimeout(()=>btn.textContent=old,1600);}
+  }
+}
+function editWise(){
+  const cur=localStorage.getItem(WKEY)||'';
+  const v=prompt('Numéro de compte Wise\n(ex: BE12 3456 7890 1234 ou email)',cur);
+  if(v===null)return;
+  if(v.trim())localStorage.setItem(WKEY,v.trim());else localStorage.removeItem(WKEY);
+  renderWise();
+}
+function renderBalance(){
+  const tbl=document.getElementById('balance-table');if(!tbl)return;
+  tbl.innerHTML='<thead><tr><th style="text-align:left">Famille</th><th>Montant dû</th></tr></thead><tbody>'+
+    BALANCE.map((b,i)=>{
+      const cls=b.amt>0?'amt-due':b.amt<0?'amt-ok':'amt-zero';
+      const txt=b.amt>0?'+'+b.amt+' €':b.amt<0?b.amt+' €':'soldé ✓';
+      return '<tr><td><span class="bal-dot" style="background:'+FAM_COLORS[b.fam]+'"></span>'+b.fam+'</td><td class="'+cls+'" onclick="editAmt('+i+')">'+txt+'</td></tr>';
+    }).join('')+'</tbody>';
+}
+function editAmt(i){
+  const b=BALANCE[i];
+  const v=prompt('Montant dû par '+b.fam+' (€)\n+ = doit de l\'argent\n− = on lui doit\n0 = soldé',b.amt);
+  if(v===null)return;
+  const n=parseFloat(v.replace(',','.'));
+  if(!isNaN(n)){BALANCE[i].amt=Math.round(n*100)/100;try{localStorage.setItem(BKEY,JSON.stringify(BALANCE));}catch(e){}}
+  renderBalance();
+}
+function editAllAmts(){
+  for(let i=0;i<BALANCE.length;i++){
+    const b=BALANCE[i];
+    const v=prompt('Montant dû par '+b.fam+' (€) :',b.amt);
+    if(v===null)break;
+    const n=parseFloat(v.replace(',','.'));
+    if(!isNaN(n))BALANCE[i].amt=Math.round(n*100)/100;
+  }
+  try{localStorage.setItem(BKEY,JSON.stringify(BALANCE));}catch(e){}
+  renderBalance();
+}
 
 /* PWA + auto-update */
 if('serviceWorker' in navigator&&location.protocol==='https:'){

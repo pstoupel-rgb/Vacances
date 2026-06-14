@@ -73,8 +73,10 @@
   .cd-label{font-size:.73rem;color:var(--muted);text-align:center;margin-bottom:6px;}
   .cd-nums{display:flex;justify-content:space-around;}
   .cd-block{text-align:center;}
-  .cd-block strong{font-size:1.4rem;font-weight:700;color:var(--brown);}
+  .cd-block strong{font-size:1.4rem;font-weight:700;color:var(--brown);display:inline-block;font-variant-numeric:tabular-nums;}
   .cd-block span{display:block;font-size:.65rem;color:var(--muted);margin-top:1px;}
+  #cd-s{color:var(--caramel);}
+  @keyframes cdpulse{0%{transform:scale(1)}45%{transform:scale(1.18)}100%{transform:scale(1)}}
 
   /* ===== PROGRAMME DU JOUR ===== */
   .reco-section{padding:13px 16px 0;}
@@ -89,6 +91,11 @@
   .prog-name{font-weight:600;font-size:.9rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
   .prog-time{font-size:.75rem;color:var(--muted);margin-top:1px;}
   .prog-thumb{width:58px;height:44px;border-radius:10px;object-fit:cover;flex-shrink:0;background:var(--bg2);}
+  .prog-carousel{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none;-webkit-overflow-scrolling:touch;margin-top:2px;}
+  .prog-carousel::-webkit-scrollbar{display:none;}
+  .prog-slide{flex:0 0 100%;scroll-snap-align:center;padding:0 16px;}
+  .prog-slide-head{font-size:.74rem;color:var(--muted);font-weight:600;margin-bottom:8px;display:flex;align-items:center;flex-wrap:wrap;gap:5px;}
+  .ps-today{background:var(--brown);color:#fff;font-size:.58rem;font-weight:700;padding:2px 7px;border-radius:6px;}
 
   /* ===== RECO TILES ===== */
   .reco-grid{display:flex;gap:10px;margin-top:9px;}
@@ -329,13 +336,14 @@
       <div class="cd-block"><strong id="cd-d">—</strong><span>jours</span></div>
       <div class="cd-block"><strong id="cd-h">—</strong><span>heures</span></div>
       <div class="cd-block"><strong id="cd-m">—</strong><span>min</span></div>
+      <div class="cd-block"><strong id="cd-s">—</strong><span>sec</span></div>
     </div>
   </div>
 
-  <div class="reco-section">
-    <div class="prog-head"><span class="reco-label" id="program-title">Programme du jour</span><span class="prog-day" id="program-day"></span></div>
-    <div class="program" id="program"></div>
+  <div class="reco-section" style="padding-bottom:0">
+    <div class="prog-head"><span class="reco-label">Programme du séjour</span><span class="prog-day">‹ glissez les jours ›</span></div>
   </div>
+  <div class="prog-carousel" id="prog-carousel"></div>
 
   <div class="reco-section">
     <div class="reco-label">Nos recommandations</div>
@@ -834,16 +842,18 @@ window.addEventListener('load',()=>setTimeout(()=>{const s=document.getElementBy
 
 /* ⏳ COMPTE À REBOURS */
 (function(){
-  const els={d:document.getElementById('cd-d'),h:document.getElementById('cd-h'),m:document.getElementById('cd-m')};
+  const els={d:document.getElementById('cd-d'),h:document.getElementById('cd-h'),m:document.getElementById('cd-m'),s:document.getElementById('cd-s')};
   const target=new Date('2026-07-04T11:20:00').getTime();
   function tick(){
     const diff=target-Date.now();
-    if(diff<=0){els.d.textContent='🎉';els.h.textContent='';els.m.textContent='';return;}
+    if(diff<=0){els.d.textContent='🎉';els.h.textContent='';els.m.textContent='';els.s.textContent='';return;}
     els.d.textContent=Math.floor(diff/86400000);
-    els.h.textContent=Math.floor((diff%86400000)/3600000);
+    els.h.textContent=String(Math.floor((diff%86400000)/3600000)).padStart(2,'0');
     els.m.textContent=String(Math.floor((diff%3600000)/60000)).padStart(2,'0');
+    els.s.textContent=String(Math.floor((diff%60000)/1000)).padStart(2,'0');
+    els.s.style.animation='none';void els.s.offsetWidth;els.s.style.animation='cdpulse .45s ease';
   }
-  tick();setInterval(tick,60000);
+  tick();setInterval(tick,1000);
 })();
 
 /* 📅 PROGRAMME DU JOUR */
@@ -877,14 +887,16 @@ const DAYS=[
   {date:'2026-07-18',name:'Samedi — Retour',short:'Sam 18/07',items:[{ic:'🏠',t:'Rangement, derniers cafés',time:'Matin',img:IMG.home},{ic:'✈️',t:'Vol Figari → Lille',time:'13h55',img:IMG.plane},{ic:'✈️',t:'Vol Figari → Charleroi',time:'15h05',img:IMG.plane}]}
 ];
 function renderProgram(){
-  const host=document.getElementById('program');if(!host)return;
+  const host=document.getElementById('prog-carousel');if(!host)return;
   const tk=new Date().toISOString().slice(0,10);
-  let day=DAYS.find(d=>d.date===tk),title;
-  if(day){title='Programme du jour';}
-  else{day=DAYS.find(d=>d.date>tk)||DAYS[DAYS.length-1];title='Prochaine étape';}
-  document.getElementById('program-title').textContent=title;
-  document.getElementById('program-day').textContent=day.short+' · '+day.name;
-  host.innerHTML=day.items.map(it=>'<div class="prog-item"><div class="prog-left"><div class="prog-ic">'+it.ic+'</div><div><div class="prog-name">'+it.t+'</div><div class="prog-time">'+(it.time||'')+'</div></div></div><img class="prog-thumb" src="'+it.img+'" loading="lazy" alt=""></div>').join('');
+  let startIdx=DAYS.findIndex(d=>d.date===tk);
+  if(startIdx<0){startIdx=DAYS.findIndex(d=>d.date>tk);if(startIdx<0)startIdx=DAYS.length-1;}
+  host.innerHTML=DAYS.map(day=>{
+    const today=day.date===tk;
+    const items=day.items.map(it=>'<div class="prog-item"><div class="prog-left"><div class="prog-ic">'+it.ic+'</div><div><div class="prog-name">'+it.t+'</div><div class="prog-time">'+(it.time||'')+'</div></div></div><img class="prog-thumb" src="'+it.img+'" loading="lazy" alt=""></div>').join('');
+    return '<div class="prog-slide"><div class="prog-slide-head"><span>'+day.short+' · '+day.name+'</span>'+(today?'<span class="ps-today">Aujourd\'hui</span>':'')+'</div><div class="program">'+items+'</div></div>';
+  }).join('');
+  if(!host.dataset.init){host.dataset.init='1';requestAnimationFrame(()=>{host.scrollLeft=startIdx*host.clientWidth;});}
 }
 renderProgram();
 

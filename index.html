@@ -216,6 +216,30 @@
   .wave { text-align:center; font-size:1.6rem; margin:10px 0 4px; letter-spacing:4px; }
   footer { text-align:center; padding:14px 16px 12px; font-size:.78rem; color:var(--muted); }
   footer strong { color:var(--coral-d); }
+  /* ===== 📸 PHOTOS ===== */
+  .album-card { margin-bottom:14px; }
+  .album-empty { background:var(--card); border:2px dashed var(--sun); border-radius:var(--radius); padding:18px 16px; text-align:center; box-shadow:var(--shadow); }
+  .album-emoji { font-size:2.2rem; }
+  .album-txt { font-size:.82rem; color:var(--night); line-height:1.5; margin:8px 0 12px; }
+  .album-txt b { color:var(--coral-d); }
+  .album-set { background:var(--coral); color:#fff; padding:10px 18px; border-radius:14px; font-size:.85rem; font-family:'Baloo 2',sans-serif; font-weight:700; border:none; cursor:pointer; box-shadow:0 4px 12px rgba(255,107,74,.3); }
+  .album-open { display:block; background:var(--sunset); color:#fff; text-align:center; text-decoration:none; font-family:'Baloo 2',sans-serif; font-weight:800; font-size:.95rem; padding:14px; border-radius:var(--radius); box-shadow:0 6px 16px rgba(255,107,74,.32); }
+  .album-edit { display:block; margin:8px auto 0; background:none; border:none; color:var(--muted); text-decoration:underline; font-size:.78rem; cursor:pointer; }
+  .btn-add { width:100%; background:var(--sea); color:#fff; border:none; border-radius:var(--radius); padding:14px; font-family:'Baloo 2',sans-serif; font-weight:800; font-size:.95rem; cursor:pointer; box-shadow:0 4px 14px rgba(19,168,158,.3); }
+  .btn-add:active { background:var(--sea-d); }
+  .photo-hint { font-size:.74rem; color:var(--muted); text-align:center; line-height:1.5; margin:12px 4px 14px; }
+  .photo-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:6px; }
+  .photo-cell { position:relative; aspect-ratio:1; border-radius:13px; overflow:hidden; background:var(--sand-2); cursor:pointer; }
+  .photo-cell img { width:100%; height:100%; object-fit:cover; display:block; }
+  .photo-cell:active img { opacity:.85; }
+  .photo-empty { grid-column:1/-1; text-align:center; color:var(--muted); font-size:.82rem; padding:30px 10px; line-height:1.6; }
+  .lightbox { position:fixed; inset:0; background:rgba(20,12,8,.95); z-index:600; display:none; flex-direction:column; }
+  .lightbox.open { display:flex; }
+  .lb-bar { display:flex; justify-content:space-between; align-items:center; padding:calc(12px + env(safe-area-inset-top)) 16px 12px; }
+  .lb-bar button { background:rgba(255,255,255,.16); border:none; color:#fff; width:42px; height:42px; border-radius:50%; font-size:1.15rem; cursor:pointer; }
+  .lb-actions { display:flex; gap:10px; }
+  .lb-img { flex:1; display:grid; place-items:center; overflow:hidden; padding:8px; }
+  .lb-img img { max-width:100%; max-height:100%; object-fit:contain; border-radius:10px; }
 </style>
 </head>
 <body>
@@ -229,6 +253,10 @@
   <button class="app-nav-btn" id="nav-gps" onclick="showPage('gps', this)">
     <span class="nav-icon">🗺️</span>
     <span class="nav-label">Restos & Adresses</span>
+  </button>
+  <button class="app-nav-btn" id="nav-photos" onclick="showPage('photos', this)">
+    <span class="nav-icon">📸</span>
+    <span class="nav-label">Photos</span>
   </button>
 </nav>
 
@@ -364,9 +392,6 @@
 
   <!-- ===== SEMAINE 1 ===== -->
   <div class="week" id="week2">
-    <div class="wa-banner" onclick="sendWA('5 juillet — Dimanche 🌊\n\n🍽️ Déjeuner 12h30 : Playarellu (~10 min) ou RENA Cala Rossa (~20 min)\n\nÀ décider ce matin ! Qui vote pour quoi ? 🗳️', 1)">
-      <div class="wa-icon">💬</div><div class="wa-text"><div class="wa-title">Envoyer le programme du jour</div><div class="wa-sub">Dim 5 juillet</div></div><div class="wa-arrow">→</div>
-    </div>
     <div class="day-card">
       <div class="day-header"><div class="day-number">5</div><div class="day-info"><div class="day-name">Dimanche — Farniente</div><div class="day-date">5 juillet 2026</div></div><div class="day-vibe">🍹</div></div>
       <div class="timeline">
@@ -383,9 +408,6 @@
       </div>
     </div>
 
-    <div class="wa-banner" onclick="sendWA('6 juillet — Lundi ⛳\n\n🚗 Départ maison 7h40 — Golf de Spérone (Bonifacio, ~1h)\n🏌️ Golf 18 trous 9h\n🍽️ Déjeuner 12h30 : Tamaricciu (Palombaggia, ~40 min)\n\nOn se retrouve à la voiture à 7h30 !', 1)">
-      <div class="wa-icon">💬</div><div class="wa-text"><div class="wa-title">Envoyer le programme du jour</div><div class="wa-sub">Lun 6 juillet</div></div><div class="wa-arrow">→</div>
-    </div>
     <div class="day-card">
       <div class="day-header"><div class="day-number">6</div><div class="day-info"><div class="day-name">Lundi — Golf ⛳</div><div class="day-date">6 juillet 2026</div></div><div class="day-vibe">⛳</div></div>
       <div class="timeline">
@@ -402,9 +424,6 @@
       </div>
     </div>
 
-    <div class="wa-banner" onclick="sendWA('7 juillet — Mardi 🏖️\n\n🍽️ Déjeuner 12h30 : Le Cabanon Bleu (St Cyprien, ~15 min)\n\nOn part ensemble à 12h00 !', 1)">
-      <div class="wa-icon">💬</div><div class="wa-text"><div class="wa-title">Envoyer le programme du jour</div><div class="wa-sub">Mar 7 juillet</div></div><div class="wa-arrow">→</div>
-    </div>
     <div class="day-card">
       <div class="day-header"><div class="day-number">7</div><div class="day-info"><div class="day-name">Mardi — Plage</div><div class="day-date">7 juillet 2026</div></div><div class="day-vibe">🏖️</div></div>
       <div class="timeline">
@@ -417,9 +436,6 @@
       </div>
     </div>
 
-    <div class="wa-banner" onclick="sendWA('8 juillet — Mercredi ⛵ JOURNÉE BATEAU\n\n⚓ Départ Port de Pinarellu (~10 min de la maison)\n🍽️ Déjeuner : Paillotte Capu Biancu (Bonifacio, accès bateau)\n\nOn se retrouve au port à quelle heure ? ⛵', 1)">
-      <div class="wa-icon">💬</div><div class="wa-text"><div class="wa-title">Envoyer le programme du jour</div><div class="wa-sub">Mer 8 juillet</div></div><div class="wa-arrow">→</div>
-    </div>
     <div class="day-card">
       <div class="day-header"><div class="day-number">8</div><div class="day-info"><div class="day-name">Mercredi — Journée Bateau</div><div class="day-date">8 juillet 2026</div></div><div class="day-vibe">⛵</div></div>
       <div class="timeline">
@@ -429,9 +445,6 @@
       </div>
     </div>
 
-    <div class="wa-banner" onclick="sendWA('9 juillet — Jeudi 🏄 SKI NAUTIQUE\n\n🏄 Ski Nautique 11h\n🍽️ Déjeuner 12h30 : Le Tiki (St Cyprien, ~10 min)\n\nC\'est parti pour les sensations ! 💪', 1)">
-      <div class="wa-icon">💬</div><div class="wa-text"><div class="wa-title">Envoyer le programme du jour</div><div class="wa-sub">Jeu 9 juillet</div></div><div class="wa-arrow">→</div>
-    </div>
     <div class="day-card">
       <div class="day-header"><div class="day-number">9</div><div class="day-info"><div class="day-name">Jeudi — Ski Nautique</div><div class="day-date">9 juillet 2026</div></div><div class="day-vibe">🏄</div></div>
       <div class="timeline">
@@ -441,9 +454,6 @@
       </div>
     </div>
 
-    <div class="wa-banner" onclick="sendWA('10 juillet — Vendredi 🏔️ CANYONING + ARRIVÉE ETIENNE !\n\n🚗 Départ maison 7h20 — Corsica Canyon (1h de route)\n🏔️ Canyoning 8h45\n🍽️ Déjeuner 12h30 : La Voile Rouge (Solaro, ~45 min)\n✈️ Arrivée Famille Etienne ce soir (FR4566, ~18h20 à la maison)\n\nOn les accueille comme il se doit ce soir 🎉', 1)">
-      <div class="wa-icon">💬</div><div class="wa-text"><div class="wa-title">Envoyer le programme du jour</div><div class="wa-sub">Ven 10 juillet</div></div><div class="wa-arrow">→</div>
-    </div>
     <div class="day-card">
       <div class="day-header"><div class="day-number">10</div><div class="day-info"><div class="day-name">Vendredi — Canyoning + Etienne !</div><div class="day-date">10 juillet 2026</div></div><div class="day-vibe">🏔️</div></div>
       <div class="timeline">
@@ -459,9 +469,6 @@
   <!-- ===== SEMAINE 2 ===== -->
   <div class="week" id="week3">
 
-    <div class="wa-banner" onclick="sendWA('11 juillet — Samedi 👋 Départ Carniol\n\n✈️ Bon retour à la famille Carniol ! (V72527 Figari→Lille)\n🍽️ Déjeuner 12h30 : Ranch\'O Plage (Cala Rossa, ~20 min)\n\nOn continue le kif pour ceux qui restent 😎', 2)">
-      <div class="wa-icon">💬</div><div class="wa-text"><div class="wa-title">Envoyer le programme du jour</div><div class="wa-sub">Sam 11 juillet</div></div><div class="wa-arrow">→</div>
-    </div>
     <div class="day-card">
       <div class="day-header"><div class="day-number">11</div><div class="day-info"><div class="day-name">Samedi — Départ Carniol</div><div class="day-date">11 juillet 2026</div></div><div class="day-vibe">👋</div></div>
       <div class="timeline">
@@ -471,9 +478,6 @@
       </div>
     </div>
 
-    <div class="wa-banner" onclick="sendWA('12 juillet — Dimanche 😎 Farniente total\n\n🍽️ Déjeuner 12h30 : Playarellu (~10 min)\n\nJournée détente, plage, apéro 🍹', 2)">
-      <div class="wa-icon">💬</div><div class="wa-text"><div class="wa-title">Envoyer le programme du jour</div><div class="wa-sub">Dim 12 juillet</div></div><div class="wa-arrow">→</div>
-    </div>
     <div class="day-card">
       <div class="day-header"><div class="day-number">12</div><div class="day-info"><div class="day-name">Dimanche — Farniente</div><div class="day-date">12 juillet 2026</div></div><div class="day-vibe">😎</div></div>
       <div class="timeline">
@@ -483,9 +487,6 @@
       </div>
     </div>
 
-    <div class="wa-banner" onclick="sendWA('13 juillet — Lundi 🥾 Balade\n\n🍽️ Déjeuner 12h30 : Le Cabanon Bleu (St Cyprien, ~15 min)\n🏛️ Option : Visite Bonifacio 16h ?\n\nQui est partant pour Bonifacio cet après-midi ? 🗣️', 2)">
-      <div class="wa-icon">💬</div><div class="wa-text"><div class="wa-title">Envoyer le programme du jour</div><div class="wa-sub">Lun 13 juillet</div></div><div class="wa-arrow">→</div>
-    </div>
     <div class="day-card">
       <div class="day-header"><div class="day-number">13</div><div class="day-info"><div class="day-name">Lundi — Balade</div><div class="day-date">13 juillet 2026</div></div><div class="day-vibe">🥾</div></div>
       <div class="timeline">
@@ -496,9 +497,6 @@
       </div>
     </div>
 
-    <div class="wa-banner" onclick="sendWA('14 juillet — Mardi 🎆 FÊTE NATIONALE\n\n🍽️ Déjeuner 12h30 : RENA (~20 min) ou Bar Plage Santa Giulia (~40 min)\n🎆 Ce soir feux d\'artifice !\n\nVote : RENA ou Bar Plage ? 🗳️', 2)">
-      <div class="wa-icon">💬</div><div class="wa-text"><div class="wa-title">Envoyer le programme du jour</div><div class="wa-sub">Mar 14 juillet</div></div><div class="wa-arrow">→</div>
-    </div>
     <div class="day-card">
       <div class="day-header"><div class="day-number">14</div><div class="day-info"><div class="day-name">Mardi — Fête Nationale 🎆</div><div class="day-date">14 juillet 2026</div></div><div class="day-vibe">🎆</div></div>
       <div class="timeline">
@@ -507,9 +505,6 @@
       </div>
     </div>
 
-    <div class="wa-banner" onclick="sendWA('15 juillet — Mercredi ⛵ JOURNÉE BATEAU\n\n⚓ Départ Port de Pinarellu (~10 min de la maison)\n🍽️ Déjeuner : Paillotte Capu Biancu (Bonifacio, accès bateau)\n\nOn se retrouve au port à quelle heure ? ⛵', 2)">
-      <div class="wa-icon">💬</div><div class="wa-text"><div class="wa-title">Envoyer le programme du jour</div><div class="wa-sub">Mer 15 juillet</div></div><div class="wa-arrow">→</div>
-    </div>
     <div class="day-card">
       <div class="day-header"><div class="day-number">15</div><div class="day-info"><div class="day-name">Mercredi — Journée Bateau</div><div class="day-date">15 juillet 2026</div></div><div class="day-vibe">⛵</div></div>
       <div class="timeline">
@@ -519,9 +514,6 @@
       </div>
     </div>
 
-    <div class="wa-banner" onclick="sendWA('16 juillet — Jeudi 🏔️ CANYONING\n\n🚗 Départ maison 7h20 — Corsica Canyon (1h de route)\n🏔️ Canyoning 8h45\n🍽️ Déjeuner 12h30 : La Voile Rouge (Solaro, ~45 min)\n\nOn se retrouve à la voiture à 7h10 !', 2)">
-      <div class="wa-icon">💬</div><div class="wa-text"><div class="wa-title">Envoyer le programme du jour</div><div class="wa-sub">Jeu 16 juillet</div></div><div class="wa-arrow">→</div>
-    </div>
     <div class="day-card">
       <div class="day-header"><div class="day-number">16</div><div class="day-info"><div class="day-name">Jeudi — Canyoning</div><div class="day-date">16 juillet 2026</div></div><div class="day-vibe">🏔️</div></div>
       <div class="timeline">
@@ -532,9 +524,6 @@
       </div>
     </div>
 
-    <div class="wa-banner" onclick="sendWA('17 juillet — Vendredi 🏄 SKI NAUTIQUE\n\n🏄 Ski Nautique 11h\n🍽️ Déjeuner 12h30 : Le Tiki (St Cyprien, ~10 min)\n\nAvant-dernier jour... on profite à fond ! 🌊', 2)">
-      <div class="wa-icon">💬</div><div class="wa-text"><div class="wa-title">Envoyer le programme du jour</div><div class="wa-sub">Ven 17 juillet</div></div><div class="wa-arrow">→</div>
-    </div>
     <div class="day-card">
       <div class="day-header"><div class="day-number">17</div><div class="day-info"><div class="day-name">Vendredi — Ski Nautique</div><div class="day-date">17 juillet 2026</div></div><div class="day-vibe">🏄</div></div>
       <div class="timeline">
@@ -544,9 +533,6 @@
       </div>
     </div>
 
-    <div class="wa-banner" onclick="sendWA('18 juillet — Samedi ✈️ RETOUR\n\nMerci pour ces 14 jours de folie ! 🙏❤️\n✈️ Stoupel + Carniol : V72527 Volotea Figari→Lille (~13h55)\n✈️ Delhauteur + Etienne : FR4567 Ryanair Figari→Charleroi (~15h05)\n\nÀ l\'année prochaine Team Corse 🌊🌴', 2)">
-      <div class="wa-icon">💬</div><div class="wa-text"><div class="wa-title">Envoyer le programme du jour</div><div class="wa-sub">Sam 18 juillet</div></div><div class="wa-arrow">→</div>
-    </div>
     <div class="day-card">
       <div class="day-header"><div class="day-number">18</div><div class="day-info"><div class="day-name">Samedi — Retour 😢</div><div class="day-date">18 juillet 2026</div></div><div class="day-vibe">🛫</div></div>
       <div class="timeline">
@@ -662,12 +648,39 @@
 </div>
 
 
+<!-- ========== PAGE 3 : PHOTOS ========== -->
+<div class="page page-content" id="page-photos">
+  <div class="section" style="padding-top:18px">
+    <div class="section-title">📸 Photos du séjour</div>
+    <div class="album-card" id="album-card"></div>
+    <button class="btn-add" onclick="addPhotos()">＋ Ajouter des photos</button>
+    <p class="photo-hint">🔒 Vos photos restent sur votre appareil.<br>Téléchargez-les (⤓) ou partagez-les (⤴) pour les enregistrer dans Photos et les ajouter à l'album partagé.</p>
+    <div class="photo-grid" id="photo-grid"></div>
+  </div>
+  <div class="wave">🌊🌴☀️🌊🌴</div>
+  <footer>Fait avec ❤️ pour la <strong>Team Corse 2026</strong></footer>
+</div>
+
+<!-- lightbox photo -->
+<div class="lightbox" id="lightbox">
+  <div class="lb-bar">
+    <button onclick="closeLightbox()" title="Fermer">✕</button>
+    <div class="lb-actions">
+      <button onclick="downloadCurrent()" title="Télécharger">⤓</button>
+      <button onclick="shareCurrent()" title="Partager">⤴</button>
+      <button onclick="deleteCurrent()" title="Supprimer">🗑️</button>
+    </div>
+  </div>
+  <div class="lb-img" id="lb-img"></div>
+</div>
+
 <script>
 function showPage(name, btn) {
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   document.querySelectorAll('.app-nav-btn').forEach(b => b.classList.remove('active'));
   document.getElementById('page-' + name).classList.add('active');
   btn.classList.add('active');
+  if (name === 'photos') { renderAlbum(); renderPhotos(); }
   window.scrollTo({top:0, behavior:'smooth'});
 }
 function showWeek(n, btn) {
@@ -676,12 +689,49 @@ function showWeek(n, btn) {
   document.getElementById('week'+n).classList.add('active');
   btn.classList.add('active');
 }
-const WA_S1 = 'https://chat.whatsapp.com/H5Rt3CtLHBJ5BdCPUQF5mz';
-const WA_S2 = 'https://chat.whatsapp.com/DNh1jYoUvUE2pt87vLcu3j';
-function sendWA(text, week) {
-  window.location.href = 'whatsapp://send?text=' + encodeURIComponent(text);
-  setTimeout(() => { window.open('https://wa.me/?text=' + encodeURIComponent(text), '_blank'); }, 1500);
+
+
+/* ===== 📸 PHOTOS (stockées uniquement sur l'appareil) ===== */
+const PKEY='corse2026-photos', AKEY='corse2026-album';
+let PHOTOS=[]; try{ PHOTOS=JSON.parse(localStorage.getItem(PKEY)||'[]'); }catch(e){ PHOTOS=[]; }
+function savePhotos(){ try{ localStorage.setItem(PKEY, JSON.stringify(PHOTOS)); }catch(e){ alert('Stockage plein — téléchargez puis supprimez quelques photos.'); } }
+const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,7);
+
+const FileDB=(()=>{ let p;
+  function open(){ if(p) return p; p=new Promise((res,rej)=>{ const r=indexedDB.open('corse-photos',1); r.onupgradeneeded=e=>{ const db=e.target.result; if(!db.objectStoreNames.contains('files')) db.createObjectStore('files',{keyPath:'id'}); }; r.onsuccess=()=>res(r.result); r.onerror=()=>rej(r.error); }); return p; }
+  function tx(mode,fn){ return open().then(db=>new Promise((res,rej)=>{ const t=db.transaction('files',mode); const s=t.objectStore('files'); const rq=fn(s); t.oncomplete=()=>res(rq&&rq.result); t.onerror=()=>rej(t.error); })); }
+  return { put:f=>tx('readwrite',s=>s.put(f)), get:id=>tx('readonly',s=>s.get(id)), del:id=>tx('readwrite',s=>s.delete(id)) };
+})();
+
+function renderAlbum(){
+  const link=localStorage.getItem(AKEY)||''; const el=document.getElementById('album-card'); if(!el) return;
+  if(link){ el.innerHTML='<a class="album-open" href="'+link+'" target="_blank" rel="noopener">📲 Ouvrir l’album partagé Apple Photos</a><button class="album-edit" onclick="setAlbum()">Modifier le lien</button>'; }
+  else { el.innerHTML='<div class="album-empty"><div class="album-emoji">📲</div><div class="album-txt">Créez un <b>album partagé</b> dans Apple Photos, puis collez ici son lien pour que toute la Team y accède en un tap.</div><button class="album-set" onclick="setAlbum()">＋ Ajouter le lien de l’album</button></div>'; }
 }
+function setAlbum(){ const cur=localStorage.getItem(AKEY)||''; const v=prompt('Collez le lien de l’album partagé iCloud (https://www.icloud.com/…)', cur); if(v===null) return; if(v.trim()) localStorage.setItem(AKEY,v.trim()); else localStorage.removeItem(AKEY); renderAlbum(); }
+
+function pickFiles(){ return new Promise(res=>{ const i=document.createElement('input'); i.type='file'; i.accept='image/*'; i.multiple=true; i.onchange=()=>res([...i.files]); i.click(); }); }
+function downscale(file,max){ return new Promise(res=>{ const img=new Image(); img.onload=()=>{ let w=img.width,h=img.height; if(Math.max(w,h)>max){ const r=max/Math.max(w,h); w=Math.round(w*r); h=Math.round(h*r); } const c=document.createElement('canvas'); c.width=w; c.height=h; c.getContext('2d').drawImage(img,0,0,w,h); c.toBlob(b=>res(b||file),'image/jpeg',0.85); }; img.onerror=()=>res(file); img.src=URL.createObjectURL(file); }); }
+async function addPhotos(){ const files=await pickFiles(); if(!files.length) return; for(const f of files){ const id=uid(); const blob=await downscale(f,1800); await FileDB.put({id,blob}); PHOTOS.unshift({id,date:Date.now()}); } savePhotos(); renderPhotos(); }
+
+let _urls=[];
+async function renderPhotos(){
+  const grid=document.getElementById('photo-grid'); if(!grid) return;
+  _urls.forEach(u=>URL.revokeObjectURL(u)); _urls=[];
+  if(!PHOTOS.length){ grid.innerHTML='<div class="photo-empty">Aucune photo pour l’instant 📷<br>Ajoutez vos plus beaux souvenirs !</div>'; return; }
+  grid.innerHTML=PHOTOS.map(p=>'<div class="photo-cell" data-id="'+p.id+'"><img loading="lazy" alt=""></div>').join('');
+  for(const p of PHOTOS){ const f=await FileDB.get(p.id); if(!f) continue; const url=URL.createObjectURL(f.blob); _urls.push(url); const cell=grid.querySelector('.photo-cell[data-id="'+p.id+'"]'); if(cell){ cell.querySelector('img').src=url; cell.onclick=()=>openLightbox(p.id,url); } }
+}
+
+let _cur=null;
+function openLightbox(id,url){ _cur={id,url}; document.getElementById('lb-img').innerHTML='<img src="'+url+'" alt="">'; document.getElementById('lightbox').classList.add('open'); }
+function closeLightbox(){ document.getElementById('lightbox').classList.remove('open'); document.getElementById('lb-img').innerHTML=''; _cur=null; }
+async function blobOf(id){ const f=await FileDB.get(id); return f?f.blob:null; }
+async function downloadCurrent(){ if(!_cur) return; const b=await blobOf(_cur.id); if(!b) return; const a=document.createElement('a'); a.href=URL.createObjectURL(b); a.download='corse-'+_cur.id+'.jpg'; document.body.appendChild(a); a.click(); a.remove(); setTimeout(()=>URL.revokeObjectURL(a.href),1500); }
+async function shareCurrent(){ if(!_cur) return; const b=await blobOf(_cur.id); if(!b) return; try{ const file=new File([b],'corse-'+_cur.id+'.jpg',{type:'image/jpeg'}); if(navigator.canShare&&navigator.canShare({files:[file]})){ await navigator.share({files:[file]}); return; } }catch(e){ if(e.name==='AbortError') return; } downloadCurrent(); }
+async function deleteCurrent(){ if(!_cur) return; if(!confirm('Supprimer cette photo ?')) return; await FileDB.del(_cur.id); PHOTOS=PHOTOS.filter(p=>p.id!==_cur.id); savePhotos(); closeLightbox(); renderPhotos(); }
+window.addEventListener('keydown',e=>{ if(e.key==='Escape') closeLightbox(); });
+
 
 /* ☀️ MÉTÉO — Open-Meteo (gratuit, sans clé). Maison à Zonza. */
 const HOUSE = { lat:41.6532, lng:9.3511 };

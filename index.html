@@ -420,6 +420,7 @@
   <div class="page-hero"><h2>Liste de courses</h2><p>Par jour · modifiable par toute la Team</p></div>
   <div class="courses-days" id="courses-days"></div>
   <div class="section" style="padding-top:10px">
+    <div id="courses-banner"></div>
     <div class="courses-list" id="courses-list"></div>
     <div class="courses-add">
       <input id="courses-input" type="text" placeholder="Ajouter un article…" autocomplete="off" onkeydown="if(event.key==='Enter')addCourse()">
@@ -1174,20 +1175,38 @@ async function initMap(){
   }
 }
 
-/* ===== LISTE DE COURSES ===== */
+/* ===== LISTE DE COURSES (partagée Firebase) ===== */
 const CKEY='corse2026-courses';
 let CDATA={};try{CDATA=JSON.parse(localStorage.getItem(CKEY)||'{}');}catch(e){CDATA={};}
-let CDAY=0;
+let CDAY=0,_coursesFbUnsub=null;
 const C_DAYS=['Sam 4/7','Dim 5/7','Lun 6/7','Mar 7/7','Mer 8/7','Jeu 9/7','Ven 10/7','Sam 11/7','Dim 12/7','Lun 13/7','Mar 14/7','Mer 15/7','Jeu 16/7','Ven 17/7','Sam 18/7'];
 const C_START=new Date('2026-07-04T00:00:00');
 function saveCourses(){try{localStorage.setItem(CKEY,JSON.stringify(CDATA));}catch(e){}}
-function initCourses(){
+function coursesShared(){return typeof _isFbReady==='function'&&_isFbReady();}
+async function initCourses(){
   const bar=document.getElementById('courses-days');if(!bar)return;
   const today=new Date();const diff=Math.floor((today-C_START)/(864e5));
   CDAY=Math.max(0,Math.min(14,diff));
   bar.innerHTML=C_DAYS.map((d,i)=>'<button class="cd-tab'+(i===CDAY?' active':'')+'" onclick="selectDay('+i+')">'+d+'</button>').join('');
-  renderCoursesList();
+  renderCoursesBanner();renderCoursesList();
   requestAnimationFrame(()=>{const t=bar.children[CDAY];if(t)t.scrollIntoView({behavior:'smooth',block:'nearest',inline:'center'});});
+  if(typeof _initFbAsync==='function'){const ok=await _initFbAsync();renderCoursesBanner();if(ok)subscribeCourses();}
+}
+function renderCoursesBanner(){
+  const el=document.getElementById('courses-banner');if(!el)return;
+  if(coursesShared())el.innerHTML='<div class="fb-ok">🔥 <b>Liste partagée</b> — visible et modifiable par toute la Team en temps réel</div>';
+  else if(localStorage.getItem('fb-config'))el.innerHTML='<div class="fb-connecting">⏳ Connexion Firebase…</div>';
+  else el.innerHTML='<div class="fb-connecting">📵 Liste locale — configure Firebase (onglet 📷 Photos) pour la partager avec la Team</div>';
+}
+function subscribeCourses(){
+  if(!coursesShared())return;
+  if(_coursesFbUnsub){_coursesFbUnsub();_coursesFbUnsub=null;}
+  _coursesFbUnsub=_fbDb.collection('courses').onSnapshot(snap=>{
+    CDATA={};
+    snap.forEach(d=>{const v=d.data();if(v.day==null)return;(CDATA[v.day]=CDATA[v.day]||[]).push(v);});
+    Object.keys(CDATA).forEach(k=>CDATA[k].sort((a,b)=>(a.ts||0)-(b.ts||0)));
+    renderCoursesList();
+  },err=>console.warn('courses fb',err));
 }
 function selectDay(i){
   CDAY=i;
@@ -1200,19 +1219,29 @@ function renderCoursesList(){
   if(!items.length){el.innerHTML='<div class="courses-empty">Aucun article pour ce jour 🛒<br>Ajoutez les courses à faire !</div>';return;}
   el.innerHTML=items.map(it=>'<div class="courses-item'+(it.done?' done':'')+'" data-id="'+it.id+'"><button class="ci-check" onclick="toggleCourse(\''+it.id+'\')">'+(it.done?'✅':'⬜')+'</button><span class="ci-text">'+escHtml(it.text)+'</span><button class="ci-del" onclick="delCourse(\''+it.id+'\')">×</button></div>').join('');
 }
-function addCourse(){
+async function addCourse(){
   const inp=document.getElementById('courses-input');const text=inp.value.trim();if(!text)return;
-  if(!CDATA[CDAY])CDATA[CDAY]=[];
-  CDATA[CDAY].push({id:uid(),text,done:false});
-  saveCourses();inp.value='';renderCoursesList();
+  inp.value='';
+  const id=uid();
+  if(coursesShared()){
+    try{await _fbDb.collection('courses').doc(id).set({id,day:CDAY,text,done:false,ts:Date.now()});}
+    catch(e){alert('Erreur : '+e.message);}
+  }else{
+    if(!CDATA[CDAY])CDATA[CDAY]=[];
+    CDATA[CDAY].push({id,text,done:false,ts:Date.now()});
+    saveCourses();renderCoursesList();
+  }
 }
-function toggleCourse(id){
-  const items=CDATA[CDAY]||[];const it=items.find(x=>x.id===id);if(it)it.done=!it.done;
-  saveCourses();renderCoursesList();
+async function toggleCourse(id){
+  const items=CDATA[CDAY]||[];const it=items.find(x=>x.id===id);if(!it)return;
+  if(coursesShared()){
+    try{await _fbDb.collection('courses').doc(id).update({done:!it.done});}catch(e){}
+  }else{it.done=!it.done;saveCourses();renderCoursesList();}
 }
-function delCourse(id){
-  if(!CDATA[CDAY])return;CDATA[CDAY]=CDATA[CDAY].filter(x=>x.id!==id);
-  saveCourses();renderCoursesList();
+async function delCourse(id){
+  if(coursesShared()){
+    try{await _fbDb.collection('courses').doc(id).delete();}catch(e){}
+  }else{if(!CDATA[CDAY])return;CDATA[CDAY]=CDATA[CDAY].filter(x=>x.id!==id);saveCourses();renderCoursesList();}
 }
 
 /* ===== FIREBASE SYNC ===== */

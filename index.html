@@ -176,6 +176,13 @@
   .page-hero h2{font-family:'Playfair Display',serif;font-size:1.7rem;color:var(--brown);}
   .page-hero p{font-size:.82rem;color:var(--muted);margin-top:5px;}
 
+  /* ===== GALERIE MAISON ===== */
+  .house-label{font-size:.78rem;font-weight:700;color:var(--brown);margin:14px 2px 8px;text-transform:uppercase;letter-spacing:.5px;}
+  .house-gallery{position:relative;width:100%;height:440px;border-radius:var(--radius);overflow:hidden;border:1px solid var(--border);box-shadow:var(--shadow);background:var(--bg2);}
+  .house-gallery iframe{width:100%;height:100%;border:0;display:block;}
+  .house-open{display:flex;align-items:center;justify-content:center;gap:6px;background:var(--brown);color:#fff;text-align:center;text-decoration:none;font-weight:700;font-size:.9rem;padding:13px;border-radius:var(--radius);margin-top:8px;}
+  .house-open:active{opacity:.9;}
+
   /* ===== CARTE ===== */
   #map{height:300px;margin:0 16px 4px;border-radius:var(--radius);overflow:hidden;border:1px solid var(--border);box-shadow:var(--shadow);background:var(--bg2);z-index:0;}
   .leaflet-container{font-family:'Inter',sans-serif;}
@@ -578,6 +585,10 @@
       <div class="card-body"><div class="card-name">Aéroport de Figari</div><div class="card-meta">Figari Sud-Corse</div><div class="card-tags"><span class="tag orange">~45 min</span></div></div>
       <a class="waze-btn" href="https://waze.com/ul?ll=41.498692,9.098273&navigate=yes" target="_blank"><span class="waze-logo">🗺️</span><span>Waze</span></a>
     </div>
+
+    <div class="house-label">📸 La maison en photos</div>
+    <div class="house-gallery"><iframe id="house-frame" data-src="https://cupulatta.fr/photos" loading="lazy" title="Photos de la maison" referrerpolicy="no-referrer"></iframe></div>
+    <a class="house-open" href="https://cupulatta.fr/photos" target="_blank" rel="noopener">📲 Ouvrir toutes les photos de la maison</a>
   </div>
 
   <div class="section" id="section-activites">
@@ -790,7 +801,7 @@ function showPage(name,btn,filter){
   document.getElementById('page-'+name).classList.add('active');
   if(btn){document.querySelectorAll('.app-nav-btn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');}
   if(name==='photos'){renderAlbum();renderPhotos();}
-  if(name==='carte'){initMap();filterCarte(filter);}
+  if(name==='carte'){initMap();filterCarte(filter);loadHouseFrame();}
   if(name==='home'){renderProgram();}
   if(name==='profil'){renderFrais();}
   window.__page=name;
@@ -798,6 +809,7 @@ function showPage(name,btn,filter){
   if(nb){nb.classList.remove('show');document.getElementById('navbar-title').textContent=NAV_TITLES[name]||'Corse 2026';}
   window.scrollTo({top:0,behavior:'smooth'});
 }
+function loadHouseFrame(){const f=document.getElementById('house-frame');if(f&&!f.src&&f.dataset.src)f.src=f.dataset.src;}
 function filterCarte(f){
   const map={maison:'section-maison',activites:'section-activites',restaurants:'section-restaurants'};
   const ids=Object.values(map);

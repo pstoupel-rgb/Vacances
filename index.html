@@ -1,1650 +1,723 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-<meta charset="utf-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=1.0, user-scalable=no"/>
-<title>Mon Carnet de Voyage</title>
-<meta name="description" content="Planifiez vos voyages, suivez vos dépenses, partagez vos photos et gardez vos documents importants à portée de main."/>
-<meta name="theme-color" content="#0A7EA4"/>
-<meta name="apple-mobile-web-app-capable" content="yes"/>
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
-<meta name="apple-mobile-web-app-title" content="Voyages"/>
-<meta name="mobile-web-app-capable" content="yes"/>
-<link rel="manifest" href="manifest.webmanifest"/>
-<link rel="apple-touch-icon" href="icon.svg"/>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Corse 2026 🌴</title>
+<meta name="description" content="Le carnet de voyage de la Team Corse 2026 — planning jour par jour, restos, adresses et météo.">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Corse 2026">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#FF6B4A">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icon.svg">
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Pacifico&family=Inter:wght@400;500;600;700;800&display=swap');
-
-  *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
-
+  @import url('https://fonts.googleapis.com/css2?family=Pacifico&family=Baloo+2:wght@500;600;700;800&family=Inter:wght@400;500;600;700&display=swap');
+  * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
   :root {
-    --sun:#F5A623; --sea:#0A7EA4; --sea-d:#0D5C7A; --sand:#FFF8EE; --coral:#E8503A;
-    --green:#2E7D52; --purple:#6C5CE7; --night:#1A2332; --muted:#6B7A8D;
-    --card:#ffffff; --line:#ECE5D8; --radius:18px; --shadow:0 2px 14px rgba(26,35,50,.08);
-    --shadow-lg:0 8px 30px rgba(26,35,50,.14);
+    /* 🌅 palette chaleureuse vacances */
+    --sun:#FFB23E; --sun-d:#F59425;
+    --coral:#FF6B4A; --coral-d:#E64F2E;
+    --terracotta:#E07856;
+    --sea:#13A89E; --sea-d:#0E7C7B;   /* turquoise lagon */
+    --green:#3FA66A;
+    --sand:#FFF6EA; --sand-2:#FBE9D2;
+    --night:#3A2A22;                  /* brun chaud (texte) */
+    --muted:#A18A78;
+    --card:#FFFFFF; --line:#F1E2CF;
+    --radius:18px;
+    --shadow:0 4px 16px rgba(180,110,60,.10);
+    --shadow-lg:0 10px 30px rgba(180,110,60,.18);
+    --sunset:linear-gradient(135deg,#FF8A5B 0%,#FF6B4A 45%,#FFB23E 100%);
   }
-
-  html, body { height:100%; }
   body {
-    font-family:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;
-    background:var(--sand); color:var(--night); min-height:100vh;
-    overscroll-behavior-y:none;
-    padding-top:env(safe-area-inset-top);
+    font-family:'Inter',-apple-system,sans-serif; background:var(--sand); color:var(--night); min-height:100vh;
+    padding-top:env(safe-area-inset-top); padding-bottom:env(safe-area-inset-bottom);
+    background-image:radial-gradient(circle at 15% 0%, rgba(255,178,62,.10), transparent 40%),
+                     radial-gradient(circle at 90% 12%, rgba(19,168,158,.08), transparent 38%);
   }
-  button, input, select, textarea { font-family:inherit; }
-  button { cursor:pointer; }
-  a { color:inherit; }
 
-  /* ===================== APP SHELL ===================== */
-  #app { max-width:560px; margin:0 auto; min-height:100vh; position:relative; }
-  .screen { display:none; }
-  .screen.active { display:block; animation:fade .25s ease; }
+  /* ========== APP NAV (haut de page) ========== */
+  .app-nav {
+    position:sticky; top:0; left:0; right:0;
+    background:var(--sunset); display:flex; z-index:100;
+    box-shadow:0 3px 14px rgba(230,79,46,.28);
+  }
+  .app-nav-btn {
+    flex:1; display:flex; flex-direction:column; align-items:center; gap:3px;
+    background:none; border:none; cursor:pointer; padding:11px 4px 9px;
+    color:rgba(255,255,255,.72); font-family:'Baloo 2','Inter',sans-serif;
+    border-bottom:3px solid transparent; transition:all .15s;
+  }
+  .app-nav-btn.active { color:#fff; border-bottom-color:#fff; }
+  .app-nav-btn .nav-icon { font-size:1.35rem; }
+  .app-nav-btn .nav-label { font-size:.68rem; font-weight:700; letter-spacing:.3px; }
+
+  .page-content { padding-bottom:20px; }
+
+  /* ========== HEADER ========== */
+  header {
+    background:var(--sunset);
+    padding:30px 20px 38px; text-align:center; position:relative; overflow:hidden;
+  }
+  header::after {
+    content:'☀️'; position:absolute; top:14px; right:18px; font-size:2.6rem; opacity:.85;
+    filter:drop-shadow(0 2px 6px rgba(0,0,0,.15)); animation:floaty 5s ease-in-out infinite;
+  }
+  @keyframes floaty { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-6px)} }
+  header::before {
+    content:''; position:absolute; bottom:-2px; left:0; right:0; height:26px;
+    background:var(--sand); clip-path:ellipse(60% 100% at 50% 100%);
+  }
+  .header-emoji { font-size:2.4rem; display:block; margin-bottom:2px; }
+  header h1 { font-family:'Pacifico',cursive; font-size:2.3rem; color:#fff; text-shadow:0 3px 10px rgba(0,0,0,.22); }
+  .header-sub { color:rgba(255,255,255,.92); font-size:.86rem; font-weight:600; margin-top:6px; }
+  .dates-badge {
+    display:inline-block; background:#fff; color:var(--coral-d); font-weight:800; font-size:.8rem;
+    padding:5px 16px; border-radius:20px; margin-top:12px; box-shadow:0 3px 10px rgba(0,0,0,.12);
+  }
+
+  /* ========== PAGES ========== */
+  .page { display:none; }
+  .page.active { display:block; animation:fade .25s ease; }
   @keyframes fade { from{opacity:0; transform:translateY(6px);} to{opacity:1; transform:none;} }
 
-  /* ===================== HOME — HERO ===================== */
-  .home-hero {
-    background:linear-gradient(150deg,var(--sea) 0%,var(--sea-d) 60%,#0a4459 100%);
-    color:#fff; padding:26px 20px 30px; position:relative; overflow:hidden;
-    border-bottom-left-radius:28px; border-bottom-right-radius:28px;
+  /* ========== MÉTÉO ========== */
+  .weather-wrap { padding:14px 12px 0; }
+  .weather-card {
+    background:linear-gradient(135deg,#FF9E5E 0%,#FF7E5F 55%,#FFB23E 100%);
+    border-radius:var(--radius); padding:14px 14px 12px; position:relative; overflow:hidden;
+    box-shadow:var(--shadow);
   }
-  .home-hero::after {
-    content:'✈️'; position:absolute; right:-10px; top:6px; font-size:5.5rem; opacity:.13; transform:rotate(-18deg);
-  }
-  .hero-greet { font-size:.82rem; opacity:.8; font-weight:500; }
-  .hero-title { font-family:'Pacifico',cursive; font-size:2rem; margin:2px 0 14px; text-shadow:0 2px 8px rgba(0,0,0,.2); }
-  .hero-stats { display:flex; gap:10px; }
-  .hstat { flex:1; background:rgba(255,255,255,.14); backdrop-filter:blur(4px); border-radius:14px; padding:10px 12px; }
-  .hstat .v { font-size:1.5rem; font-weight:800; line-height:1; }
-  .hstat .l { font-size:.66rem; opacity:.85; margin-top:4px; text-transform:uppercase; letter-spacing:.5px; }
-
-  /* ===================== SECTION / LISTS ===================== */
-  .wrap { padding:18px 16px 120px; }
-  .section-head { display:flex; align-items:center; justify-content:space-between; margin:22px 2px 12px; }
-  .section-head:first-child { margin-top:6px; }
-  .section-head h2 { font-size:1.05rem; font-weight:800; }
-  .section-head .count { font-size:.72rem; color:var(--muted); font-weight:600; }
-
-  /* TRIP CARD */
-  .trip-card {
-    background:var(--card); border-radius:var(--radius); overflow:hidden; box-shadow:var(--shadow);
-    margin-bottom:14px; cursor:pointer; transition:transform .15s, box-shadow .15s; position:relative;
-  }
-  .trip-card:active { transform:scale(.985); }
-  .trip-cover { height:96px; display:flex; align-items:flex-end; padding:12px 14px; position:relative; overflow:hidden; }
-  .trip-cover .emoji { position:absolute; right:-6px; top:-12px; font-size:4.6rem; opacity:.28; }
-  .trip-cover .status {
-    position:absolute; top:10px; left:12px; background:rgba(255,255,255,.92); color:var(--night);
-    font-size:.64rem; font-weight:800; padding:4px 9px; border-radius:20px; text-transform:uppercase; letter-spacing:.4px;
-  }
-  .trip-cover h3 { color:#fff; font-size:1.25rem; font-weight:800; text-shadow:0 2px 6px rgba(0,0,0,.3); z-index:1; }
-  .trip-body { padding:11px 14px 13px; }
-  .trip-meta { display:flex; align-items:center; gap:6px; color:var(--muted); font-size:.8rem; font-weight:500; }
-  .trip-meta .dot { width:3px; height:3px; border-radius:50%; background:var(--muted); }
-  .trip-foot { display:flex; gap:8px; margin-top:10px; flex-wrap:wrap; }
-  .mini-tag { font-size:.68rem; font-weight:700; padding:3px 9px; border-radius:8px; background:#F2F6F8; color:var(--sea); display:inline-flex; align-items:center; gap:4px; }
-  .mini-tag.warn { background:#FFF4E0; color:#C07000; }
-  .mini-tag.ok { background:#EDF7F2; color:var(--green); }
-
-  /* EMPTY */
-  .empty { text-align:center; padding:48px 24px; color:var(--muted); }
-  .empty .big { font-size:3.4rem; display:block; margin-bottom:10px; }
-  .empty p { font-size:.92rem; line-height:1.5; margin-bottom:18px; }
-
-  /* ===================== TRIP DETAIL ===================== */
-  .trip-header {
-    background:linear-gradient(150deg,var(--sea) 0%,var(--sea-d) 100%); color:#fff;
-    padding:14px 14px 20px; position:sticky; top:0; z-index:40;
-    border-bottom-left-radius:22px; border-bottom-right-radius:22px;
-  }
-  .th-top { display:flex; align-items:center; gap:10px; }
-  .icon-btn {
-    width:38px; height:38px; border:none; border-radius:12px; background:rgba(255,255,255,.16);
-    color:#fff; font-size:1.1rem; display:grid; place-items:center; flex-shrink:0;
-  }
-  .icon-btn:active { background:rgba(255,255,255,.28); }
-  .th-title { flex:1; min-width:0; }
-  .th-title h1 { font-size:1.2rem; font-weight:800; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-  .th-title .sub { font-size:.76rem; opacity:.85; font-weight:500; margin-top:1px; }
-  .th-count {
-    margin-top:14px; background:rgba(255,255,255,.14); border-radius:14px; padding:10px 14px;
-    display:flex; align-items:center; justify-content:space-between;
-  }
-  .th-count .big { font-size:1.5rem; font-weight:800; line-height:1; }
-  .th-count .lbl { font-size:.7rem; opacity:.85; }
-  .th-count .prog { flex:1; margin-left:14px; }
-  .prog-bar { height:7px; border-radius:10px; background:rgba(255,255,255,.25); overflow:hidden; }
-  .prog-bar i { display:block; height:100%; background:var(--sun); border-radius:10px; transition:width .4s; }
-
-  /* SUB TABS (bottom nav inside a trip) */
-  .tabbar {
-    position:fixed; bottom:0; left:50%; transform:translateX(-50%); width:100%; max-width:560px;
-    background:#fff; border-top:1px solid var(--line); display:flex; z-index:50;
-    padding-bottom:env(safe-area-inset-bottom);
-    box-shadow:0 -2px 16px rgba(26,35,50,.06);
-  }
-  .tabbar button {
-    flex:1; border:none; background:none; padding:9px 2px 7px; display:flex; flex-direction:column;
-    align-items:center; gap:3px; color:var(--muted); font-size:.62rem; font-weight:700;
-  }
-  .tabbar button .ic { font-size:1.3rem; line-height:1; transition:transform .15s; }
-  .tabbar button.active { color:var(--sea); }
-  .tabbar button.active .ic { transform:translateY(-2px) scale(1.08); }
-
-  .tabpage { display:none; padding:16px 14px 120px; }
-  .tabpage.active { display:block; animation:fade .2s ease; }
-
-  /* ===================== GENERIC CARD ===================== */
-  .card {
-    background:var(--card); border-radius:var(--radius); padding:14px 16px; box-shadow:var(--shadow); margin-bottom:12px;
-  }
-  .card-row { display:flex; align-items:center; gap:13px; }
-  .card-ic { width:46px; height:46px; border-radius:13px; display:grid; place-items:center; font-size:1.5rem; flex-shrink:0; background:#F2F6F8; }
-  .card-grow { flex:1; min-width:0; }
-  .card-title { font-weight:700; font-size:.95rem; }
-  .card-sub { font-size:.76rem; color:var(--muted); margin-top:2px; }
-
-  .block-title { font-size:.7rem; font-weight:800; text-transform:uppercase; letter-spacing:1.2px; color:var(--muted); margin:18px 4px 10px; display:flex; align-items:center; gap:8px; }
-  .block-title:first-child { margin-top:4px; }
-
-  /* ===================== TIMELINE (planning) ===================== */
-  .day-card { background:var(--card); border-radius:var(--radius); margin-bottom:12px; overflow:hidden; box-shadow:var(--shadow); }
-  .day-head { padding:12px 14px 10px; display:flex; align-items:center; gap:11px; border-bottom:1px solid #F4EFE4; }
-  .day-num { font-family:'Pacifico',cursive; font-size:1.45rem; color:var(--sea); min-width:30px; line-height:1; }
-  .day-name { font-weight:700; font-size:.92rem; }
-  .day-date { font-size:.7rem; color:var(--muted); margin-top:1px; }
-  .day-vibe { margin-left:auto; font-size:1.4rem; }
-  .timeline { padding:12px 14px 8px; }
-  .tl-item { display:flex; gap:11px; margin-bottom:12px; position:relative; }
-  .tl-item:not(:last-child)::after { content:''; position:absolute; left:46px; top:24px; bottom:-12px; width:2px; background:var(--line); }
-  .tl-time { font-size:.66rem; font-weight:700; color:var(--muted); width:36px; flex-shrink:0; text-align:right; padding-top:3px; }
-  .tl-dot { width:20px; height:20px; border-radius:50%; flex-shrink:0; display:grid; place-items:center; font-size:.62rem; z-index:1; margin-top:1px; background:#EAF4F8; }
-  .tl-body { flex:1; min-width:0; }
-  .tl-title { font-weight:600; font-size:.86rem; }
-  .tl-sub { font-size:.73rem; color:var(--muted); margin-top:2px; line-height:1.4; }
-  .tl-row { display:flex; align-items:center; gap:7px; margin-top:6px; flex-wrap:wrap; }
-  .chip { font-size:.64rem; font-weight:700; padding:2px 8px; border-radius:7px; background:#F0F4FF; color:var(--sea); }
-  .chip.green{background:#EDF7F2;color:var(--green);} .chip.orange{background:#FFF4E0;color:#C07000;}
-  .chip.coral{background:#FFF0EE;color:var(--coral);} .chip.purple{background:#F0EEFF;color:var(--purple);}
-  .waze {
-    background:var(--sea); color:#fff; border:none; border-radius:9px; padding:4px 9px; font-size:.66rem;
-    font-weight:700; text-decoration:none; display:inline-flex; align-items:center; gap:4px;
-  }
-  .waze:active { background:var(--sea-d); }
-
-  /* ===================== EXPENSES ===================== */
-  .exp-summary { background:linear-gradient(135deg,#0A7EA4,#0D5C7A); color:#fff; border-radius:var(--radius); padding:16px; margin-bottom:14px; }
-  .exp-summary .total { font-size:2rem; font-weight:800; line-height:1; }
-  .exp-summary .total small { font-size:.95rem; font-weight:600; opacity:.85; }
-  .exp-summary .meta { font-size:.76rem; opacity:.85; margin-top:5px; }
-  .exp-bars { margin-top:14px; display:flex; flex-direction:column; gap:8px; }
-  .exp-bar-row { display:flex; align-items:center; gap:9px; font-size:.74rem; }
-  .exp-bar-row .nm { width:84px; flex-shrink:0; display:flex; align-items:center; gap:5px; }
-  .exp-bar-row .track { flex:1; height:7px; background:rgba(255,255,255,.22); border-radius:8px; overflow:hidden; }
-  .exp-bar-row .track i { display:block; height:100%; background:var(--sun); border-radius:8px; }
-  .exp-bar-row .amt { font-weight:700; width:62px; text-align:right; flex-shrink:0; }
-
-  .exp-item { background:var(--card); border-radius:14px; padding:11px 13px; box-shadow:var(--shadow); margin-bottom:9px; display:flex; align-items:center; gap:12px; }
-  .exp-item:active { background:#FAFCFD; }
-  .exp-cat { width:42px; height:42px; border-radius:12px; display:grid; place-items:center; font-size:1.3rem; flex-shrink:0; background:#F2F6F8; }
-  .exp-info { flex:1; min-width:0; }
-  .exp-info .t { font-weight:700; font-size:.9rem; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-  .exp-info .s { font-size:.72rem; color:var(--muted); margin-top:1px; }
-  .exp-amt { font-weight:800; font-size:.95rem; flex-shrink:0; }
-
-  .balance-card { background:var(--card); border-radius:14px; padding:12px 14px; box-shadow:var(--shadow); margin-bottom:9px; display:flex; align-items:center; justify-content:space-between; }
-  .balance-card .who { display:flex; align-items:center; gap:9px; font-weight:700; font-size:.88rem; }
-  .avatar { width:32px; height:32px; border-radius:50%; display:grid; place-items:center; color:#fff; font-weight:800; font-size:.8rem; flex-shrink:0; }
-  .bal-amt { font-weight:800; font-size:.9rem; }
-  .bal-amt.pos { color:var(--green); } .bal-amt.neg { color:var(--coral); }
-  .settle-line { display:flex; align-items:center; gap:8px; font-size:.82rem; padding:9px 4px; }
-  .settle-line .arrow { color:var(--muted); }
-
-  /* ===================== PHOTOS ===================== */
-  .photo-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:6px; }
-  .photo-cell { position:relative; aspect-ratio:1; border-radius:12px; overflow:hidden; background:#E8EEF1; cursor:pointer; }
-  .photo-cell img { width:100%; height:100%; object-fit:cover; display:block; }
-  .photo-cell:active img { transform:scale(.97); }
-  .photo-add { aspect-ratio:1; border-radius:12px; border:2px dashed #C9D6DD; background:#F7FBFC; display:grid; place-items:center; font-size:1.8rem; color:var(--sea); }
-
-  /* ===================== DOCUMENTS ===================== */
-  .doc-item { background:var(--card); border-radius:14px; padding:12px 13px; box-shadow:var(--shadow); margin-bottom:9px; display:flex; align-items:center; gap:12px; }
-  .doc-ic { width:46px; height:46px; border-radius:12px; display:grid; place-items:center; font-size:1.4rem; flex-shrink:0; }
-  .doc-grow { flex:1; min-width:0; }
-  .doc-grow .t { font-weight:700; font-size:.9rem; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-  .doc-grow .s { font-size:.72rem; color:var(--muted); margin-top:1px; }
-  .doc-actions { display:flex; gap:6px; flex-shrink:0; }
-  .doc-actions button { width:34px; height:34px; border:none; border-radius:10px; background:#F2F6F8; font-size:.95rem; display:grid; place-items:center; }
-  .doc-actions button:active { background:#E4ECEF; }
-
-  .sos-card { background:linear-gradient(135deg,#E8503A,#c0341f); color:#fff; border-radius:var(--radius); padding:16px; margin-bottom:14px; }
-  .sos-card h3 { font-size:1rem; font-weight:800; display:flex; align-items:center; gap:7px; }
-  .sos-card .ln { font-size:.82rem; opacity:.92; margin-top:7px; display:flex; justify-content:space-between; gap:10px; }
-  .sos-card .ln b { font-weight:700; }
-  .sos-call { display:block; margin-top:13px; background:#fff; color:var(--coral); text-align:center; font-weight:800; padding:11px; border-radius:12px; text-decoration:none; font-size:.95rem; }
-
-  /* ===================== BUTTONS / FORMS ===================== */
-  .btn {
-    display:inline-flex; align-items:center; justify-content:center; gap:7px; border:none; border-radius:13px;
-    padding:13px 18px; font-size:.95rem; font-weight:700; background:var(--sea); color:#fff; width:100%;
-    transition:transform .12s, filter .12s;
-  }
-  .btn:active { transform:scale(.98); filter:brightness(.95); }
-  .btn.ghost { background:#F2F6F8; color:var(--sea); }
-  .btn.coral { background:var(--coral); }
-  .btn.sm { width:auto; padding:8px 14px; font-size:.8rem; border-radius:11px; }
-  .btn.danger { background:#FDECEA; color:var(--coral); }
-
-  .fab {
-    position:fixed; bottom:calc(20px + env(safe-area-inset-bottom)); right:50%; margin-right:-260px; z-index:45;
-    width:56px; height:56px; border-radius:50%; border:none; background:var(--coral); color:#fff;
-    font-size:1.7rem; box-shadow:0 6px 20px rgba(232,80,58,.45); display:grid; place-items:center;
-  }
-  .fab:active { transform:scale(.92); }
-  @media (max-width:560px){ .fab { right:20px; margin-right:0; } }
-
-  .field { margin-bottom:14px; }
-  .field label { display:block; font-size:.78rem; font-weight:700; margin-bottom:6px; color:var(--night); }
-  .field input, .field select, .field textarea {
-    width:100%; padding:12px 13px; border:1.5px solid var(--line); border-radius:12px; font-size:1rem;
-    background:#fff; color:var(--night); transition:border-color .15s;
-  }
-  .field input:focus, .field select:focus, .field textarea:focus { outline:none; border-color:var(--sea); }
-  .field textarea { resize:vertical; min-height:64px; }
-  .field-row { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
-  .help { font-size:.72rem; color:var(--muted); margin-top:5px; }
-
-  .emoji-pick { display:flex; gap:7px; flex-wrap:wrap; }
-  .emoji-pick button { width:42px; height:42px; border-radius:11px; border:1.5px solid var(--line); background:#fff; font-size:1.3rem; }
-  .emoji-pick button.sel { border-color:var(--sea); background:#EAF4F8; }
-
-  .seg { display:flex; gap:6px; flex-wrap:wrap; }
-  .seg button { padding:8px 12px; border-radius:10px; border:1.5px solid var(--line); background:#fff; font-size:.8rem; font-weight:600; }
-  .seg button.sel { border-color:var(--sea); background:var(--sea); color:#fff; }
-
-  .check-list { display:flex; flex-direction:column; gap:8px; }
-  .check-row { display:flex; align-items:center; gap:10px; padding:9px 11px; border:1.5px solid var(--line); border-radius:12px; font-size:.9rem; font-weight:600; }
-  .check-row.sel { border-color:var(--sea); background:#EAF4F8; }
-  .check-row input { width:20px; height:20px; accent-color:var(--sea); }
-
-  /* ===================== MODAL / SHEET ===================== */
-  .overlay { position:fixed; inset:0; background:rgba(26,35,50,.55); z-index:200; display:none; align-items:flex-end; justify-content:center; }
-  .overlay.open { display:flex; animation:fade .2s; }
-  .sheet {
-    background:#fff; width:100%; max-width:560px; border-top-left-radius:24px; border-top-right-radius:24px;
-    max-height:92vh; overflow-y:auto; padding:8px 18px calc(24px + env(safe-area-inset-bottom));
-    animation:slideUp .3s cubic-bezier(.2,.9,.3,1);
-  }
-  @keyframes slideUp { from{transform:translateY(100%);} to{transform:none;} }
-  .sheet-grip { width:42px; height:5px; border-radius:10px; background:var(--line); margin:8px auto 14px; }
-  .sheet h2 { font-size:1.2rem; font-weight:800; margin-bottom:4px; }
-  .sheet .sheet-sub { font-size:.82rem; color:var(--muted); margin-bottom:18px; }
-
-  /* lightbox */
-  .lightbox { position:fixed; inset:0; background:rgba(0,0,0,.94); z-index:300; display:none; flex-direction:column; }
-  .lightbox.open { display:flex; }
-  .lb-top { display:flex; justify-content:space-between; align-items:center; padding:calc(10px + env(safe-area-inset-top)) 16px 10px; }
-  .lb-top button { background:rgba(255,255,255,.16); border:none; color:#fff; width:40px; height:40px; border-radius:50%; font-size:1.1rem; }
-  .lb-body { flex:1; display:grid; place-items:center; overflow:hidden; padding:8px; }
-  .lb-body img { max-width:100%; max-height:100%; object-fit:contain; border-radius:8px; }
-  .lb-body iframe { width:100%; height:100%; border:none; background:#fff; border-radius:8px; }
-  .lb-cap { color:#fff; text-align:center; padding:12px 16px calc(20px + env(safe-area-inset-bottom)); font-size:.85rem; opacity:.9; }
-
-  /* toast */
-  #toast { position:fixed; bottom:calc(86px + env(safe-area-inset-bottom)); left:50%; transform:translateX(-50%); background:var(--night); color:#fff; padding:11px 20px; border-radius:30px; font-size:.85rem; font-weight:600; z-index:400; box-shadow:var(--shadow-lg); opacity:0; transition:opacity .25s, transform .25s; pointer-events:none; }
-  #toast.show { opacity:1; transform:translateX(-50%) translateY(-4px); }
-
-  .row-actions { display:flex; gap:10px; margin-top:6px; }
-  .muted-link { background:none; border:none; color:var(--muted); font-size:.82rem; font-weight:600; text-decoration:underline; padding:6px; }
-  .danger-link { color:var(--coral); }
-
-  /* ===================== WEATHER ===================== */
-  .weather-widget { background:linear-gradient(135deg,#0A2540 0%,#0A7EA4 80%,#1490b8 100%); border-radius:var(--radius); padding:14px 14px 12px; margin-bottom:12px; position:relative; overflow:hidden; }
-  .weather-widget::before { content:''; position:absolute; right:-20px; top:-20px; width:90px; height:90px; border-radius:50%; background:rgba(255,255,255,.05); }
-  .weather-dest { font-size:.68rem; color:rgba(255,255,255,.72); font-weight:700; margin-bottom:10px; text-transform:uppercase; letter-spacing:.6px; }
-  .weather-strip { display:flex; gap:7px; overflow-x:auto; scroll-snap-type:x mandatory; scrollbar-width:none; padding-bottom:2px; }
+  .weather-card::before { content:''; position:absolute; right:-24px; top:-24px; width:96px; height:96px; border-radius:50%; background:rgba(255,255,255,.16); }
+  .weather-head { display:flex; align-items:center; justify-content:space-between; margin-bottom:11px; position:relative; z-index:1; }
+  .weather-title { font-family:'Baloo 2',sans-serif; font-weight:800; font-size:.98rem; color:#fff; display:flex; align-items:center; gap:6px; }
+  .weather-loc { font-size:.66rem; color:rgba(255,255,255,.85); font-weight:600; }
+  .weather-strip { display:flex; gap:7px; overflow-x:auto; scroll-snap-type:x mandatory; scrollbar-width:none; padding-bottom:2px; position:relative; z-index:1; }
   .weather-strip::-webkit-scrollbar { display:none; }
-  .w-day { flex-shrink:0; background:rgba(255,255,255,.1); border-radius:13px; padding:9px 11px; text-align:center; min-width:62px; color:#fff; scroll-snap-align:start; border:1.5px solid transparent; }
-  .w-day.in-trip { background:rgba(245,166,35,.25); border-color:rgba(245,166,35,.5); }
-  .w-day .wn { font-size:.58rem; font-weight:700; opacity:.8; text-transform:uppercase; }
-  .w-day .wi { font-size:1.35rem; margin:3px 0; line-height:1; }
-  .w-day .wh { font-size:.84rem; font-weight:800; }
-  .w-day .wl { font-size:.66rem; opacity:.72; margin-top:1px; }
-  .w-day .wr { font-size:.58rem; opacity:.75; margin-top:3px; }
-  .skel { background:linear-gradient(90deg,rgba(255,255,255,.06) 25%,rgba(255,255,255,.14) 50%,rgba(255,255,255,.06) 75%); background-size:300% 100%; animation:shimmer 1.5s infinite; border-radius:8px; }
-  @keyframes shimmer { to { background-position:-100% 0; } }
-  .weather-error { color:rgba(255,255,255,.7); font-size:.8rem; text-align:center; padding:12px 0; }
+  .w-day { flex-shrink:0; background:rgba(255,255,255,.18); border-radius:14px; padding:9px 11px; text-align:center; min-width:60px; color:#fff; scroll-snap-align:start; border:1.5px solid transparent; backdrop-filter:blur(3px); }
+  .w-day.today { background:rgba(255,255,255,.34); border-color:rgba(255,255,255,.7); }
+  .w-day .wn { font-size:.6rem; font-weight:800; opacity:.95; text-transform:uppercase; }
+  .w-day .wi { font-size:1.4rem; margin:3px 0; line-height:1; }
+  .w-day .wh { font-size:.86rem; font-weight:800; }
+  .w-day .wl { font-size:.66rem; opacity:.8; }
+  .w-day .wr { font-size:.58rem; opacity:.85; margin-top:3px; }
+  .skel { background:linear-gradient(90deg,rgba(255,255,255,.12) 25%,rgba(255,255,255,.28) 50%,rgba(255,255,255,.12) 75%); background-size:300% 100%; animation:shim 1.4s infinite; border-radius:8px; }
+  @keyframes shim { to{ background-position:-100% 0; } }
+  .weather-msg { color:rgba(255,255,255,.92); font-size:.78rem; text-align:center; padding:10px 0; position:relative; z-index:1; }
 
-  /* ===================== MAP OVERLAY ===================== */
-  #map-overlay { position:fixed; inset:0; z-index:500; background:#eae6de; display:flex; flex-direction:column; transform:translateY(100%); transition:transform .35s cubic-bezier(.2,.9,.3,1); }
-  #map-overlay.open { transform:none; }
-  #map-topbar { display:flex; align-items:center; gap:10px; flex-shrink:0; padding:calc(14px + env(safe-area-inset-top)) 14px 12px; background:#fff; box-shadow:0 2px 10px rgba(0,0,0,.07); }
-  #map-title { flex:1; font-weight:800; font-size:1.05rem; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-  #map-container { flex:1; min-height:0; }
-  #map-day-filters { display:flex; gap:8px; overflow-x:auto; scrollbar-width:none; flex-shrink:0; padding:10px 14px calc(10px + env(safe-area-inset-bottom)); background:rgba(255,255,255,.96); backdrop-filter:blur(8px); border-top:1px solid var(--line); }
-  #map-day-filters::-webkit-scrollbar { display:none; }
-  .map-chip { flex-shrink:0; padding:7px 14px; border-radius:20px; border:none; font-size:.74rem; font-weight:700; background:#F2F6F8; color:var(--night); cursor:pointer; transition:all .15s; white-space:nowrap; }
-  .map-chip.active { background:var(--night); color:#fff; }
-  .icon-btn-dark { width:38px; height:38px; border:none; border-radius:12px; background:#F2F6F8; color:var(--night); font-size:1.1rem; display:grid; place-items:center; flex-shrink:0; cursor:pointer; }
-  .icon-btn-dark:active { background:#E4ECEF; }
+  /* ========== PLANNING — WEEK NAV ========== */
+  .week-nav {
+    display:flex; gap:6px; padding:14px 12px 10px;
+    position:sticky; top:0; background:var(--sand); z-index:20;
+  }
+  .week-btn {
+    flex:1; padding:9px 2px; border:2px solid var(--coral); border-radius:14px;
+    background:transparent; color:var(--coral-d); font-family:'Baloo 2',sans-serif; font-weight:700; font-size:.74rem; cursor:pointer; transition:all .15s;
+  }
+  .week-btn.active { background:var(--coral); color:#fff; box-shadow:0 4px 12px rgba(255,107,74,.3); }
+  .week { display:none; padding:6px 12px 12px; }
+  .week.active { display:block; }
 
-  /* ===================== CHECKLIST ===================== */
-  .cl-card { background:var(--card); border-radius:var(--radius); padding:14px 16px; box-shadow:var(--shadow); margin-bottom:12px; }
-  .cl-hdr { display:flex; align-items:center; justify-content:space-between; margin-bottom:8px; }
-  .cl-ttl { font-weight:800; font-size:.95rem; }
-  .cl-pct { font-size:.82rem; font-weight:800; color:var(--sea); }
-  .cl-bar { height:8px; border-radius:10px; background:#EEF3F5; overflow:hidden; margin-bottom:10px; }
-  .cl-bar i { display:block; height:100%; background:linear-gradient(90deg,var(--sea),#00B4D8); border-radius:10px; transition:width .5s; }
-  .cl-cat-hd { font-size:.64rem; font-weight:800; text-transform:uppercase; letter-spacing:1px; color:var(--muted); margin:12px 0 4px; display:flex; align-items:center; gap:7px; }
-  .cl-item { display:flex; align-items:center; gap:10px; padding:9px 0; border-bottom:1px solid #F4EFE4; cursor:pointer; user-select:none; }
-  .cl-item:last-child { border-bottom:none; }
-  .cl-chk { width:22px; height:22px; border-radius:7px; border:2px solid var(--line); flex-shrink:0; display:grid; place-items:center; font-size:.7rem; transition:all .18s; background:#fff; color:transparent; }
-  .cl-item.done .cl-chk { background:var(--sea); border-color:var(--sea); color:#fff; }
-  .cl-item.done .cl-lbl { text-decoration:line-through; color:var(--muted); }
-  .cl-lbl { font-size:.9rem; font-weight:500; flex:1; }
-  .cl-tpl-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:10px; }
-  .cl-tpl { background:var(--card); border-radius:14px; padding:13px; border:2px solid var(--line); text-align:center; cursor:pointer; transition:transform .12s; box-shadow:var(--shadow); }
-  .cl-tpl:active { transform:scale(.96); }
-  .cl-tpl .te { font-size:1.9rem; display:block; margin-bottom:5px; }
-  .cl-tpl .tn { font-size:.82rem; font-weight:700; }
-  .cl-tpl .tc { font-size:.68rem; color:var(--muted); margin-top:1px; }
+  /* ========== WHATSAPP BANNER ========== */
+  .wa-banner {
+    background:linear-gradient(135deg,#25D366,#1ebe5a); border-radius:15px; padding:12px 14px;
+    display:flex; align-items:center; gap:12px; margin-bottom:12px;
+    cursor:pointer; transition:transform .12s, opacity .15s; box-shadow:0 4px 14px rgba(37,211,102,.28);
+  }
+  .wa-banner:active { transform:scale(.985); opacity:.92; }
+  .wa-icon { font-size:1.6rem; flex-shrink:0; }
+  .wa-text { flex:1; }
+  .wa-title { font-weight:700; font-size:.88rem; color:#fff; }
+  .wa-sub { font-size:.72rem; color:rgba(255,255,255,.9); margin-top:2px; }
+  .wa-arrow { color:#fff; font-size:1.1rem; }
+
+  /* ========== DAY CARD ========== */
+  .day-card { background:var(--card); border-radius:var(--radius); margin-bottom:12px; overflow:hidden; box-shadow:var(--shadow); }
+  .day-header { padding:13px 16px 11px; display:flex; align-items:center; gap:11px; border-bottom:1px solid var(--line);
+    background:linear-gradient(180deg,#FFFBF4,#fff); }
+  .day-number { font-family:'Pacifico',cursive; font-size:1.7rem; line-height:1; color:var(--coral); min-width:38px; }
+  .day-name { font-family:'Baloo 2',sans-serif; font-weight:700; font-size:.98rem; }
+  .day-date { font-size:.72rem; color:var(--muted); margin-top:1px; }
+  .day-vibe { margin-left:auto; font-size:1.55rem; }
+
+  /* ========== TIMELINE ========== */
+  .timeline { padding:13px 16px 15px; }
+  .tl-item { display:flex; gap:12px; margin-bottom:11px; position:relative; }
+  .tl-item:last-child { margin-bottom:0; }
+  .tl-item:not(:last-child)::after {
+    content:''; position:absolute; left:50px; top:26px; bottom:-11px; width:2px; background:var(--line);
+  }
+  .tl-time { font-size:.68rem; font-weight:700; color:var(--muted); width:40px; flex-shrink:0; padding-top:3px; text-align:right; }
+  .tl-dot { width:21px; height:21px; border-radius:50%; flex-shrink:0; display:flex; align-items:center; justify-content:center; font-size:.66rem; margin-top:1px; z-index:1; }
+  .dot-plane{background:#E3F4F2;} .dot-food{background:#FFEDE6;} .dot-home{background:#FFF1D6;}
+  .dot-activity{background:#E7F6EC;} .dot-boat{background:#E0F2F0;} .dot-free{background:#FBEEDD;}
+  .tl-title { font-weight:600; font-size:.88rem; }
+  .tl-sub { font-size:.74rem; color:var(--muted); margin-top:2px; line-height:1.4; }
+  .tl-row { display:flex; align-items:center; gap:8px; margin-top:6px; flex-wrap:wrap; }
+
+  /* ========== TAGS ========== */
+  .tag { font-size:.65rem; font-weight:700; padding:3px 8px; border-radius:7px; background:#E3F4F2; color:var(--sea-d); }
+  .tag.green{background:#E7F6EC;color:var(--green);} .tag.orange{background:#FFF0DA;color:#C07000;}
+  .tag.coral{background:#FFEAE3;color:var(--coral-d);} .tag.yellow{background:#FFF6D6;color:#9A7400;}
+
+  /* ========== WAZE INLINE ========== */
+  .waze-inline {
+    background:var(--sea); color:#fff; border:none; border-radius:10px;
+    padding:5px 11px; font-size:.68rem; font-weight:700; cursor:pointer;
+    text-decoration:none; display:inline-flex; align-items:center; gap:4px; flex-shrink:0;
+  }
+  .waze-inline:active{background:var(--sea-d);}
+
+  /* ========== LEGEND ========== */
+  .legend { background:var(--card); border-radius:var(--radius); padding:14px 16px; margin-bottom:12px; box-shadow:var(--shadow); }
+  .legend-title { font-family:'Baloo 2',sans-serif; font-size:.82rem; font-weight:800; color:var(--coral-d); margin-bottom:10px; }
+  .legend-grid { display:grid; grid-template-columns:1fr 1fr; gap:7px; }
+  .legend-item { display:flex; align-items:center; gap:8px; font-size:.78rem; }
+  .legend-dot { width:11px; height:11px; border-radius:50%; flex-shrink:0; }
+
+  /* ========== GPS PAGE ========== */
+  .gps-intro { padding:16px 16px 4px; text-align:center; font-size:.82rem; color:var(--muted); line-height:1.5; }
+  .section { padding:16px 16px 0; }
+  .section-title {
+    font-family:'Baloo 2',sans-serif; font-size:.82rem; font-weight:800;
+    color:var(--coral-d); margin-bottom:12px; display:flex; align-items:center; gap:8px;
+  }
+  .section-title::after { content:''; flex:1; height:2px; border-radius:2px; background:var(--sand-2); }
+
+  .card {
+    background:var(--card); border-radius:var(--radius); padding:14px 16px; margin-bottom:10px;
+    display:flex; align-items:center; gap:14px; box-shadow:var(--shadow);
+    text-decoration:none; color:inherit; transition:transform .15s; position:relative;
+  }
+  .card:active { transform:scale(.98); }
+  .card-icon { font-size:1.8rem; width:50px; height:50px; display:flex; align-items:center; justify-content:center; border-radius:14px; flex-shrink:0; }
+  .icon-home{background:#FFF1D6;} .icon-plane{background:#E3F4F2;} .icon-canyon{background:#E7F6EC;}
+  .icon-food{background:#FFEDE6;} .icon-boat{background:#E0F2F0;} .icon-golf{background:#E7F6EC;}
+  .card-body { flex:1; min-width:0; }
+  .card-name { font-family:'Baloo 2',sans-serif; font-weight:700; font-size:.96rem; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .card-meta { font-size:.75rem; color:var(--muted); margin-top:2px; }
+  .card-tags { display:flex; flex-wrap:wrap; gap:4px; margin-top:5px; }
+
+  .waze-btn {
+    background:var(--sea); color:#fff; border:none; border-radius:13px; padding:10px 14px;
+    font-size:.75rem; font-weight:700; cursor:pointer; display:flex; flex-direction:column;
+    align-items:center; gap:2px; flex-shrink:0; text-decoration:none; transition:background .15s; min-width:58px;
+  }
+  .waze-btn:active{background:var(--sea-d);}
+  .waze-btn .waze-logo{font-size:1.3rem;}
+  .waze-btn span{font-size:.65rem; letter-spacing:.3px;}
+  .waze-btn.coral{background:var(--coral);} .waze-btn.coral:active{background:var(--coral-d);}
+  .waze-btn.green-btn{background:var(--green);} .waze-btn.green-btn:active{background:#2e7d4f;}
+  .waze-btn.disabled{background:#D8C9B6; cursor:default; pointer-events:none;}
+  .card.home-card { background:linear-gradient(135deg,#FFF6EA 0%,#FFE6C2 100%); border:2px solid var(--sun); }
+
+  .wave { text-align:center; font-size:1.6rem; margin:10px 0 4px; letter-spacing:4px; }
+  footer { text-align:center; padding:14px 16px 12px; font-size:.78rem; color:var(--muted); }
+  footer strong { color:var(--coral-d); }
 </style>
 </head>
 <body>
-<div id="app">
 
-  <!-- ============ SCREEN: HOME ============ -->
-  <section class="screen active" id="screen-home">
-    <div class="home-hero">
-      <div class="hero-greet" id="hero-greet">Bonjour 👋</div>
-      <div class="hero-title">Mes Voyages</div>
-      <div class="hero-stats">
-        <div class="hstat"><div class="v" id="stat-trips">0</div><div class="l">Voyages</div></div>
-        <div class="hstat"><div class="v" id="stat-countries">0</div><div class="l">Destinations</div></div>
-        <div class="hstat"><div class="v" id="stat-spent">0€</div><div class="l">Dépensé</div></div>
+<!-- ========== TOP NAV ========== -->
+<nav class="app-nav">
+  <button class="app-nav-btn active" id="nav-planning" onclick="showPage('planning', this)">
+    <span class="nav-icon">📅</span>
+    <span class="nav-label">Planning</span>
+  </button>
+  <button class="app-nav-btn" id="nav-gps" onclick="showPage('gps', this)">
+    <span class="nav-icon">🗺️</span>
+    <span class="nav-label">Restos & Adresses</span>
+  </button>
+</nav>
+
+
+<!-- ========== PAGE 1 : PLANNING ========== -->
+<div class="page active page-content" id="page-planning">
+
+  <header>
+    <span class="header-emoji">🌴</span>
+    <h1>Corse 2026</h1>
+    <div class="header-sub">14 jours au paradis · Team Corse</div>
+    <span class="dates-badge">4 → 18 juillet 2026</span>
+  </header>
+
+  <!-- ☀️ Météo -->
+  <div class="weather-wrap">
+    <div class="weather-card" id="weather-card">
+      <div class="weather-head">
+        <span class="weather-title">☀️ Météo</span>
+        <span class="weather-loc">Zonza · Corse-du-Sud</span>
+      </div>
+      <div class="weather-strip" id="weather-strip"></div>
+    </div>
+  </div>
+
+  <div class="week-nav">
+    <button class="week-btn active" onclick="showWeek(1,this)">✈️ Arr.</button>
+    <button class="week-btn" onclick="showWeek(2,this)">🌊 S1</button>
+    <button class="week-btn" onclick="showWeek(3,this)">🌴 S2</button>
+  </div>
+
+  <!-- ===== ARRIVÉES ===== -->
+  <div class="week active" id="week1">
+    <div class="legend">
+      <div class="legend-title">👨‍👩‍👧 Les familles</div>
+      <div class="legend-grid">
+        <div class="legend-item"><div class="legend-dot" style="background:#13A89E"></div><strong>Stoupel</strong> — arr. 4/07</div>
+        <div class="legend-item"><div class="legend-dot" style="background:#FF6B4A"></div><strong>Carniol</strong> — arr. 4/07</div>
+        <div class="legend-item"><div class="legend-dot" style="background:#3FA66A"></div><strong>Delhauteur</strong> — arr. 4/07</div>
+        <div class="legend-item"><div class="legend-dot" style="background:#FFB23E"></div><strong>Etienne</strong> — arr. 10/07</div>
       </div>
     </div>
-    <div class="wrap">
-      <div class="section-head">
-        <h2>À venir &amp; en cours</h2>
-      </div>
-      <div id="trips-upcoming"></div>
-      <div class="section-head" id="past-head" style="display:none">
-        <h2>Souvenirs</h2>
-      </div>
-      <div id="trips-past"></div>
-      <div id="trips-empty"></div>
 
-      <div class="row-actions" style="margin-top:22px; justify-content:center;">
-        <button class="muted-link" onclick="exportData()">⤓ Sauvegarder mes données</button>
-        <button class="muted-link" onclick="document.getElementById('import-file').click()">⤒ Importer</button>
-        <input type="file" id="import-file" accept="application/json" hidden onchange="importData(this)"/>
+    <div class="day-card">
+      <div class="day-header">
+        <div class="day-number" style="font-size:1.2rem;padding-top:4px">✈️</div>
+        <div class="day-info"><div class="day-name">Stoupel + Carniol</div><div class="day-date">Sam 4 juillet — Volotea Lille → Figari</div></div>
+        <div class="day-vibe">🔵🔴</div>
       </div>
-    </div>
-    <button class="fab" onclick="openTripForm()">＋</button>
-  </section>
-
-  <!-- ============ SCREEN: TRIP DETAIL ============ -->
-  <section class="screen" id="screen-trip">
-    <div class="trip-header">
-      <div class="th-top">
-        <button class="icon-btn" onclick="goHome()">‹</button>
-        <div class="th-title">
-          <h1 id="th-name">Voyage</h1>
-          <div class="sub" id="th-sub"></div>
+      <div class="timeline">
+        <div class="tl-item">
+          <div class="tl-time">11h20</div><div class="tl-dot dot-plane">✈️</div>
+          <div class="tl-content">
+            <div class="tl-title">V72526 Volotea — départ Lille</div>
+            <div class="tl-row"><span class="tag yellow">V72526</span><span class="tag">Volotea</span><span class="tag green">2h05</span></div>
+          </div>
         </div>
-        <button class="icon-btn" onclick="openMap()" title="Carte">🗺️</button>
-        <button class="icon-btn" onclick="editCurrentTrip()">✎</button>
+        <div class="tl-item">
+          <div class="tl-time">13h25</div><div class="tl-dot dot-plane">🛬</div>
+          <div class="tl-content"><div class="tl-title">Atterrissage Figari</div></div>
+        </div>
+        <div class="tl-item">
+          <div class="tl-time">13h30</div><div class="tl-dot dot-activity">🚗</div>
+          <div class="tl-content">
+            <div class="tl-title">Sixt — location voiture</div>
+            <div class="tl-sub">⚠️ Longues files en juillet — prévoir ~40 min</div>
+            <div class="tl-row"><span class="tag orange">~40 min</span></div>
+          </div>
+        </div>
+        <div class="tl-item">
+          <div class="tl-time">~14h15</div><div class="tl-dot dot-home">🏠</div>
+          <div class="tl-content">
+            <div class="tl-title">Route vers la maison · ~45 min</div>
+            <div class="tl-row"><span class="tag orange">Arrivée ~15h00</span><a class="waze-inline" href="https://waze.com/ul?ll=41.6532357,9.3511&navigate=yes" target="_blank">🗺️ Waze maison</a></div>
+          </div>
+        </div>
       </div>
-      <div class="th-count" id="th-count"></div>
     </div>
 
-    <!-- TAB: RÉSUMÉ -->
-    <div class="tabpage active" id="tab-resume"></div>
-    <!-- TAB: PLANNING -->
-    <div class="tabpage" id="tab-planning"></div>
-    <!-- TAB: DÉPENSES -->
-    <div class="tabpage" id="tab-depenses"></div>
-    <!-- TAB: PHOTOS -->
-    <div class="tabpage" id="tab-photos"></div>
-    <!-- TAB: DOCUMENTS -->
-    <div class="tabpage" id="tab-documents"></div>
-
-    <div class="tabbar">
-      <button data-tab="resume" class="active" onclick="showTab('resume')"><span class="ic">🏝️</span>Résumé</button>
-      <button data-tab="planning" onclick="showTab('planning')"><span class="ic">📅</span>Planning</button>
-      <button data-tab="depenses" onclick="showTab('depenses')"><span class="ic">💰</span>Dépenses</button>
-      <button data-tab="photos" onclick="showTab('photos')"><span class="ic">📸</span>Photos</button>
-      <button data-tab="documents" onclick="showTab('documents')"><span class="ic">🪪</span>Docs</button>
+    <div class="day-card">
+      <div class="day-header">
+        <div class="day-number" style="font-size:1.2rem;padding-top:4px">✈️</div>
+        <div class="day-info"><div class="day-name">Delhauteur</div><div class="day-date">Sam 4 juillet — Ryanair Charleroi → Figari</div></div>
+        <div class="day-vibe">🟢</div>
+      </div>
+      <div class="timeline">
+        <div class="tl-item">
+          <div class="tl-time">14h40</div><div class="tl-dot dot-plane">✈️</div>
+          <div class="tl-content">
+            <div class="tl-title">FR4566 Ryanair — départ Charleroi</div>
+            <div class="tl-row"><span class="tag yellow">FR4566</span><span class="tag">Ryanair</span><span class="tag green">2h05</span></div>
+          </div>
+        </div>
+        <div class="tl-item">
+          <div class="tl-time">16h45</div><div class="tl-dot dot-plane">🛬</div>
+          <div class="tl-content"><div class="tl-title">Atterrissage Figari</div></div>
+        </div>
+        <div class="tl-item">
+          <div class="tl-time">16h50</div><div class="tl-dot dot-activity">🚗</div>
+          <div class="tl-content">
+            <div class="tl-title">Sixt — location voiture</div>
+            <div class="tl-sub">⚠️ Prévoir ~40 min de file</div>
+            <div class="tl-row"><span class="tag orange">~40 min</span></div>
+          </div>
+        </div>
+        <div class="tl-item">
+          <div class="tl-time">~17h35</div><div class="tl-dot dot-home">🏠</div>
+          <div class="tl-content">
+            <div class="tl-title">Route vers la maison · ~45 min</div>
+            <div class="tl-row"><span class="tag orange">Arrivée ~18h20</span><a class="waze-inline" href="https://waze.com/ul?ll=41.6532357,9.3511&navigate=yes" target="_blank">🗺️ Waze maison</a></div>
+          </div>
+        </div>
+      </div>
     </div>
-  </section>
 
-</div>
-
-<!-- generic overlay sheet -->
-<div class="overlay" id="overlay" onclick="if(event.target===this)closeSheet()">
-  <div class="sheet" id="sheet"></div>
-</div>
-
-<!-- lightbox -->
-<div class="lightbox" id="lightbox">
-  <div class="lb-top">
-    <button onclick="closeLightbox()">✕</button>
-    <button id="lb-share" onclick="shareLightbox()">⤴</button>
+    <div class="day-card">
+      <div class="day-header">
+        <div class="day-number" style="font-size:1.2rem;padding-top:4px">🥂</div>
+        <div class="day-info"><div class="day-name">Soir — Apéro de bienvenue !</div><div class="day-date">Samedi 4 juillet — à la maison</div></div>
+        <div class="day-vibe">🎉</div>
+      </div>
+      <div class="timeline">
+        <div class="tl-item">
+          <div class="tl-time">~18h30</div><div class="tl-dot dot-home">🏠</div>
+          <div class="tl-content">
+            <div class="tl-title">3 familles réunies — apéro 🥂</div>
+            <div class="tl-row"><span class="tag coral">3 familles</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
-  <div class="lb-body" id="lb-body"></div>
-  <div class="lb-cap" id="lb-cap"></div>
-</div>
 
-<!-- map overlay -->
-<div id="map-overlay">
-  <div id="map-topbar">
-    <button class="icon-btn-dark" onclick="closeMap()">✕</button>
-    <div id="map-title">Carte du voyage</div>
+  <!-- ===== SEMAINE 1 ===== -->
+  <div class="week" id="week2">
+    <div class="wa-banner" onclick="sendWA('5 juillet — Dimanche 🌊\n\n🍽️ Déjeuner 12h30 : Playarellu (~10 min) ou RENA Cala Rossa (~20 min)\n\nÀ décider ce matin ! Qui vote pour quoi ? 🗳️', 1)">
+      <div class="wa-icon">💬</div><div class="wa-text"><div class="wa-title">Envoyer le programme du jour</div><div class="wa-sub">Dim 5 juillet</div></div><div class="wa-arrow">→</div>
+    </div>
+    <div class="day-card">
+      <div class="day-header"><div class="day-number">5</div><div class="day-info"><div class="day-name">Dimanche — Farniente</div><div class="day-date">5 juillet 2026</div></div><div class="day-vibe">🍹</div></div>
+      <div class="timeline">
+        <div class="tl-item"><div class="tl-time">Matin</div><div class="tl-dot dot-free">🌅</div><div class="tl-content"><div class="tl-title">Premier réveil en Corse ☀️</div></div></div>
+        <div class="tl-item">
+          <div class="tl-time">12h30</div><div class="tl-dot dot-food">🍽️</div>
+          <div class="tl-content">
+            <div class="tl-title">Déjeuner — Playarellu ou RENA</div>
+            <div class="tl-sub">Playarellu ~10 min · RENA Cala Rossa ~20 min</div>
+            <div class="tl-row"><a class="waze-inline" href="https://waze.com/ul?ll=41.6764273,9.3725932&navigate=yes" target="_blank">🗺️ Playarellu</a><a class="waze-inline" href="https://waze.com/ul?ll=41.6200909,9.3318116&navigate=yes" target="_blank">🗺️ RENA</a></div>
+          </div>
+        </div>
+        <div class="tl-item"><div class="tl-time">Soir</div><div class="tl-dot dot-home">🏠</div><div class="tl-content"><div class="tl-title">Maison</div></div></div>
+      </div>
+    </div>
+
+    <div class="wa-banner" onclick="sendWA('6 juillet — Lundi ⛳\n\n🚗 Départ maison 7h40 — Golf de Spérone (Bonifacio, ~1h)\n🏌️ Golf 18 trous 9h\n🍽️ Déjeuner 12h30 : Tamaricciu (Palombaggia, ~40 min)\n\nOn se retrouve à la voiture à 7h30 !', 1)">
+      <div class="wa-icon">💬</div><div class="wa-text"><div class="wa-title">Envoyer le programme du jour</div><div class="wa-sub">Lun 6 juillet</div></div><div class="wa-arrow">→</div>
+    </div>
+    <div class="day-card">
+      <div class="day-header"><div class="day-number">6</div><div class="day-info"><div class="day-name">Lundi — Golf ⛳</div><div class="day-date">6 juillet 2026</div></div><div class="day-vibe">⛳</div></div>
+      <div class="timeline">
+        <div class="tl-item">
+          <div class="tl-time">7h40</div><div class="tl-dot dot-activity">🚗</div>
+          <div class="tl-content"><div class="tl-title">Départ — Golf de Spérone</div><div class="tl-sub">Bonifacio · ~1h de route · ⭐ 4.6</div><div class="tl-row"><a class="waze-inline" href="https://waze.com/ul?ll=41.3729733,9.2101607&navigate=yes" target="_blank">🗺️ Waze golf</a></div></div>
+        </div>
+        <div class="tl-item"><div class="tl-time">9h00</div><div class="tl-dot dot-activity">⛳</div><div class="tl-content"><div class="tl-title">Golf de Spérone — 18 trous</div><div class="tl-sub">Vue mer sur la Sardaigne</div></div></div>
+        <div class="tl-item">
+          <div class="tl-time">12h30</div><div class="tl-dot dot-food">🍽️</div>
+          <div class="tl-content"><div class="tl-title">Déjeuner — Tamaricciu</div><div class="tl-sub">Palombaggia · ~40 min · ⭐ 4.3</div><div class="tl-row"><span class="tag orange">~40 min</span><a class="waze-inline" href="https://waze.com/ul?ll=41.553447,9.3181647&navigate=yes" target="_blank">🗺️ Waze</a></div></div>
+        </div>
+        <div class="tl-item"><div class="tl-time">Soir</div><div class="tl-dot dot-home">🏠</div><div class="tl-content"><div class="tl-title">Maison</div></div></div>
+      </div>
+    </div>
+
+    <div class="wa-banner" onclick="sendWA('7 juillet — Mardi 🏖️\n\n🍽️ Déjeuner 12h30 : Le Cabanon Bleu (St Cyprien, ~15 min)\n\nOn part ensemble à 12h00 !', 1)">
+      <div class="wa-icon">💬</div><div class="wa-text"><div class="wa-title">Envoyer le programme du jour</div><div class="wa-sub">Mar 7 juillet</div></div><div class="wa-arrow">→</div>
+    </div>
+    <div class="day-card">
+      <div class="day-header"><div class="day-number">7</div><div class="day-info"><div class="day-name">Mardi — Plage</div><div class="day-date">7 juillet 2026</div></div><div class="day-vibe">🏖️</div></div>
+      <div class="timeline">
+        <div class="tl-item"><div class="tl-time">Matin</div><div class="tl-dot dot-free">🌊</div><div class="tl-content"><div class="tl-title">Plage libre</div></div></div>
+        <div class="tl-item">
+          <div class="tl-time">12h30</div><div class="tl-dot dot-food">🍽️</div>
+          <div class="tl-content"><div class="tl-title">Déjeuner — Le Cabanon Bleu</div><div class="tl-sub">St Cyprien · ~15 min · ⭐ 3.9</div><div class="tl-row"><span class="tag green">~15 min</span><a class="waze-inline" href="https://waze.com/ul?ll=41.6411233,9.3566431&navigate=yes" target="_blank">🗺️ Waze</a></div></div>
+        </div>
+        <div class="tl-item"><div class="tl-time">Soir</div><div class="tl-dot dot-home">🏠</div><div class="tl-content"><div class="tl-title">Maison</div></div></div>
+      </div>
+    </div>
+
+    <div class="wa-banner" onclick="sendWA('8 juillet — Mercredi ⛵ JOURNÉE BATEAU\n\n⚓ Départ Port de Pinarellu (~10 min de la maison)\n🍽️ Déjeuner : Paillotte Capu Biancu (Bonifacio, accès bateau)\n\nOn se retrouve au port à quelle heure ? ⛵', 1)">
+      <div class="wa-icon">💬</div><div class="wa-text"><div class="wa-title">Envoyer le programme du jour</div><div class="wa-sub">Mer 8 juillet</div></div><div class="wa-arrow">→</div>
+    </div>
+    <div class="day-card">
+      <div class="day-header"><div class="day-number">8</div><div class="day-info"><div class="day-name">Mercredi — Journée Bateau</div><div class="day-date">8 juillet 2026</div></div><div class="day-vibe">⛵</div></div>
+      <div class="timeline">
+        <div class="tl-item"><div class="tl-time">Matin</div><div class="tl-dot dot-boat">⚓</div><div class="tl-content"><div class="tl-title">Départ Port de Pinarellu</div><div class="tl-row"><span class="tag green">~10 min</span><a class="waze-inline" href="https://waze.com/ul?ll=41.6819974,9.3738209&navigate=yes" target="_blank">🗺️ Waze port</a></div></div></div>
+        <div class="tl-item"><div class="tl-time">12h30</div><div class="tl-dot dot-food">🍽️</div><div class="tl-content"><div class="tl-title">Déjeuner — Paillotte Capu Biancu</div><div class="tl-sub">Bonifacio · Accès bateau · ⭐ 4.4</div><div class="tl-row"><span class="tag">⛵ En bateau</span></div></div></div>
+        <div class="tl-item"><div class="tl-time">Soir</div><div class="tl-dot dot-home">🏠</div><div class="tl-content"><div class="tl-title">Maison ou Porto Vecchio ?</div></div></div>
+      </div>
+    </div>
+
+    <div class="wa-banner" onclick="sendWA('9 juillet — Jeudi 🏄 SKI NAUTIQUE\n\n🏄 Ski Nautique 11h\n🍽️ Déjeuner 12h30 : Le Tiki (St Cyprien, ~10 min)\n\nC\'est parti pour les sensations ! 💪', 1)">
+      <div class="wa-icon">💬</div><div class="wa-text"><div class="wa-title">Envoyer le programme du jour</div><div class="wa-sub">Jeu 9 juillet</div></div><div class="wa-arrow">→</div>
+    </div>
+    <div class="day-card">
+      <div class="day-header"><div class="day-number">9</div><div class="day-info"><div class="day-name">Jeudi — Ski Nautique</div><div class="day-date">9 juillet 2026</div></div><div class="day-vibe">🏄</div></div>
+      <div class="timeline">
+        <div class="tl-item"><div class="tl-time">11h00</div><div class="tl-dot dot-activity">🏄</div><div class="tl-content"><div class="tl-title">Ski Nautique 11h</div></div></div>
+        <div class="tl-item"><div class="tl-time">12h30</div><div class="tl-dot dot-food">🍽️</div><div class="tl-content"><div class="tl-title">Déjeuner — Le Tiki</div><div class="tl-sub">St Cyprien · ~10 min · ⭐ 3.9</div><div class="tl-row"><span class="tag green">~10 min</span><a class="waze-inline" href="https://waze.com/ul?ll=41.6312841,9.3456628&navigate=yes" target="_blank">🗺️ Waze</a></div></div></div>
+        <div class="tl-item"><div class="tl-time">Soir</div><div class="tl-dot dot-home">🏠</div><div class="tl-content"><div class="tl-title">Maison</div></div></div>
+      </div>
+    </div>
+
+    <div class="wa-banner" onclick="sendWA('10 juillet — Vendredi 🏔️ CANYONING + ARRIVÉE ETIENNE !\n\n🚗 Départ maison 7h20 — Corsica Canyon (1h de route)\n🏔️ Canyoning 8h45\n🍽️ Déjeuner 12h30 : La Voile Rouge (Solaro, ~45 min)\n✈️ Arrivée Famille Etienne ce soir (FR4566, ~18h20 à la maison)\n\nOn les accueille comme il se doit ce soir 🎉', 1)">
+      <div class="wa-icon">💬</div><div class="wa-text"><div class="wa-title">Envoyer le programme du jour</div><div class="wa-sub">Ven 10 juillet</div></div><div class="wa-arrow">→</div>
+    </div>
+    <div class="day-card">
+      <div class="day-header"><div class="day-number">10</div><div class="day-info"><div class="day-name">Vendredi — Canyoning + Etienne !</div><div class="day-date">10 juillet 2026</div></div><div class="day-vibe">🏔️</div></div>
+      <div class="timeline">
+        <div class="tl-item"><div class="tl-time">7h20</div><div class="tl-dot dot-activity">🚗</div><div class="tl-content"><div class="tl-title">Départ — Corsica Canyon</div><div class="tl-sub">~1h de route</div><div class="tl-row"><a class="waze-inline" href="https://waze.com/ul?ll=41.8248008,9.2629071&navigate=yes" target="_blank">🗺️ Waze canyon</a></div></div></div>
+        <div class="tl-item"><div class="tl-time">8h45</div><div class="tl-dot dot-activity">🏔️</div><div class="tl-content"><div class="tl-title">Canyoning — Corsica Canyon</div></div></div>
+        <div class="tl-item"><div class="tl-time">12h30</div><div class="tl-dot dot-food">🍽️</div><div class="tl-content"><div class="tl-title">Déjeuner — La Voile Rouge</div><div class="tl-sub">Solaro · ~45 min · ⭐ 4.4</div><div class="tl-row"><span class="tag orange">~45 min</span><a class="waze-inline" href="https://waze.com/ul?ll=41.8659172,9.3986435&navigate=yes" target="_blank">🗺️ Waze</a></div></div></div>
+        <div class="tl-item"><div class="tl-time">14h40</div><div class="tl-dot dot-plane">✈️</div><div class="tl-content"><div class="tl-title">FR4566 Ryanair — départ Charleroi</div><div class="tl-sub">Etienne</div><div class="tl-row"><span class="tag yellow">FR4566</span><span class="tag">Ryanair</span></div></div></div>
+        <div class="tl-item"><div class="tl-time">~18h20</div><div class="tl-dot dot-home">🏠</div><div class="tl-content"><div class="tl-title">Arrivée Etienne à la maison 🎉</div><div class="tl-row"><span class="tag coral">4 familles !</span></div></div></div>
+      </div>
+    </div>
   </div>
-  <div id="map-container"></div>
-  <div id="map-day-filters"></div>
+
+  <!-- ===== SEMAINE 2 ===== -->
+  <div class="week" id="week3">
+
+    <div class="wa-banner" onclick="sendWA('11 juillet — Samedi 👋 Départ Carniol\n\n✈️ Bon retour à la famille Carniol ! (V72527 Figari→Lille)\n🍽️ Déjeuner 12h30 : Ranch\'O Plage (Cala Rossa, ~20 min)\n\nOn continue le kif pour ceux qui restent 😎', 2)">
+      <div class="wa-icon">💬</div><div class="wa-text"><div class="wa-title">Envoyer le programme du jour</div><div class="wa-sub">Sam 11 juillet</div></div><div class="wa-arrow">→</div>
+    </div>
+    <div class="day-card">
+      <div class="day-header"><div class="day-number">11</div><div class="day-info"><div class="day-name">Samedi — Départ Carniol</div><div class="day-date">11 juillet 2026</div></div><div class="day-vibe">👋</div></div>
+      <div class="timeline">
+        <div class="tl-item"><div class="tl-time">Matin</div><div class="tl-dot dot-plane">✈️</div><div class="tl-content"><div class="tl-title">Départ Carniol — V72527 Figari → Lille</div><div class="tl-row"><span class="tag yellow">V72527</span><span class="tag">Volotea</span><a class="waze-inline" href="https://waze.com/ul?ll=41.498692,9.098273&navigate=yes" target="_blank">🗺️ Aéroport</a></div></div></div>
+        <div class="tl-item"><div class="tl-time">12h30</div><div class="tl-dot dot-food">🍽️</div><div class="tl-content"><div class="tl-title">Déjeuner — Ranch'O Plage</div><div class="tl-sub">Cala Rossa · ~20 min · ⭐ 4.4</div><div class="tl-row"><span class="tag green">~20 min</span><a class="waze-inline" href="https://waze.com/ul?ll=41.6206819,9.3326507&navigate=yes" target="_blank">🗺️ Waze</a></div></div></div>
+        <div class="tl-item"><div class="tl-time">Soir</div><div class="tl-dot dot-home">🏠</div><div class="tl-content"><div class="tl-title">Maison</div></div></div>
+      </div>
+    </div>
+
+    <div class="wa-banner" onclick="sendWA('12 juillet — Dimanche 😎 Farniente total\n\n🍽️ Déjeuner 12h30 : Playarellu (~10 min)\n\nJournée détente, plage, apéro 🍹', 2)">
+      <div class="wa-icon">💬</div><div class="wa-text"><div class="wa-title">Envoyer le programme du jour</div><div class="wa-sub">Dim 12 juillet</div></div><div class="wa-arrow">→</div>
+    </div>
+    <div class="day-card">
+      <div class="day-header"><div class="day-number">12</div><div class="day-info"><div class="day-name">Dimanche — Farniente</div><div class="day-date">12 juillet 2026</div></div><div class="day-vibe">😎</div></div>
+      <div class="timeline">
+        <div class="tl-item"><div class="tl-time">Matin</div><div class="tl-dot dot-free">🌊</div><div class="tl-content"><div class="tl-title">Plage — Farniente total</div></div></div>
+        <div class="tl-item"><div class="tl-time">12h30</div><div class="tl-dot dot-food">🍽️</div><div class="tl-content"><div class="tl-title">Déjeuner — Playarellu</div><div class="tl-sub">Zonza · ~10 min · ⭐ 4.3</div><div class="tl-row"><span class="tag green">~10 min</span><a class="waze-inline" href="https://waze.com/ul?ll=41.6764273,9.3725932&navigate=yes" target="_blank">🗺️ Waze</a></div></div></div>
+        <div class="tl-item"><div class="tl-time">Soir</div><div class="tl-dot dot-home">🏠</div><div class="tl-content"><div class="tl-title">Maison</div></div></div>
+      </div>
+    </div>
+
+    <div class="wa-banner" onclick="sendWA('13 juillet — Lundi 🥾 Balade\n\n🍽️ Déjeuner 12h30 : Le Cabanon Bleu (St Cyprien, ~15 min)\n🏛️ Option : Visite Bonifacio 16h ?\n\nQui est partant pour Bonifacio cet après-midi ? 🗣️', 2)">
+      <div class="wa-icon">💬</div><div class="wa-text"><div class="wa-title">Envoyer le programme du jour</div><div class="wa-sub">Lun 13 juillet</div></div><div class="wa-arrow">→</div>
+    </div>
+    <div class="day-card">
+      <div class="day-header"><div class="day-number">13</div><div class="day-info"><div class="day-name">Lundi — Balade</div><div class="day-date">13 juillet 2026</div></div><div class="day-vibe">🥾</div></div>
+      <div class="timeline">
+        <div class="tl-item"><div class="tl-time">Matin</div><div class="tl-dot dot-free">🥾</div><div class="tl-content"><div class="tl-title">Balade / activité libre</div></div></div>
+        <div class="tl-item"><div class="tl-time">12h30</div><div class="tl-dot dot-food">🍽️</div><div class="tl-content"><div class="tl-title">Déjeuner — Le Cabanon Bleu</div><div class="tl-sub">St Cyprien · ~15 min · ⭐ 3.9</div><div class="tl-row"><span class="tag green">~15 min</span><a class="waze-inline" href="https://waze.com/ul?ll=41.6411233,9.3566431&navigate=yes" target="_blank">🗺️ Waze</a></div></div></div>
+        <div class="tl-item"><div class="tl-time">16h00</div><div class="tl-dot dot-activity">🏛️</div><div class="tl-content"><div class="tl-title">Bonifacio 16h ? (option)</div></div></div>
+        <div class="tl-item"><div class="tl-time">Soir</div><div class="tl-dot dot-home">🏠</div><div class="tl-content"><div class="tl-title">Maison</div></div></div>
+      </div>
+    </div>
+
+    <div class="wa-banner" onclick="sendWA('14 juillet — Mardi 🎆 FÊTE NATIONALE\n\n🍽️ Déjeuner 12h30 : RENA (~20 min) ou Bar Plage Santa Giulia (~40 min)\n🎆 Ce soir feux d\'artifice !\n\nVote : RENA ou Bar Plage ? 🗳️', 2)">
+      <div class="wa-icon">💬</div><div class="wa-text"><div class="wa-title">Envoyer le programme du jour</div><div class="wa-sub">Mar 14 juillet</div></div><div class="wa-arrow">→</div>
+    </div>
+    <div class="day-card">
+      <div class="day-header"><div class="day-number">14</div><div class="day-info"><div class="day-name">Mardi — Fête Nationale 🎆</div><div class="day-date">14 juillet 2026</div></div><div class="day-vibe">🎆</div></div>
+      <div class="timeline">
+        <div class="tl-item"><div class="tl-time">12h30</div><div class="tl-dot dot-food">🍽️</div><div class="tl-content"><div class="tl-title">Déjeuner — RENA ou Bar Plage</div><div class="tl-sub">RENA ~20 min · Bar Plage Santa Giulia ~40 min</div><div class="tl-row"><a class="waze-inline" href="https://waze.com/ul?ll=41.6200909,9.3318116&navigate=yes" target="_blank">🗺️ RENA</a><a class="waze-inline" href="https://waze.com/ul?ll=41.5318654,9.2744203&navigate=yes" target="_blank">🗺️ Bar Plage</a></div></div></div>
+        <div class="tl-item"><div class="tl-time">Soir</div><div class="tl-dot dot-home">🏠</div><div class="tl-content"><div class="tl-title">Maison — Feux d'artifice 🎆</div></div></div>
+      </div>
+    </div>
+
+    <div class="wa-banner" onclick="sendWA('15 juillet — Mercredi ⛵ JOURNÉE BATEAU\n\n⚓ Départ Port de Pinarellu (~10 min de la maison)\n🍽️ Déjeuner : Paillotte Capu Biancu (Bonifacio, accès bateau)\n\nOn se retrouve au port à quelle heure ? ⛵', 2)">
+      <div class="wa-icon">💬</div><div class="wa-text"><div class="wa-title">Envoyer le programme du jour</div><div class="wa-sub">Mer 15 juillet</div></div><div class="wa-arrow">→</div>
+    </div>
+    <div class="day-card">
+      <div class="day-header"><div class="day-number">15</div><div class="day-info"><div class="day-name">Mercredi — Journée Bateau</div><div class="day-date">15 juillet 2026</div></div><div class="day-vibe">⛵</div></div>
+      <div class="timeline">
+        <div class="tl-item"><div class="tl-time">Matin</div><div class="tl-dot dot-boat">⚓</div><div class="tl-content"><div class="tl-title">Départ Port de Pinarellu</div><div class="tl-row"><span class="tag green">~10 min</span><a class="waze-inline" href="https://waze.com/ul?ll=41.6819974,9.3738209&navigate=yes" target="_blank">🗺️ Waze port</a></div></div></div>
+        <div class="tl-item"><div class="tl-time">12h30</div><div class="tl-dot dot-food">🍽️</div><div class="tl-content"><div class="tl-title">Déjeuner — Paillotte Capu Biancu</div><div class="tl-sub">Bonifacio · Accès bateau · ⭐ 4.4</div><div class="tl-row"><span class="tag">⛵ En bateau</span></div></div></div>
+        <div class="tl-item"><div class="tl-time">Soir</div><div class="tl-dot dot-home">🏠</div><div class="tl-content"><div class="tl-title">Maison</div></div></div>
+      </div>
+    </div>
+
+    <div class="wa-banner" onclick="sendWA('16 juillet — Jeudi 🏔️ CANYONING\n\n🚗 Départ maison 7h20 — Corsica Canyon (1h de route)\n🏔️ Canyoning 8h45\n🍽️ Déjeuner 12h30 : La Voile Rouge (Solaro, ~45 min)\n\nOn se retrouve à la voiture à 7h10 !', 2)">
+      <div class="wa-icon">💬</div><div class="wa-text"><div class="wa-title">Envoyer le programme du jour</div><div class="wa-sub">Jeu 16 juillet</div></div><div class="wa-arrow">→</div>
+    </div>
+    <div class="day-card">
+      <div class="day-header"><div class="day-number">16</div><div class="day-info"><div class="day-name">Jeudi — Canyoning</div><div class="day-date">16 juillet 2026</div></div><div class="day-vibe">🏔️</div></div>
+      <div class="timeline">
+        <div class="tl-item"><div class="tl-time">7h20</div><div class="tl-dot dot-activity">🚗</div><div class="tl-content"><div class="tl-title">Départ — Corsica Canyon</div><div class="tl-row"><a class="waze-inline" href="https://waze.com/ul?ll=41.8248008,9.2629071&navigate=yes" target="_blank">🗺️ Waze canyon</a></div></div></div>
+        <div class="tl-item"><div class="tl-time">8h45</div><div class="tl-dot dot-activity">🏔️</div><div class="tl-content"><div class="tl-title">Canyoning — Corsica Canyon</div></div></div>
+        <div class="tl-item"><div class="tl-time">12h30</div><div class="tl-dot dot-food">🍽️</div><div class="tl-content"><div class="tl-title">Déjeuner — La Voile Rouge</div><div class="tl-sub">Solaro · ~45 min · ⭐ 4.4</div><div class="tl-row"><span class="tag orange">~45 min</span><a class="waze-inline" href="https://waze.com/ul?ll=41.8659172,9.3986435&navigate=yes" target="_blank">🗺️ Waze</a></div></div></div>
+        <div class="tl-item"><div class="tl-time">Soir</div><div class="tl-dot dot-home">🏠</div><div class="tl-content"><div class="tl-title">Maison</div></div></div>
+      </div>
+    </div>
+
+    <div class="wa-banner" onclick="sendWA('17 juillet — Vendredi 🏄 SKI NAUTIQUE\n\n🏄 Ski Nautique 11h\n🍽️ Déjeuner 12h30 : Le Tiki (St Cyprien, ~10 min)\n\nAvant-dernier jour... on profite à fond ! 🌊', 2)">
+      <div class="wa-icon">💬</div><div class="wa-text"><div class="wa-title">Envoyer le programme du jour</div><div class="wa-sub">Ven 17 juillet</div></div><div class="wa-arrow">→</div>
+    </div>
+    <div class="day-card">
+      <div class="day-header"><div class="day-number">17</div><div class="day-info"><div class="day-name">Vendredi — Ski Nautique</div><div class="day-date">17 juillet 2026</div></div><div class="day-vibe">🏄</div></div>
+      <div class="timeline">
+        <div class="tl-item"><div class="tl-time">11h00</div><div class="tl-dot dot-activity">🏄</div><div class="tl-content"><div class="tl-title">Ski Nautique 11h</div></div></div>
+        <div class="tl-item"><div class="tl-time">12h30</div><div class="tl-dot dot-food">🍽️</div><div class="tl-content"><div class="tl-title">Déjeuner — Le Tiki</div><div class="tl-sub">St Cyprien · ~10 min · ⭐ 3.9</div><div class="tl-row"><span class="tag green">~10 min</span><a class="waze-inline" href="https://waze.com/ul?ll=41.6312841,9.3456628&navigate=yes" target="_blank">🗺️ Waze</a></div></div></div>
+        <div class="tl-item"><div class="tl-time">Soir</div><div class="tl-dot dot-home">🏠</div><div class="tl-content"><div class="tl-title">Maison — Dernier soir ensemble 🌅</div></div></div>
+      </div>
+    </div>
+
+    <div class="wa-banner" onclick="sendWA('18 juillet — Samedi ✈️ RETOUR\n\nMerci pour ces 14 jours de folie ! 🙏❤️\n✈️ Stoupel + Carniol : V72527 Volotea Figari→Lille (~13h55)\n✈️ Delhauteur + Etienne : FR4567 Ryanair Figari→Charleroi (~15h05)\n\nÀ l\'année prochaine Team Corse 🌊🌴', 2)">
+      <div class="wa-icon">💬</div><div class="wa-text"><div class="wa-title">Envoyer le programme du jour</div><div class="wa-sub">Sam 18 juillet</div></div><div class="wa-arrow">→</div>
+    </div>
+    <div class="day-card">
+      <div class="day-header"><div class="day-number">18</div><div class="day-info"><div class="day-name">Samedi — Retour 😢</div><div class="day-date">18 juillet 2026</div></div><div class="day-vibe">🛫</div></div>
+      <div class="timeline">
+        <div class="tl-item"><div class="tl-time">Matin</div><div class="tl-dot dot-home">🏠</div><div class="tl-content"><div class="tl-title">Rangement, derniers cafés 😢</div></div></div>
+        <div class="tl-item">
+          <div class="tl-time">~13h55</div><div class="tl-dot dot-plane">✈️</div>
+          <div class="tl-content"><div class="tl-title">V72527 Volotea — Figari → Lille</div><div class="tl-sub">Stoupel + Carniol</div><div class="tl-row"><span class="tag yellow">V72527</span><span class="tag">Volotea</span><a class="waze-inline" href="https://waze.com/ul?ll=41.498692,9.098273&navigate=yes" target="_blank">🗺️ Aéroport</a></div></div>
+        </div>
+        <div class="tl-item">
+          <div class="tl-time">~15h05</div><div class="tl-dot dot-plane">✈️</div>
+          <div class="tl-content"><div class="tl-title">FR4567 Ryanair — Figari → Charleroi</div><div class="tl-sub">Delhauteur + Etienne</div><div class="tl-row"><span class="tag yellow">FR4567</span><span class="tag">Ryanair</span></div></div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+
+  <div class="wave">🌊🌴☀️🌊🌴</div>
+  <footer>Fait avec ❤️ pour la <strong>Team Corse 2026</strong></footer>
+
 </div>
 
-<div id="toast"></div>
+<!-- ========== PAGE 2 : GPS ========== -->
+<div class="page page-content" id="page-gps">
+
+  <!-- Maison + Aéroport fixes -->
+  <div class="section" style="padding-top:18px">
+    <div class="section-title">🏠 La maison</div>
+    <div class="card home-card">
+      <div class="card-icon icon-home">🏠</div>
+      <div class="card-body"><div class="card-name">La Maison — Zonza</div><div class="card-meta">Vacinatojo, 20124 Zonza</div></div>
+      <a class="waze-btn coral" href="https://waze.com/ul?ll=41.6532357,9.3511&navigate=yes" target="_blank"><span class="waze-logo">🗺️</span><span>Waze</span></a>
+    </div>
+    <div class="card">
+      <div class="card-icon icon-plane">✈️</div>
+      <div class="card-body"><div class="card-name">Aéroport de Figari</div><div class="card-meta">Figari Sud-Corse</div><div class="card-tags"><span class="tag orange">~45 min</span></div></div>
+      <a class="waze-btn" href="https://waze.com/ul?ll=41.498692,9.098273&navigate=yes" target="_blank"><span class="waze-logo">🗺️</span><span>Waze</span></a>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">🏄 Activités</div>
+    <div class="card">
+      <div class="card-icon icon-golf">⛳</div>
+      <div class="card-body"><div class="card-name">Golf de Spérone</div><div class="card-meta">Bonifacio · 18 trous · ⭐ 4.6</div><div class="card-tags"><span class="tag orange">~1h</span><span class="tag">Lun 6/07</span></div><div class="card-meta" style="margin-top:4px"><a href="tel:+33495731713" style="color:var(--sea-d);font-weight:600;text-decoration:none">📞 04 95 73 17 13</a></div></div>
+      <a class="waze-btn green-btn" href="https://waze.com/ul?ll=41.3729733,9.2101607&navigate=yes" target="_blank"><span class="waze-logo">🗺️</span><span>Waze</span></a>
+    </div>
+    <div class="card">
+      <div class="card-icon icon-canyon">🏔️</div>
+      <div class="card-body"><div class="card-name">Corsica Canyon</div><div class="card-meta">Canyoning — départ 7h20</div><div class="card-tags"><span class="tag orange">~1h</span><span class="tag">Ven 10/07</span><span class="tag">Jeu 16/07</span></div><div class="card-meta" style="margin-top:4px"><a href="tel:+33622916144" style="color:var(--sea-d);font-weight:600;text-decoration:none">📞 06 22 91 61 44</a></div></div>
+      <a class="waze-btn green-btn" href="https://waze.com/ul?ll=41.8248008,9.2629071&navigate=yes" target="_blank"><span class="waze-logo">🗺️</span><span>Waze</span></a>
+    </div>
+    <div class="card">
+      <div class="card-icon icon-boat">⚓</div>
+      <div class="card-body"><div class="card-name">Port de Pinarellu</div><div class="card-meta">Journées bateau</div><div class="card-tags"><span class="tag green">~10 min</span><span class="tag">Mer 8/07</span><span class="tag">Mer 15/07</span></div></div>
+      <a class="waze-btn" href="https://waze.com/ul?ll=41.6819974,9.3738209&navigate=yes" target="_blank"><span class="waze-logo">🗺️</span><span>Waze</span></a>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">🍽️ Restaurants — midi 12h30</div>
+    <div class="card">
+      <div class="card-icon icon-food">🍺</div>
+      <div class="card-body"><div class="card-name">Playarellu</div><div class="card-meta">Zonza · ⭐ 4.3</div><div class="card-tags"><span class="tag green">~10 min</span><span class="tag">S1 Dim 5/07</span><span class="tag">S2 Dim 12/07</span></div><div class="card-meta" style="margin-top:4px"><a href="tel:+33789432456" style="color:var(--sea-d);font-weight:600;text-decoration:none">📞 07 89 43 24 56</a></div></div>
+      <a class="waze-btn" href="https://waze.com/ul?ll=41.6764273,9.3725932&navigate=yes" target="_blank"><span class="waze-logo">🗺️</span><span>Waze</span></a>
+    </div>
+    <div class="card">
+      <div class="card-icon icon-food">🌴</div>
+      <div class="card-body"><div class="card-name">Le Tiki</div><div class="card-meta">Plage de St Cyprien · ⭐ 3.9</div><div class="card-tags"><span class="tag green">~10 min</span><span class="tag">S1 Jeu 9/07</span><span class="tag">S2 Ven 17/07</span></div><div class="card-meta" style="margin-top:4px"><a href="tel:+33630230268" style="color:var(--sea-d);font-weight:600;text-decoration:none">📞 06 30 23 02 68</a></div></div>
+      <a class="waze-btn" href="https://waze.com/ul?ll=41.6312841,9.3456628&navigate=yes" target="_blank"><span class="waze-logo">🗺️</span><span>Waze</span></a>
+    </div>
+    <div class="card">
+      <div class="card-icon icon-food">🐚</div>
+      <div class="card-body"><div class="card-name">Le Cabanon Bleu</div><div class="card-meta">Baie de St Cyprien · ⭐ 3.9</div><div class="card-tags"><span class="tag green">~15 min</span><span class="tag">S1 Mar 7/07</span><span class="tag">S2 Lun 13/07</span></div><div class="card-meta" style="margin-top:4px"><a href="tel:+33611690056" style="color:var(--sea-d);font-weight:600;text-decoration:none">📞 06 11 69 00 56</a></div></div>
+      <a class="waze-btn" href="https://waze.com/ul?ll=41.6411233,9.3566431&navigate=yes" target="_blank"><span class="waze-logo">🗺️</span><span>Waze</span></a>
+    </div>
+    <div class="card">
+      <div class="card-icon icon-food">🌊</div>
+      <div class="card-body"><div class="card-name">RENA — Cala Rossa</div><div class="card-meta">Plage de Cala Rossa · ⭐ 4.6</div><div class="card-tags"><span class="tag green">~20 min</span><span class="tag">S1 Dim 5/07</span><span class="tag">S2 Mar 14/07</span></div><div class="card-meta" style="margin-top:4px"><a href="tel:+33420130091" style="color:var(--sea-d);font-weight:600;text-decoration:none">📞 04 20 13 00 91</a></div></div>
+      <a class="waze-btn" href="https://waze.com/ul?ll=41.6200909,9.3318116&navigate=yes" target="_blank"><span class="waze-logo">🗺️</span><span>Waze</span></a>
+    </div>
+    <div class="card">
+      <div class="card-icon icon-food">🍹</div>
+      <div class="card-body"><div class="card-name">Bar Plage — Santa Giulia</div><div class="card-meta">Baie de Santa Giulia · ⭐ 4.3</div><div class="card-tags"><span class="tag orange">~40 min</span><span class="tag">S1 Dim 5/07</span><span class="tag">S2 Mar 14/07</span></div><div class="card-meta" style="margin-top:4px"><a href="tel:+33644373770" style="color:var(--sea-d);font-weight:600;text-decoration:none">📞 06 44 37 37 70</a></div></div>
+      <a class="waze-btn" href="https://waze.com/ul?ll=41.5318654,9.2744203&navigate=yes" target="_blank"><span class="waze-logo">🗺️</span><span>Waze</span></a>
+    </div>
+    <div class="card">
+      <div class="card-icon icon-food">🤠</div>
+      <div class="card-body"><div class="card-name">Ranch'O Plage</div><div class="card-meta">Grande Plage de Cala Rossa · ⭐ 4.4</div><div class="card-tags"><span class="tag green">~20 min</span><span class="tag">S2 Sam 11/07</span></div><div class="card-meta" style="margin-top:4px"><a href="tel:+33495716267" style="color:var(--sea-d);font-weight:600;text-decoration:none">📞 04 95 71 62 67</a></div></div>
+      <a class="waze-btn" href="https://waze.com/ul?ll=41.6206819,9.3326507&navigate=yes" target="_blank"><span class="waze-logo">🗺️</span><span>Waze</span></a>
+    </div>
+    <div class="card">
+      <div class="card-icon icon-food">🏖️</div>
+      <div class="card-body"><div class="card-name">Tamaricciu</div><div class="card-meta">Route de Palombaggia · ⭐ 4.3</div><div class="card-tags"><span class="tag orange">~40 min</span><span class="tag">S1 Lun 6/07</span></div><div class="card-meta" style="margin-top:4px"><a href="tel:+33495704989" style="color:var(--sea-d);font-weight:600;text-decoration:none">📞 04 95 70 49 89</a></div></div>
+      <a class="waze-btn" href="https://waze.com/ul?ll=41.553447,9.3181647&navigate=yes" target="_blank"><span class="waze-logo">🗺️</span><span>Waze</span></a>
+    </div>
+    <div class="card">
+      <div class="card-icon icon-food">⛵</div>
+      <div class="card-body"><div class="card-name">La Voile Rouge</div><div class="card-meta">Scaffa Rossa — Solaro · ⭐ 4.4</div><div class="card-tags"><span class="tag orange">~45 min</span><span class="tag">S1 Ven 10/07</span><span class="tag">S2 Jeu 16/07</span></div><div class="card-meta" style="margin-top:4px"><a href="tel:+33495366003" style="color:var(--sea-d);font-weight:600;text-decoration:none">📞 04 95 36 60 03</a></div></div>
+      <a class="waze-btn" href="https://waze.com/ul?ll=41.8659172,9.3986435&navigate=yes" target="_blank"><span class="waze-logo">🗺️</span><span>Waze</span></a>
+    </div>
+    <div class="card">
+      <div class="card-icon icon-boat">⚓</div>
+      <div class="card-body"><div class="card-name">Capu Biancu — Bonifacio</div><div class="card-meta">Accès en bateau uniquement 🚢</div><div class="card-tags"><span class="tag">S1 Mer 8/07</span><span class="tag">S2 Mer 15/07</span></div><div class="card-meta" style="margin-top:4px"><a href="tel:+33495730558" style="color:var(--sea-d);font-weight:600;text-decoration:none">📞 04 95 73 05 58</a></div></div>
+      <a class="waze-btn disabled"><span class="waze-logo">⚓</span><span>Bateau</span></a>
+    </div>
+  </div>
+
+  <div class="wave">🌊🌴☀️🌊🌴</div>
+  <footer>Fait avec ❤️ pour la <strong>Team Corse 2026</strong></footer>
+
+</div>
+
 
 <script>
-/* =====================================================================
-   MON CARNET DE VOYAGE — application 100% locale, hors-ligne.
-   Données structurées : localStorage.  Fichiers (photos, scans) : IndexedDB.
-   ===================================================================== */
+function showPage(name, btn) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.app-nav-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('page-' + name).classList.add('active');
+  btn.classList.add('active');
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+function showWeek(n, btn) {
+  document.querySelectorAll('#page-planning .week').forEach(w => w.classList.remove('active'));
+  document.querySelectorAll('#page-planning .week-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('week'+n).classList.add('active');
+  btn.classList.add('active');
+}
+const WA_S1 = 'https://chat.whatsapp.com/H5Rt3CtLHBJ5BdCPUQF5mz';
+const WA_S2 = 'https://chat.whatsapp.com/DNh1jYoUvUE2pt87vLcu3j';
+function sendWA(text, week) {
+  window.location.href = 'whatsapp://send?text=' + encodeURIComponent(text);
+  setTimeout(() => { window.open('https://wa.me/?text=' + encodeURIComponent(text), '_blank'); }, 1500);
+}
 
-/* ---------------------- IndexedDB (fichiers binaires) ---------------------- */
-const FileDB = (() => {
-  let p;
-  function open() {
-    if (p) return p;
-    p = new Promise((res, rej) => {
-      const r = indexedDB.open('carnet-voyage', 1);
-      r.onupgradeneeded = e => {
-        const db = e.target.result;
-        if (!db.objectStoreNames.contains('files')) db.createObjectStore('files', { keyPath: 'id' });
-      };
-      r.onsuccess = () => res(r.result);
-      r.onerror = () => rej(r.error);
-    });
-    return p;
-  }
-  async function tx(mode, fn) {
-    const db = await open();
-    return new Promise((res, rej) => {
-      const t = db.transaction('files', mode);
-      const store = t.objectStore('files');
-      const req = fn(store);
-      t.oncomplete = () => res(req && req.result);
-      t.onerror = () => rej(t.error);
-    });
-  }
-  return {
-    put: (file) => tx('readwrite', s => s.put(file)),
-    get: (id) => tx('readonly', s => s.get(id)),
-    del: (id) => tx('readwrite', s => s.delete(id)),
-  };
-})();
-
-/* ---------------------- Store (localStorage) ---------------------- */
-const KEY = 'carnet-voyage-data';
-let DATA = load();
-
-function load() {
+/* ☀️ MÉTÉO — Open-Meteo (gratuit, sans clé). Maison à Zonza. */
+const HOUSE = { lat:41.6532, lng:9.3511 };
+const WMO = {0:'☀️',1:'🌤️',2:'⛅',3:'☁️',45:'🌫️',48:'🌫️',51:'🌦️',53:'🌦️',55:'🌧️',61:'🌧️',63:'🌧️',65:'🌧️',71:'❄️',73:'❄️',75:'❄️',80:'🌦️',81:'🌧️',82:'⛈️',85:'🌨️',95:'⛈️',96:'⛈️',99:'⛈️'};
+function wmoE(c){ if(WMO[c]!=null) return WMO[c]; const ks=Object.keys(WMO).map(Number).sort((a,b)=>a-b); let b=ks[0]; for(const k of ks){ if(k<=c) b=k; } return WMO[b]||'🌈'; }
+async function loadWeather(){
+  const strip = document.getElementById('weather-strip');
+  strip.innerHTML = Array.from({length:7}).map(()=>`<div class="w-day"><div class="skel" style="height:10px;width:30px;margin:0 auto 6px"></div><div class="skel" style="height:22px;width:22px;border-radius:50%;margin:0 auto 6px"></div><div class="skel" style="height:10px;width:26px;margin:0 auto"></div></div>`).join('');
   try {
-    const raw = localStorage.getItem(KEY);
-    if (raw) return JSON.parse(raw);
-  } catch (e) {}
-  return { trips: [], expenses: [], photos: [], docs: [] };
-}
-function save() {
-  try { localStorage.setItem(KEY, JSON.stringify(DATA)); }
-  catch (e) { toast('⚠️ Stockage plein'); }
-}
-const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
-
-/* ---------------------- Helpers ---------------------- */
-const COLORS = ['#0A7EA4', '#E8503A', '#2E7D52', '#F5A623', '#6C5CE7', '#0aa', '#d6336c', '#1f7a8c'];
-const TRIP_EMOJIS = ['🏝️','🗼','🏔️','🏛️','🏖️','🌴','🗽','🕌','🎿','🏕️','🚢','🌋','🦁','🗾','🏙️','🍷'];
-const EXP_CATS = {
-  transport:{e:'🚗',n:'Transport',c:'#0A7EA4'}, logement:{e:'🏨',n:'Logement',c:'#6C5CE7'},
-  resto:{e:'🍽️',n:'Restaurant',c:'#E8503A'}, courses:{e:'🛒',n:'Courses',c:'#2E7D52'},
-  activite:{e:'🎟️',n:'Activité',c:'#F5A623'}, shopping:{e:'🛍️',n:'Shopping',c:'#d6336c'},
-  sante:{e:'💊',n:'Santé',c:'#0aa'}, autre:{e:'✨',n:'Autre',c:'#6B7A8D'}
-};
-const DOC_TYPES = {
-  billet:{e:'🎫',n:'Billet d\'avion',c:'#EAF4F8'}, identite:{e:'🪪',n:'Carte d\'identité',c:'#FFF4E0'},
-  passeport:{e:'🛂',n:'Passeport',c:'#EDF7F2'}, assurance:{e:'🛡️',n:'Assurance voyage',c:'#FFF0EE'},
-  visa:{e:'📋',n:'Visa',c:'#F0EEFF'}, reservation:{e:'🏨',n:'Réservation',c:'#F2F6F8'},
-  permis:{e:'🚘',n:'Permis de conduire',c:'#EAF4F8'}, autre:{e:'📄',n:'Autre document',c:'#F2F6F8'}
-};
-
-function fmtMoney(n, cur = 'EUR') {
-  try { return new Intl.NumberFormat('fr-FR', { style:'currency', currency:cur, maximumFractionDigits: (n%1===0?0:2) }).format(n||0); }
-  catch(e){ return (n||0).toFixed(0) + ' ' + cur; }
-}
-function fmtDate(s, opts) {
-  if (!s) return '';
-  const d = new Date(s + (s.length === 10 ? 'T00:00:00' : ''));
-  return d.toLocaleDateString('fr-FR', opts || { day:'numeric', month:'short', year:'numeric' });
-}
-function fmtDateShort(s){ return fmtDate(s, { day:'numeric', month:'short' }); }
-function daysBetween(a, b){ if(!a||!b) return 0; return Math.max(0, Math.round((new Date(b)-new Date(a))/864e5)); }
-function tripStatus(t){
-  const today = new Date(); today.setHours(0,0,0,0);
-  const start = t.dateDebut ? new Date(t.dateDebut) : null;
-  const end = t.dateFin ? new Date(t.dateFin) : null;
-  if (start && today < start) return { k:'soon', label:'À venir', days: Math.ceil((start-today)/864e5) };
-  if (start && end && today >= start && today <= end) return { k:'now', label:'En cours' };
-  if (end && today > end) return { k:'past', label:'Terminé' };
-  return { k:'soon', label:'Planifié' };
-}
-function initials(name){ return (name||'?').trim().split(/\s+/).map(w=>w[0]).slice(0,2).join('').toUpperCase(); }
-function avatarColor(name){ let h=0; for(const c of (name||'')) h=(h*31+c.charCodeAt(0))%COLORS.length; return COLORS[h]; }
-function esc(s){ return (s==null?'':String(s)).replace(/[&<>"']/g, m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])); }
-
-let toastTimer;
-function toast(msg){
-  const el = document.getElementById('toast');
-  el.textContent = msg; el.classList.add('show');
-  clearTimeout(toastTimer); toastTimer = setTimeout(()=>el.classList.remove('show'), 2200);
-}
-
-/* ---------------------- Navigation ---------------------- */
-let currentTripId = null;
-let currentTab = 'resume';
-
-function goHome(){
-  currentTripId = null;
-  document.getElementById('screen-trip').classList.remove('active');
-  document.getElementById('screen-home').classList.add('active');
-  renderHome();
-  window.scrollTo(0,0);
-}
-function openTrip(id){
-  currentTripId = id;
-  document.getElementById('screen-home').classList.remove('active');
-  document.getElementById('screen-trip').classList.add('active');
-  showTab('resume');
-  renderTripHeader();
-  window.scrollTo(0,0);
-}
-function showTab(tab){
-  currentTab = tab;
-  document.querySelectorAll('.tabbar button').forEach(b=>b.classList.toggle('active', b.dataset.tab===tab));
-  document.querySelectorAll('#screen-trip .tabpage').forEach(p=>p.classList.remove('active'));
-  document.getElementById('tab-'+tab).classList.add('active');
-  const r = { resume:renderResume, planning:renderPlanning, depenses:renderDepenses, photos:renderPhotos, documents:renderDocuments }[tab];
-  if (r) r();
-  window.scrollTo(0,0);
-}
-const trip = () => DATA.trips.find(t=>t.id===currentTripId);
-
-/* ---------------------- HOME render ---------------------- */
-function renderHome(){
-  const h = new Date().getHours();
-  document.getElementById('hero-greet').textContent =
-    (h<6?'Bonne nuit 🌙':h<12?'Bonjour ☀️':h<18?'Bon après-midi 🌤️':'Bonsoir 🌆');
-
-  const trips = [...DATA.trips];
-  document.getElementById('stat-trips').textContent = trips.length;
-  const countries = new Set(trips.map(t=>(t.pays||t.destination||'').trim().toLowerCase()).filter(Boolean));
-  document.getElementById('stat-countries').textContent = countries.size;
-  const spent = DATA.expenses.reduce((s,e)=>s+(+e.montant||0),0);
-  document.getElementById('stat-spent').textContent = fmtMoney(spent).replace(/\s/g,'');
-
-  const withStatus = trips.map(t=>({t, st:tripStatus(t)}));
-  const upcoming = withStatus.filter(x=>x.st.k!=='past')
-    .sort((a,b)=>new Date(a.t.dateDebut||0)-new Date(b.t.dateDebut||0));
-  const past = withStatus.filter(x=>x.st.k==='past')
-    .sort((a,b)=>new Date(b.t.dateFin||0)-new Date(a.t.dateFin||0));
-
-  document.getElementById('trips-upcoming').innerHTML = upcoming.map(x=>tripCardHTML(x.t,x.st)).join('');
-  document.getElementById('trips-past').innerHTML = past.map(x=>tripCardHTML(x.t,x.st)).join('');
-  document.getElementById('past-head').style.display = past.length ? 'flex' : 'none';
-
-  document.querySelector('#screen-home .section-head').style.display = upcoming.length ? 'flex' : 'none';
-  document.getElementById('trips-empty').innerHTML = trips.length ? '' : `
-    <div class="empty">
-      <span class="big">🧳</span>
-      <p>Aucun voyage pour l'instant.<br>Créez votre premier voyage et commencez à tout organiser !</p>
-      <button class="btn" style="max-width:260px;margin:0 auto;" onclick="openTripForm()">＋ Créer un voyage</button>
-    </div>`;
-}
-function tripCardHTML(t, st){
-  const exp = DATA.expenses.filter(e=>e.tripId===t.id).reduce((s,e)=>s+(+e.montant||0),0);
-  const nPhotos = DATA.photos.filter(p=>p.tripId===t.id).length;
-  const nDocs = DATA.docs.filter(d=>d.tripId===t.id).length;
-  const grad = `linear-gradient(135deg,${t.couleur||'#0A7EA4'},${shade(t.couleur||'#0A7EA4',-30)})`;
-  const statusTag = st.k==='now' ? `<span class="status" style="color:#2E7D52">● En cours</span>`
-    : st.k==='soon' ? `<span class="status">J‑${st.days||0}</span>`
-    : `<span class="status">Terminé</span>`;
-  const dateline = (t.dateDebut||t.dateFin) ? `${fmtDateShort(t.dateDebut)} – ${fmtDate(t.dateFin)}` : 'Dates à définir';
-  return `
-  <div class="trip-card" onclick="openTrip('${t.id}')">
-    <div class="trip-cover" style="background:${grad}">
-      <span class="emoji">${t.emoji||'✈️'}</span>
-      ${statusTag}
-      <h3>${esc(t.nom)}</h3>
-    </div>
-    <div class="trip-body">
-      <div class="trip-meta">
-        <span>📍 ${esc(t.destination||'—')}</span><span class="dot"></span><span>${dateline}</span>
-      </div>
-      <div class="trip-foot">
-        ${exp>0?`<span class="mini-tag">💰 ${fmtMoney(exp,t.devise)}</span>`:''}
-        ${nPhotos?`<span class="mini-tag">📸 ${nPhotos}</span>`:''}
-        ${nDocs?`<span class="mini-tag ok">🪪 ${nDocs}</span>`:''}
-        ${(t.participants&&t.participants.length>1)?`<span class="mini-tag">👥 ${t.participants.length}</span>`:''}
-      </div>
-    </div>
-  </div>`;
-}
-function shade(hex, p){
-  const n = parseInt(hex.slice(1),16); let r=(n>>16)+p, g=((n>>8)&255)+p, b=(n&255)+p;
-  r=Math.max(0,Math.min(255,r)); g=Math.max(0,Math.min(255,g)); b=Math.max(0,Math.min(255,b));
-  return '#'+((1<<24)+(r<<16)+(g<<8)+b).toString(16).slice(1);
-}
-
-/* ---------------------- TRIP HEADER ---------------------- */
-function renderTripHeader(){
-  const t = trip(); if(!t) return;
-  document.getElementById('th-name').textContent = t.nom;
-  document.getElementById('th-sub').textContent =
-    `${t.emoji||'✈️'} ${t.destination||''} · ${t.dateDebut?fmtDateShort(t.dateDebut):''}${t.dateFin?' – '+fmtDate(t.dateFin):''}`;
-  const st = tripStatus(t);
-  const box = document.getElementById('th-count');
-  if (st.k==='soon'){
-    box.innerHTML = `<div><div class="big">J‑${st.days||0}</div><div class="lbl">avant le départ ✈️</div></div>`;
-  } else if (st.k==='now'){
-    const total = daysBetween(t.dateDebut,t.dateFin)||1;
-    const done = daysBetween(t.dateDebut, new Date().toISOString().slice(0,10));
-    box.innerHTML = `<div><div class="big">Jour ${Math.min(done+1,total)}</div><div class="lbl">sur ${total} · profite ! 🌴</div></div>
-      <div class="prog"><div class="prog-bar"><i style="width:${Math.min(100,(done/total)*100)}%"></i></div></div>`;
-  } else {
-    const total = daysBetween(t.dateDebut,t.dateFin);
-    box.innerHTML = `<div><div class="big">${total} jours</div><div class="lbl">de souvenirs ❤️</div></div>`;
-  }
-}
-
-/* ---------------------- TAB: RÉSUMÉ ---------------------- */
-function renderResume(){
-  const t = trip(); if(!t) return;
-  const exp = DATA.expenses.filter(e=>e.tripId===t.id);
-  const spent = exp.reduce((s,e)=>s+(+e.montant||0),0);
-  const budgetPct = t.budget>0 ? Math.min(100, (spent/t.budget)*100) : 0;
-  const parts = t.participants||[];
-
-  document.getElementById('tab-resume').innerHTML = `
-    <div id="weather-widget"></div>
-    ${t.budget>0 ? `
-    <div class="card">
-      <div style="display:flex;justify-content:space-between;align-items:baseline;">
-        <div class="card-title">Budget</div>
-        <div style="font-size:.8rem;color:var(--muted)">${fmtMoney(spent,t.devise)} / ${fmtMoney(t.budget,t.devise)}</div>
-      </div>
-      <div class="prog-bar" style="margin-top:9px;background:#EEF3F5;"><i style="width:${budgetPct}%;background:${budgetPct>90?'var(--coral)':'var(--sea)'}"></i></div>
-      <div class="help">${spent<=t.budget?`Il reste ${fmtMoney(t.budget-spent,t.devise)} 👍`:`Dépassement de ${fmtMoney(spent-t.budget,t.devise)} ⚠️`}</div>
-    </div>`:''}
-
-    <div class="card">
-      <div class="card-row">
-        <div class="card-ic" style="background:#EAF4F8">💰</div>
-        <div class="card-grow"><div class="card-title">${fmtMoney(spent,t.devise)}</div><div class="card-sub">${exp.length} dépense${exp.length>1?'s':''}</div></div>
-        <button class="btn ghost sm" onclick="showTab('depenses')">Voir</button>
-      </div>
-    </div>
-
-    <div class="block-title">👥 Participants</div>
-    <div class="card">
-      <div style="display:flex;flex-wrap:wrap;gap:8px;">
-        ${parts.map(p=>`<span class="mini-tag" style="background:${avatarColor(p.nom)}1a;color:${avatarColor(p.nom)};">${esc(p.nom)}</span>`).join('') || '<span class="card-sub">Aucun participant</span>'}
-      </div>
-      <div class="row-actions" style="margin-top:12px;">
-        <button class="btn ghost sm" onclick="openParticipants()">＋ Gérer</button>
-      </div>
-    </div>
-
-    <div class="block-title">📝 Notes</div>
-    <div class="card">
-      <textarea id="trip-notes" placeholder="Idées, infos pratiques, choses à ne pas oublier…" style="width:100%;border:none;font-size:.9rem;min-height:80px;resize:vertical;color:var(--night);" oninput="saveNotes(this.value)">${esc(t.notes||'')}</textarea>
-    </div>
-
-    <div class="block-title">⚙️ Voyage</div>
-    <div class="card">
-      <div class="row-actions" style="flex-direction:column;">
-        <button class="btn ghost" onclick="editCurrentTrip()">✎ Modifier le voyage</button>
-        <button class="btn danger" onclick="deleteTrip()">🗑️ Supprimer ce voyage</button>
-      </div>
-    </div>
-  `;
-  loadWeather(t);
-}
-function saveNotes(v){ const t=trip(); if(t){ t.notes=v; save(); } }
-
-/* ---------------------- TAB: PLANNING ---------------------- */
-function renderPlanning(){
-  const t = trip(); if(!t) return;
-  const jours = [...(t.jours||[])].sort((a,b)=>(a.date||'').localeCompare(b.date||''));
-  let html = '';
-  if (!jours.length){
-    html = `<div class="empty"><span class="big">🗓️</span><p>Aucune journée planifiée.<br>Ajoutez vos étapes jour par jour.</p>
-      <button class="btn" style="max-width:240px;margin:0 auto;" onclick="openDayForm()">＋ Ajouter une journée</button></div>`;
-  } else {
-    html = jours.map((j,i)=>`
-      <div class="day-card">
-        <div class="day-head" onclick="openDayForm('${j.id}')">
-          <div class="day-num">${i+1}</div>
-          <div><div class="day-name">${esc(j.titre||'Journée')}</div><div class="day-date">${j.date?fmtDate(j.date,{weekday:'long',day:'numeric',month:'long'}):''}</div></div>
-          <div class="day-vibe">${j.vibe||'🌤️'}</div>
-        </div>
-        <div class="timeline">
-          ${(j.events||[]).sort((a,b)=>(a.heure||'').localeCompare(b.heure||'')).map(ev=>eventHTML(j.id,ev)).join('') || '<div class="card-sub" style="padding:4px 2px 10px">Aucune activité — appuyez ci-dessous pour en ajouter</div>'}
-          <button class="btn ghost sm" style="margin:2px 0 10px" onclick="openEventForm('${j.id}')">＋ Activité</button>
-        </div>
-      </div>`).join('');
-    html += `<button class="btn ghost" onclick="openDayForm()">＋ Ajouter une journée</button>`;
-  }
-  document.getElementById('tab-planning').innerHTML = html;
-}
-function eventHTML(dayId, ev){
-  const waze = (ev.lat&&ev.lng) ? `<a class="waze" href="https://waze.com/ul?ll=${ev.lat},${ev.lng}&navigate=yes" target="_blank" onclick="event.stopPropagation()">🗺️ Y aller</a>` : '';
-  const icons = { vol:'✈️', repas:'🍽️', hotel:'🏠', activite:'🎯', transport:'🚗', visite:'🏛️', plage:'🏖️', libre:'🌤️' };
-  return `
-    <div class="tl-item" onclick="openEventForm('${dayId}','${ev.id}')">
-      <div class="tl-time">${esc(ev.heure||'')}</div>
-      <div class="tl-dot">${icons[ev.type]||'•'}</div>
-      <div class="tl-body">
-        <div class="tl-title">${esc(ev.titre)}</div>
-        ${ev.sousTitre?`<div class="tl-sub">${esc(ev.sousTitre)}</div>`:''}
-        ${waze?`<div class="tl-row">${waze}</div>`:''}
-      </div>
-    </div>`;
-}
-
-/* ---------------------- TAB: DÉPENSES ---------------------- */
-function renderDepenses(){
-  const t = trip(); if(!t) return;
-  const exp = DATA.expenses.filter(e=>e.tripId===t.id).sort((a,b)=>(b.date||'').localeCompare(a.date||'')||b.id.localeCompare(a.id));
-  const total = exp.reduce((s,e)=>s+(+e.montant||0),0);
-  const cur = t.devise||'EUR';
-  const parts = t.participants||[];
-
-  // breakdown by category
-  const byCat = {};
-  exp.forEach(e=>{ byCat[e.categorie] = (byCat[e.categorie]||0) + (+e.montant||0); });
-  const cats = Object.entries(byCat).sort((a,b)=>b[1]-a[1]);
-  const maxCat = cats.length ? cats[0][1] : 1;
-
-  // balances
-  const paid = {}, share = {};
-  parts.forEach(p=>{ paid[p.id]=0; share[p.id]=0; });
-  exp.forEach(e=>{
-    if (paid[e.payeParId]!=null) paid[e.payeParId] += (+e.montant||0);
-    const sp = (e.splitIds&&e.splitIds.length)?e.splitIds:parts.map(p=>p.id);
-    const per = (+e.montant||0)/sp.length;
-    sp.forEach(id=>{ if(share[id]!=null) share[id]+=per; });
-  });
-  const balances = parts.map(p=>({ id:p.id, nom:p.nom, bal: (paid[p.id]||0)-(share[p.id]||0) }));
-  const settlements = settle(balances);
-
-  let html = `
-    <div class="exp-summary">
-      <div class="total">${fmtMoney(total,cur)}</div>
-      <div class="meta">${exp.length} dépense${exp.length>1?'s':''}${parts.length>1?` · ${fmtMoney(total/Math.max(1,parts.length),cur)} / pers.`:''}</div>
-      ${cats.length?`<div class="exp-bars">${cats.slice(0,6).map(([k,v])=>`
-        <div class="exp-bar-row">
-          <span class="nm">${EXP_CATS[k]?.e||'✨'} ${EXP_CATS[k]?.n||k}</span>
-          <span class="track"><i style="width:${(v/maxCat)*100}%"></i></span>
-          <span class="amt">${fmtMoney(v,cur)}</span>
-        </div>`).join('')}</div>`:''}
-    </div>`;
-
-  if (parts.length>1){
-    html += `<div class="block-title">⚖️ Équilibre du groupe</div>`;
-    html += balances.map(b=>`
-      <div class="balance-card">
-        <span class="who"><span class="avatar" style="background:${avatarColor(b.nom)}">${initials(b.nom)}</span>${esc(b.nom)}</span>
-        <span class="bal-amt ${b.bal>=0?'pos':'neg'}">${b.bal>=0?'+':''}${fmtMoney(b.bal,cur)}</span>
-      </div>`).join('');
-    if (settlements.length){
-      html += `<div class="card" style="margin-top:6px">
-        <div class="card-title" style="margin-bottom:6px">💸 Remboursements</div>
-        ${settlements.map(s=>`<div class="settle-line">
-          <span class="avatar" style="background:${avatarColor(s.from)};width:26px;height:26px;font-size:.7rem">${initials(s.from)}</span>
-          <b>${esc(s.from)}</b><span class="arrow">→</span><b>${esc(s.to)}</b>
-          <span style="margin-left:auto;font-weight:800;color:var(--sea)">${fmtMoney(s.montant,cur)}</span>
-        </div>`).join('')}
-      </div>`;
-    } else {
-      html += `<div class="card"><div class="card-sub" style="text-align:center">✅ Tout est équilibré</div></div>`;
-    }
-  }
-
-  html += `<div class="block-title">🧾 Dépenses</div>`;
-  if (!exp.length){
-    html += `<div class="empty" style="padding:30px"><span class="big">💸</span><p>Aucune dépense.<br>Ajoutez-en avec le bouton ＋</p></div>`;
-  } else {
-    html += exp.map(e=>{
-      const c = EXP_CATS[e.categorie]||EXP_CATS.autre;
-      const payeur = parts.find(p=>p.id===e.payeParId);
-      return `<div class="exp-item" onclick="openExpenseForm('${e.id}')">
-        <div class="exp-cat" style="background:${c.c}1a">${c.e}</div>
-        <div class="exp-info">
-          <div class="t">${esc(e.label||c.n)}</div>
-          <div class="s">${e.date?fmtDateShort(e.date):''}${payeur?` · payé par ${esc(payeur.nom)}`:''}</div>
-        </div>
-        <div class="exp-amt">${fmtMoney(+e.montant,e.devise||cur)}</div>
-      </div>`;
-    }).join('');
-  }
-  document.getElementById('tab-depenses').innerHTML = html;
-}
-function settle(balances){
-  const debt = balances.filter(b=>b.bal<-0.01).map(b=>({nom:b.nom,v:-b.bal})).sort((a,b)=>b.v-a.v);
-  const cred = balances.filter(b=>b.bal>0.01).map(b=>({nom:b.nom,v:b.bal})).sort((a,b)=>b.v-a.v);
-  const tx=[]; let i=0,j=0;
-  while(i<debt.length && j<cred.length){
-    const m = Math.min(debt[i].v, cred[j].v);
-    tx.push({ from:debt[i].nom, to:cred[j].nom, montant:m });
-    debt[i].v-=m; cred[j].v-=m;
-    if(debt[i].v<0.01) i++; if(cred[j].v<0.01) j++;
-  }
-  return tx;
-}
-
-/* ---------------------- TAB: PHOTOS ---------------------- */
-let photoUrls = [];
-function renderPhotos(){
-  const t = trip(); if(!t) return;
-  photoUrls.forEach(u=>URL.revokeObjectURL(u)); photoUrls = [];
-  const photos = DATA.photos.filter(p=>p.tripId===t.id).sort((a,b)=>b.id.localeCompare(a.id));
-  const el = document.getElementById('tab-photos');
-  el.innerHTML = `<div class="photo-grid">
-    <div class="photo-add" onclick="pickPhotos()">＋</div>
-    ${photos.map(p=>`<div class="photo-cell" data-id="${p.id}"><img loading="lazy" alt=""></div>`).join('')}
-  </div>
-  ${photos.length?`<p class="help" style="text-align:center;margin-top:14px">Appuyez sur une photo pour l'agrandir ou la partager 📤</p>`:`<p class="help" style="text-align:center;margin-top:20px">Ajoutez les photos de votre voyage 📸<br>Elles restent privées sur votre appareil.</p>`}`;
-  // load thumbnails
-  photos.forEach(async p=>{
-    const f = await FileDB.get(p.fileId);
-    if (!f) return;
-    const url = URL.createObjectURL(f.blob); photoUrls.push(url);
-    const cell = el.querySelector(`.photo-cell[data-id="${p.id}"]`);
-    if (cell){ cell.querySelector('img').src = url; cell.onclick = ()=>openLightbox(p, f); }
-  });
-}
-
-/* ---------------------- TAB: DOCUMENTS ---------------------- */
-function renderDocuments(){
-  const t = trip(); if(!t) return;
-  const docs = DATA.docs.filter(d=>d.tripId===t.id);
-  let html = '';
-
-  // checklist
-  const cl = t.checklist||[];
-  if (!cl.length) {
-    html += `<div class="block-title">✅ Check-list</div>
-    <div class="cl-card">
-      <div class="cl-ttl" style="margin-bottom:10px">Choisissez un modèle</div>
-      <div class="cl-tpl-grid">
-        ${Object.entries(CL_TEMPLATES).map(([k,tpl])=>`
-          <div class="cl-tpl" onclick="applyTemplate('${k}')">
-            <span class="te">${tpl.emoji}</span>
-            <div class="tn">${esc(tpl.name)}</div>
-            <div class="tc">${tpl.items.length} éléments</div>
-          </div>`).join('')}
-      </div>
-      <button class="btn ghost sm" onclick="openAddChecklistItem()">＋ Liste perso</button>
-    </div>`;
-  } else {
-    const done = cl.filter(i=>i.done).length;
-    const pct = Math.round((done/cl.length)*100);
-    const byCat = {};
-    cl.forEach(i=>{ (byCat[i.c]=byCat[i.c]||[]).push(i); });
-    html += `<div class="block-title">✅ Check-list</div>
-    <div class="cl-card">
-      <div class="cl-hdr"><span class="cl-ttl">Préparation du voyage</span><span class="cl-pct">${done}/${cl.length}</span></div>
-      <div class="cl-bar"><i style="width:${pct}%"></i></div>
-      ${Object.entries(byCat).map(([cat,items])=>`
-        <div class="cl-cat-hd"><span style="width:8px;height:8px;border-radius:50%;background:${CL_CAT[cat]||'#6B7A8D'};display:inline-block"></span>${cat}</div>
-        ${items.map(item=>`
-          <div class="cl-item ${item.done?'done':''}" onclick="toggleCL('${item.id}')">
-            <div class="cl-chk">${item.done?'✓':''}</div>
-            <div class="cl-lbl">${esc(item.l)}</div>
-          </div>`).join('')}
-      `).join('')}
-    </div>
-    <div class="row-actions" style="margin-bottom:14px">
-      <button class="btn ghost sm" onclick="openAddChecklistItem()">＋ Ajouter</button>
-      <button class="muted-link" onclick="resetCL()">Réinitialiser</button>
-    </div>`;
-  }
-
-  // assurance SOS card
-  const ass = t.assurance||{};
-  if (ass.compagnie || ass.telUrgence || ass.contrat){
-    html += `<div class="sos-card">
-      <h3>🛡️ Assurance voyage</h3>
-      ${ass.compagnie?`<div class="ln"><span>Compagnie</span><b>${esc(ass.compagnie)}</b></div>`:''}
-      ${ass.contrat?`<div class="ln"><span>N° de contrat</span><b>${esc(ass.contrat)}</b></div>`:''}
-      ${ass.notes?`<div class="ln"><span>Infos</span><b>${esc(ass.notes)}</b></div>`:''}
-      ${ass.telUrgence?`<a class="sos-call" href="tel:${esc(ass.telUrgence.replace(/\s/g,''))}">📞 Urgence 24h/24 · ${esc(ass.telUrgence)}</a>`:''}
-    </div>`;
-  } else {
-    html += `<div class="card" onclick="openInsuranceForm()" style="cursor:pointer">
-      <div class="card-row"><div class="card-ic" style="background:#FFF0EE">🛡️</div>
-      <div class="card-grow"><div class="card-title">Ajouter votre assurance</div><div class="card-sub">N° de contrat + urgence 24h/24 (Europ Assistance…)</div></div>
-      <span style="font-size:1.3rem;color:var(--muted)">›</span></div></div>`;
-  }
-  html += `<button class="muted-link" style="margin:2px 0 8px" onclick="openInsuranceForm()">✎ Modifier l'assurance</button>`;
-
-  // group documents by type
-  html += `<div class="block-title">📁 Mes documents</div>`;
-  if (!docs.length){
-    html += `<div class="empty" style="padding:26px"><span class="big">🗂️</span><p>Aucun document.<br>Photographiez vos billets, passeport, carte d'identité…</p></div>`;
-  } else {
-    const order = Object.keys(DOC_TYPES);
-    docs.sort((a,b)=>order.indexOf(a.type)-order.indexOf(b.type));
-    html += docs.map(d=>{
-      const dt = DOC_TYPES[d.type]||DOC_TYPES.autre;
-      const isPdf = (d.mime||'').includes('pdf');
-      return `<div class="doc-item">
-        <div class="doc-ic" style="background:${dt.c}" onclick="viewDoc('${d.id}')">${dt.e}</div>
-        <div class="doc-grow" onclick="viewDoc('${d.id}')">
-          <div class="t">${esc(d.nom||dt.n)}</div>
-          <div class="s">${dt.n}${isPdf?' · PDF':''} · ${fmtDate(d.date)}</div>
-        </div>
-        <div class="doc-actions">
-          <button onclick="shareDoc('${d.id}')" title="Partager">⤴</button>
-          <button onclick="deleteDoc('${d.id}')" title="Supprimer">🗑️</button>
-        </div>
-      </div>`;
-    }).join('');
-  }
-  html += `<button class="btn" style="margin-top:8px" onclick="openDocForm()">＋ Ajouter un document</button>
-    <p class="help" style="text-align:center;margin-top:12px">🔒 Vos documents sont stockés uniquement sur cet appareil, jamais envoyés sur internet.</p>`;
-  document.getElementById('tab-documents').innerHTML = html;
-}
-
-/* =====================================================================
-   SHEETS / FORMS
-   ===================================================================== */
-function openSheet(html){
-  document.getElementById('sheet').innerHTML = `<div class="sheet-grip"></div>` + html;
-  document.getElementById('overlay').classList.add('open');
-  document.body.style.overflow = 'hidden';
-}
-function closeSheet(){
-  document.getElementById('overlay').classList.remove('open');
-  document.body.style.overflow = '';
-}
-
-/* ---- Trip create/edit ---- */
-function openTripForm(){ tripFormSheet(null); }
-function editCurrentTrip(){ tripFormSheet(trip()); }
-function tripFormSheet(t){
-  const isEdit = !!t;
-  t = t || {};
-  const parts = (t.participants||[]).map(p=>p.nom).join(', ');
-  openSheet(`
-    <h2>${isEdit?'Modifier le voyage':'Nouveau voyage'}</h2>
-    <div class="sheet-sub">${isEdit?'':'Quelques infos pour démarrer ✈️'}</div>
-    <div class="field"><label>Nom du voyage</label><input id="f-nom" placeholder="Ex: Été en Corse" value="${esc(t.nom||'')}"></div>
-    <div class="field"><label>Destination</label><input id="f-dest" placeholder="Ex: Corse, France" value="${esc(t.destination||'')}"></div>
-    <div class="field"><label>Emoji</label><div class="emoji-pick" id="f-emoji">
-      ${TRIP_EMOJIS.map(e=>`<button type="button" class="${(t.emoji||'🏝️')===e?'sel':''}" onclick="pickEmoji(this,'${e}')">${e}</button>`).join('')}
-    </div></div>
-    <div class="field-row">
-      <div class="field"><label>Départ</label><input type="date" id="f-debut" value="${t.dateDebut||''}"></div>
-      <div class="field"><label>Retour</label><input type="date" id="f-fin" value="${t.dateFin||''}"></div>
-    </div>
-    <div class="field-row">
-      <div class="field"><label>Budget</label><input type="number" id="f-budget" placeholder="2000" value="${t.budget||''}"></div>
-      <div class="field"><label>Devise</label><select id="f-devise">
-        ${['EUR','USD','GBP','CHF','CAD','JPY','MAD','THB'].map(c=>`<option ${(t.devise||'EUR')===c?'selected':''}>${c}</option>`).join('')}
-      </select></div>
-    </div>
-    <div class="field"><label>Participants <span style="font-weight:500;color:var(--muted)">(séparés par des virgules)</span></label>
-      <input id="f-parts" placeholder="Moi, Camille, Léo" value="${esc(parts)}">
-      <div class="help">Pour partager les dépenses entre vous</div>
-    </div>
-    <button class="btn" onclick="saveTrip(${isEdit?`'${t.id}'`:'null'})">${isEdit?'Enregistrer':'Créer le voyage'}</button>
-  `);
-  setTimeout(()=>document.getElementById('f-nom').focus(), 300);
-}
-let _emoji = null;
-function pickEmoji(btn, e){
-  _emoji = e;
-  btn.parentElement.querySelectorAll('button').forEach(b=>b.classList.remove('sel'));
-  btn.classList.add('sel');
-}
-function saveTrip(id){
-  const nom = document.getElementById('f-nom').value.trim();
-  if (!nom){ toast('Donnez un nom au voyage'); return; }
-  const partsStr = document.getElementById('f-parts').value;
-  const existing = id ? DATA.trips.find(t=>t.id===id) : null;
-  const existParts = existing ? existing.participants||[] : [];
-  const newNames = partsStr.split(',').map(s=>s.trim()).filter(Boolean);
-  const participants = newNames.map(nm=>{
-    const ex = existParts.find(p=>p.nom.toLowerCase()===nm.toLowerCase());
-    return ex || { id:uid(), nom:nm };
-  });
-  const obj = {
-    id: id || uid(),
-    nom,
-    destination: document.getElementById('f-dest').value.trim(),
-    pays: document.getElementById('f-dest').value.trim(),
-    emoji: _emoji || (existing&&existing.emoji) || '🏝️',
-    dateDebut: document.getElementById('f-debut').value,
-    dateFin: document.getElementById('f-fin').value,
-    budget: +document.getElementById('f-budget').value || 0,
-    devise: document.getElementById('f-devise').value,
-    participants,
-    couleur: existing ? existing.couleur : COLORS[DATA.trips.length % COLORS.length],
-    notes: existing ? existing.notes : '',
-    jours: existing ? existing.jours||[] : [],
-    assurance: existing ? existing.assurance||{} : {},
-    checklist: existing ? (existing.checklist||[]) : []
-  };
-  if (existing){ Object.assign(existing, obj); } else { DATA.trips.push(obj); }
-  _emoji = null;
-  save(); closeSheet();
-  if (id && currentTripId){ renderTripHeader(); showTab(currentTab); }
-  else { openTrip(obj.id); }
-  toast(id?'Voyage mis à jour ✅':'Voyage créé 🎉');
-}
-function deleteTrip(){
-  const t = trip(); if(!t) return;
-  if (!confirm(`Supprimer "${t.nom}" et toutes ses données ?`)) return;
-  DATA.photos.filter(p=>p.tripId===t.id).forEach(p=>FileDB.del(p.fileId));
-  DATA.docs.filter(d=>d.tripId===t.id).forEach(d=>FileDB.del(d.fileId));
-  DATA.trips = DATA.trips.filter(x=>x.id!==t.id);
-  DATA.expenses = DATA.expenses.filter(e=>e.tripId!==t.id);
-  DATA.photos = DATA.photos.filter(p=>p.tripId!==t.id);
-  DATA.docs = DATA.docs.filter(d=>d.tripId!==t.id);
-  save(); closeSheet(); goHome(); toast('Voyage supprimé');
-}
-
-/* ---- Participants ---- */
-function openParticipants(){
-  const t = trip();
-  openSheet(`
-    <h2>Participants</h2>
-    <div class="sheet-sub">Qui voyage avec vous ?</div>
-    <div id="part-list" class="check-list">${(t.participants||[]).map(p=>`
-      <div class="check-row sel" style="justify-content:space-between">
-        <span><span class="avatar" style="background:${avatarColor(p.nom)};width:26px;height:26px;font-size:.7rem;display:inline-grid">${initials(p.nom)}</span> ${esc(p.nom)}</span>
-        <button class="muted-link danger-link" onclick="removePart('${p.id}')">Retirer</button>
-      </div>`).join('') || '<div class="card-sub">Aucun participant</div>'}</div>
-    <div class="field" style="margin-top:14px"><label>Ajouter quelqu'un</label>
-      <div style="display:flex;gap:8px"><input id="new-part" placeholder="Prénom"><button class="btn sm" onclick="addPart()">＋</button></div>
-    </div>
-    <button class="btn ghost" onclick="closeSheet();renderResume()">Terminé</button>
-  `);
-}
-function addPart(){
-  const t = trip(); const nm = document.getElementById('new-part').value.trim();
-  if(!nm) return;
-  t.participants = t.participants||[]; t.participants.push({id:uid(), nom:nm});
-  save(); openParticipants();
-}
-function removePart(id){
-  const t = trip();
-  t.participants = (t.participants||[]).filter(p=>p.id!==id);
-  save(); openParticipants();
-}
-
-/* ---- Expense ---- */
-function openExpenseForm(id){
-  const t = trip();
-  const parts = t.participants||[];
-  if (!parts.length){
-    if (confirm("Ajoutez d'abord au moins un participant pour suivre les dépenses. Le faire maintenant ?")) openParticipants();
-    return;
-  }
-  const e = id ? DATA.expenses.find(x=>x.id===id) : null;
-  const ed = e || { categorie:'resto', date:new Date().toISOString().slice(0,10), payeParId:parts[0].id, splitIds:parts.map(p=>p.id), devise:t.devise };
-  openSheet(`
-    <h2>${e?'Modifier la dépense':'Nouvelle dépense'}</h2>
-    <div class="field"><label>Montant (${ed.devise||t.devise})</label><input type="number" inputmode="decimal" id="e-montant" placeholder="0" value="${e?e.montant:''}" style="font-size:1.6rem;font-weight:800"></div>
-    <div class="field"><label>Intitulé</label><input id="e-label" placeholder="Ex: Dîner au resto" value="${esc(ed.label||'')}"></div>
-    <div class="field"><label>Catégorie</label><div class="seg" id="e-cat">
-      ${Object.entries(EXP_CATS).map(([k,c])=>`<button type="button" class="${ed.categorie===k?'sel':''}" data-k="${k}" onclick="selSeg(this,'e-cat')">${c.e} ${c.n}</button>`).join('')}
-    </div></div>
-    <div class="field"><label>Date</label><input type="date" id="e-date" value="${ed.date||''}"></div>
-    <div class="field"><label>Payé par</label><select id="e-payeur">
-      ${parts.map(p=>`<option value="${p.id}" ${ed.payeParId===p.id?'selected':''}>${esc(p.nom)}</option>`).join('')}
-    </select></div>
-    <div class="field"><label>Partagé entre</label><div class="check-list" id="e-split">
-      ${parts.map(p=>`<label class="check-row ${(ed.splitIds||[]).includes(p.id)?'sel':''}"><input type="checkbox" value="${p.id}" ${(ed.splitIds||[]).includes(p.id)?'checked':''} onchange="this.closest('.check-row').classList.toggle('sel',this.checked)"> ${esc(p.nom)}</label>`).join('')}
-    </div></div>
-    <button class="btn" onclick="saveExpense(${e?`'${e.id}'`:'null'})">${e?'Enregistrer':'Ajouter'}</button>
-    ${e?`<button class="muted-link danger-link" style="display:block;margin:10px auto 0" onclick="deleteExpense('${e.id}')">Supprimer cette dépense</button>`:''}
-  `);
-  setTimeout(()=>document.getElementById('e-montant').focus(),300);
-}
-function selSeg(btn, wrap){
-  document.getElementById(wrap).querySelectorAll('button').forEach(b=>b.classList.remove('sel'));
-  btn.classList.add('sel');
-}
-function saveExpense(id){
-  const t = trip();
-  const montant = parseFloat(document.getElementById('e-montant').value);
-  if (!(montant>0)){ toast('Montant invalide'); return; }
-  const cat = document.querySelector('#e-cat button.sel')?.dataset.k || 'autre';
-  const splitIds = [...document.querySelectorAll('#e-split input:checked')].map(i=>i.value);
-  if (!splitIds.length){ toast('Sélectionnez au moins une personne'); return; }
-  const obj = {
-    id: id || uid(), tripId: t.id, montant, devise: t.devise,
-    label: document.getElementById('e-label').value.trim(),
-    categorie: cat, date: document.getElementById('e-date').value,
-    payeParId: document.getElementById('e-payeur').value, splitIds
-  };
-  const ex = id ? DATA.expenses.find(x=>x.id===id) : null;
-  if (ex) Object.assign(ex, obj); else DATA.expenses.push(obj);
-  save(); closeSheet(); renderDepenses(); toast(id?'Dépense modifiée':'Dépense ajoutée 💰');
-}
-function deleteExpense(id){
-  DATA.expenses = DATA.expenses.filter(e=>e.id!==id);
-  save(); closeSheet(); renderDepenses(); toast('Dépense supprimée');
-}
-
-/* ---- Day / Event (planning) ---- */
-function openDayForm(id){
-  const t = trip();
-  const j = id ? (t.jours||[]).find(x=>x.id===id) : null;
-  const vibes = ['🌤️','🏖️','🏔️','🏛️','🍽️','⛵','🎉','✈️','🥾','🛍️'];
-  openSheet(`
-    <h2>${j?'Modifier la journée':'Nouvelle journée'}</h2>
-    <div class="field"><label>Titre</label><input id="d-titre" placeholder="Ex: Visite de la vieille ville" value="${esc(j?.titre||'')}"></div>
-    <div class="field"><label>Date</label><input type="date" id="d-date" value="${j?.date||t.dateDebut||''}"></div>
-    <div class="field"><label>Ambiance</label><div class="emoji-pick" id="d-vibe">
-      ${vibes.map(v=>`<button type="button" class="${(j?.vibe||'🌤️')===v?'sel':''}" onclick="pickEmoji(this,'${v}')">${v}</button>`).join('')}
-    </div></div>
-    <button class="btn" onclick="saveDay(${j?`'${j.id}'`:'null'})">${j?'Enregistrer':'Ajouter'}</button>
-    ${j?`<button class="muted-link danger-link" style="display:block;margin:10px auto 0" onclick="deleteDay('${j.id}')">Supprimer la journée</button>`:''}
-  `);
-  _emoji = j?.vibe || '🌤️';
-}
-function saveDay(id){
-  const t = trip();
-  const titre = document.getElementById('d-titre').value.trim();
-  const date = document.getElementById('d-date').value;
-  if (!titre && !date){ toast('Ajoutez un titre ou une date'); return; }
-  t.jours = t.jours||[];
-  const j = id ? t.jours.find(x=>x.id===id) : null;
-  if (j){ j.titre=titre; j.date=date; j.vibe=_emoji; }
-  else t.jours.push({ id:uid(), titre, date, vibe:_emoji||'🌤️', events:[] });
-  _emoji=null; save(); closeSheet(); renderPlanning(); toast(id?'Journée modifiée':'Journée ajoutée');
-}
-function deleteDay(id){
-  const t = trip();
-  t.jours = (t.jours||[]).filter(j=>j.id!==id);
-  save(); closeSheet(); renderPlanning(); toast('Journée supprimée');
-}
-function openEventForm(dayId, evId){
-  const t = trip();
-  const day = (t.jours||[]).find(j=>j.id===dayId);
-  const ev = evId ? (day.events||[]).find(e=>e.id===evId) : null;
-  const types = { vol:'✈️ Vol', transport:'🚗 Transport', hotel:'🏠 Logement', repas:'🍽️ Repas', activite:'🎯 Activité', visite:'🏛️ Visite', plage:'🏖️ Plage', libre:'🌤️ Libre' };
-  openSheet(`
-    <h2>${ev?'Modifier l\'activité':'Nouvelle activité'}</h2>
-    <div class="field-row">
-      <div class="field"><label>Heure</label><input type="time" id="ev-heure" value="${ev?.heure||''}"></div>
-      <div class="field"><label>Type</label><select id="ev-type">
-        ${Object.entries(types).map(([k,v])=>`<option value="${k}" ${ev?.type===k?'selected':''}>${v}</option>`).join('')}
-      </select></div>
-    </div>
-    <div class="field"><label>Titre</label><input id="ev-titre" placeholder="Ex: Déjeuner chez Marco" value="${esc(ev?.titre||'')}"></div>
-    <div class="field"><label>Détail</label><input id="ev-sous" placeholder="Adresse, infos, réservation…" value="${esc(ev?.sousTitre||'')}"></div>
-    <div class="field"><label>Lien Waze / Google Maps <span style="font-weight:500;color:var(--muted)">(optionnel)</span></label>
-      <input id="ev-lien" placeholder="Collez un lien Waze ou Maps" value="${ev&&ev.lat?`https://waze.com/ul?ll=${ev.lat},${ev.lng}`:''}">
-      <div class="help">Le bouton « Y aller » apparaîtra automatiquement</div>
-    </div>
-    <button class="btn" onclick="saveEvent('${dayId}',${ev?`'${ev.id}'`:'null'})">${ev?'Enregistrer':'Ajouter'}</button>
-    ${ev?`<button class="muted-link danger-link" style="display:block;margin:10px auto 0" onclick="deleteEvent('${dayId}','${ev.id}')">Supprimer</button>`:''}
-  `);
-}
-function parseLatLng(url){
-  if (!url) return {};
-  let m = url.match(/ll=(-?\d+\.?\d*),(-?\d+\.?\d*)/) || url.match(/@(-?\d+\.?\d*),(-?\d+\.?\d*)/) || url.match(/q=(-?\d+\.?\d*),(-?\d+\.?\d*)/);
-  if (m) return { lat:m[1], lng:m[2] };
-  return {};
-}
-function saveEvent(dayId, evId){
-  const t = trip();
-  const day = (t.jours||[]).find(j=>j.id===dayId);
-  const titre = document.getElementById('ev-titre').value.trim();
-  if (!titre){ toast('Donnez un titre'); return; }
-  const ll = parseLatLng(document.getElementById('ev-lien').value.trim());
-  const obj = {
-    id: evId||uid(), heure: document.getElementById('ev-heure').value,
-    type: document.getElementById('ev-type').value, titre,
-    sousTitre: document.getElementById('ev-sous').value.trim(), lat: ll.lat, lng: ll.lng
-  };
-  day.events = day.events||[];
-  const ev = evId ? day.events.find(e=>e.id===evId) : null;
-  if (ev) Object.assign(ev, obj); else day.events.push(obj);
-  save(); closeSheet(); renderPlanning(); toast(evId?'Modifié':'Ajouté');
-}
-function deleteEvent(dayId, evId){
-  const t = trip();
-  const day = (t.jours||[]).find(j=>j.id===dayId);
-  day.events = (day.events||[]).filter(e=>e.id!==evId);
-  save(); closeSheet(); renderPlanning(); toast('Supprimé');
-}
-
-/* ---- Insurance ---- */
-function openInsuranceForm(){
-  const t = trip(); const a = t.assurance||{};
-  openSheet(`
-    <h2>🛡️ Assurance voyage</h2>
-    <div class="sheet-sub">Gardez l'essentiel à portée de main en cas de pépin</div>
-    <div class="field"><label>Compagnie</label><input id="a-comp" placeholder="Ex: Europ Assistance" value="${esc(a.compagnie||'')}"></div>
-    <div class="field"><label>N° de contrat / police</label><input id="a-contrat" placeholder="Ex: 58 00 1234 567" value="${esc(a.contrat||'')}"></div>
-    <div class="field"><label>📞 Numéro d'urgence 24h/24</label><input id="a-tel" placeholder="Ex: +33 1 41 85 85 85" value="${esc(a.telUrgence||'')}"></div>
-    <div class="field"><label>Notes</label><input id="a-notes" placeholder="Plafond, garanties, n° d'assuré…" value="${esc(a.notes||'')}"></div>
-    <button class="btn" onclick="saveInsurance()">Enregistrer</button>
-    <p class="help" style="text-align:center;margin-top:10px">💡 Pensez aussi à ajouter une photo de votre attestation dans les documents.</p>
-  `);
-}
-function saveInsurance(){
-  const t = trip();
-  t.assurance = {
-    compagnie: document.getElementById('a-comp').value.trim(),
-    contrat: document.getElementById('a-contrat').value.trim(),
-    telUrgence: document.getElementById('a-tel').value.trim(),
-    notes: document.getElementById('a-notes').value.trim()
-  };
-  save(); closeSheet(); renderDocuments(); toast('Assurance enregistrée 🛡️');
-}
-
-/* =====================================================================
-   FICHIERS : photos & documents
-   ===================================================================== */
-function pickFile(accept, capture){
-  return new Promise(res=>{
-    const inp = document.createElement('input');
-    inp.type='file'; inp.accept=accept; inp.multiple = !capture;
-    if (capture) inp.capture='environment';
-    inp.onchange = ()=>res([...inp.files]);
-    inp.click();
-  });
-}
-async function pickPhotos(){
-  const files = await pickFile('image/*');
-  if (!files.length) return;
-  const t = trip();
-  for (const file of files){
-    const fileId = uid();
-    const blob = await downscaleImage(file, 1600);
-    await FileDB.put({ id:fileId, blob, mime:blob.type||file.type, name:file.name });
-    DATA.photos.push({ id:uid(), tripId:t.id, fileId, caption:'', date:new Date().toISOString().slice(0,10) });
-  }
-  save(); renderPhotos(); toast(files.length>1?`${files.length} photos ajoutées 📸`:'Photo ajoutée 📸');
-}
-function downscaleImage(file, maxDim){
-  return new Promise(res=>{
-    const img = new Image();
-    img.onload = ()=>{
-      let { width:w, height:h } = img;
-      if (Math.max(w,h) > maxDim){ const r = maxDim/Math.max(w,h); w=Math.round(w*r); h=Math.round(h*r); }
-      const cv = document.createElement('canvas'); cv.width=w; cv.height=h;
-      cv.getContext('2d').drawImage(img,0,0,w,h);
-      cv.toBlob(b=>res(b||file), 'image/jpeg', 0.82);
-    };
-    img.onerror = ()=>res(file);
-    img.src = URL.createObjectURL(file);
-  });
-}
-
-function openDocForm(){
-  openSheet(`
-    <h2>Ajouter un document</h2>
-    <div class="sheet-sub">Billet, passeport, attestation… 📄</div>
-    <div class="field"><label>Type de document</label><div class="seg" id="doc-type">
-      ${Object.entries(DOC_TYPES).map(([k,d],i)=>`<button type="button" class="${i===0?'sel':''}" data-k="${k}" onclick="selSeg(this,'doc-type')">${d.e} ${d.n}</button>`).join('')}
-    </div></div>
-    <div class="field"><label>Nom <span style="font-weight:500;color:var(--muted)">(optionnel)</span></label><input id="doc-nom" placeholder="Ex: Passeport de Léo"></div>
-    <div class="row-actions" style="flex-direction:column">
-      <button class="btn" onclick="captureDoc(true)">📷 Prendre en photo</button>
-      <button class="btn ghost" onclick="captureDoc(false)">🖼️ Choisir un fichier (photo / PDF)</button>
-    </div>
-  `);
-}
-async function captureDoc(camera){
-  const type = document.querySelector('#doc-type button.sel')?.dataset.k || 'autre';
-  const nom = document.getElementById('doc-nom').value.trim();
-  const files = await pickFile(camera?'image/*':'image/*,application/pdf', camera);
-  if (!files.length) return;
-  const t = trip();
-  for (const file of files){
-    const fileId = uid();
-    const isPdf = file.type.includes('pdf');
-    const blob = isPdf ? file : await downscaleImage(file, 2000);
-    await FileDB.put({ id:fileId, blob, mime:file.type, name:file.name });
-    DATA.docs.push({ id:uid(), tripId:t.id, type, nom: nom||file.name.replace(/\.[^.]+$/,''), fileId, mime:file.type, date:new Date().toISOString().slice(0,10) });
-  }
-  save(); closeSheet(); renderDocuments(); toast('Document ajouté 🔒');
-}
-async function viewDoc(id){
-  const d = DATA.docs.find(x=>x.id===id); if(!d) return;
-  const f = await FileDB.get(d.fileId); if(!f){ toast('Fichier introuvable'); return; }
-  const url = URL.createObjectURL(f.blob);
-  const body = document.getElementById('lb-body');
-  if ((d.mime||'').includes('pdf')) body.innerHTML = `<iframe src="${url}"></iframe>`;
-  else body.innerHTML = `<img src="${url}" alt="">`;
-  document.getElementById('lb-cap').textContent = d.nom || '';
-  _lightboxShare = { blob:f.blob, name:(d.nom||'document'), mime:d.mime };
-  _lightboxUrl = url;
-  document.getElementById('lightbox').classList.add('open');
-}
-
-let _lightboxUrl = null, _lightboxShare = null;
-function openLightbox(photo, f){
-  const url = URL.createObjectURL(f.blob);
-  document.getElementById('lb-body').innerHTML = `<img src="${url}" alt="">`;
-  document.getElementById('lb-cap').textContent = photo.caption || fmtDate(photo.date);
-  _lightboxUrl = url;
-  _lightboxShare = { blob:f.blob, name:'photo.jpg', mime:f.mime||'image/jpeg', photoId:photo.id };
-  document.getElementById('lightbox').classList.add('open');
-}
-function closeLightbox(){
-  document.getElementById('lightbox').classList.remove('open');
-  document.getElementById('lb-body').innerHTML='';
-  if (_lightboxUrl){ URL.revokeObjectURL(_lightboxUrl); _lightboxUrl=null; }
-}
-async function shareLightbox(){
-  if (!_lightboxShare) return;
-  await shareBlob(_lightboxShare.blob, _lightboxShare.name, _lightboxShare.mime);
-}
-async function shareBlob(blob, name, mime){
-  try {
-    const file = new File([blob], name, { type: mime||blob.type });
-    if (navigator.canShare && navigator.canShare({ files:[file] })){
-      await navigator.share({ files:[file] });
-      return;
-    }
-  } catch(e){ if(e.name==='AbortError') return; }
-  // fallback: download
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a'); a.href=url; a.download=name; a.click();
-  setTimeout(()=>URL.revokeObjectURL(url), 1000);
-  toast('Partage non dispo — fichier téléchargé');
-}
-async function shareDoc(id){
-  const d = DATA.docs.find(x=>x.id===id); if(!d) return;
-  const f = await FileDB.get(d.fileId); if(!f) return;
-  const ext = (d.mime||'').includes('pdf')?'.pdf':'.jpg';
-  await shareBlob(f.blob, (d.nom||'document')+ext, d.mime);
-}
-async function deleteDoc(id){
-  const d = DATA.docs.find(x=>x.id===id); if(!d) return;
-  if (!confirm('Supprimer ce document ?')) return;
-  await FileDB.del(d.fileId);
-  DATA.docs = DATA.docs.filter(x=>x.id!==id);
-  save(); renderDocuments(); toast('Document supprimé');
-}
-
-/* =====================================================================
-   IMPORT / EXPORT (sauvegarde des données structurées)
-   ===================================================================== */
-function exportData(){
-  const blob = new Blob([JSON.stringify(DATA,null,2)], { type:'application/json' });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href=url; a.download=`carnet-voyage-${new Date().toISOString().slice(0,10)}.json`; a.click();
-  setTimeout(()=>URL.revokeObjectURL(url),1000);
-  toast('Sauvegarde exportée ⤓');
-}
-function importData(input){
-  const file = input.files[0]; if(!file) return;
-  const reader = new FileReader();
-  reader.onload = ()=>{
-    try {
-      const d = JSON.parse(reader.result);
-      if (!d.trips) throw 0;
-      if (!confirm('Remplacer vos données actuelles par cette sauvegarde ?')) return;
-      DATA = { trips:d.trips||[], expenses:d.expenses||[], photos:d.photos||[], docs:d.docs||[] };
-      save(); goHome(); toast('Données importées ✅ (les photos/docs liés à cet appareil peuvent manquer)');
-    } catch(e){ toast('Fichier invalide'); }
-  };
-  reader.readAsText(file);
-  input.value='';
-}
-
-/* =====================================================================
-   CHECKLIST
-   ===================================================================== */
-const CL_TEMPLATES = {
-  plage:    { emoji:'🏖️', name:'Plage & Mer', items:[
-    {c:'Documents',l:"Carte d'identité / Passeport"},{c:'Documents',l:"Billet d'avion"},
-    {c:'Documents',l:"Assurance voyage"},{c:'Documents',l:"Carte Vitale / CEAM"},
-    {c:'Vêtements',l:"Maillot de bain ×2"},{c:'Vêtements',l:"Shorts et t-shirts"},
-    {c:'Vêtements',l:"Lunettes de soleil"},{c:'Vêtements',l:"Chapeau / casquette"},{c:'Vêtements',l:"Tongs"},
-    {c:'Toilette',l:"Crème solaire SPF 50+"},{c:'Toilette',l:"After-sun"},{c:'Toilette',l:"Anti-moustiques"},{c:'Toilette',l:"Trousse de toilette"},
-    {c:'Électronique',l:"Chargeur téléphone"},{c:'Électronique',l:"Adaptateur de prise"},{c:'Électronique',l:"Powerbank"},
-    {c:'Santé',l:"Médicaments + ordonnances"},{c:'Santé',l:"Trousse premiers secours"},
-    {c:'Plage',l:"Serviette de plage"},{c:'Plage',l:"Masque et tuba"},{c:'Plage',l:"Sac étanche"},
-  ]},
-  city:     { emoji:'🏙️', name:'City-break', items:[
-    {c:'Documents',l:"Carte d'identité / Passeport"},{c:'Documents',l:"Billet transport"},
-    {c:'Documents',l:"Confirmation hôtel"},{c:'Documents',l:"Assurance voyage"},{c:'Documents',l:"Carte bancaire"},
-    {c:'Vêtements',l:"Tenues variées"},{c:'Vêtements',l:"Veste légère"},{c:'Vêtements',l:"Chaussures confortables"},{c:'Vêtements',l:"Tenue soirée"},
-    {c:'Toilette',l:"Trousse de toilette compacte"},{c:'Toilette',l:"Crème solaire"},
-    {c:'Électronique',l:"Chargeur + câbles"},{c:'Électronique',l:"Adaptateur de prise"},{c:'Électronique',l:"Appareil photo"},
-    {c:'Santé',l:"Médicaments essentiels"},{c:'Bagages',l:"Cadenas valise"},{c:'Bagages',l:"Sac à dos journée"},
-  ]},
-  montagne: { emoji:'🏔️', name:'Montagne', items:[
-    {c:'Documents',l:"Carte d'identité"},{c:'Documents',l:"Assurance rapatriement"},
-    {c:'Vêtements',l:"Veste imperméable"},{c:'Vêtements',l:"Sous-couches thermiques"},{c:'Vêtements',l:"Polaire"},
-    {c:'Vêtements',l:"Pantalon de randonnée"},{c:'Vêtements',l:"Chaussettes de rando ×3"},{c:'Vêtements',l:"Bonnet + gants"},
-    {c:'Équipement',l:"Chaussures de randonnée"},{c:'Équipement',l:"Bâtons"},{c:'Équipement',l:"Sac à dos 30-40L"},
-    {c:'Équipement',l:"Lampe frontale + piles"},{c:'Équipement',l:"Gourde"},{c:'Équipement',l:"Carte / topo-guide"},
-    {c:'Santé',l:"Crème solaire SPF 50+"},{c:'Santé',l:"Trousse premiers secours"},{c:'Santé',l:"Anti-ampoules"},
-  ]},
-  ski:      { emoji:'⛷️', name:'Ski & Hiver', items:[
-    {c:'Documents',l:"Carte d'identité"},{c:'Documents',l:"Forfait ski"},{c:'Documents',l:"Assurance ski"},
-    {c:'Vêtements',l:"Veste de ski"},{c:'Vêtements',l:"Pantalon de ski"},{c:'Vêtements',l:"Sous-couches ×2"},
-    {c:'Vêtements',l:"Chaussettes de ski ×3"},{c:'Vêtements',l:"Bonnet + tour de cou"},{c:'Vêtements',l:"Gants de ski"},
-    {c:'Équipement',l:"Casque de ski"},{c:'Équipement',l:"Masque"},{c:'Équipement',l:"Chaussures / location"},
-    {c:'Santé',l:"Crème solaire + stick lèvres"},{c:'Santé',l:"Protection dorsale"},
-  ]},
-  roadtrip: { emoji:'🚗', name:'Road Trip', items:[
-    {c:'Documents',l:"Permis de conduire"},{c:'Documents',l:"Carte d'identité / Passeport"},
-    {c:'Documents',l:"Assurance véhicule"},{c:'Documents',l:"Réservations hébergements"},
-    {c:'Véhicule',l:"GPS / carte routière"},{c:'Véhicule',l:"Triangle + gilet"},{c:'Véhicule',l:"Trousse premiers secours"},
-    {c:'Véhicule',l:"Vignettes pays traversés"},
-    {c:'Vêtements',l:"Vêtements pour tous les temps"},{c:'Électronique',l:"Chargeur voiture USB"},{c:'Électronique',l:"Support téléphone"},
-    {c:'Confort',l:"Oreiller de voyage"},{c:'Confort',l:"Couverture / plaid"},{c:'Confort',l:"Snacks et boissons"},
-  ]},
-};
-const CL_CAT = {
-  'Documents':'#0A7EA4','Vêtements':'#6C5CE7','Toilette':'#2E7D52',
-  'Électronique':'#F5A623','Santé':'#E8503A','Plage':'#00B4D8',
-  'Équipement':'#0D5C7A','Bagages':'#d6336c','Véhicule':'#0aa','Confort':'#6B7A8D','Perso':'#1A2332',
-};
-function applyTemplate(key) {
-  const t = trip(); const tpl = CL_TEMPLATES[key]; if (!tpl) return;
-  if ((t.checklist||[]).length && !confirm(`Remplacer la check-list par "${tpl.name}" ?`)) return;
-  t.checklist = tpl.items.map(i=>({ id:uid(), c:i.c, l:i.l, done:false }));
-  save(); renderDocuments(); toast(`Check-list "${tpl.name}" appliquée ✅`);
-}
-function toggleCL(id) {
-  const t = trip(); const item = (t.checklist||[]).find(i=>i.id===id); if (!item) return;
-  item.done = !item.done; save();
-  if (item.done && navigator.vibrate) navigator.vibrate(10);
-  renderDocuments();
-}
-function resetCL() {
-  if (!confirm('Remettre à zéro la check-list ?')) return;
-  const t = trip(); t.checklist = []; save(); renderDocuments(); toast('Check-list remise à zéro');
-}
-function openAddChecklistItem() {
-  openSheet(`<h2>Ajouter un élément</h2>
-    <div class="field"><label>Élément</label><input id="cl-inp" placeholder="Ex: Crème solaire"></div>
-    <button class="btn" onclick="addCLItem()">Ajouter</button>`);
-  setTimeout(()=>document.getElementById('cl-inp')?.focus(), 300);
-}
-function addCLItem() {
-  const t = trip(); const lbl = (document.getElementById('cl-inp')?.value||'').trim();
-  if (!lbl) { toast('Entrez un élément'); return; }
-  t.checklist = t.checklist||[];
-  t.checklist.push({ id:uid(), c:'Perso', l:lbl, done:false });
-  save(); closeSheet(); renderDocuments(); toast('Ajouté ✅');
-}
-
-/* =====================================================================
-   MÉTÉO (Open-Meteo + Nominatim, sans clé API)
-   ===================================================================== */
-const _wCache = {};
-const WMO = {0:'☀️',1:'🌤️',2:'⛅',3:'☁️',45:'🌫️',48:'🌫️',51:'🌦️',53:'🌦️',55:'🌧️',61:'🌧️',63:'🌧️',65:'🌊',71:'❄️',73:'❄️',75:'❄️',80:'🌦️',81:'🌧️',82:'⛈️',85:'🌨️',95:'⛈️',96:'⛈️',99:'⛈️'};
-function wmoE(code) {
-  if (WMO[code]) return WMO[code];
-  const keys = Object.keys(WMO).map(Number).sort((a,b)=>a-b);
-  let best = keys[0]; for (const k of keys) { if (k<=code) best=k; } return WMO[best]||'🌈';
-}
-async function fetchT(url, opts, ms) {
-  const ctrl = new AbortController(); const t = setTimeout(()=>ctrl.abort(), ms||5000);
-  try { return await fetch(url, {...(opts||{}), signal:ctrl.signal}); } finally { clearTimeout(t); }
-}
-async function loadWeather(t) {
-  if (!t.destination) return;
-  const el = document.getElementById('weather-widget'); if (!el) return;
-  el.innerHTML = `<div class="weather-widget"><div class="weather-dest">🌤️ Météo · ${esc(t.destination)}</div><div class="weather-strip">${[...Array(7)].map(()=>`<div class="w-day"><div class="skel" style="height:10px;width:32px;margin:0 auto 5px"></div><div class="skel" style="height:22px;width:22px;border-radius:50%;margin:0 auto 5px"></div><div class="skel" style="height:10px;width:26px;margin:0 auto"></div></div>`).join('')}</div></div>`;
-  try {
-    let c = _wCache[t.id];
-    if (!c || Date.now()-c.ts > 3*3600*1000) {
-      const gr = await fetchT(`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(t.destination)}&format=json&limit=1`,{headers:{'Accept-Language':'fr','User-Agent':'CarnetVoyage/1.0'}},5000);
-      const gd = await gr.json();
-      if (!gd||!gd[0]) throw new Error('geo');
-      const lat = +gd[0].lat, lng = +gd[0].lon;
-      const wr = await fetchT(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lng}&daily=weathercode,temperature_2m_max,temperature_2m_min,precipitation_probability_max&timezone=auto&forecast_days=8`,{},6000);
-      if (!wr.ok) throw new Error('api');
-      c = { ts:Date.now(), data:await wr.json() };
-      _wCache[t.id] = c;
-    }
-    const el2 = document.getElementById('weather-widget'); if (!el2) return;
-    const d = c.data.daily; const n = (d.time||[]).length;
-    const ts = t.dateDebut ? new Date(t.dateDebut+'T00:00:00') : null;
-    const te = t.dateFin   ? new Date(t.dateFin  +'T00:00:00') : null;
+    const url = `https://api.open-meteo.com/v1/forecast?latitude=${HOUSE.lat}&longitude=${HOUSE.lng}&daily=weathercode,temperature_2m_max,temperature_2m_min,precipitation_probability_max&timezone=auto&forecast_days=7`;
+    const ctrl = new AbortController(); const to = setTimeout(()=>ctrl.abort(), 6000);
+    const r = await fetch(url, { signal:ctrl.signal }); clearTimeout(to);
+    if (!r.ok) throw new Error('api');
+    const d = (await r.json()).daily;
     const DN = ['Dim','Lun','Mar','Mer','Jeu','Ven','Sam'];
-    let h = `<div class="weather-widget"><div class="weather-dest">🌤️ Météo · ${esc(t.destination)}</div><div class="weather-strip">`;
-    for (let i=0;i<n;i++) {
-      const dt = new Date(d.time[i]+'T00:00:00');
-      const inT = ts && te && dt>=ts && dt<=te;
-      h += `<div class="w-day${inT?' in-trip':''}"><div class="wn">${DN[dt.getDay()]}</div><div class="wi">${wmoE(d.weathercode[i])}</div><div class="wh">${Math.round(d.temperature_2m_max[i])}°</div><div class="wl">${Math.round(d.temperature_2m_min[i])}°</div><div class="wr">💧${d.precipitation_probability_max[i]||0}%</div></div>`;
-    }
-    h += `</div></div>`;
-    el2.innerHTML = h;
-  } catch(e) {
-    const el2 = document.getElementById('weather-widget'); if (!el2) return;
-    el2.innerHTML = `<div class="weather-widget"><div class="weather-error">🌐 Météo non disponible (connexion requise)</div></div>`;
+    const today = new Date().toISOString().slice(0,10);
+    strip.innerHTML = d.time.map((t,i)=>{
+      const dt = new Date(t+'T00:00:00');
+      return `<div class="w-day${t===today?' today':''}">
+        <div class="wn">${t===today?"Auj.":DN[dt.getDay()]}</div>
+        <div class="wi">${wmoE(d.weathercode[i])}</div>
+        <div class="wh">${Math.round(d.temperature_2m_max[i])}°</div>
+        <div class="wl">${Math.round(d.temperature_2m_min[i])}°</div>
+        <div class="wr">💧${d.precipitation_probability_max[i]||0}%</div>
+      </div>`;
+    }).join('');
+  } catch(e){
+    strip.innerHTML = `<div class="weather-msg">🌐 Météo indisponible — vérifiez la connexion.</div>`;
   }
 }
+loadWeather();
 
-/* =====================================================================
-   CARTE (Leaflet lazy-load depuis CDN)
-   ===================================================================== */
-let _map=null, _lfLoaded=false, _mMarkers=[], _mLines=[];
-function loadScript(src){ return new Promise((res,rej)=>{ if(document.querySelector(`script[src="${src}"]`)){res();return;} const s=document.createElement('script');s.src=src;s.onload=res;s.onerror=rej;document.head.appendChild(s); }); }
-function loadCSS(href){ if(document.querySelector(`link[href="${href}"]`))return; const l=document.createElement('link');l.rel='stylesheet';l.href=href;document.head.appendChild(l); }
-async function initLeaflet(){ if(_lfLoaded)return; loadCSS('https://unpkg.com/leaflet@1.9.4/dist/leaflet.css'); await loadScript('https://unpkg.com/leaflet@1.9.4/dist/leaflet.js'); _lfLoaded=true; }
-
-async function openMap() {
-  const t=trip(); if(!t) return;
-  document.getElementById('map-title').textContent = 'Carte — '+t.nom;
-  document.getElementById('map-overlay').classList.add('open');
-  try { await initLeaflet(); } catch(e) {
-    document.getElementById('map-container').innerHTML='<div style="height:100%;display:grid;place-items:center;text-align:center;padding:24px;color:var(--muted)">🌐 Connexion requise pour afficher la carte.</div>'; return;
-  }
-  if (_map) { _map.off(); _map.remove(); _map=null; }
-  _mMarkers=[]; _mLines=[];
-  const mapEl = document.getElementById('map-container');
-  _map = L.map(mapEl,{zoomControl:false}).setView([46.2,2.2],5);
-  L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png',{attribution:'© OpenStreetMap © CARTO',subdomains:'abcd',maxZoom:19}).addTo(_map);
-  L.control.zoom({position:'topright'}).addTo(_map);
-  const jours=[...(t.jours||[])].sort((a,b)=>(a.date||'').localeCompare(b.date||''));
-  const DC=['#0A7EA4','#E8503A','#2E7D52','#F5A623','#6C5CE7','#0aa','#d6336c','#1f7a8c'];
-  const EI={vol:'✈️',transport:'🚗',hotel:'🏠',repas:'🍽️',activite:'🎯',visite:'🏛️',plage:'🏖️',libre:'🌤️'};
-  const bounds=[]; let chips=`<button class="map-chip active" onclick="filterMapDay(-1,this)">Tous</button>`;
-  jours.forEach((j,idx)=>{
-    const col=DC[idx%DC.length];
-    const evs=(j.events||[]).filter(ev=>ev.lat&&ev.lng);
-    if(evs.length) chips+=`<button class="map-chip" data-di="${idx}" onclick="filterMapDay(${idx},this)">${idx+1} — ${esc(j.titre||'Jour')}</button>`;
-    const pts=[];
-    evs.forEach(ev=>{
-      const ll=[+ev.lat,+ev.lng]; bounds.push(ll); pts.push(ll);
-      const icon=L.divIcon({className:'',html:`<div style="width:32px;height:32px;border-radius:50%;background:${col};border:3px solid #fff;box-shadow:0 2px 8px rgba(0,0,0,.3);display:grid;place-items:center;font-size:.95rem">${EI[ev.type]||'📍'}</div>`,iconSize:[32,32],iconAnchor:[16,16],popupAnchor:[0,-18]});
-      const m=L.marker(ll,{icon}).addTo(_map).bindPopup(`<div style="font-family:-apple-system,sans-serif;min-width:130px"><b style="font-size:.9rem">${esc(ev.titre)}</b>${ev.sousTitre?`<div style="font-size:.76rem;color:#666;margin:3px 0">${esc(ev.sousTitre)}</div>`:''}<div style="margin-top:6px;display:flex;gap:5px"><a href="https://waze.com/ul?ll=${ev.lat},${ev.lng}&navigate=yes" target="_blank" style="background:#0A7EA4;color:#fff;padding:3px 8px;border-radius:5px;text-decoration:none;font-size:.7rem;font-weight:700">🗺️ Waze</a><a href="https://maps.google.com/maps?q=${ev.lat},${ev.lng}" target="_blank" style="background:#EAF4F8;color:#0A7EA4;padding:3px 8px;border-radius:5px;text-decoration:none;font-size:.7rem;font-weight:700">Maps</a></div></div>`);
-      _mMarkers.push({m,di:idx});
-    });
-    if(pts.length>1){ const line=L.polyline(pts,{color:col,weight:2.5,opacity:.65,dashArray:'6,6'}).addTo(_map); _mLines.push({line,di:idx}); }
-  });
-  document.getElementById('map-day-filters').innerHTML=chips;
-  if(bounds.length) { _map.fitBounds(bounds,{padding:[30,30],maxZoom:13}); }
-  else { fetchT(`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(t.destination||'')}&format=json&limit=1`,{headers:{'Accept-Language':'fr','User-Agent':'CarnetVoyage/1.0'}},5000).then(r=>r.json()).then(d=>{ if(d&&d[0]&&_map) _map.setView([+d[0].lat,+d[0].lon],9); }); }
-  setTimeout(()=>{ if(_map) _map.invalidateSize(); },350);
-}
-function closeMap(){ document.getElementById('map-overlay').classList.remove('open'); }
-function filterMapDay(di,btn) {
-  document.querySelectorAll('.map-chip').forEach(b=>b.classList.remove('active'));
-  if(btn) btn.classList.add('active');
-  _mMarkers.forEach(({m,di:d})=>{ if(di===-1||d===di) m.addTo(_map); else _map.removeLayer(m); });
-  _mLines.forEach(({line,di:d})=>{ if(di===-1||d===di) line.addTo(_map); else _map.removeLayer(line); });
-}
-
-/* =====================================================================
-   SEED — exemple Corse 2026 au premier lancement
-   ===================================================================== */
-function seedIfEmpty(){
-  if (DATA.trips.length) return;
-  const pid = { s:uid(), c:uid(), d:uid(), e:uid() };
-  const tripId = uid();
-  DATA.trips.push({
-    id: tripId, nom:'Corse 2026', destination:'Corse, France', pays:'France',
-    emoji:'🏝️', dateDebut:'2026-07-04', dateFin:'2026-07-18', budget:4000, devise:'EUR',
-    couleur:'#0A7EA4', notes:'Maison à Zonza. 4 familles réunies 🌊',
-    participants:[{id:pid.s,nom:'Stoupel'},{id:pid.c,nom:'Carniol'},{id:pid.d,nom:'Delhauteur'},{id:pid.e,nom:'Etienne'}],
-    assurance:{ compagnie:'Europ Assistance', contrat:'58 00 0000 000', telUrgence:'+33 1 41 85 85 85', notes:'Rapatriement + frais médicaux' },
-    jours:[
-      { id:uid(), titre:'Arrivée en Corse ✈️', date:'2026-07-04', vibe:'✈️', events:[
-        { id:uid(), heure:'13:25', type:'vol', titre:'Atterrissage Figari', sousTitre:'Volotea Lille → Figari' },
-        { id:uid(), heure:'15:00', type:'hotel', titre:'Arrivée à la maison', sousTitre:'Vacinatojo, 20124 Zonza', lat:'41.6532357', lng:'9.3511' },
-        { id:uid(), heure:'18:30', type:'libre', titre:'Apéro de bienvenue 🥂', sousTitre:'3 familles réunies' }
-      ]},
-      { id:uid(), titre:'Golf de Spérone ⛳', date:'2026-07-06', vibe:'🏔️', events:[
-        { id:uid(), heure:'09:00', type:'activite', titre:'Golf de Spérone — 18 trous', sousTitre:'Bonifacio · vue sur la Sardaigne', lat:'41.3729733', lng:'9.2101607' },
-        { id:uid(), heure:'12:30', type:'repas', titre:'Déjeuner — Tamaricciu', sousTitre:'Palombaggia · ⭐ 4.3', lat:'41.553447', lng:'9.3181647' }
-      ]},
-      { id:uid(), titre:'Journée bateau ⛵', date:'2026-07-08', vibe:'⛵', events:[
-        { id:uid(), heure:'09:00', type:'activite', titre:'Départ Port de Pinarellu', lat:'41.6819974', lng:'9.3738209' },
-        { id:uid(), heure:'12:30', type:'repas', titre:'Paillotte Capu Biancu', sousTitre:'Accès en bateau · ⭐ 4.4' }
-      ]}
-    ]
-  });
-  DATA.expenses.push(
-    { id:uid(), tripId, montant:1200, devise:'EUR', label:'Location maison', categorie:'logement', date:'2026-07-04', payeParId:pid.s, splitIds:[pid.s,pid.c,pid.d,pid.e] },
-    { id:uid(), tripId, montant:320, devise:'EUR', label:'Courses Super U', categorie:'courses', date:'2026-07-05', payeParId:pid.c, splitIds:[pid.s,pid.c,pid.d,pid.e] },
-    { id:uid(), tripId, montant:240, devise:'EUR', label:'Green fees golf', categorie:'activite', date:'2026-07-06', payeParId:pid.d, splitIds:[pid.s,pid.d] },
-    { id:uid(), tripId, montant:180, devise:'EUR', label:'Déjeuner Tamaricciu', categorie:'resto', date:'2026-07-06', payeParId:pid.e, splitIds:[pid.s,pid.c,pid.d,pid.e] }
-  );
-  save();
-}
-
-/* =====================================================================
-   INIT
-   ===================================================================== */
-seedIfEmpty();
-renderHome();
-
-// PWA service worker (actif uniquement si hébergé en https)
+/* PWA hors-ligne (si hébergé en https) */
 if ('serviceWorker' in navigator && location.protocol === 'https:'){
   navigator.serviceWorker.register('sw.js').catch(()=>{});
 }
-// fermer lightbox au bouton retour Android
-window.addEventListener('keydown', e=>{ if(e.key==='Escape'){ closeLightbox(); closeSheet(); } });
 </script>
 </body>
 </html>

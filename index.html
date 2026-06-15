@@ -381,7 +381,7 @@
           <button class="menu-item" onclick="openNumeros()"><span class="mi-ico">📞</span>Numéros utiles</button>
         </div>
       </div>
-      <button class="ci-cam-btn" onclick="window.open('https://www.icloud.com/sharedalbum/#B2NGI9HKKJF3QTY','_blank')" aria-label="Photos">📷</button>
+      <button class="ci-cam-btn" onclick="openPhotos()" aria-label="Photos">📷</button>
     </div>
     <div class="hero-title"><h1>Corse 2026</h1></div>
   </div>
@@ -825,6 +825,25 @@
   <div class="lb-img" id="lb-img"></div>
 </div>
 
+<!-- PHOTOS MODAL -->
+<div class="team-overlay" id="photos-overlay" onclick="if(event.target===this)closePhotos()">
+  <div class="team-sheet">
+    <div class="team-grip"></div>
+    <div class="team-head"><h2>📸 Photos Corse 2026</h2><p>Album partagé de la Team</p></div>
+    <a href="https://www.icloud.com/sharedalbum/#B2NGI9HKKJF3QTY" target="_blank" rel="noopener"
+       onclick="closePhotos()"
+       style="display:flex;align-items:center;justify-content:space-between;background:var(--caramel);color:#fff;border-radius:14px;padding:14px 18px;font-weight:700;font-size:.95rem;text-decoration:none;margin-bottom:12px;">
+      <span>📷 Voir &amp; ajouter des photos</span><span>→</span>
+    </a>
+    <div style="background:var(--bg2);border-radius:12px;padding:13px 15px;font-size:.82rem;color:var(--muted);line-height:1.55;">
+      <b style="color:var(--text)">Comment ajouter une photo ?</b><br>
+      1. Clique sur le bouton ci-dessus (ouvre Safari)<br>
+      2. Dans l'album, touche <b>＋</b> en haut à droite<br>
+      3. Sélectionne tes photos depuis ta galerie
+    </div>
+  </div>
+</div>
+
 <!-- NUMÉROS UTILES MODAL -->
 <div class="team-overlay" id="numeros-overlay" onclick="if(event.target===this)closeNumeros()">
   <div class="team-sheet">
@@ -871,6 +890,8 @@ function closeMenu(){const d=document.getElementById('menu-drop');if(d)d.classLi
 document.addEventListener('click',e=>{const w=e.target.closest('.hero-menu-wrap');if(!w)closeMenu();});
 function openTeam(){closeMenu();document.getElementById('team-overlay').classList.add('open');renderTeam();}
 function closeTeam(){document.getElementById('team-overlay').classList.remove('open');}
+function openPhotos(){document.getElementById('photos-overlay').classList.add('open');}
+function closePhotos(){document.getElementById('photos-overlay').classList.remove('open');}
 function openNumeros(){closeMenu();document.getElementById('numeros-overlay').classList.add('open');}
 function closeNumeros(){document.getElementById('numeros-overlay').classList.remove('open');}
 
@@ -1326,7 +1347,7 @@ async function deleteCurrent(){if(!_cur)return;if(!confirm('Supprimer cette phot
     closeLightbox();/* listener auto-updates grid */
   }else{await FileDB.del(_cur.id);PHOTOS=PHOTOS.filter(p=>p.id!==_cur.id);savePhotos();closeLightbox();renderPhotos();}
 }
-window.addEventListener('keydown',e=>{if(e.key==='Escape'){closeLightbox();closeTeam();closeNumeros();closeMenu();cropCancel();}});
+window.addEventListener('keydown',e=>{if(e.key==='Escape'){closeLightbox();closeTeam();closeNumeros();closePhotos();closeMenu();cropCancel();}});
 
 /* 🏠 GALERIE MAISON (intérieur / extérieur) */
 const MKEY='corse2026-maison';

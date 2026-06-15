@@ -155,11 +155,14 @@
   .home-links-row{display:flex;gap:8px;}
   .home-link-half{flex:1;font-size:.8rem;padding:9px 10px;justify-content:center;text-align:center;white-space:normal;line-height:1.3;}
   /* ===== PHRASES CULTES ===== */
-  .phrase-authors{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;padding:6px 12px 4px;}
-  .phrase-author-btn{display:flex;flex-direction:column;align-items:center;gap:5px;background:var(--card);border:1.5px solid var(--border);border-radius:16px;padding:10px 8px 8px;cursor:pointer;font-family:'Inter',sans-serif;font-size:.85rem;font-weight:600;color:var(--text);box-shadow:var(--shadow);}
-  .phrase-author-btn:active{transform:scale(.95);}
-  .phrase-author-av{width:clamp(50px,calc((100vh - 410px)/4),calc((100vw - 40px)/2));height:clamp(50px,calc((100vh - 410px)/4),calc((100vw - 40px)/2));border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:2rem;font-weight:700;color:#fff;flex-shrink:0;overflow:hidden;}
+  .phrase-authors{display:flex;overflow-x:auto;gap:10px;padding:10px 16px 8px;-webkit-overflow-scrolling:touch;scrollbar-width:none;}
+  .phrase-authors::-webkit-scrollbar{display:none;}
+  .phrase-author-btn{display:flex;flex-direction:column;align-items:center;gap:4px;min-width:54px;background:none;border:none;padding:2px 0;cursor:pointer;font-family:'Inter',sans-serif;font-size:.72rem;font-weight:600;color:var(--text);}
+  .phrase-author-btn:active{transform:scale(.88);}
+  .phrase-author-av{width:52px;height:52px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.2rem;font-weight:700;color:#fff;flex-shrink:0;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,.15);}
   .phrase-author-av img{width:100%;height:100%;object-fit:cover;}
+  .phrase-actions{display:flex;gap:5px;margin-top:8px;}
+  .phrase-action-btn{background:none;border:1px solid var(--border);border-radius:20px;padding:3px 9px;font-size:.7rem;color:var(--muted);cursor:pointer;font-family:'Inter',sans-serif;}
   .phrases-list{padding:0 16px;display:flex;flex-direction:column;gap:10px;margin:8px 0 30px;}
   .phrases-empty{text-align:center;padding:40px 20px;color:var(--muted);font-size:.9rem;line-height:1.6;}
   .phrase-card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:14px 15px 10px;box-shadow:var(--shadow);position:relative;}
@@ -515,7 +518,7 @@
 
 <!-- ========== PHRASES CULTES ========== -->
 <div class="page page-content" id="page-phrases">
-  <div class="page-hero" style="padding:12px 16px 8px"><h2>Phrases cultes</h2><p>Clique sur quelqu'un pour immortaliser sa bêtise 😂</p></div>
+  <div class="page-hero" style="padding:14px 16px 4px"><h2>Phrases cultes</h2><p>Clique sur un prénom pour immortaliser une bêtise 😂</p></div>
   <div class="phrase-authors" id="phrase-authors"></div>
   <div class="phrases-list" id="phrases-list">
     <div class="phrases-empty">Chargement…</div>
@@ -1748,7 +1751,7 @@ loadWorldCup();
 /* 😂 PHRASES CULTES */
 const PHRASE_DEV_KEY='corse2026-devid';
 function _phraseDevId(){let id=localStorage.getItem(PHRASE_DEV_KEY);if(!id){id=uid();localStorage.setItem(PHRASE_DEV_KEY,id);}return id;}
-let _phrasesFbUnsub=null,PHRASES=[],_phraseAuthor='';
+let _phrasesFbUnsub=null,PHRASES=[],_phraseAuthor='',_phraseEditId=null;
 async function initPhrases(){
   renderPhraseAuthors();
   if(typeof _initFbAsync==='function'){
@@ -1815,10 +1818,15 @@ function renderPhrases(){
           <button class="phrase-like${liked?' liked':''}" onclick="likePhrase('${p.id}')">😂${likes.length>0?' '+likes.length:''}</button>
         </div>
       </div>
+      <div class="phrase-actions">
+        <button class="phrase-action-btn" onclick="editPhrase('${p.id}')">✏️ Modifier</button>
+        <button class="phrase-action-btn" onclick="deletePhrase('${p.id}')">🗑️ Supprimer</button>
+      </div>
     </div>`;
   }).join('');
 }
 function openPhraseModal(author){
+  _phraseEditId=null;
   _phraseAuthor=author||'';
   document.getElementById('phrase-modal-title').textContent='🏆 '+_phraseAuthor+' a dit…';
   document.getElementById('phrase-text-input').value='';
@@ -1828,9 +1836,28 @@ function openPhraseModal(author){
   document.getElementById('phrase-modal').style.display='flex';
   setTimeout(()=>document.getElementById('phrase-text-input').focus(),150);
 }
+function editPhrase(id){
+  const p=PHRASES.find(x=>x.id===id);if(!p)return;
+  _phraseEditId=id;
+  _phraseAuthor=p.author||'';
+  document.getElementById('phrase-modal-title').textContent='✏️ '+_phraseAuthor+' a dit…';
+  document.getElementById('phrase-text-input').value=p.text||'';
+  document.getElementById('phrase-photo-input').value='';
+  document.getElementById('phrase-photo-name').textContent='';
+  const prev=document.getElementById('phrase-photo-preview');
+  if(p.imgUrl){prev.src=p.imgUrl;prev.style.display='block';}
+  else{prev.style.display='none';}
+  document.getElementById('phrase-modal').style.display='flex';
+  setTimeout(()=>document.getElementById('phrase-text-input').focus(),150);
+}
+async function deletePhrase(id){
+  if(!confirm('Supprimer cette phrase ?'))return;
+  if(_fbDb){try{await _fbDb.collection('phrases').doc(id).delete();}catch(e){alert('Erreur : '+e.message);}}
+  else{PHRASES=PHRASES.filter(x=>x.id!==id);renderPhrases();}
+}
 function closePhraseModal(){
   document.getElementById('phrase-modal').style.display='none';
-  _phraseAuthor='';
+  _phraseAuthor='';_phraseEditId=null;
 }
 function previewPhrasePhoto(input){
   const file=input.files[0];if(!file)return;
@@ -1842,8 +1869,10 @@ function previewPhrasePhoto(input){
 async function savePhrase(){
   const text=document.getElementById('phrase-text-input').value.trim();
   if(!text){document.getElementById('phrase-text-input').focus();return;}
-  const id=uid();
-  const p={id,text,author:_phraseAuthor,addedBy:'',ts:Date.now(),likes:[]};
+  const isEdit=!!_phraseEditId;
+  const id=isEdit?_phraseEditId:uid();
+  const existing=isEdit?PHRASES.find(x=>x.id===id):null;
+  const p=isEdit?{...existing,text}:{id,text,author:_phraseAuthor,addedBy:'',ts:Date.now(),likes:[]};
   const file=document.getElementById('phrase-photo-input').files[0];
   closePhraseModal();
   if(file&&_fbSt){
@@ -1854,7 +1883,11 @@ async function savePhrase(){
     }catch(e){console.warn('photo upload',e);}
   }
   if(_fbDb){try{await _fbDb.collection('phrases').doc(id).set(p);}catch(e){alert('Erreur : '+e.message);}}
-  else{PHRASES.unshift(p);renderPhrases();}
+  else{
+    if(isEdit){const i=PHRASES.findIndex(x=>x.id===id);if(i>=0)PHRASES[i]=p;}
+    else{PHRASES.unshift(p);}
+    renderPhrases();
+  }
 }
 async function likePhrase(id){
   const me=_phraseDevId();

@@ -193,7 +193,12 @@
   .wc-badge{font-size:.58rem;display:block;opacity:.65;margin-top:1px;}
   .wc-live{color:#5dff8a;}
   .wc-dot{color:#ff5555;display:block;font-size:.58rem;}
-  .wc-no-match{text-align:center;opacity:.65;font-size:.82rem;padding:6px 0;}
+  .wc-no-match{text-align:center;opacity:.7;font-size:.82rem;padding:4px 0;}
+  .wc-phase-big{text-align:center;font-size:1rem;font-weight:800;margin:4px 0;}
+  .wc-fallback-grid{margin-top:6px;display:flex;flex-direction:column;gap:3px;}
+  .wc-fb-row{display:flex;justify-content:space-between;font-size:.75rem;padding:3px 6px;border-radius:6px;opacity:.8;}
+  .wc-fb-hi{background:rgba(255,255,255,.15);opacity:1;font-weight:700;}
+  .wc-final-note{font-size:.68rem;opacity:.6;text-align:center;width:100%;padding-top:2px;}
   @keyframes wcblink{0%,100%{opacity:1}50%{opacity:.4}}
   .wc-dot{animation:wcblink 1.2s infinite;}
 
@@ -1452,47 +1457,56 @@ async function loadWeather(){
 loadWeather();
 
 /* ⚽ COUPE DU MONDE */
-const WC_END = new Date('2026-07-20');
-async function loadWorldCup(){
-  const el=document.getElementById('wc-widget');
-  if(!el) return;
-  if(new Date()>WC_END){el.style.display='none';return;}
-  await _fetchWCDay(el,new Date(),0);
-  setTimeout(loadWorldCup,3*60*1000);
+/* ⚽ COUPE DU MONDE */
+const WC_PHASES=[
+  {from:'2026-06-11',to:'2026-06-28',label:'Phase de groupes'},
+  {from:'2026-06-28',to:'2026-07-04',label:'8ème de finale'},
+  {from:'2026-07-04',to:'2026-07-09',label:'1/8 de finale'},
+  {from:'2026-07-09',to:'2026-07-13',label:'Quarts de finale'},
+  {from:'2026-07-13',to:'2026-07-17',label:'Demi-finales'},
+  {from:'2026-07-17',to:'2026-07-19',label:'Match pour la 3e place'},
+  {from:'2026-07-19',to:'2026-07-20',label:'⭐ FINALE'},
+];
+function _wcPhase(d){return WC_PHASES.find(p=>d>=new Date(p.from)&&d<new Date(p.to));}
+function _wcFallback(el){
+  const now=new Date();
+  const ph=_wcPhase(now);
+  const vacStart=new Date('2026-07-04');
+  let body='';
+  if(!ph){body='<div class="wc-no-match">Tournoi terminé 🏆</div>';}
+  else if(now<vacStart){
+    body=`<div class="wc-no-match">📡 ${ph.label} en cours</div>
+    <div class="wc-fallback-grid">
+      <div class="wc-fb-row"><span>4–8 juil.</span><span>1/8 de finale</span></div>
+      <div class="wc-fb-row wc-fb-hi"><span>10–12 juil.</span><span>⚡ Quarts</span></div>
+      <div class="wc-fb-row wc-fb-hi"><span>14–15 juil.</span><span>⭐ Demies</span></div>
+      <div class="wc-fb-row wc-fb-hi"><span>18 juil.</span><span>🥉 3e place</span></div>
+      <div class="wc-fb-row"><span class="wc-final-note">Finale 19 juil. — après Corse !</span></div>
+    </div>`;
+  }else{
+    body=`<div class="wc-phase-big">${ph.label}</div><div class="wc-no-match">Vous êtes en Corse 🏖️</div>`;
+  }
+  el.innerHTML=`<div class="wc-card"><div class="wc-title">⚽ Coupe du Monde 2026</div>${body}</div>`;
 }
-async function _fetchWCDay(el,date,depth){
-  if(depth>4){el.innerHTML='<div class="wc-card"><div class="wc-title">⚽ Coupe du Monde 2026</div><div class="wc-no-match">Pas de match prévu</div></div>';return;}
-  const ds=date.getFullYear()+String(date.getMonth()+1).padStart(2,'0')+String(date.getDate()).padStart(2,'0');
-  try{
-    const r=await fetch('https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard?dates='+ds);
-    const j=await r.json();
-    const evs=(j.events||[]).filter(e=>e.competitions?.length);
-    if(evs.length){_renderWC(el,evs,date);return;}
-    const nx=new Date(date);nx.setDate(nx.getDate()+1);
-    await _fetchWCDay(el,nx,depth+1);
-  }catch(e){el.innerHTML='<div class="wc-card"><div class="wc-title">⚽ Coupe du Monde 2026</div><div class="wc-no-match">Hors ligne</div></div>';}
-}
-function _renderWC(el,events,date){
+function _wcRender(el,events,date){
   const todayStr=new Date().toISOString().slice(0,10);
-  const evDate=date.toISOString().slice(0,10);
-  const isToday=evDate===todayStr;
+  const isToday=date.toISOString().slice(0,10)===todayStr;
   const c0=events[0].competitions[0];
-  const phase=c0.notes?.[0]?.headline||c0.notes?.[0]?.type||'';
-  const dayLabel=isToday?'Aujourd\'hui':date.toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long'});
+  const phase=c0.notes?.[0]?.headline||_wcPhase(date)?.label||'';
+  const dayLabel=isToday?null:date.toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long'});
   let h=`<div class="wc-card"><div class="wc-title">⚽ Coupe du Monde 2026</div>`;
   if(phase) h+=`<div class="wc-phase">${phase}</div>`;
-  if(!isToday) h+=`<div class="wc-day">Prochain · ${dayLabel}</div>`;
+  if(dayLabel) h+=`<div class="wc-day">Prochain · ${dayLabel}</div>`;
   for(const ev of events){
     const c=ev.competitions[0];
     const hm=c.competitors?.find(x=>x.homeAway==='home');
     const aw=c.competitors?.find(x=>x.homeAway==='away');
     const st=c.status?.type?.name||'';
-    const detail=c.status?.type?.shortDetail||'';
     let mid='';
     if(st==='STATUS_FINAL'){
-      mid=`<span class="wc-score">${hm?.score??'—'} - ${aw?.score??'—'}</span><span class="wc-badge">${detail}</span>`;
+      mid=`<span class="wc-score">${hm?.score??'—'}&nbsp;-&nbsp;${aw?.score??'—'}</span><span class="wc-badge">${c.status?.type?.shortDetail||'FT'}</span>`;
     }else if(st==='STATUS_IN_PROGRESS'){
-      mid=`<span class="wc-score wc-live">${hm?.score??'0'} - ${aw?.score??'0'}</span><span class="wc-dot">🔴 ${c.status?.displayClock||detail}</span>`;
+      mid=`<span class="wc-score wc-live">${hm?.score??'0'}&nbsp;-&nbsp;${aw?.score??'0'}</span><span class="wc-dot">🔴 ${c.status?.displayClock||''}</span>`;
     }else{
       const t=new Date(ev.date).toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit',timeZone:'Europe/Paris'});
       mid=`<span class="wc-time">${t}</span>`;
@@ -1502,13 +1516,39 @@ function _renderWC(el,events,date){
     const hN=hm?.team?.shortDisplayName||hm?.team?.abbreviation||hm?.team?.displayName||'?';
     const aN=aw?.team?.shortDisplayName||aw?.team?.abbreviation||aw?.team?.displayName||'?';
     h+=`<div class="wc-match">
-      <div class="wc-team">${hF?`<img class="wc-flag" src="${hF}" alt="">`:'<span style="font-size:.9rem">🏳</span>'}<span>${hN}</span></div>
+      <div class="wc-team">${hF?`<img class="wc-flag" src="${hF}" alt="">`:'🏳'} <span>${hN}</span></div>
       <div class="wc-mid">${mid}</div>
-      <div class="wc-team wc-team-r"><span>${aN}</span>${aF?`<img class="wc-flag" src="${aF}" alt="">`:'<span style="font-size:.9rem">🏳</span>'}</div>
+      <div class="wc-team wc-team-r"><span>${aN}</span> ${aF?`<img class="wc-flag" src="${aF}" alt="">`:'🏳'}</div>
     </div>`;
   }
-  h+=`</div>`;
-  el.innerHTML=h;
+  el.innerHTML=h+'</div>';
+}
+async function _wcTryDay(date){
+  const ds=date.getFullYear()+String(date.getMonth()+1).padStart(2,'0')+String(date.getDate()).padStart(2,'0');
+  const r=await fetch('https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard?dates='+ds,{signal:AbortSignal.timeout(5000)});
+  if(!r.ok) return null;
+  const j=await r.json();
+  return (j.events||[]).filter(e=>e.competitions?.length);
+}
+async function loadWorldCup(){
+  const el=document.getElementById('wc-widget');
+  if(!el) return;
+  const now=new Date();
+  if(now<new Date('2026-06-11')||now>=new Date('2026-07-20')){el.style.display='none';return;}
+  try{
+    let evs=await _wcTryDay(now);
+    if(evs&&evs.length){_wcRender(el,evs,now);}
+    else{
+      let found=false;
+      for(let i=1;i<=5&&!found;i++){
+        const nd=new Date(now);nd.setDate(nd.getDate()+i);
+        evs=await _wcTryDay(nd);
+        if(evs&&evs.length){_wcRender(el,evs,nd);found=true;}
+      }
+      if(!found)_wcFallback(el);
+    }
+  }catch(e){_wcFallback(el);}
+  setTimeout(loadWorldCup,3*60*1000);
 }
 loadWorldCup();
 

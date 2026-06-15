@@ -1595,10 +1595,13 @@ async function loadWorldCup(){
   if(!el) return;
   const now=new Date();
   if(now<new Date('2026-06-11')||now>=new Date('2026-07-20')){el.style.display='none';return;}
+  let hasLive=false;
   try{
     let evs=await _wcTryDay(now);
-    if(evs&&evs.length){_wcRender(el,evs,now);}
-    else{
+    if(evs&&evs.length){
+      hasLive=evs.some(ev=>{const s=ev.competitions?.[0]?.status?.type?.name||'';return s.includes('PROGRESS')||s==='STATUS_HALFTIME'||s==='STATUS_END_PERIOD';});
+      _wcRender(el,evs,now);
+    }else{
       let found=false;
       for(let i=1;i<=5&&!found;i++){
         const nd=new Date(now);nd.setDate(nd.getDate()+i);
@@ -1608,7 +1611,7 @@ async function loadWorldCup(){
       if(!found)_wcFallback(el);
     }
   }catch(e){_wcFallback(el);}
-  setTimeout(loadWorldCup,3*60*1000);
+  setTimeout(loadWorldCup,hasLive?60*1000:3*60*1000);
 }
 loadWorldCup();
 

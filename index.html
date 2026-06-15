@@ -155,11 +155,10 @@
   .home-links-row{display:flex;gap:8px;}
   .home-link-half{flex:1;font-size:.8rem;padding:9px 10px;justify-content:center;text-align:center;white-space:normal;line-height:1.3;}
   /* ===== PHRASES CULTES ===== */
-  .phrase-authors{display:flex;overflow-x:auto;gap:10px;padding:10px 16px 8px;-webkit-overflow-scrolling:touch;scrollbar-width:none;}
-  .phrase-authors::-webkit-scrollbar{display:none;}
-  .phrase-author-btn{display:flex;flex-direction:column;align-items:center;gap:4px;min-width:54px;background:none;border:none;padding:2px 0;cursor:pointer;font-family:'Inter',sans-serif;font-size:.72rem;font-weight:600;color:var(--text);}
+  .phrase-authors{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;padding:8px 16px 4px;}
+  .phrase-author-btn{display:flex;flex-direction:column;align-items:center;gap:4px;background:none;border:none;padding:2px 0;cursor:pointer;font-family:'Inter',sans-serif;font-size:.72rem;font-weight:600;color:var(--text);}
   .phrase-author-btn:active{transform:scale(.88);}
-  .phrase-author-av{width:52px;height:52px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.2rem;font-weight:700;color:#fff;flex-shrink:0;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,.15);}
+  .phrase-author-av{width:60px;height:60px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.3rem;font-weight:700;color:#fff;flex-shrink:0;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,.15);}
   .phrase-author-av img{width:100%;height:100%;object-fit:cover;}
   .phrase-actions{display:flex;gap:5px;margin-top:8px;}
   .phrase-action-btn{background:none;border:1px solid var(--border);border-radius:20px;padding:3px 9px;font-size:.7rem;color:var(--muted);cursor:pointer;font-family:'Inter',sans-serif;}

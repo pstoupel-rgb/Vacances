@@ -1075,6 +1075,7 @@ function paintTeam(){
     else{const f=await FileDB.get('team-'+m.id);if(f){src=URL.createObjectURL(f.blob);_teamUrls.push(src);}}
     if(src)ava.innerHTML='<img src="'+src+'" alt=""><span class="ava-cam">📷</span>';
   });
+  paintPhraseAuthors();
 }
 let _teamModalId='';
 function viewTeamPhoto(id){
@@ -1752,11 +1753,22 @@ async function initPhrases(){
   renderPhraseAuthors();
   if(typeof _initFbAsync==='function'){
     await _initFbAsync();
-    if(_fbDb&&!_phrasesFbUnsub){
-      _phrasesFbUnsub=_fbDb.collection('phrases').orderBy('ts','desc').onSnapshot(snap=>{
-        PHRASES=[];snap.forEach(d=>PHRASES.push(d.data()));renderPhrases();
-      },err=>console.warn('phrases',err));
-      return;
+    if(_fbDb){
+      /* Load team photos if the profil tab hasn't been visited yet */
+      if(!_teamFbUnsub){
+        _fbDb.collection('team').get().then(snap=>{
+          snap.forEach(d=>{const v=d.data();if(v&&v.url)TEAM_PHOTOS[d.id]=v.url;});
+          paintPhraseAuthors();
+        }).catch(()=>{});
+      } else {
+        paintPhraseAuthors();
+      }
+      if(!_phrasesFbUnsub){
+        _phrasesFbUnsub=_fbDb.collection('phrases').orderBy('ts','desc').onSnapshot(snap=>{
+          PHRASES=[];snap.forEach(d=>PHRASES.push(d.data()));renderPhrases();
+        },err=>console.warn('phrases',err));
+        return;
+      }
     }
   }
   renderPhrases();
@@ -1765,14 +1777,23 @@ function renderPhraseAuthors(){
   const el=document.getElementById('phrase-authors');if(!el)return;
   const adults=TEAM.filter(t=>t.g==='a');
   el.innerHTML=adults.map(t=>{
-    const url=TEAM_PHOTOS[t.id];
     const col=teamColor(t.id);
-    const av=url?`<img src="${url}" alt="">`:`<span>${t.name[0]}</span>`;
     return `<button class="phrase-author-btn" onclick="openPhraseModal('${t.name}')">
-      <div class="phrase-author-av" style="background:${col}">${av}</div>
+      <div class="phrase-author-av" id="phrase-av-${t.id}" style="background:${col}"><span>${t.name[0]}</span></div>
       <span>${t.name}</span>
     </button>`;
   }).join('');
+  paintPhraseAuthors();
+}
+function paintPhraseAuthors(){
+  TEAM.filter(t=>t.g==='a').forEach(async t=>{
+    const el=document.getElementById('phrase-av-'+t.id);if(!el)return;
+    const p=TEAM_PHOTOS[t.id];if(!p)return;
+    let src=null;
+    if(typeof p==='string'){src=p;}
+    else{try{const f=await FileDB.get('team-'+t.id);if(f){src=URL.createObjectURL(f.blob);_teamUrls.push(src);}}catch(e){}}
+    if(src)el.innerHTML=`<img src="${src}" alt="">`;
+  });
 }
 function renderPhrases(){
   const el=document.getElementById('phrases-list');if(!el)return;

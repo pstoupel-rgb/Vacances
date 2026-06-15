@@ -845,19 +845,12 @@
 </div>
 
 <!-- ========== MAISON (galerie) ========== -->
-<div class="page page-content" id="page-maison">
-  <div style="padding:6px 16px 0">
-    <div class="courses-days" id="maison-tabs">
-      <button class="cd-tab active" onclick="houseFilter('all',this)">Toutes</button>
-      <button class="cd-tab" onclick="houseFilter('int',this)">🛋️ Intérieur</button>
-      <button class="cd-tab" onclick="houseFilter('ext',this)">🌿 Extérieur</button>
-      <button class="cd-tab" onclick="houseFilter('piscine',this)">🏊 Piscine</button>
-    </div>
+<div class="page" id="page-maison" style="display:none;flex-direction:column;height:100vh;padding-top:env(safe-area-inset-top);">
+  <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 16px 6px;background:var(--bg);border-bottom:1px solid var(--border);flex-shrink:0;">
+    <span style="font-family:'Playfair Display',serif;font-weight:700;font-size:1rem;color:var(--brown)">📷 Photos de la Maison</span>
+    <a href="https://cupulatta.fr/photos" target="_blank" rel="noopener" style="font-size:.8rem;color:var(--brown);font-weight:600;text-decoration:none;">↗ Safari</a>
   </div>
-  <div class="section" style="padding-top:12px;position:relative">
-    <div class="photo-grid" id="maison-grid"></div>
-    <button class="maison-add-fab" onclick="addHousePhotos()" title="Ajouter des photos">＋</button>
-  </div>
+  <iframe src="https://cupulatta.fr/photos" style="flex:1;width:100%;border:none;display:block;" loading="lazy" allowfullscreen></iframe>
 </div>
 
 <!-- ========== PHOTOS ========== -->
@@ -1042,6 +1035,7 @@ function showPage(name,btn,filter){
   document.querySelectorAll('.page').forEach(p=>{p.classList.remove('active');p.style.display='';});
   const pg=document.getElementById('page-'+name);
   pg.classList.add('active');
+  if(name==='maison')pg.style.display='flex';
   if(btn){document.querySelectorAll('.app-nav-btn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');}
   if(name==='photos'){initPhotos();}
   if(name==='carte'){initMap();filterCarte(filter);}

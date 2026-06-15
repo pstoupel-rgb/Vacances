@@ -1560,10 +1560,12 @@ function _wcRender(el,events,date){
     const hm=c.competitors?.find(x=>x.homeAway==='home');
     const aw=c.competitors?.find(x=>x.homeAway==='away');
     const st=c.status?.type?.name||'';
+    const isDone=c.status?.type?.completed===true||st==='STATUS_FINAL'||st==='STATUS_FULL_TIME'||st.includes('FINAL');
+    const isLive=!isDone&&(st==='STATUS_IN_PROGRESS'||st==='STATUS_HALFTIME'||st==='STATUS_END_PERIOD'||st.includes('PROGRESS'));
     let mid='';
-    if(st==='STATUS_FINAL'){
+    if(isDone){
       mid=`<span class="wc-score">${hm?.score??'—'}&nbsp;-&nbsp;${aw?.score??'—'}</span><span class="wc-badge">${c.status?.type?.shortDetail||'FT'}</span>`;
-    }else if(st==='STATUS_IN_PROGRESS'){
+    }else if(isLive){
       mid=`<span class="wc-score wc-live">${hm?.score??'0'}&nbsp;-&nbsp;${aw?.score??'0'}</span><span class="wc-dot">🔴 ${c.status?.displayClock||''}</span>`;
     }else{
       const t=new Date(ev.date).toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit',timeZone:'Europe/Paris'});

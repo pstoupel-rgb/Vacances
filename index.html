@@ -53,8 +53,8 @@
   .app-nav{position:fixed;bottom:0;left:0;right:0;height:calc(56px + env(safe-area-inset-bottom));background:rgba(245,242,237,.82);-webkit-backdrop-filter:saturate(180%) blur(20px);backdrop-filter:saturate(180%) blur(20px);border-top:1px solid rgba(0,0,0,.08);display:flex;justify-content:space-around;align-items:flex-start;z-index:200;padding:7px 0 env(safe-area-inset-bottom);}
   .app-nav-btn{background:none;border:none;cursor:pointer;text-align:center;color:var(--muted);display:flex;flex-direction:column;align-items:center;gap:3px;transition:transform .15s,color .15s;}
   .app-nav-btn:active{transform:scale(.88);}
-  .app-nav-btn .nav-icon{font-size:1.3rem;line-height:1;}
-  .app-nav-btn .nav-label{font-size:.65rem;font-weight:600;}
+  .app-nav-btn .nav-icon{font-size:1.15rem;line-height:1;}
+  .app-nav-btn .nav-label{font-size:.58rem;font-weight:600;}
   .app-nav-btn.active{color:var(--brown);}
   .page-content{padding-bottom:calc(80px + env(safe-area-inset-bottom));}
   .page{display:none;}
@@ -390,6 +390,7 @@
   <button class="app-nav-btn active" id="nav-home" onclick="showPage('home',this)"><span class="nav-icon">🏠</span><span class="nav-label">Accueil</span></button>
   <button class="app-nav-btn" id="nav-planning" onclick="showPage('planning',this)"><span class="nav-icon">📅</span><span class="nav-label">Planning</span></button>
   <button class="app-nav-btn" id="nav-carte" onclick="showPage('carte',this)"><span class="nav-icon">📍</span><span class="nav-label">Carte</span></button>
+  <button class="app-nav-btn" id="nav-commerces" onclick="showPage('carte',this,'commerces')"><span class="nav-icon">🛒</span><span class="nav-label">Commerces</span></button>
   <button class="app-nav-btn" id="nav-profil" onclick="showPage('profil',this)"><span class="nav-icon">👤</span><span class="nav-label">Profil</span></button>
 </nav>
 
@@ -1069,7 +1070,7 @@ function showPage(name,btn,filter){
   window.scrollTo({top:0,behavior:'smooth'});
 }
 function filterCarte(f){
-  const map={maison:'section-maison',activites:'section-activites',restaurants:'section-restaurants'};
+  const map={maison:'section-maison',activites:'section-activites',restaurants:'section-restaurants',commerces:'section-commerces'};
   const ids=Object.values(map);
   ids.forEach(id=>{const e=document.getElementById(id);if(e)e.style.display=(!f||id===map[f])?'':'none';});
 }

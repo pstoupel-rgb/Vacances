@@ -328,11 +328,7 @@
   .btn-add:active{background:var(--border);}
   .btn-add:disabled{opacity:.5;cursor:not-allowed;}
   .photo-hint{font-size:.74rem;color:var(--muted);text-align:center;line-height:1.5;margin:12px 4px 14px;}
-  .maison-top-bar{display:flex;align-items:center;background:var(--bg);border-bottom:1px solid var(--border);flex-shrink:0;}
-  .maison-top-bar .courses-days{flex:1;}
-  .maison-safari-btn{flex-shrink:0;padding:8px 14px 6px 4px;font-size:1.1rem;color:var(--brown);text-decoration:none;font-weight:700;}
-  .maison-frame-wrap{margin:0;border-radius:0;overflow:hidden;background:var(--bg2);}
-  .maison-frame{width:100%;height:100%;border:none;display:block;}
+  .maison-add-fab{position:absolute;bottom:0;right:0;width:44px;height:44px;border-radius:50%;background:var(--brown);color:#fff;border:none;font-size:1.5rem;line-height:1;cursor:pointer;box-shadow:0 4px 14px rgba(0,0,0,.22);display:grid;place-items:center;}
   .photo-hint b{color:var(--brown);}
   .photo-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;}
   .photo-cell{position:relative;aspect-ratio:1;border-radius:12px;overflow:hidden;background:var(--bg2);cursor:pointer;}
@@ -834,18 +830,18 @@
 </div>
 
 <!-- ========== MAISON (galerie) ========== -->
-<div class="page" id="page-maison" style="display:none;flex-direction:column;height:100vh;padding-top:env(safe-area-inset-top);">
-  <div class="maison-top-bar">
-    <div class="courses-days" id="maison-tabs" style="padding:8px 12px 6px">
-      <button class="cd-tab active" onclick="mFilter('all',this)">Toutes</button>
-      <button class="cd-tab" onclick="mFilter('int',this)">🛋️ Intérieur</button>
-      <button class="cd-tab" onclick="mFilter('ext',this)">🌿 Extérieur</button>
-      <button class="cd-tab" onclick="mFilter('piscine',this)">🏊 Piscine</button>
+<div class="page page-content" id="page-maison">
+  <div style="padding:6px 16px 0">
+    <div class="courses-days" id="maison-tabs">
+      <button class="cd-tab active" onclick="houseFilter('all',this)">Toutes</button>
+      <button class="cd-tab" onclick="houseFilter('int',this)">🛋️ Intérieur</button>
+      <button class="cd-tab" onclick="houseFilter('ext',this)">🌿 Extérieur</button>
+      <button class="cd-tab" onclick="houseFilter('piscine',this)">🏊 Piscine</button>
     </div>
-    <a class="maison-safari-btn" id="maison-safari-link" href="https://cupulatta.fr/photos" target="_blank" rel="noopener">↗</a>
   </div>
-  <div class="maison-frame-wrap" style="flex:1;margin:0;border-radius:0;height:auto;">
-    <iframe id="maison-frame" class="maison-frame" src="https://cupulatta.fr/photos" loading="lazy" frameborder="0" allowfullscreen></iframe>
+  <div class="section" style="padding-top:12px;position:relative">
+    <div class="photo-grid" id="maison-grid"></div>
+    <button class="maison-add-fab" onclick="addHousePhotos()" title="Ajouter des photos">＋</button>
   </div>
 </div>
 
@@ -1031,12 +1027,12 @@ function showPage(name,btn,filter){
   document.querySelectorAll('.page').forEach(p=>{p.classList.remove('active');p.style.display='';});
   const pg=document.getElementById('page-'+name);
   pg.classList.add('active');
-  if(name==='maison')pg.style.display='flex';
   if(btn){document.querySelectorAll('.app-nav-btn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');}
   if(name==='photos'){initPhotos();}
   if(name==='carte'){initMap();filterCarte(filter);}
   if(name==='home'){renderProgram();}
   if(name==='profil'){renderFrais();}
+  if(name==='maison'){renderHouse();}
   if(name==='courses'){initCourses();}
   window.__page=name;
   const nb=document.getElementById('navbar');
@@ -1367,7 +1363,7 @@ const MKEY='corse2026-maison';
 let HOUSE_PHOTOS=[];try{HOUSE_PHOTOS=JSON.parse(localStorage.getItem(MKEY)||'[]');}catch(e){HOUSE_PHOTOS=[];}
 function saveHouse(){try{localStorage.setItem(MKEY,JSON.stringify(HOUSE_PHOTOS));}catch(e){alert('Stockage plein.');}}
 let HOUSE_FILTER='all',_hurls=[];
-function houseFilter(c,btn){HOUSE_FILTER=c;if(btn){document.querySelectorAll('#page-maison .week-btn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');}renderHouse();}
+function houseFilter(c,btn){HOUSE_FILTER=c;if(btn){document.querySelectorAll('#maison-tabs .cd-tab').forEach(b=>b.classList.remove('active'));btn.classList.add('active');}renderHouse();}
 const MAISON_URLS={all:'https://cupulatta.fr/photos',int:'https://cupulatta.fr/photos#interieur',ext:'https://cupulatta.fr/photos#exterieur',piscine:'https://cupulatta.fr/photos#piscine'};
 function mFilter(cat,btn){
   document.querySelectorAll('#maison-tabs .cd-tab').forEach(b=>b.classList.remove('active'));
@@ -1380,7 +1376,7 @@ function mFilter(cat,btn){
 }
 async function addHousePhotos(){
   let cat=HOUSE_FILTER;
-  if(cat==='all')cat=confirm('Ces photos sont-elles à l\'INTÉRIEUR ?\n\nOK = Intérieur · Annuler = Extérieur')?'int':'ext';
+  if(cat==='all'){const r=prompt('Catégorie ?\n1 = Intérieur\n2 = Extérieur\n3 = Piscine','1');cat=r==='2'?'ext':r==='3'?'piscine':'int';}
   const files=await pickFiles();if(!files.length)return;
   for(const f of files){const id=uid();const blob=await downscale(f,1800);await FileDB.put({id,blob});HOUSE_PHOTOS.unshift({id,cat,date:Date.now()});}
   saveHouse();renderHouse();

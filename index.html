@@ -163,6 +163,20 @@
   .courses-add button{background:var(--brown);color:#fff;border:none;border-radius:12px;padding:11px 16px;font-size:1.2rem;font-weight:700;cursor:pointer;}
   .ci-cam-btn{background:rgba(255,255,255,.55);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);border:none;color:#3a3a3a;font-size:1.2rem;cursor:pointer;width:38px;height:38px;border-radius:50%;display:grid;place-items:center;box-shadow:0 2px 8px rgba(0,0,0,.12);}
 
+  /* ===== MÉTÉO HOME ===== */
+  .hw-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);padding:14px 16px;display:flex;align-items:center;gap:14px;}
+  .hw-today{display:flex;align-items:center;gap:10px;flex:1;}
+  .hw-icon{font-size:2.4rem;line-height:1;}
+  .hw-info{flex:1;}
+  .hw-loc{font-size:.68rem;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.04em;}
+  .hw-temp{font-size:1.5rem;font-weight:800;color:var(--brown);line-height:1.1;}
+  .hw-desc{font-size:.75rem;color:var(--muted);margin-top:1px;}
+  .hw-next{display:flex;gap:8px;}
+  .hw-mini{text-align:center;background:var(--bg2);border-radius:10px;padding:6px 8px;min-width:46px;}
+  .hw-mini .wn{font-size:.6rem;font-weight:700;color:var(--muted);text-transform:uppercase;}
+  .hw-mini .wi{font-size:1rem;}
+  .hw-mini .wh{font-size:.78rem;font-weight:700;color:var(--text);}
+
   /* ===== MÉTÉO ===== */
   .weather-wrap{padding:16px 16px 0;}
   .weather-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:14px;box-shadow:var(--shadow);}
@@ -405,7 +419,11 @@
     </div>
   </div>
 
-  <div class="reco-section" style="padding-bottom:0">
+  <div class="reco-section" style="padding-bottom:4px;padding-top:0">
+    <div id="home-weather"></div>
+  </div>
+
+  <div class="reco-section" style="padding-bottom:0;padding-top:0">
     <div class="prog-head"><span class="reco-label">Programme du séjour</span><span class="prog-day">‹ glissez les jours ›</span></div>
   </div>
   <div class="prog-carousel" id="prog-carousel"></div>
@@ -1357,6 +1375,15 @@ async function loadWeather(){
       const dt=new Date(t+'T00:00:00');
       return '<div class="w-day'+(t===today?' today':'')+'"><div class="wn">'+(t===today?'Auj.':DN[dt.getDay()]+' '+dt.getDate())+'</div><div class="wi">'+wmoE(d.weathercode[i])+'</div><div class="wh">'+Math.round(d.temperature_2m_max[i])+'°</div><div class="wl">'+Math.round(d.temperature_2m_min[i])+'°</div><div class="wr">💧'+(d.precipitation_probability_max[i]||0)+'%</div></div>';
     }).join('');
+    const hw=document.getElementById('home-weather');
+    if(hw){
+      const ti=d.time.indexOf(today);
+      const i=ti>=0?ti:0;
+      const rain=d.precipitation_probability_max[i]||0;
+      const desc=rain>50?'Risque de pluie':''+Math.round(d.temperature_2m_min[i])+'° min · 💧'+rain+'%';
+      const next=d.time.slice(i+1,i+4).map((t,j)=>{const dt=new Date(t+'T00:00:00');return '<div class="hw-mini"><div class="wn">'+DN[dt.getDay()]+'</div><div class="wi">'+wmoE(d.weathercode[i+1+j])+'</div><div class="wh">'+Math.round(d.temperature_2m_max[i+1+j])+'°</div></div>';}).join('');
+      hw.innerHTML='<div class="hw-card"><div class="hw-today"><div class="hw-icon">'+wmoE(d.weathercode[i])+'</div><div class="hw-info"><div class="hw-loc">Porto-Vecchio · Aujourd\'hui</div><div class="hw-temp">'+Math.round(d.temperature_2m_max[i])+'°</div><div class="hw-desc">'+desc+'</div></div></div><div class="hw-next">'+next+'</div></div>';
+    }
   }catch(e){strip.innerHTML='<div class="weather-msg">🌐 Météo indisponible — vérifiez la connexion.</div>';}
 }
 loadWeather();

@@ -338,6 +338,9 @@
   .beach-waze{font-size:1.2rem;}
 
   /* ===== PHOTOS ===== */
+  .photo-how{background:var(--bg2);border-radius:14px;padding:12px 14px;margin-bottom:12px;display:flex;flex-direction:column;gap:8px;}
+  .photo-how-row{display:flex;align-items:center;gap:10px;font-size:.82rem;color:var(--muted);line-height:1.4;}
+  .photo-how-ic{font-size:1rem;width:24px;text-align:center;flex-shrink:0;color:var(--brown);font-weight:800;}
   .fb-ok{background:#e8f5e9;border:1.5px solid #4caf50;border-radius:var(--radius);padding:12px 14px;font-size:.82rem;color:#2a7d4f;display:flex;align-items:center;gap:6px;margin-bottom:14px;line-height:1.4;}
   .fb-ok b{font-weight:700;}
   .fb-cfg-btn{background:none;border:none;cursor:pointer;font-size:1rem;margin-left:auto;opacity:.7;padding:2px 4px;}
@@ -831,9 +834,14 @@
 
 <!-- ========== PHOTOS ========== -->
 <div class="page page-content" id="page-photos">
-  <div class="page-hero"><h2>📸 Souvenirs</h2><p>Photos de la Team Corse 2026</p></div>
+  <div class="page-hero"><h2>📸 Souvenirs</h2><p>Les photos de toute la Team · en temps réel</p></div>
   <div class="section" style="padding-top:0">
     <div id="fb-card"></div>
+    <div class="photo-how">
+      <div class="photo-how-row"><span class="photo-how-ic">＋</span><span>Tape <b>Ajouter</b> pour partager une photo depuis ta pellicule</span></div>
+      <div class="photo-how-row"><span class="photo-how-ic">👁</span><span>Tape une photo pour la voir en grand</span></div>
+      <div class="photo-how-row"><span class="photo-how-ic">⤓</span><span>Dans la visionneuse, télécharge-la dans ton iPhone</span></div>
+    </div>
     <button class="btn-add" id="btn-add-photo" onclick="addPhotos()">＋ Ajouter une photo</button>
     <div class="photo-grid" id="photo-grid"></div>
   </div>

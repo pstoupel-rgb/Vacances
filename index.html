@@ -148,25 +148,30 @@
   .home-links-row{display:flex;gap:8px;}
   .home-link-half{flex:1;}
   /* ===== PHRASES CULTES ===== */
-  .phrases-list{padding:0 16px;display:flex;flex-direction:column;gap:10px;margin:10px 0 90px;}
-  .phrases-empty{text-align:center;padding:50px 20px;color:var(--muted);font-size:.9rem;line-height:1.6;}
+  .phrase-authors{display:flex;flex-wrap:wrap;gap:8px;padding:12px 16px 4px;}
+  .phrase-author-btn{display:flex;align-items:center;gap:7px;background:var(--card);border:1.5px solid var(--border);border-radius:40px;padding:7px 14px 7px 8px;cursor:pointer;font-family:'Inter',sans-serif;font-size:.85rem;font-weight:600;color:var(--text);box-shadow:var(--shadow);}
+  .phrase-author-btn:active{transform:scale(.95);}
+  .phrase-author-av{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.75rem;font-weight:700;color:#fff;flex-shrink:0;overflow:hidden;}
+  .phrase-author-av img{width:100%;height:100%;object-fit:cover;}
+  .phrases-list{padding:0 16px;display:flex;flex-direction:column;gap:10px;margin:8px 0 30px;}
+  .phrases-empty{text-align:center;padding:40px 20px;color:var(--muted);font-size:.9rem;line-height:1.6;}
   .phrase-card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:14px 15px 10px;box-shadow:var(--shadow);position:relative;}
   .phrase-card::before{content:'"';font-size:3.5rem;line-height:.8;color:var(--brown);opacity:.12;position:absolute;top:8px;left:10px;font-family:Georgia,serif;}
   .phrase-text{font-size:.95rem;font-weight:600;color:var(--text);padding-left:4px;line-height:1.45;margin-bottom:8px;}
+  .phrase-card-img{width:100%;border-radius:10px;margin-bottom:8px;max-height:200px;object-fit:cover;display:block;}
   .phrase-meta{display:flex;justify-content:space-between;align-items:center;gap:8px;}
-  .phrase-author{font-size:.75rem;font-weight:700;color:var(--brown);}
+  .phrase-who{font-size:.75rem;font-weight:700;color:var(--brown);}
   .phrase-date{font-size:.62rem;color:var(--muted);}
-  .phrase-by{font-size:.6rem;color:var(--muted);margin-top:3px;}
+  .phrase-by{font-size:.6rem;color:var(--muted);margin-top:2px;}
   .phrase-like{background:none;border:1px solid var(--border);font-size:.78rem;cursor:pointer;padding:3px 8px;border-radius:20px;color:var(--muted);display:flex;align-items:center;gap:3px;line-height:1;}
   .phrase-like.liked{color:#d63;background:rgba(220,100,51,.1);border-color:rgba(220,100,51,.3);}
-  .phrases-fab{position:fixed;bottom:calc(68px + env(safe-area-inset-bottom) + 16px);right:18px;width:54px;height:54px;border-radius:50%;background:var(--brown);color:#fff;border:none;font-size:1.8rem;font-weight:300;cursor:pointer;box-shadow:0 4px 18px rgba(0,0,0,.28);display:flex;align-items:center;justify-content:center;z-index:100;line-height:1;}
   .phrase-modal{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:300;display:flex;align-items:flex-end;justify-content:center;}
   .phrase-sheet{background:var(--bg);width:100%;max-width:480px;border-radius:22px 22px 0 0;padding:18px 18px calc(20px + env(safe-area-inset-bottom));animation:sheetup .28s cubic-bezier(.2,.8,.2,1);}
-  .phrase-sheet h3{font-size:1rem;font-weight:700;margin:0 0 14px;text-align:center;}
+  .phrase-sheet h3{font-size:1rem;font-weight:700;margin:0 0 12px;text-align:center;}
   .phrase-sheet textarea{width:100%;border:1.5px solid var(--border);border-radius:12px;padding:11px 13px;font-family:'Inter',sans-serif;font-size:.92rem;color:var(--text);background:var(--card);resize:none;outline:none;box-sizing:border-box;-webkit-user-select:text;user-select:text;}
   .phrase-sheet textarea:focus{border-color:var(--caramel);}
-  .phrase-sheet input{width:100%;border:1.5px solid var(--border);border-radius:12px;padding:10px 13px;font-family:'Inter',sans-serif;font-size:.92rem;color:var(--text);background:var(--card);outline:none;box-sizing:border-box;margin-top:8px;-webkit-user-select:text;user-select:text;}
-  .phrase-sheet input:focus{border-color:var(--caramel);}
+  .phrase-photo-row{display:flex;align-items:center;gap:10px;margin-top:10px;}
+  .phrase-photo-btn{background:var(--bg2);border:1.5px solid var(--border);border-radius:10px;padding:8px 12px;font-size:.82rem;font-weight:600;color:var(--text);cursor:pointer;white-space:nowrap;}
   .phrase-btns{display:flex;gap:8px;margin-top:12px;}
   .phrase-btns button{flex:1;padding:12px;border-radius:12px;font-family:'Inter',sans-serif;font-weight:700;font-size:.9rem;border:none;cursor:pointer;}
   .phrase-btn-save{background:var(--brown);color:#fff;}
@@ -503,19 +508,24 @@
 
 <!-- ========== PHRASES CULTES ========== -->
 <div class="page page-content" id="page-phrases">
-  <div class="page-hero"><h2>Phrases cultes</h2><p>Les moments inoubliables de Corse 2026 😂</p></div>
+  <div class="page-hero"><h2>Phrases cultes</h2><p>Clique sur quelqu'un pour immortaliser sa bêtise 😂</p></div>
+  <div class="phrase-authors" id="phrase-authors"></div>
   <div class="phrases-list" id="phrases-list">
     <div class="phrases-empty">Chargement…</div>
   </div>
-  <button class="phrases-fab" onclick="openPhraseModal()" aria-label="Ajouter une phrase">＋</button>
 </div>
 
 <!-- Modal phrase -->
 <div id="phrase-modal" class="phrase-modal" style="display:none" onclick="if(event.target===this)closePhraseModal()">
   <div class="phrase-sheet">
-    <h3>🏆 Nouvelle phrase culte</h3>
+    <h3 id="phrase-modal-title">🏆 Phrase culte</h3>
     <textarea id="phrase-text-input" rows="3" placeholder="La phrase ou la bêtise…"></textarea>
-    <input id="phrase-author-input" type="text" placeholder="Qui l'a dit ? (prénom)">
+    <div class="phrase-photo-row">
+      <label class="phrase-photo-btn" for="phrase-photo-input">📷 Photo (optionnel)</label>
+      <input type="file" id="phrase-photo-input" accept="image/*" capture="environment" style="display:none" onchange="previewPhrasePhoto(this)">
+      <span id="phrase-photo-name" style="font-size:.75rem;color:var(--muted);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;"></span>
+    </div>
+    <img id="phrase-photo-preview" style="display:none;width:100%;border-radius:10px;margin-top:8px;max-height:160px;object-fit:cover;" alt="">
     <div class="phrase-btns">
       <button class="phrase-btn-cancel" onclick="closePhraseModal()">Annuler</button>
       <button class="phrase-btn-save" onclick="savePhrase()">Enregistrer 🎉</button>
@@ -1603,9 +1613,9 @@ loadWorldCup();
 /* 😂 PHRASES CULTES */
 const PHRASE_DEV_KEY='corse2026-devid';
 function _phraseDevId(){let id=localStorage.getItem(PHRASE_DEV_KEY);if(!id){id=uid();localStorage.setItem(PHRASE_DEV_KEY,id);}return id;}
-let _phrasesFbUnsub=null,PHRASES=[];
+let _phrasesFbUnsub=null,PHRASES=[],_phraseAuthor='';
 async function initPhrases(){
-  const el=document.getElementById('phrases-list');if(!el)return;
+  renderPhraseAuthors();
   if(typeof _initFbAsync==='function'){
     await _initFbAsync();
     if(_fbDb&&!_phrasesFbUnsub){
@@ -1616,6 +1626,19 @@ async function initPhrases(){
     }
   }
   renderPhrases();
+}
+function renderPhraseAuthors(){
+  const el=document.getElementById('phrase-authors');if(!el)return;
+  const adults=TEAM.filter(t=>t.g==='a');
+  el.innerHTML=adults.map(t=>{
+    const url=TEAM_PHOTOS[t.id];
+    const col=teamColor(t.id);
+    const av=url?`<img src="${url}" alt="">`:`<span>${t.name[0]}</span>`;
+    return `<button class="phrase-author-btn" onclick="openPhraseModal('${t.name}')">
+      <div class="phrase-author-av" style="background:${col}">${av}</div>
+      <span>${t.name}</span>
+    </button>`;
+  }).join('');
 }
 function renderPhrases(){
   const el=document.getElementById('phrases-list');if(!el)return;
@@ -1628,10 +1651,10 @@ function renderPhrases(){
     const d=new Date(p.ts);
     const dateStr=d.toLocaleDateString('fr-FR',{day:'numeric',month:'short'})+' · '+d.toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'});
     return `<div class="phrase-card">
+      ${p.imgUrl?`<img class="phrase-card-img" src="${escHtml(p.imgUrl)}" alt="" loading="lazy">`:''}
       <div class="phrase-text">${escHtml(p.text)}</div>
       <div class="phrase-meta">
-        <div><div class="phrase-author">— ${escHtml(p.author||'Anonyme')}</div>${p.addedBy&&p.addedBy!==p.author?`<div class="phrase-by">rapporté par ${escHtml(p.addedBy)}</div>`:''}
-        </div>
+        <div><div class="phrase-who">— ${escHtml(p.author||'?')}</div>${p.addedBy&&p.addedBy!==p.author?`<div class="phrase-by">ajouté par ${escHtml(p.addedBy)}</div>`:''}</div>
         <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px">
           <span class="phrase-date">${dateStr}</span>
           <button class="phrase-like${liked?' liked':''}" onclick="likePhrase('${p.id}')">😂${likes.length>0?' '+likes.length:''}</button>
@@ -1640,22 +1663,41 @@ function renderPhrases(){
     </div>`;
   }).join('');
 }
-function openPhraseModal(){
+function openPhraseModal(author){
+  _phraseAuthor=author||'';
+  document.getElementById('phrase-modal-title').textContent='🏆 '+_phraseAuthor+' a dit…';
+  document.getElementById('phrase-text-input').value='';
+  document.getElementById('phrase-photo-input').value='';
+  document.getElementById('phrase-photo-name').textContent='';
+  document.getElementById('phrase-photo-preview').style.display='none';
   document.getElementById('phrase-modal').style.display='flex';
-  setTimeout(()=>document.getElementById('phrase-text-input').focus(),100);
+  setTimeout(()=>document.getElementById('phrase-text-input').focus(),150);
 }
 function closePhraseModal(){
   document.getElementById('phrase-modal').style.display='none';
-  document.getElementById('phrase-text-input').value='';
-  document.getElementById('phrase-author-input').value='';
+  _phraseAuthor='';
+}
+function previewPhrasePhoto(input){
+  const file=input.files[0];if(!file)return;
+  document.getElementById('phrase-photo-name').textContent=file.name;
+  const reader=new FileReader();
+  reader.onload=e=>{const img=document.getElementById('phrase-photo-preview');img.src=e.target.result;img.style.display='block';};
+  reader.readAsDataURL(file);
 }
 async function savePhrase(){
   const text=document.getElementById('phrase-text-input').value.trim();
-  const author=document.getElementById('phrase-author-input').value.trim()||'Anonyme';
   if(!text){document.getElementById('phrase-text-input').focus();return;}
-  const addedBy=localStorage.getItem('corse2026-myname')||'';
-  const id=uid();const p={id,text,author,addedBy,ts:Date.now(),likes:[]};
+  const id=uid();
+  const p={id,text,author:_phraseAuthor,addedBy:'',ts:Date.now(),likes:[]};
+  const file=document.getElementById('phrase-photo-input').files[0];
   closePhraseModal();
+  if(file&&_fbSt){
+    try{
+      const ref=_fbSt.ref('phrases/'+id+'.jpg');
+      await ref.put(file,{contentType:file.type});
+      p.imgUrl=await ref.getDownloadURL();
+    }catch(e){console.warn('photo upload',e);}
+  }
   if(_fbDb){try{await _fbDb.collection('phrases').doc(id).set(p);}catch(e){alert('Erreur : '+e.message);}}
   else{PHRASES.unshift(p);renderPhrases();}
 }

@@ -145,6 +145,8 @@
   .reco-tile span{position:absolute;bottom:7px;left:9px;color:#fff;font-size:.74rem;font-weight:600;z-index:1;}
   .home-link{width:100%;background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:10px 14px;font-family:'Inter',sans-serif;font-weight:700;font-size:.9rem;color:var(--brown);text-align:left;box-shadow:var(--shadow);cursor:pointer;display:flex;justify-content:space-between;align-items:center;}
   .home-link:active{transform:scale(.98);}
+  .home-links-row{display:flex;gap:8px;}
+  .home-link-half{flex:1;}
   /* ===== PHRASES CULTES ===== */
   .phrases-list{padding:0 16px;display:flex;flex-direction:column;gap:10px;margin:10px 0 90px;}
   .phrases-empty{text-align:center;padding:50px 20px;color:var(--muted);font-size:.9rem;line-height:1.6;}
@@ -476,26 +478,25 @@
     <div id="wc-widget"><div class="wc-card"><div class="wc-title">⚽ Coupe du Monde 2026</div><div class="wc-no-match">Chargement…</div></div></div>
   </div>
 
+  <div class="reco-section" style="padding-bottom:6px;padding-top:8px">
+    <div class="home-links-row">
+      <button class="home-link home-link-half" onclick="showPage('courses',document.getElementById('nav-courses'))"><span>🛒 Courses</span><span>→</span></button>
+      <button class="home-link home-link-half" onclick="showPage('phrases',null)"><span>😂 Phrases</span><span>→</span></button>
+    </div>
+  </div>
+
   <div class="reco-section" style="padding-bottom:0;padding-top:0">
     <div class="prog-head"><span class="reco-label">Programme du séjour</span><span class="prog-day">‹ glissez les jours ›</span></div>
   </div>
   <div class="prog-carousel" id="prog-carousel"></div>
 
-  <div class="reco-section">
+  <div class="reco-section" style="padding-bottom:16px">
     <div class="reco-label">Nos recommandations</div>
     <div class="reco-grid">
       <div class="reco-tile" onclick="showPage('maison',document.getElementById('nav-maison'))"><img src="https://images.unsplash.com/photo-1568605114967-8130f3a36994?w=240&q=70" loading="lazy" alt=""><span>Maison</span></div>
       <div class="reco-tile" onclick="showPage('carte',document.getElementById('nav-carte'),'restaurants')"><img src="https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=240&q=70" loading="lazy" alt=""><span>Restaurants</span></div>
       <div class="reco-tile" onclick="showPage('carte',document.getElementById('nav-commerces'),'commerces')"><img src="https://images.unsplash.com/photo-1604719312566-8912e9227c6a?w=240&q=70" loading="lazy" alt=""><span>Commerces</span></div>
     </div>
-  </div>
-
-  <div class="reco-section">
-    <button class="home-link" onclick="showPage('courses',document.getElementById('nav-courses'))"><span>🛒 Liste de courses</span><span>→</span></button>
-  </div>
-
-  <div class="reco-section" style="padding-bottom:16px">
-    <button class="home-link" onclick="showPage('phrases',null)"><span>😂 Phrases cultes</span><span>→</span></button>
   </div>
 
 </div>

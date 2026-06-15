@@ -145,6 +145,30 @@
   .reco-tile span{position:absolute;bottom:7px;left:9px;color:#fff;font-size:.74rem;font-weight:600;z-index:1;}
   .home-link{width:100%;background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:10px 14px;font-family:'Inter',sans-serif;font-weight:700;font-size:.9rem;color:var(--brown);text-align:left;box-shadow:var(--shadow);cursor:pointer;display:flex;justify-content:space-between;align-items:center;}
   .home-link:active{transform:scale(.98);}
+  /* ===== PHRASES CULTES ===== */
+  .phrases-list{padding:0 16px;display:flex;flex-direction:column;gap:10px;margin:10px 0 90px;}
+  .phrases-empty{text-align:center;padding:50px 20px;color:var(--muted);font-size:.9rem;line-height:1.6;}
+  .phrase-card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:14px 15px 10px;box-shadow:var(--shadow);position:relative;}
+  .phrase-card::before{content:'"';font-size:3.5rem;line-height:.8;color:var(--brown);opacity:.12;position:absolute;top:8px;left:10px;font-family:Georgia,serif;}
+  .phrase-text{font-size:.95rem;font-weight:600;color:var(--text);padding-left:4px;line-height:1.45;margin-bottom:8px;}
+  .phrase-meta{display:flex;justify-content:space-between;align-items:center;gap:8px;}
+  .phrase-author{font-size:.75rem;font-weight:700;color:var(--brown);}
+  .phrase-date{font-size:.62rem;color:var(--muted);}
+  .phrase-by{font-size:.6rem;color:var(--muted);margin-top:3px;}
+  .phrase-like{background:none;border:1px solid var(--border);font-size:.78rem;cursor:pointer;padding:3px 8px;border-radius:20px;color:var(--muted);display:flex;align-items:center;gap:3px;line-height:1;}
+  .phrase-like.liked{color:#d63;background:rgba(220,100,51,.1);border-color:rgba(220,100,51,.3);}
+  .phrases-fab{position:fixed;bottom:calc(68px + env(safe-area-inset-bottom) + 16px);right:18px;width:54px;height:54px;border-radius:50%;background:var(--brown);color:#fff;border:none;font-size:1.8rem;font-weight:300;cursor:pointer;box-shadow:0 4px 18px rgba(0,0,0,.28);display:flex;align-items:center;justify-content:center;z-index:100;line-height:1;}
+  .phrase-modal{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:300;display:flex;align-items:flex-end;justify-content:center;}
+  .phrase-sheet{background:var(--bg);width:100%;max-width:480px;border-radius:22px 22px 0 0;padding:18px 18px calc(20px + env(safe-area-inset-bottom));animation:sheetup .28s cubic-bezier(.2,.8,.2,1);}
+  .phrase-sheet h3{font-size:1rem;font-weight:700;margin:0 0 14px;text-align:center;}
+  .phrase-sheet textarea{width:100%;border:1.5px solid var(--border);border-radius:12px;padding:11px 13px;font-family:'Inter',sans-serif;font-size:.92rem;color:var(--text);background:var(--card);resize:none;outline:none;box-sizing:border-box;-webkit-user-select:text;user-select:text;}
+  .phrase-sheet textarea:focus{border-color:var(--caramel);}
+  .phrase-sheet input{width:100%;border:1.5px solid var(--border);border-radius:12px;padding:10px 13px;font-family:'Inter',sans-serif;font-size:.92rem;color:var(--text);background:var(--card);outline:none;box-sizing:border-box;margin-top:8px;-webkit-user-select:text;user-select:text;}
+  .phrase-sheet input:focus{border-color:var(--caramel);}
+  .phrase-btns{display:flex;gap:8px;margin-top:12px;}
+  .phrase-btns button{flex:1;padding:12px;border-radius:12px;font-family:'Inter',sans-serif;font-weight:700;font-size:.9rem;border:none;cursor:pointer;}
+  .phrase-btn-save{background:var(--brown);color:#fff;}
+  .phrase-btn-cancel{background:var(--bg2);color:var(--muted);}
   /* ===== LISTE DE COURSES ===== */
   .courses-days{display:flex;gap:7px;overflow-x:auto;padding:0 16px 2px;scrollbar-width:none;-webkit-overflow-scrolling:touch;scroll-snap-type:x mandatory;}
   .courses-days::-webkit-scrollbar{display:none;}
@@ -470,6 +494,32 @@
     <button class="home-link" onclick="showPage('courses',document.getElementById('nav-courses'))"><span>🛒 Liste de courses</span><span>→</span></button>
   </div>
 
+  <div class="reco-section" style="padding-bottom:16px">
+    <button class="home-link" onclick="showPage('phrases',null)"><span>😂 Phrases cultes</span><span>→</span></button>
+  </div>
+
+</div>
+
+<!-- ========== PHRASES CULTES ========== -->
+<div class="page page-content" id="page-phrases">
+  <div class="page-hero"><h2>Phrases cultes</h2><p>Les moments inoubliables de Corse 2026 😂</p></div>
+  <div class="phrases-list" id="phrases-list">
+    <div class="phrases-empty">Chargement…</div>
+  </div>
+  <button class="phrases-fab" onclick="openPhraseModal()" aria-label="Ajouter une phrase">＋</button>
+</div>
+
+<!-- Modal phrase -->
+<div id="phrase-modal" class="phrase-modal" style="display:none" onclick="if(event.target===this)closePhraseModal()">
+  <div class="phrase-sheet">
+    <h3>🏆 Nouvelle phrase culte</h3>
+    <textarea id="phrase-text-input" rows="3" placeholder="La phrase ou la bêtise…"></textarea>
+    <input id="phrase-author-input" type="text" placeholder="Qui l'a dit ? (prénom)">
+    <div class="phrase-btns">
+      <button class="phrase-btn-cancel" onclick="closePhraseModal()">Annuler</button>
+      <button class="phrase-btn-save" onclick="savePhrase()">Enregistrer 🎉</button>
+    </div>
+  </div>
 </div>
 
 <!-- ========== LISTE DE COURSES ========== -->
@@ -1078,7 +1128,7 @@ function cropConfirm(){
 function cropCancel(){const c=_crop;_cropClose();if(c)c.resolve(null);}
 function _cropClose(){const ov=document.getElementById('crop-overlay');if(ov)ov.classList.remove('open');if(_crop&&_crop.url)URL.revokeObjectURL(_crop.url);_crop=null;}
 
-const NAV_TITLES={home:'Corse 2026',planning:'Planning',carte:'Carte',profil:'Profil',photos:'Souvenirs',maison:'La Maison',courses:'Liste de courses'};
+const NAV_TITLES={home:'Corse 2026',planning:'Planning',carte:'Carte',profil:'Profil',photos:'Souvenirs',maison:'La Maison',courses:'Liste de courses',phrases:'Phrases cultes'};
 function showPage(name,btn,filter){
   document.querySelectorAll('.page').forEach(p=>{p.classList.remove('active');p.style.display='';});
   const pg=document.getElementById('page-'+name);
@@ -1091,6 +1141,7 @@ function showPage(name,btn,filter){
   if(name==='profil'){renderFrais();}
   if(name==='maison'){renderHouse();}
   if(name==='courses'){initCourses();}
+  if(name==='phrases'){initPhrases();}
   window.__page=name;
   const nb=document.getElementById('navbar');
   if(nb){nb.classList.remove('show');document.getElementById('navbar-title').textContent=NAV_TITLES[name]||'Corse 2026';}
@@ -1547,6 +1598,74 @@ async function loadWorldCup(){
   setTimeout(loadWorldCup,3*60*1000);
 }
 loadWorldCup();
+
+/* 😂 PHRASES CULTES */
+const PHRASE_DEV_KEY='corse2026-devid';
+function _phraseDevId(){let id=localStorage.getItem(PHRASE_DEV_KEY);if(!id){id=uid();localStorage.setItem(PHRASE_DEV_KEY,id);}return id;}
+let _phrasesFbUnsub=null,PHRASES=[];
+async function initPhrases(){
+  const el=document.getElementById('phrases-list');if(!el)return;
+  if(typeof _initFbAsync==='function'){
+    await _initFbAsync();
+    if(_fbDb&&!_phrasesFbUnsub){
+      _phrasesFbUnsub=_fbDb.collection('phrases').orderBy('ts','desc').onSnapshot(snap=>{
+        PHRASES=[];snap.forEach(d=>PHRASES.push(d.data()));renderPhrases();
+      },err=>console.warn('phrases',err));
+      return;
+    }
+  }
+  renderPhrases();
+}
+function renderPhrases(){
+  const el=document.getElementById('phrases-list');if(!el)return;
+  const me=_phraseDevId();
+  if(!PHRASES.length){
+    el.innerHTML='<div class="phrases-empty">😂 Personne n\'a encore dit de bêtise…<br><br>Ça ne devrait pas tarder en Corse !</div>';return;
+  }
+  el.innerHTML=PHRASES.map(p=>{
+    const likes=p.likes||[];const liked=likes.includes(me);
+    const d=new Date(p.ts);
+    const dateStr=d.toLocaleDateString('fr-FR',{day:'numeric',month:'short'})+' · '+d.toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'});
+    return `<div class="phrase-card">
+      <div class="phrase-text">${escHtml(p.text)}</div>
+      <div class="phrase-meta">
+        <div><div class="phrase-author">— ${escHtml(p.author||'Anonyme')}</div>${p.addedBy&&p.addedBy!==p.author?`<div class="phrase-by">rapporté par ${escHtml(p.addedBy)}</div>`:''}
+        </div>
+        <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px">
+          <span class="phrase-date">${dateStr}</span>
+          <button class="phrase-like${liked?' liked':''}" onclick="likePhrase('${p.id}')">😂${likes.length>0?' '+likes.length:''}</button>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+function openPhraseModal(){
+  document.getElementById('phrase-modal').style.display='flex';
+  setTimeout(()=>document.getElementById('phrase-text-input').focus(),100);
+}
+function closePhraseModal(){
+  document.getElementById('phrase-modal').style.display='none';
+  document.getElementById('phrase-text-input').value='';
+  document.getElementById('phrase-author-input').value='';
+}
+async function savePhrase(){
+  const text=document.getElementById('phrase-text-input').value.trim();
+  const author=document.getElementById('phrase-author-input').value.trim()||'Anonyme';
+  if(!text){document.getElementById('phrase-text-input').focus();return;}
+  const addedBy=localStorage.getItem('corse2026-myname')||'';
+  const id=uid();const p={id,text,author,addedBy,ts:Date.now(),likes:[]};
+  closePhraseModal();
+  if(_fbDb){try{await _fbDb.collection('phrases').doc(id).set(p);}catch(e){alert('Erreur : '+e.message);}}
+  else{PHRASES.unshift(p);renderPhrases();}
+}
+async function likePhrase(id){
+  const me=_phraseDevId();
+  const p=PHRASES.find(x=>x.id===id);if(!p)return;
+  const likes=p.likes||[];
+  const newLikes=likes.includes(me)?likes.filter(x=>x!==me):[...likes,me];
+  if(_fbDb){try{await _fbDb.collection('phrases').doc(id).update({likes:newLikes});}catch(e){}}
+  else{p.likes=newLikes;renderPhrases();}
+}
 
 /* 💳 PARTAGE DES FRAIS */
 const RECUS=22486;

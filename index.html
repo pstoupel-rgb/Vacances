@@ -1560,16 +1560,28 @@ function _normEspn(ev){
 }
 /* Normalise un event Sofascore → format commun */
 function _normSS(ev){
-  const st=ev.status?.type||'';
-  const isDone=st==='finished'||(ev.status?.description||'').toLowerCase().includes('ended')||(ev.status?.description||'').toLowerCase().includes('after');
-  const isLive=!isDone&&(st==='inprogress'||st==='halftime'||st==='pause'||ev.status?.description==='1st half'||ev.status?.description==='2nd half');
-  const hS=isDone||isLive?(ev.homeScore?.current??'—'):'';
-  const aS=isDone||isLive?(ev.awayScore?.current??'—'):'';
-  const clock=ev.status?.description||'';
+  const s=ev.status||{};
+  /* status.type peut être une string OU un objet selon la version de l'API */
+  const stStr=typeof s.type==='string'?s.type:(s.type?.type||'');
+  const code=typeof s.code==='number'?s.code:(s.type?.id||0);
+  const desc=(s.description||s.type?.description||'').toLowerCase();
+  const isDone=stStr==='finished'||code===100||
+    desc==='ended'||desc==='ft'||desc.includes('full time')||
+    desc.includes('after extra')||desc.includes('after pen')||desc.includes('aet')||desc.includes('ap');
+  const isLive=!isDone&&(stStr==='inprogress'||stStr==='halftime'||stStr==='pause'||stStr==='interrupted'||
+    (code>0&&code<100)||
+    desc.includes('half')||desc.includes('extra time')||desc.includes('penalties'));
+  const started=(ev.startTimestamp||0)*1000<Date.now()-60000;
+  const hasScore=ev.homeScore?.current!==undefined&&ev.awayScore?.current!==undefined;
+  /* Heuristique : si match commencé avec score, on l'affiche toujours */
+  const effectiveDone=isDone||(started&&hasScore&&!isLive);
+  const effectiveLive=!effectiveDone&&(isLive||(started&&hasScore));
+  const hS=effectiveDone||effectiveLive?(ev.homeScore?.current??'—'):'';
+  const aS=effectiveDone||effectiveLive?(ev.awayScore?.current??'—'):'';
   return{hN:ev.homeTeam?.shortName||ev.homeTeam?.name||'?',aN:ev.awayTeam?.shortName||ev.awayTeam?.name||'?',
     hF:'',aF:'',hS,aS,
-    status:isDone?'done':isLive?'live':'soon',
-    time:new Date((ev.startTimestamp||0)*1000),clock,detail:'FT'};
+    status:effectiveDone?'done':effectiveLive?'live':'soon',
+    time:new Date((ev.startTimestamp||0)*1000),clock:s.description||'',detail:'FT'};
 }
 function _wcRender(el,matches,date){
   const todayStr=new Date().toISOString().slice(0,10);

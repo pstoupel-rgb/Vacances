@@ -1553,18 +1553,25 @@ function _wcRenderEspn(el,evs,date){
   let h=`<div class="wc-card"><div class="wc-title">⚽ Coupe du Monde 2026</div>`;
   if(phase) h+=`<div class="wc-phase">${phase}</div>`;
   if(dayLabel) h+=`<div class="wc-day">Prochain · ${dayLabel}</div>`;
+  const now=Date.now();
   for(const ev of evs){
     const c=ev.competitions[0];
     const hm=c.competitors?.find(x=>x.homeAway==='home');
     const aw=c.competitors?.find(x=>x.homeAway==='away');
     const st=c.status?.type?.name||'';
-    const isDone=st==='STATUS_FINAL'||st==='STATUS_FULL_TIME'||c.status?.type?.completed===true;
-    const isLive=!isDone&&(st==='STATUS_IN_PROGRESS'||st==='STATUS_HALFTIME'||st==='STATUS_END_PERIOD');
+    const matchStart=new Date(ev.date).getTime();
+    const minElapsed=(now-matchStart)/60000;
+    /* Time-based fallback: API status may lag — >110 min since kickoff → done, 0–110 → live */
+    const timeDone=minElapsed>110;
+    const timeLive=minElapsed>0&&minElapsed<=110;
+    const isDone=st==='STATUS_FINAL'||st==='STATUS_FULL_TIME'||c.status?.type?.completed===true||timeDone;
+    const isLive=!isDone&&(st==='STATUS_IN_PROGRESS'||st==='STATUS_HALFTIME'||st==='STATUS_END_PERIOD'||timeLive);
     let mid='';
     if(isDone){
-      mid=`<span class="wc-score">${hm?.score??'—'}&nbsp;-&nbsp;${aw?.score??'—'}</span><span class="wc-badge">${c.status?.type?.shortDetail||'FT'}</span>`;
+      const badge=c.status?.type?.shortDetail||'FT';
+      mid=`<span class="wc-score">${hm?.score??'—'}&nbsp;-&nbsp;${aw?.score??'—'}</span><span class="wc-badge">${badge}</span>`;
     }else if(isLive){
-      mid=`<span class="wc-score wc-live">${hm?.score??'0'}&nbsp;-&nbsp;${aw?.score??'0'}</span><span class="wc-dot">🔴 ${c.status?.displayClock||''}</span>`;
+      mid=`<span class="wc-score wc-live">${hm?.score??'0'}&nbsp;-&nbsp;${aw?.score??'0'}</span><span class="wc-dot">🔴 ${c.status?.displayClock||'⏱'}</span>`;
     }else{
       const t=new Date(ev.date).toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit',timeZone:'Europe/Paris'});
       mid=`<span class="wc-time">${t}</span>`;
@@ -1623,7 +1630,7 @@ function _wcRenderSS(el,evs,date){
 async function _wcFetchDay(date){
   const ds=date.getFullYear()+String(date.getMonth()+1).padStart(2,'0')+String(date.getDate()).padStart(2,'0');
   const iso=date.toISOString().slice(0,10);
-  /* 1. ESPN en priorité (logique originale) */
+  /* 1. ESPN fifa.world (primary) */
   try{
     const r=await fetch('https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard?dates='+ds,{signal:AbortSignal.timeout(5000)});
     if(r.ok){
@@ -1632,14 +1639,30 @@ async function _wcFetchDay(date){
       if(evs.length) return{src:'espn',evs};
     }
   }catch(e){}
-  /* 2. Sofascore en fallback */
+  /* 2. ESPN global soccer scoreboard — filter by WC name (catches slug changes) */
+  try{
+    const r=await fetch('https://site.api.espn.com/apis/site/v2/sports/soccer/scoreboard?dates='+ds+'&limit=100',{signal:AbortSignal.timeout(5000)});
+    if(r.ok){
+      const j=await r.json();
+      const evs=(j.events||[]).filter(e=>{
+        if(!e.competitions?.length) return false;
+        const ln=(e.league?.name||e.name||e.shortName||'').toLowerCase();
+        return ln.includes('world cup')||ln.includes('coupe du monde')||ln.includes('fifa world');
+      });
+      if(evs.length) return{src:'espn',evs};
+    }
+  }catch(e){}
+  /* 3. Sofascore fallback — relaxed filter, no hard ID */
   try{
     const r=await fetch('https://api.sofascore.app/api/v1/sport/football/scheduled-events/'+iso,{signal:AbortSignal.timeout(6000)});
     if(r.ok){
       const j=await r.json();
       const evs=(j.events||[]).filter(e=>{
         const tn=(e.tournament?.name||'').toLowerCase();
-        return tn.includes('world cup')||tn.includes('coupe du monde')||e.tournament?.uniqueTournament?.id===16;
+        const utn=(e.tournament?.uniqueTournament?.name||'').toLowerCase();
+        const cat=(e.tournament?.category?.name||'').toLowerCase();
+        return tn.includes('world cup')||tn.includes('coupe du monde')||tn.includes('fifa')||
+               utn.includes('world cup')||cat.includes('world');
       });
       if(evs.length) return{src:'ss',evs};
     }

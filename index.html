@@ -774,6 +774,30 @@
     </div>
   </div>
 
+  <div class="section" id="section-commerces">
+    <div class="section-hdr">🛒 Commerces · Lecci</div>
+    <div class="card">
+      <div class="card-icon icon-home">🥖</div>
+      <div class="card-body"><div class="card-name">Boulangerie</div><div class="card-meta">Lecci</div><div class="card-tags"><span class="tag green">~5 min</span></div></div>
+      <a class="waze-btn" href="https://waze.com/ul?ll=41.66690,9.30741&navigate=yes" target="_blank"><span class="waze-logo">🗺️</span><span>Waze</span></a>
+    </div>
+    <div class="card">
+      <div class="card-icon icon-home">🥩</div>
+      <div class="card-body"><div class="card-name">Boucherie</div><div class="card-meta">Lecci</div><div class="card-tags"><span class="tag green">~5 min</span></div></div>
+      <a class="waze-btn" href="https://waze.com/ul?ll=41.66686,9.30790&navigate=yes" target="_blank"><span class="waze-logo">🗺️</span><span>Waze</span></a>
+    </div>
+    <div class="card">
+      <div class="card-icon icon-home">🛒</div>
+      <div class="card-body"><div class="card-name">Spar</div><div class="card-meta">Lecci</div><div class="card-tags"><span class="tag green">~5 min</span></div></div>
+      <a class="waze-btn" href="https://waze.com/ul?ll=41.66705,9.30758&navigate=yes" target="_blank"><span class="waze-logo">🗺️</span><span>Waze</span></a>
+    </div>
+    <div class="card">
+      <div class="card-icon icon-home">💊</div>
+      <div class="card-body"><div class="card-name">Pharmacie</div><div class="card-meta">Lecci</div><div class="card-tags"><span class="tag green">~8 min</span></div></div>
+      <a class="waze-btn" href="https://waze.com/ul?ll=41.69821,9.34238&navigate=yes" target="_blank"><span class="waze-logo">🗺️</span><span>Waze</span></a>
+    </div>
+  </div>
+
 </div>
 
 <!-- ========== PROFIL ========== -->
@@ -1145,7 +1169,11 @@ const PLACES=[
   {n:'🍹 Bar Plage Santa Giulia',lat:41.5318654,lng:9.2744203},
   {n:"🤠 Ranch'O Plage",lat:41.6206819,lng:9.3326507},
   {n:'🏖️ Tamaricciu',lat:41.553447,lng:9.3181647},
-  {n:'⛵ La Voile Rouge',lat:41.8659172,lng:9.3986435}
+  {n:'⛵ La Voile Rouge',lat:41.8659172,lng:9.3986435},
+  {n:'🥖 Boulangerie — Lecci',lat:41.66690,lng:9.30741},
+  {n:'🥩 Boucherie — Lecci',lat:41.66686,lng:9.30790},
+  {n:'🛒 Spar — Lecci',lat:41.66705,lng:9.30758},
+  {n:'💊 Pharmacie',lat:41.69821,lng:9.34238}
 ];
 let _map=null,_mapInit=false;
 function loadCSS(href){return new Promise(r=>{const l=document.createElement('link');l.rel='stylesheet';l.href=href;l.onload=r;l.onerror=r;document.head.appendChild(l);});}

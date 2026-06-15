@@ -124,8 +124,7 @@
   .program{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:3px 14px;box-shadow:var(--shadow);}
   .prog-item{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:8px 0;border-bottom:1px solid var(--border);}
   .prog-item:last-child{border-bottom:none;}
-  .prog-beach{background:linear-gradient(90deg,rgba(19,168,158,.08) 0%,transparent 100%);border-radius:10px;padding:8px 8px;margin:0 -8px;}
-  .prog-waze{font-size:1.2rem;flex-shrink:0;text-decoration:none;margin-right:2px;}
+  .prog-link{color:var(--brown);text-decoration:underline;font-weight:700;}
   .prog-left{display:flex;align-items:center;gap:11px;min-width:0;}
   .prog-ic{font-size:1.3rem;width:32px;text-align:center;flex-shrink:0;}
   .prog-name{font-weight:600;font-size:.9rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
@@ -1119,9 +1118,8 @@ function renderProgram(){
   host.innerHTML=DAYS.map(day=>{
     const today=day.date===tk;
     const items=day.items.map(it=>{
-      const waze=it.waze?'<a class="prog-waze" href="https://waze.com/ul?ll='+it.waze+'&navigate=yes" target="_blank" rel="noopener">🗺️</a>':'';
-      const cls='prog-item'+(it.beach?' prog-beach':'');
-      return '<div class="'+cls+'"><div class="prog-left"><div class="prog-ic">'+it.ic+'</div><div><div class="prog-name">'+it.t+'</div><div class="prog-time">'+(it.time||'')+'</div></div></div>'+waze+'<img class="prog-thumb" src="'+it.img+'" loading="lazy" alt=""></div>';
+      const name=it.waze?'<a class="prog-name prog-link" href="https://waze.com/ul?ll='+it.waze+'&navigate=yes" target="_blank" rel="noopener">'+it.t+'</a>':'<div class="prog-name">'+it.t+'</div>';
+      return '<div class="prog-item"><div class="prog-left"><div class="prog-ic">'+it.ic+'</div><div>'+name+'<div class="prog-time">'+(it.time||'')+'</div></div></div><img class="prog-thumb" src="'+it.img+'" loading="lazy" alt=""></div>';
     }).join('');
     return '<div class="prog-slide"><div class="prog-slide-head"><span>'+day.short+' · '+day.name+'</span>'+(today?'<span class="ps-today">Aujourd\'hui</span>':'')+'</div><div class="program">'+items+'</div></div>';
   }).join('');

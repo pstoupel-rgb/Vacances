@@ -154,6 +154,17 @@
   .home-link:active{transform:scale(.98);}
   .home-links-row{display:flex;gap:8px;}
   .home-link-half{flex:1;font-size:.8rem;padding:9px 10px;justify-content:center;text-align:center;white-space:normal;line-height:1.3;}
+  /* Bouteilles */
+  .bottles-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:10px 12px;box-shadow:var(--shadow);}
+  .bottles-title{font-size:.6rem;font-weight:800;color:var(--muted);letter-spacing:.07em;text-transform:uppercase;margin-bottom:9px;text-align:center;}
+  .bottles-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:4px;}
+  .bottle-col{display:flex;flex-direction:column;align-items:center;gap:2px;}
+  .bottle-emoji{font-size:1.4rem;line-height:1;}
+  .bottle-label{font-size:.58rem;font-weight:700;color:var(--muted);text-align:center;}
+  .bottle-count{font-size:1.35rem;font-weight:800;color:var(--text);min-width:24px;text-align:center;line-height:1.2;}
+  .bottle-btns{display:flex;gap:5px;margin-top:2px;}
+  .bottle-btn{width:26px;height:26px;border-radius:50%;border:1px solid var(--border);background:var(--bg2);cursor:pointer;display:grid;place-items:center;font-size:.9rem;color:var(--text);font-family:inherit;font-weight:700;}
+  .bottle-btn:active{transform:scale(.88);background:var(--border);}
   /* ===== PHRASES CULTES ===== */
   .phrase-authors{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;padding:8px 16px 4px;}
   .phrase-author-btn{display:flex;flex-direction:column;align-items:center;gap:4px;background:none;border:none;padding:2px 0;cursor:pointer;font-family:'Inter',sans-serif;font-size:.72rem;font-weight:600;color:var(--text);}
@@ -501,6 +512,50 @@
     <div class="home-links-row">
       <button class="home-link home-link-half" onclick="showPage('courses',document.getElementById('nav-courses'))">🛒 Liste de courses</button>
       <button class="home-link home-link-half" onclick="showPage('phrases',null)">😂 Phrases cultes</button>
+    </div>
+  </div>
+
+  <div class="reco-section" style="padding-top:0;padding-bottom:6px">
+    <div class="bottles-card">
+      <div class="bottles-title">🍾 Bouteilles consommées</div>
+      <div class="bottles-grid">
+        <div class="bottle-col">
+          <span class="bottle-emoji">🍷</span>
+          <span class="bottle-label">Rouge</span>
+          <span class="bottle-count" id="bc-rouge">0</span>
+          <div class="bottle-btns">
+            <button class="bottle-btn" onclick="changeBottle('rouge',-1)">−</button>
+            <button class="bottle-btn" onclick="changeBottle('rouge',1)">+</button>
+          </div>
+        </div>
+        <div class="bottle-col">
+          <span class="bottle-emoji">🥂</span>
+          <span class="bottle-label">Blanc</span>
+          <span class="bottle-count" id="bc-blanc">0</span>
+          <div class="bottle-btns">
+            <button class="bottle-btn" onclick="changeBottle('blanc',-1)">−</button>
+            <button class="bottle-btn" onclick="changeBottle('blanc',1)">+</button>
+          </div>
+        </div>
+        <div class="bottle-col">
+          <span class="bottle-emoji">🌸</span>
+          <span class="bottle-label">Rosé</span>
+          <span class="bottle-count" id="bc-rose">0</span>
+          <div class="bottle-btns">
+            <button class="bottle-btn" onclick="changeBottle('rose',-1)">−</button>
+            <button class="bottle-btn" onclick="changeBottle('rose',1)">+</button>
+          </div>
+        </div>
+        <div class="bottle-col">
+          <span class="bottle-emoji">🍾</span>
+          <span class="bottle-label">Champ.</span>
+          <span class="bottle-count" id="bc-champagne">0</span>
+          <div class="bottle-btns">
+            <button class="bottle-btn" onclick="changeBottle('champagne',-1)">−</button>
+            <button class="bottle-btn" onclick="changeBottle('champagne',1)">+</button>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -1756,6 +1811,38 @@ async function loadWorldCup(){
   setTimeout(loadWorldCup,hasLive?60*1000:3*60*1000);
 }
 loadWorldCup();
+
+/* 🍾 BOUTEILLES */
+const BOTTLES={rouge:0,blanc:0,rose:0,champagne:0};
+let _bottlesFbUnsub=null;
+function renderBottles(){
+  ['rouge','blanc','rose','champagne'].forEach(k=>{
+    const el=document.getElementById('bc-'+k);
+    if(el)el.textContent=BOTTLES[k]||0;
+  });
+}
+async function changeBottle(key,delta){
+  BOTTLES[key]=Math.max(0,(BOTTLES[key]||0)+delta);
+  renderBottles();
+  if(typeof _fbDb!=='undefined'&&_fbDb){
+    try{await _fbDb.collection('stats').doc('bottles').set({[key]:BOTTLES[key]},{merge:true});}catch(e){}
+  }else{
+    try{localStorage.setItem('corse2026-bottles',JSON.stringify(BOTTLES));}catch(e){}
+  }
+}
+async function initBottles(){
+  try{const s=localStorage.getItem('corse2026-bottles');if(s)Object.assign(BOTTLES,JSON.parse(s));}catch(e){}
+  renderBottles();
+  if(typeof _initFbAsync==='function'){
+    await _initFbAsync();
+    if(_fbDb&&!_bottlesFbUnsub){
+      _bottlesFbUnsub=_fbDb.collection('stats').doc('bottles').onSnapshot(snap=>{
+        if(snap.exists){Object.assign(BOTTLES,snap.data());renderBottles();}
+      },()=>{});
+    }
+  }
+}
+initBottles();
 
 /* 😂 PHRASES CULTES */
 const PHRASE_DEV_KEY='corse2026-devid';

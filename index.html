@@ -314,6 +314,14 @@
   footer{text-align:center;padding:12px 16px;font-size:.78rem;color:var(--muted);}
   footer strong{color:var(--brown);}
 
+  /* ===== PLAGES ===== */
+  .beach-list{display:flex;flex-direction:column;gap:8px;}
+  .beach-chip{display:flex;align-items:center;background:var(--card);border-radius:14px;padding:13px 16px;box-shadow:var(--shadow);text-decoration:none;color:var(--text);border:1.5px solid var(--border);transition:background .15s;}
+  .beach-chip:active{background:var(--bg2);}
+  .beach-name{font-weight:700;font-size:.95rem;flex:1;}
+  .beach-dist{font-size:.8rem;color:var(--muted);margin-right:10px;}
+  .beach-waze{font-size:1.2rem;}
+
   /* ===== PHOTOS ===== */
   .fb-ok{background:#e8f5e9;border:1.5px solid #4caf50;border-radius:var(--radius);padding:12px 14px;font-size:.82rem;color:#2a7d4f;display:flex;align-items:center;gap:6px;margin-bottom:14px;line-height:1.4;}
   .fb-ok b{font-weight:700;}
@@ -407,6 +415,30 @@
       <div class="reco-tile" onclick="showPage('maison',document.getElementById('nav-maison'))"><img src="https://images.unsplash.com/photo-1568605114967-8130f3a36994?w=240&q=70" loading="lazy" alt=""><span>Maison</span></div>
       <div class="reco-tile" onclick="showPage('carte',document.getElementById('nav-carte'),'restaurants')"><img src="https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=240&q=70" loading="lazy" alt=""><span>Restaurants</span></div>
       <div class="reco-tile" onclick="showPage('carte',document.getElementById('nav-carte'),'activites')"><img src="https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?w=240&q=70" loading="lazy" alt=""><span>Activités</span></div>
+    </div>
+  </div>
+
+  <div class="reco-section">
+    <div class="reco-label">🏖️ Plages à proximité</div>
+    <div class="beach-list">
+      <a class="beach-chip" href="https://waze.com/ul?ll=41.6534,9.3585&navigate=yes" target="_blank" rel="noopener">
+        <span class="beach-name">Pinarello</span><span class="beach-dist">~15 min</span><span class="beach-waze">🗺️</span>
+      </a>
+      <a class="beach-chip" href="https://waze.com/ul?ll=41.6200909,9.3318116&navigate=yes" target="_blank" rel="noopener">
+        <span class="beach-name">Cala Rossa</span><span class="beach-dist">~20 min</span><span class="beach-waze">🗺️</span>
+      </a>
+      <a class="beach-chip" href="https://waze.com/ul?ll=41.5063,9.2577&navigate=yes" target="_blank" rel="noopener">
+        <span class="beach-name">Rondinara</span><span class="beach-dist">~25 min</span><span class="beach-waze">🗺️</span>
+      </a>
+      <a class="beach-chip" href="https://waze.com/ul?ll=41.553447,9.3181647&navigate=yes" target="_blank" rel="noopener">
+        <span class="beach-name">Palombaggia</span><span class="beach-dist">~35 min</span><span class="beach-waze">🗺️</span>
+      </a>
+      <a class="beach-chip" href="https://waze.com/ul?ll=41.5318654,9.2744203&navigate=yes" target="_blank" rel="noopener">
+        <span class="beach-name">Santa Giulia</span><span class="beach-dist">~40 min</span><span class="beach-waze">🗺️</span>
+      </a>
+      <a class="beach-chip" href="https://waze.com/ul?ll=41.4793,9.2427&navigate=yes" target="_blank" rel="noopener">
+        <span class="beach-name">Balistra</span><span class="beach-dist">~45 min</span><span class="beach-waze">🗺️</span>
+      </a>
     </div>
   </div>
 

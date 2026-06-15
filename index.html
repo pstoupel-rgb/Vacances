@@ -378,6 +378,7 @@
         <div class="menu-drop" id="menu-drop">
           <button class="menu-item" onclick="openTeam()"><span class="mi-ico">👥</span>LA TEAM</button>
           <button class="menu-item" onclick="closeMenu();showPage('profil',document.getElementById('nav-profil'))"><span class="mi-ico">💳</span>Partage des frais</button>
+          <button class="menu-item" onclick="openNumeros()"><span class="mi-ico">📞</span>Numéros utiles</button>
         </div>
       </div>
       <button class="ci-cam-btn" onclick="showPage('photos',null)" aria-label="Photos">📷</button>
@@ -747,7 +748,7 @@
 
 <!-- ========== PROFIL ========== -->
 <div class="page page-content" id="page-profil">
-  <div class="page-hero"><h2>Partage des frais</h2><p>Infos pratiques</p></div>
+  <div class="page-hero"><h2>Partage des frais</h2></div>
 
   <div class="section">
     <div class="section-hdr">💳 Partage des frais</div>
@@ -790,13 +791,6 @@
     </div>
   </div>
 
-  <div class="section">
-    <div class="section-hdr">📞 Numéros utiles</div>
-    <a class="card" href="tel:+33495738000" style="text-decoration:none">
-      <div class="card-icon icon-food">🏥</div>
-      <div class="card-body"><div class="card-name">Clinique de l'Ospedale</div><div class="card-meta">Porto-Vecchio · rue du Dr Jourdan</div><div class="card-meta" style="margin-top:2px;color:var(--brown);font-weight:600">📞 04 95 73 80 00</div></div>
-    </a>
-  </div>
 
   <div class="section">
     <div class="section-hdr">📸 Souvenirs</div>
@@ -837,6 +831,18 @@
   <div class="lb-img" id="lb-img"></div>
 </div>
 
+<!-- NUMÉROS UTILES MODAL -->
+<div class="team-overlay" id="numeros-overlay" onclick="if(event.target===this)closeNumeros()">
+  <div class="team-sheet">
+    <div class="team-grip"></div>
+    <div class="team-head"><h2>📞 Numéros utiles</h2></div>
+    <a class="card" href="tel:+33495738000" style="text-decoration:none">
+      <div class="card-icon icon-food">🏥</div>
+      <div class="card-body"><div class="card-name">Clinique de l'Ospedale</div><div class="card-meta">Porto-Vecchio · rue du Dr Jourdan</div><div class="card-meta" style="margin-top:2px;color:var(--brown);font-weight:600">📞 04 95 73 80 00</div></div>
+    </a>
+  </div>
+</div>
+
 <!-- TEAM MODAL -->
 <div class="team-overlay" id="team-overlay" onclick="if(event.target===this)closeTeam()">
   <div class="team-sheet">
@@ -871,6 +877,8 @@ function closeMenu(){const d=document.getElementById('menu-drop');if(d)d.classLi
 document.addEventListener('click',e=>{const w=e.target.closest('.hero-menu-wrap');if(!w)closeMenu();});
 function openTeam(){closeMenu();document.getElementById('team-overlay').classList.add('open');renderTeam();}
 function closeTeam(){document.getElementById('team-overlay').classList.remove('open');}
+function openNumeros(){closeMenu();document.getElementById('numeros-overlay').classList.add('open');}
+function closeNumeros(){document.getElementById('numeros-overlay').classList.remove('open');}
 
 /* ===== LA TEAM (roster + photos) ===== */
 const TEAM=[
@@ -1324,7 +1332,7 @@ async function deleteCurrent(){if(!_cur)return;if(!confirm('Supprimer cette phot
     closeLightbox();/* listener auto-updates grid */
   }else{await FileDB.del(_cur.id);PHOTOS=PHOTOS.filter(p=>p.id!==_cur.id);savePhotos();closeLightbox();renderPhotos();}
 }
-window.addEventListener('keydown',e=>{if(e.key==='Escape'){closeLightbox();closeTeam();closeMenu();cropCancel();}});
+window.addEventListener('keydown',e=>{if(e.key==='Escape'){closeLightbox();closeTeam();closeNumeros();closeMenu();cropCancel();}});
 
 /* 🏠 GALERIE MAISON (intérieur / extérieur) */
 const MKEY='corse2026-maison';

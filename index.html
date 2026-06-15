@@ -1151,8 +1151,7 @@ async function initCourses(){
 function renderCoursesBanner(){
   const el=document.getElementById('courses-banner');if(!el)return;
   if(coursesShared())el.innerHTML='<div class="fb-ok">🔥 <b>Liste partagée</b> — visible et modifiable par toute la Team en temps réel</div>';
-  else if(localStorage.getItem('fb-config'))el.innerHTML='<div class="fb-connecting">⏳ Connexion Firebase…</div>';
-  else el.innerHTML='<div class="fb-connecting">📵 Liste locale — configure Firebase (onglet 📷 Photos) pour la partager avec la Team</div>';
+  else el.innerHTML='<div class="fb-connecting">⏳ Connexion en cours...</div>';
 }
 function subscribeCourses(){
   if(!coursesShared())return;
@@ -1201,6 +1200,7 @@ async function delCourse(id){
 }
 
 /* ===== FIREBASE SYNC ===== */
+const FB_CONFIG={apiKey:"AIzaSyAL886rXzaeCatalbH39I1tnEisUvVi_bY",authDomain:"corse-2026.firebaseapp.com",projectId:"corse-2026",storageBucket:"corse-2026.firebasestorage.app",messagingSenderId:"512857354719",appId:"1:512857354719:web:c9a26c7f843bcd5c2f146a"};
 let _fbDb=null,_fbSt=null,_fbUnsub=null,_fbSdkLoaded=false;
 function _isFbReady(){return!!_fbDb;}
 function _loadFbSDK(){
@@ -1210,11 +1210,9 @@ function _loadFbSDK(){
 }
 async function _initFbAsync(){
   if(_fbDb)return true;
-  const raw=localStorage.getItem('fb-config');if(!raw)return false;
   try{
     await _loadFbSDK();
-    const cfg=JSON.parse(raw);
-    try{firebase.app();}catch(e){firebase.initializeApp(cfg);}
+    try{firebase.app();}catch(e){firebase.initializeApp(FB_CONFIG);}
     _fbDb=firebase.firestore();_fbSt=firebase.storage();
     return true;
   }catch(e){console.warn('Firebase init',e);return false;}
@@ -1222,26 +1220,10 @@ async function _initFbAsync(){
 function renderFbCard(){
   const el=document.getElementById('fb-card');if(!el)return;
   if(_isFbReady()){
-    el.innerHTML='<div class="fb-ok">🔥 <b>Galerie partagée</b> — toute la Team voit les mêmes photos en temps réel <button class="fb-cfg-btn" onclick="configureFb()" title="Configurer">⚙️</button></div>';
-  }else if(localStorage.getItem('fb-config')){
-    el.innerHTML='<div class="fb-connecting">⏳ Connexion Firebase en cours...</div>';
+    el.innerHTML='<div class="fb-ok">🔥 <b>Galerie partagée</b> — toute la Team voit les mêmes photos en temps réel</div>';
   }else{
-    el.innerHTML='<div class="fb-setup"><div class="fb-setup-icon">🔥</div><div class="fb-setup-title">Partage automatique avec la Team</div><div class="fb-setup-desc">Configure Firebase gratuitement pour que toute la Team voie les mêmes photos en temps réel — même depuis Corte ou Bonifacio !</div><button class="album-set" onclick="configureFb()">⚙️ Connecter Firebase</button></div>';
+    el.innerHTML='<div class="fb-connecting">⏳ Connexion en cours...</div>';
   }
-}
-async function configureFb(){
-  const ex=localStorage.getItem('fb-config')||'';
-  const v=prompt('Colle ici ton firebaseConfig JSON\n(Firebase Console → ⚙️ → Paramètres du projet → Config app web) :',ex);
-  if(v===null)return;
-  const m=v.match(/\{[\s\S]*\}/);
-  if(!m){alert('Format invalide — colle uniquement l\'objet JSON { apiKey:..., ... }');return;}
-  try{JSON.parse(m[0]);}catch(e){alert('JSON invalide — vérifie la syntaxe.');return;}
-  localStorage.setItem('fb-config',m[0]);
-  _fbDb=null;_fbSt=null;_fbSdkLoaded=false;
-  renderFbCard();
-  const ok=await _initFbAsync();
-  if(ok){await subscribePhotos();}else{alert('Connexion Firebase échouée.\nVérifie la config et active Firestore + Storage dans la console Firebase.');}
-  renderFbCard();
 }
 async function subscribePhotos(){
   if(!_isFbReady())return;
@@ -1260,7 +1242,7 @@ async function initPhotos(){
 /* ===== PHOTOS ===== */
 const PKEY='corse2026-photos';
 let PHOTOS=[];
-if(!localStorage.getItem('fb-config')){try{PHOTOS=JSON.parse(localStorage.getItem(PKEY)||'[]');}catch(e){PHOTOS=[];}}
+try{PHOTOS=JSON.parse(localStorage.getItem(PKEY)||'[]');}catch(e){PHOTOS=[];}
 function savePhotos(){try{localStorage.setItem(PKEY,JSON.stringify(PHOTOS));}catch(e){}}
 const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,7);
 const FileDB=(()=>{let p;

@@ -92,6 +92,13 @@
   .team-ava .ava-cam{position:absolute;bottom:-1px;right:-1px;width:24px;height:24px;border-radius:50%;background:var(--card);display:grid;place-items:center;font-size:.7rem;box-shadow:0 1px 4px rgba(0,0,0,.2);}
   .team-cell .tm-name{font-size:.85rem;font-weight:600;color:var(--text);text-align:center;}
   .team-hint{font-size:.74rem;color:var(--muted);text-align:center;margin-top:18px;line-height:1.4;}
+  /* Team photo modal */
+  .team-modal-overlay{position:fixed;inset:0;z-index:300;background:rgba(0,0,0,.88);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;padding:32px 24px;}
+  .team-modal-av{width:220px;height:220px;border-radius:50%;overflow:hidden;box-shadow:0 8px 40px rgba(0,0,0,.6);display:grid;place-items:center;font-size:4.5rem;font-weight:700;color:#fff;flex-shrink:0;}
+  .team-modal-av img{width:100%;height:100%;object-fit:cover;}
+  .team-modal-name{color:#fff;font-size:1.5rem;font-weight:800;}
+  .team-modal-change{background:rgba(255,255,255,.18);color:#fff;border:1.5px solid rgba(255,255,255,.4);border-radius:100px;padding:13px 32px;font-size:1rem;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;}
+  .team-modal-close{background:none;color:rgba(255,255,255,.55);border:none;font-size:.9rem;padding:6px;cursor:pointer;font-family:'Inter',sans-serif;}
   /* ===== CROPPER ===== */
   .crop-overlay{position:fixed;inset:0;z-index:700;background:rgba(8,6,4,.97);display:none;flex-direction:column;}
   .crop-overlay.open{display:flex;}
@@ -148,10 +155,10 @@
   .home-links-row{display:flex;gap:8px;}
   .home-link-half{flex:1;font-size:.8rem;padding:9px 10px;justify-content:center;text-align:center;white-space:normal;line-height:1.3;}
   /* ===== PHRASES CULTES ===== */
-  .phrase-authors{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;padding:12px 16px 8px;}
-  .phrase-author-btn{display:flex;flex-direction:column;align-items:center;gap:6px;background:var(--card);border:1.5px solid var(--border);border-radius:16px;padding:12px 6px 10px;cursor:pointer;font-family:'Inter',sans-serif;font-size:.82rem;font-weight:600;color:var(--text);box-shadow:var(--shadow);}
+  .phrase-authors{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;padding:8px 12px 6px;}
+  .phrase-author-btn{display:flex;flex-direction:column;align-items:center;gap:5px;background:var(--card);border:1.5px solid var(--border);border-radius:14px;padding:10px 4px 8px;cursor:pointer;font-family:'Inter',sans-serif;font-size:.72rem;font-weight:600;color:var(--text);box-shadow:var(--shadow);}
   .phrase-author-btn:active{transform:scale(.95);}
-  .phrase-author-av{width:80px;height:80px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.8rem;font-weight:700;color:#fff;flex-shrink:0;overflow:hidden;}
+  .phrase-author-av{width:60px;height:60px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.4rem;font-weight:700;color:#fff;flex-shrink:0;overflow:hidden;}
   .phrase-author-av img{width:100%;height:100%;object-fit:cover;}
   .phrases-list{padding:0 16px;display:flex;flex-direction:column;gap:10px;margin:8px 0 30px;}
   .phrases-empty{text-align:center;padding:40px 20px;color:var(--muted);font-size:.9rem;line-height:1.6;}
@@ -513,6 +520,14 @@
   <div class="phrases-list" id="phrases-list">
     <div class="phrases-empty">Chargement…</div>
   </div>
+</div>
+
+<!-- Modal team photo -->
+<div id="team-photo-modal" class="team-modal-overlay" style="display:none" onclick="if(event.target===this)closeTeamModal()">
+  <div id="team-modal-av" class="team-modal-av"></div>
+  <div id="team-modal-name" class="team-modal-name"></div>
+  <button class="team-modal-change" onclick="changeTeamPhotoFromModal()">📷 Changer la photo</button>
+  <button class="team-modal-close" onclick="closeTeamModal()">Fermer</button>
 </div>
 
 <!-- Modal phrase -->
@@ -994,7 +1009,7 @@
     <div class="team-grid" id="team-grid-adultes"></div>
     <div class="team-section-label" style="margin-top:18px">🧒 Les kids</div>
     <div class="team-grid" id="team-grid-kids"></div>
-    <p class="team-hint">Touche un visage pour ajouter ou changer sa photo 📸</p>
+    <p class="team-hint">Touche un visage pour le voir en grand 📸</p>
   </div>
 </div>
 
@@ -1049,7 +1064,7 @@ function paintTeam(){
   ['a','k'].forEach(g=>{
     const grid=document.getElementById(g==='a'?'team-grid-adultes':'team-grid-kids');if(!grid)return;
     grid.innerHTML=TEAM.filter(m=>m.g===g).map(m=>
-      '<div class="team-cell" onclick="setTeamPhoto(\''+m.id+'\')"><div class="team-ava" id="ava-'+m.id+'" style="background:'+teamColor(m.id)+'">'+m.name.charAt(0)+'<span class="ava-cam">📷</span></div><div class="tm-name">'+m.name+'</div></div>'
+      '<div class="team-cell" onclick="viewTeamPhoto(\''+m.id+'\')"><div class="team-ava" id="ava-'+m.id+'" style="background:'+teamColor(m.id)+'">'+m.name.charAt(0)+'<span class="ava-cam">📷</span></div><div class="tm-name">'+m.name+'</div></div>'
     ).join('');
   });
   TEAM.forEach(async m=>{
@@ -1060,6 +1075,32 @@ function paintTeam(){
     else{const f=await FileDB.get('team-'+m.id);if(f){src=URL.createObjectURL(f.blob);_teamUrls.push(src);}}
     if(src)ava.innerHTML='<img src="'+src+'" alt=""><span class="ava-cam">📷</span>';
   });
+}
+let _teamModalId='';
+function viewTeamPhoto(id){
+  _teamModalId=id;
+  const m=TEAM.find(t=>t.id===id);if(!m)return;
+  const av=document.getElementById('team-modal-av');
+  const avaEl=document.getElementById('ava-'+id);
+  const img=avaEl?.querySelector('img');
+  if(img){
+    av.style.background='none';
+    av.innerHTML=`<img src="${img.src}" alt="">`;
+  }else{
+    av.style.background=teamColor(id);
+    av.innerHTML=m.name[0];
+  }
+  document.getElementById('team-modal-name').textContent=m.name;
+  document.getElementById('team-photo-modal').style.display='flex';
+}
+function closeTeamModal(){
+  document.getElementById('team-photo-modal').style.display='none';
+  _teamModalId='';
+}
+async function changeTeamPhotoFromModal(){
+  const id=_teamModalId;
+  closeTeamModal();
+  await setTeamPhoto(id);
 }
 async function setTeamPhoto(id){
   const files=await pickFiles();if(!files.length)return;

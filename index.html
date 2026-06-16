@@ -1182,7 +1182,7 @@ async function changeTeamPhotoFromModal(){
 const ISA_VIDEO_ID='343196112743084';
 function playIsaVideo(){
   const wrap=document.getElementById('isa-video-wrap');
-  wrap.innerHTML='<iframe src="https://www.facebook.com/plugins/video.php?href=https%3A%2F%2Fwww.facebook.com%2Fwatch%2F%3Fv%3D'+ISA_VIDEO_ID+'&show_text=false&autoplay=1" width="100%" height="100%" style="border:none;display:block" allowfullscreen allow="autoplay;clipboard-write;encrypted-media;picture-in-picture"></iframe>';
+  wrap.innerHTML='<iframe src="https://www.facebook.com/plugins/video.php?href=https%3A%2F%2Fwww.facebook.com%2Fwatch%2F%3Fv%3D'+ISA_VIDEO_ID+'&show_text=false&autoplay=1&mute=0" width="100%" height="100%" style="border:none;display:block" frameborder="0" allowfullscreen allow="autoplay; fullscreen; clipboard-write; encrypted-media; picture-in-picture; web-share"></iframe>';
   const modal=document.getElementById('isa-video-modal');
   modal.style.display='flex';
 }

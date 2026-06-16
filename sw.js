@@ -1,11 +1,12 @@
 /* Service Worker — network-first pour HTML (toujours la dernière version),
    cache-first pour les assets statiques (offline OK). */
-const CACHE = 'corse-2026-v111';
+const CACHE = 'corse-2026-v112';
 const ASSETS = [
   './',
   './index.html',
   './manifest.webmanifest',
-  './icon.svg'
+  './icon-ldf.png',
+  './icon-ldf-180.png'
 ];
 
 self.addEventListener('install', e => {

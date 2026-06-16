@@ -584,6 +584,12 @@
   </div>
 </div>
 
+<!-- Modal vidéo Isa -->
+<div id="isa-video-modal" style="display:none;position:fixed;inset:0;z-index:1000;background:rgba(0,0,0,.95);align-items:center;justify-content:center;flex-direction:column;gap:16px;-webkit-transform:translateZ(0);transform:translateZ(0)" onclick="if(event.target===this)closeIsaVideo()">
+  <div id="isa-video-wrap" style="width:min(95vw,560px);aspect-ratio:16/9;border-radius:10px;overflow:hidden;background:#000"></div>
+  <button onclick="closeIsaVideo()" style="background:rgba(255,255,255,.15);color:#fff;border:1.5px solid rgba(255,255,255,.3);border-radius:100px;padding:10px 28px;font-size:.95rem;font-weight:700;font-family:inherit;cursor:pointer;">Fermer</button>
+</div>
+
 <!-- Phrase photo fullscreen -->
 <div id="phrase-img-overlay" class="phrase-img-overlay" onclick="this.style.display='none'">
   <img id="phrase-img-full" src="" alt="">
@@ -1130,9 +1136,12 @@ function paintTeam(){
   _teamUrls.forEach(u=>URL.revokeObjectURL(u));_teamUrls=[];
   ['a','k'].forEach(g=>{
     const grid=document.getElementById(g==='a'?'team-grid-adultes':'team-grid-kids');if(!grid)return;
-    grid.innerHTML=TEAM.filter(m=>m.g===g).map(m=>
-      '<div class="team-cell" onclick="viewTeamPhoto(\''+m.id+'\')"><div class="team-ava" id="ava-'+m.id+'" style="background:'+teamColor(m.id)+'">'+m.name.charAt(0)+'<span class="ava-cam">📷</span></div><div class="tm-name">'+m.name+'</div></div>'
-    ).join('');
+    grid.innerHTML=TEAM.filter(m=>m.g===g).map(m=>{
+      if(m.id==='isa'){
+        return '<div class="team-cell" onclick="playIsaVideo()"><div class="team-ava" id="ava-isa" style="background:'+teamColor('isa')+'">'+m.name.charAt(0)+'<span class="ava-cam">▶️</span></div><div class="tm-name">Isa</div></div>';
+      }
+      return '<div class="team-cell" onclick="viewTeamPhoto(\''+m.id+'\')"><div class="team-ava" id="ava-'+m.id+'" style="background:'+teamColor(m.id)+'">'+m.name.charAt(0)+'<span class="ava-cam">📷</span></div><div class="tm-name">'+m.name+'</div></div>';
+    }).join('');
   });
   TEAM.forEach(async m=>{
     const ava=document.getElementById('ava-'+m.id);if(!ava)return;
@@ -1140,7 +1149,7 @@ function paintTeam(){
     let src=null;
     if(typeof p==='string'){src=p;}
     else{const f=await FileDB.get('team-'+m.id);if(f){src=URL.createObjectURL(f.blob);_teamUrls.push(src);}}
-    if(src)ava.innerHTML='<img src="'+src+'" alt=""><span class="ava-cam">📷</span>';
+    if(src)ava.innerHTML='<img src="'+src+'" alt=""><span class="ava-cam">'+(m.id==='isa'?'▶️':'📷')+'</span>';
   });
   paintPhraseAuthors();
 }
@@ -1169,6 +1178,17 @@ async function changeTeamPhotoFromModal(){
   const id=_teamModalId;
   closeTeamModal();
   await setTeamPhoto(id);
+}
+const ISA_VIDEO_ID='343196112743084';
+function playIsaVideo(){
+  const wrap=document.getElementById('isa-video-wrap');
+  wrap.innerHTML='<iframe src="https://www.facebook.com/plugins/video.php?href=https%3A%2F%2Fwww.facebook.com%2Fwatch%2F%3Fv%3D'+ISA_VIDEO_ID+'&show_text=false&autoplay=1" width="100%" height="100%" style="border:none;display:block" allowfullscreen allow="autoplay;clipboard-write;encrypted-media;picture-in-picture"></iframe>';
+  const modal=document.getElementById('isa-video-modal');
+  modal.style.display='flex';
+}
+function closeIsaVideo(){
+  document.getElementById('isa-video-modal').style.display='none';
+  document.getElementById('isa-video-wrap').innerHTML='';
 }
 async function setTeamPhoto(id){
   const files=await pickFiles();if(!files.length)return;

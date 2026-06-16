@@ -515,7 +515,7 @@
     </div>
   </div>
 
-  <div class="reco-section" style="padding-top:0;padding-bottom:6px">
+  <div class="reco-section" id="bottles-section" style="padding-top:0;padding-bottom:6px">
     <div class="bottles-card">
       <div class="bottles-title">🍾 Bouteilles consommées</div>
       <div class="bottles-grid">
@@ -1831,6 +1831,13 @@ async function changeBottle(key,delta){
   }
 }
 async function initBottles(){
+  /* Visible uniquement pendant le séjour (4 juillet → 17 juillet inclus) */
+  const now=new Date();
+  const section=document.getElementById('bottles-section');
+  if(now<new Date('2026-07-04')||now>=new Date('2026-07-18')){
+    if(section)section.style.display='none';
+    return;
+  }
   try{const s=localStorage.getItem('corse2026-bottles');if(s)Object.assign(BOTTLES,JSON.parse(s));}catch(e){}
   renderBottles();
   if(typeof _initFbAsync==='function'){

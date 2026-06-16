@@ -494,7 +494,7 @@
     <div class="hero-title"><h1>Corse 2026</h1></div>
   </div>
 
-  <div class="countdown-card">
+  <div class="countdown-card" id="countdown-card">
     <div class="cd-label">Départ dans</div>
     <div class="cd-nums">
       <div class="cd-block"><strong id="cd-d">—</strong><span>jours</span></div>
@@ -504,18 +504,7 @@
     </div>
   </div>
 
-  <div class="reco-section" style="padding-top:10px;padding-bottom:4px">
-    <div id="wc-widget"><div class="wc-card"><div class="wc-title">⚽ Coupe du Monde 2026</div><div class="wc-no-match">Chargement…</div></div></div>
-  </div>
-
-  <div class="reco-section" style="padding-bottom:6px;padding-top:8px">
-    <div class="home-links-row">
-      <button class="home-link home-link-half" onclick="showPage('courses',document.getElementById('nav-courses'))">🛒 Liste de courses</button>
-      <button class="home-link home-link-half" onclick="showPage('phrases',null)">😂 Phrases cultes</button>
-    </div>
-  </div>
-
-  <div class="reco-section" id="bottles-section" style="padding-top:0;padding-bottom:6px">
+  <div id="bottles-section" style="margin:-36px 16px 0;position:relative;z-index:10;display:none">
     <div class="bottles-card">
       <div class="bottles-title">🍾 Bouteilles consommées</div>
       <div class="bottles-grid">
@@ -556,6 +545,17 @@
           </div>
         </div>
       </div>
+    </div>
+  </div>
+
+  <div class="reco-section" style="padding-top:10px;padding-bottom:4px">
+    <div id="wc-widget"><div class="wc-card"><div class="wc-title">⚽ Coupe du Monde 2026</div><div class="wc-no-match">Chargement…</div></div></div>
+  </div>
+
+  <div class="reco-section" style="padding-bottom:6px;padding-top:8px">
+    <div class="home-links-row">
+      <button class="home-link home-link-half" onclick="showPage('courses',document.getElementById('nav-courses'))">🛒 Liste de courses</button>
+      <button class="home-link home-link-half" onclick="showPage('phrases',null)">😂 Phrases cultes</button>
     </div>
   </div>
 
@@ -1831,10 +1831,16 @@ async function changeBottle(key,delta){
   }
 }
 async function initBottles(){
-  /* Visible uniquement pendant le séjour (4 juillet → 17 juillet inclus) */
   const now=new Date();
+  const vacStart=new Date('2026-07-04T11:00:00');
+  const vacEnd=new Date('2026-07-19T00:00:00'); /* jusqu'à la fin du 18 */
+  const countdown=document.getElementById('countdown-card');
   const section=document.getElementById('bottles-section');
-  if(now<new Date('2026-07-04')||now>=new Date('2026-07-18')){
+  if(now>=vacStart&&now<vacEnd){
+    /* Pendant le séjour : décompte → compteur */
+    if(countdown)countdown.style.display='none';
+    if(section)section.style.display='block';
+  }else{
     if(section)section.style.display='none';
     return;
   }

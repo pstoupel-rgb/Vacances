@@ -124,6 +124,7 @@
   #cd-s{color:var(--caramel);}
   @keyframes cdpulse{0%{transform:scale(1)}45%{transform:scale(1.18)}100%{transform:scale(1)}}
 
+  .resa-btn{display:inline-flex;align-items:center;gap:3px;background:#fff8ee;border:1px solid #d4a85a;color:#9a6e10;border-radius:20px;padding:2px 8px;font-size:.72rem;font-weight:700;cursor:pointer;font-family:inherit;margin-top:4px;}
   /* ===== PROGRAMME DU JOUR ===== */
   .reco-section{padding:8px 16px 0;}
   .reco-label{font-size:.82rem;font-weight:600;color:var(--text);}
@@ -589,6 +590,15 @@
   <button onclick="closeIsaVideo()" style="background:rgba(255,255,255,.15);color:#fff;border:1.5px solid rgba(255,255,255,.3);border-radius:100px;padding:10px 28px;font-size:.95rem;font-weight:700;font-family:inherit;cursor:pointer;">Fermer</button>
 </div>
 
+<!-- Modal réservation PDF -->
+<div id="resa-modal" style="display:none;position:fixed;inset:0;z-index:1000;background:rgba(0,0,0,.6);align-items:center;justify-content:center;-webkit-transform:translateZ(0);transform:translateZ(0)" onclick="if(event.target===this)closeResaModal()">
+  <div style="background:var(--card);border-radius:16px;padding:24px 20px;width:min(90vw,340px);display:flex;flex-direction:column;gap:14px">
+    <div style="font-weight:700;font-size:1rem;color:var(--text)">📄 Réservation Capu Biancu</div>
+    <div id="resa-modal-body" style="display:flex;flex-direction:column;gap:10px"></div>
+    <button onclick="closeResaModal()" style="background:var(--bg2);border:1px solid var(--border);color:var(--text);border-radius:100px;padding:8px 20px;font-size:.9rem;font-weight:600;cursor:pointer;font-family:inherit">Fermer</button>
+  </div>
+</div>
+
 <!-- Phrase photo fullscreen -->
 <div id="phrase-img-overlay" class="phrase-img-overlay" onclick="this.style.display='none'">
   <img id="phrase-img-full" src="" alt="">
@@ -742,7 +752,7 @@
       <div class="day-header"><div class="day-number">8</div><div class="day-info"><div class="day-name">Mercredi — Journée Bateau</div><div class="day-date">8 juillet 2026</div></div><div class="day-vibe">⛵</div></div>
       <div class="timeline">
         <div class="tl-item"><div class="tl-time">Matin</div><div class="tl-dot dot-boat">⚓</div><div class="tl-content"><div class="tl-title">Départ Port de Pinarellu</div><div class="tl-row"><span class="tag green">~10 min</span><a class="waze-inline" href="https://waze.com/ul?ll=41.6819974,9.3738209&navigate=yes" target="_blank">🗺️ Waze port</a></div></div></div>
-        <div class="tl-item"><div class="tl-time">12h30</div><div class="tl-dot dot-food">🍽️</div><div class="tl-content"><div class="tl-title">Déjeuner — Paillotte Capu Biancu</div><div class="tl-sub">Bonifacio · Accès bateau · ⭐ 4.4</div><div class="tl-row"><span class="tag">⛵ En bateau</span></div></div></div>
+        <div class="tl-item"><div class="tl-time">12h30</div><div class="tl-dot dot-food">🍽️</div><div class="tl-content"><div class="tl-title">Déjeuner — Paillotte Capu Biancu</div><div class="tl-sub">Bonifacio · Accès bateau · ⭐ 4.4</div><div class="tl-row"><span class="tag">⛵ En bateau</span></div><button class="resa-btn" onclick="openResa('capu-biancu')">📄 Résa</button></div></div>
         <div class="tl-item"><div class="tl-time">Soir</div><div class="tl-dot dot-home">🏠</div><div class="tl-content"><div class="tl-title">Maison ou Porto Vecchio ?</div></div></div>
       </div>
     </div>
@@ -812,7 +822,7 @@
       <div class="day-header"><div class="day-number">15</div><div class="day-info"><div class="day-name">Mercredi — Journée Bateau</div><div class="day-date">15 juillet 2026</div></div><div class="day-vibe">⛵</div></div>
       <div class="timeline">
         <div class="tl-item"><div class="tl-time">Matin</div><div class="tl-dot dot-boat">⚓</div><div class="tl-content"><div class="tl-title">Départ Port de Pinarellu</div><div class="tl-row"><span class="tag green">~10 min</span><a class="waze-inline" href="https://waze.com/ul?ll=41.6819974,9.3738209&navigate=yes" target="_blank">🗺️ Waze port</a></div></div></div>
-        <div class="tl-item"><div class="tl-time">12h30</div><div class="tl-dot dot-food">🍽️</div><div class="tl-content"><div class="tl-title">Déjeuner — Paillotte Capu Biancu</div><div class="tl-sub">Bonifacio · Accès bateau · ⭐ 4.4</div><div class="tl-row"><span class="tag">⛵ En bateau</span></div></div></div>
+        <div class="tl-item"><div class="tl-time">12h30</div><div class="tl-dot dot-food">🍽️</div><div class="tl-content"><div class="tl-title">Déjeuner — Paillotte Capu Biancu</div><div class="tl-sub">Bonifacio · Accès bateau · ⭐ 4.4</div><div class="tl-row"><span class="tag">⛵ En bateau</span></div><button class="resa-btn" onclick="openResa('capu-biancu')">📄 Résa</button></div></div>
         <div class="tl-item"><div class="tl-time">Soir</div><div class="tl-dot dot-home">🏠</div><div class="tl-content"><div class="tl-title">Maison</div></div></div>
       </div>
     </div>
@@ -1178,6 +1188,51 @@ async function changeTeamPhotoFromModal(){
   closeTeamModal();
   await setTeamPhoto(id);
 }
+/* ===== RÉSERVATIONS PDF ===== */
+async function openResa(key){
+  const modal=document.getElementById('resa-modal');
+  const body=document.getElementById('resa-modal-body');
+  body.innerHTML='<div style="color:var(--muted);font-size:.85rem">Chargement…</div>';
+  modal.style.display='flex';
+  let url=null;
+  try{const s=localStorage.getItem('corse2026-resa-'+key);if(s)url=s;}catch(e){}
+  if(!url&&typeof _fbDb!=='undefined'&&_fbDb){
+    try{const doc=await _fbDb.collection('reservations').doc(key).get();if(doc.exists&&doc.data().url)url=doc.data().url;}catch(e){}
+  }
+  if(url){
+    body.innerHTML='<a href="'+url+'" target="_blank" rel="noopener" style="display:flex;align-items:center;gap:8px;background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:12px 14px;color:var(--brown);font-weight:700;text-decoration:none;font-size:.95rem">📄 Voir la réservation</a>'
+      +'<button onclick="uploadResa(\''+key+'\')" style="background:none;border:none;color:var(--muted);font-size:.8rem;cursor:pointer;font-family:inherit;text-decoration:underline">Remplacer le PDF</button>';
+  }else{
+    body.innerHTML='<div style="color:var(--muted);font-size:.85rem;text-align:center">Aucune réservation attachée</div>'
+      +'<button onclick="uploadResa(\''+key+'\')" style="background:var(--brown);color:#fff;border:none;border-radius:100px;padding:10px 20px;font-size:.9rem;font-weight:700;cursor:pointer;font-family:inherit">📎 Attacher le PDF</button>';
+  }
+}
+async function uploadResa(key){
+  const input=document.createElement('input');
+  input.type='file';input.accept='application/pdf,image/*';
+  input.onchange=async(e)=>{
+    const file=e.target.files[0];if(!file)return;
+    const body=document.getElementById('resa-modal-body');
+    body.innerHTML='<div style="color:var(--muted);font-size:.85rem;text-align:center">Envoi en cours…</div>';
+    try{
+      if(typeof _fbSt!=='undefined'&&_fbSt){
+        const ext=file.name.split('.').pop();
+        const ref=_fbSt.ref('reservations/'+key+'.'+ext);
+        await ref.put(file,{contentType:file.type});
+        const url=await ref.getDownloadURL();
+        await _fbDb.collection('reservations').doc(key).set({url,name:file.name});
+        try{localStorage.setItem('corse2026-resa-'+key,url);}catch(ex){}
+      }else{
+        const url=URL.createObjectURL(file);
+        try{localStorage.setItem('corse2026-resa-'+key,url);}catch(ex){}
+      }
+    }catch(err){body.innerHTML='<div style="color:red;font-size:.85rem">Erreur : '+err.message+'</div>';return;}
+    openResa(key);
+  };
+  input.click();
+}
+function closeResaModal(){document.getElementById('resa-modal').style.display='none';}
+
 const ISA_VIDEO_ID='343196112743084';
 function playIsaVideo(){
   const wrap=document.getElementById('isa-video-wrap');
@@ -1342,14 +1397,14 @@ const DAYS=[
   {date:'2026-07-05',name:'Dimanche — Farniente',short:'Dim 5/07',items:[{ic:'🌅',t:'Premier réveil en Corse',time:'Matin',img:IMG.beach},{ic:'🍽️',t:'Déjeuner — Playarellu',time:'12h30',img:IMG.food,waze:'41.67656,9.37259'},{ic:'🏠',t:'Soirée maison',time:'Soir',img:IMG.home}]},
   {date:'2026-07-06',name:'Lundi — Golf',short:'Lun 6/07',items:[{ic:'⛳',t:'Golf de Spérone — 18 trous',time:'09h00',img:IMG.golf},{ic:'🍽️',t:'Déjeuner — Tamaricciu',time:'12h30',img:IMG.food,waze:'41.553447,9.3181647'},{ic:'🏠',t:'Soirée maison',time:'Soir',img:IMG.home}]},
   {date:'2026-07-07',name:'Mardi — Plage',short:'Mar 7/07',items:[{ic:'🌊',t:'Plage libre',time:'Matin',img:IMG.beach},{ic:'🍽️',t:'Déjeuner — Le Cabanon Bleu',time:'12h30',img:IMG.food,waze:'41.64124,9.35670'},{ic:'🏠',t:'Soirée maison',time:'Soir',img:IMG.home}]},
-  {date:'2026-07-08',name:'Mercredi — Bateau',short:'Mer 8/07',items:[{ic:'⚓',t:'Départ Port de Pinarellu',time:'Matin',img:IMG.boat,waze:'41.6572,9.3644'},{ic:'🍽️',t:'Déjeuner — Capu Biancu',time:'12h30',img:IMG.boat},{ic:'🏠',t:'Soirée',time:'Soir',img:IMG.home}]},
+  {date:'2026-07-08',name:'Mercredi — Bateau',short:'Mer 8/07',items:[{ic:'⚓',t:'Départ Port de Pinarellu',time:'Matin',img:IMG.boat,waze:'41.6572,9.3644'},{ic:'🍽️',t:'Déjeuner — Capu Biancu',time:'12h30',img:IMG.boat,resa:'capu-biancu'},{ic:'🏠',t:'Soirée',time:'Soir',img:IMG.home}]},
   {date:'2026-07-09',name:'Jeudi — Ski Nautique',short:'Jeu 9/07',items:[{ic:'🏄',t:'Ski Nautique',time:'11h00',img:IMG.water},{ic:'🍽️',t:'Déjeuner — Le Tiki',time:'12h30',img:IMG.food,waze:'41.63147,9.34571'},{ic:'🏠',t:'Soirée maison',time:'Soir',img:IMG.home}]},
   {date:'2026-07-10',name:'Vendredi — Canyoning',short:'Ven 10/07',items:[{ic:'🏔️',t:'Canyoning — Corsica Canyon',time:'08h45',img:IMG.canyon},{ic:'🍽️',t:'Déjeuner — La Voile Rouge',time:'12h30',img:IMG.food,waze:'41.8659172,9.3986435'},{ic:'🎉',t:'Arrivée Etienne',time:'18h20',img:IMG.sunset}]},
   {date:'2026-07-11',name:'Samedi — Départ Carniol',short:'Sam 11/07',items:[{ic:'✈️',t:'Départ Carniol — Figari',time:'Matin',img:IMG.plane},{ic:'🍽️',t:"Déjeuner — Ranch'O Plage",time:'12h30',img:IMG.food,waze:'41.6206819,9.3326507'},{ic:'🏠',t:'Soirée maison',time:'Soir',img:IMG.home}]},
   {date:'2026-07-12',name:'Dimanche — Arrivée Louise 🎉',short:'Dim 12/07',items:[{ic:'✈️',t:'Arrivée Louise — XK789 Figari',time:'11h55',img:IMG.plane},{ic:'🍽️',t:'Déjeuner — Playarellu',time:'12h30',img:IMG.food,waze:'41.67656,9.37259'},{ic:'🏠',t:'Soirée maison',time:'Soir',img:IMG.home}]},
   {date:'2026-07-13',name:'Lundi — Balade',short:'Lun 13/07',items:[{ic:'🥾',t:'Balade / activité libre',time:'Matin',img:IMG.beach},{ic:'🍽️',t:'Déjeuner — Le Cabanon Bleu',time:'12h30',img:IMG.food,waze:'41.64124,9.35670'},{ic:'🏛️',t:'Bonifacio (option)',time:'16h00',img:IMG.sunset,waze:'41.3872,9.1596'}]},
   {date:'2026-07-14',name:'Mardi — Fête Nationale',short:'Mar 14/07',items:[{ic:'🍽️',t:'Déjeuner — RENA / Bar Plage',time:'12h30',img:IMG.food,waze:'41.6200909,9.3318116'},{ic:'🎆',t:"Feux d'artifice",time:'Soir',img:IMG.sunset}]},
-  {date:'2026-07-15',name:'Mercredi — Bateau',short:'Mer 15/07',items:[{ic:'⚓',t:'Départ Port de Pinarellu',time:'Matin',img:IMG.boat,waze:'41.6572,9.3644'},{ic:'🍽️',t:'Déjeuner — Capu Biancu',time:'12h30',img:IMG.boat},{ic:'🏠',t:'Soirée',time:'Soir',img:IMG.home}]},
+  {date:'2026-07-15',name:'Mercredi — Bateau',short:'Mer 15/07',items:[{ic:'⚓',t:'Départ Port de Pinarellu',time:'Matin',img:IMG.boat,waze:'41.6572,9.3644'},{ic:'🍽️',t:'Déjeuner — Capu Biancu',time:'12h30',img:IMG.boat,resa:'capu-biancu'},{ic:'🏠',t:'Soirée',time:'Soir',img:IMG.home}]},
   {date:'2026-07-16',name:'Jeudi — Canyoning',short:'Jeu 16/07',items:[{ic:'🏔️',t:'Canyoning — Corsica Canyon',time:'08h45',img:IMG.canyon},{ic:'🍽️',t:'Déjeuner — La Voile Rouge',time:'12h30',img:IMG.food,waze:'41.8659172,9.3986435'},{ic:'🏠',t:'Soirée maison',time:'Soir',img:IMG.home}]},
   {date:'2026-07-17',name:'Vendredi — Ski Nautique',short:'Ven 17/07',items:[{ic:'🏄',t:'Ski Nautique',time:'11h00',img:IMG.water},{ic:'🍽️',t:'Déjeuner — Le Tiki',time:'12h30',img:IMG.food,waze:'41.63147,9.34571'},{ic:'🌅',t:'Dernier soir ensemble',time:'Soir',img:IMG.sunset}]},
   {date:'2026-07-18',name:'Samedi — Retour',short:'Sam 18/07',items:[{ic:'🏠',t:'Rangement, derniers cafés',time:'Matin',img:IMG.home},{ic:'✈️',t:'Vol Figari → Lille',time:'13h55',img:IMG.plane},{ic:'✈️',t:'Vol Figari → Charleroi',time:'15h05',img:IMG.plane}]}
@@ -1363,7 +1418,8 @@ function renderProgram(){
     const today=day.date===tk;
     const items=day.items.map(it=>{
       const name=it.waze?'<a class="prog-name prog-link" href="https://waze.com/ul?ll='+it.waze+'&navigate=yes" target="_blank" rel="noopener">'+it.t+'</a>':'<div class="prog-name">'+it.t+'</div>';
-      return '<div class="prog-item"><div class="prog-left"><div class="prog-ic">'+it.ic+'</div><div>'+name+'<div class="prog-time">'+(it.time||'')+'</div></div></div><img class="prog-thumb" src="'+it.img+'" loading="lazy" alt=""></div>';
+      const resa=it.resa?'<button class="resa-btn" onclick="openResa(\''+it.resa+'\')">📄 Résa</button>':'';
+      return '<div class="prog-item"><div class="prog-left"><div class="prog-ic">'+it.ic+'</div><div>'+name+'<div class="prog-time">'+(it.time||'')+'</div>'+resa+'</div></div><img class="prog-thumb" src="'+it.img+'" loading="lazy" alt=""></div>';
     }).join('');
     return '<div class="prog-slide"><div class="prog-slide-head"><span>'+day.short+' · '+day.name+'</span>'+(today?'<span class="ps-today">Aujourd\'hui</span>':'')+'</div><div class="program">'+items+'</div></div>';
   }).join('');

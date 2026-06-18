@@ -687,7 +687,7 @@
       <div class="timeline">
         <div class="tl-item"><div class="tl-time">11h20</div><div class="tl-dot dot-plane">✈️</div><div class="tl-content"><div class="tl-title">V72526 Volotea — départ Lille</div><div class="tl-row"><span class="tag yellow">V72526</span><span class="tag">Volotea</span><span class="tag green">2h05</span></div></div></div>
         <div class="tl-item"><div class="tl-time">13h25</div><div class="tl-dot dot-plane">🛬</div><div class="tl-content"><div class="tl-title">Atterrissage Figari</div></div></div>
-        <div class="tl-item"><div class="tl-time">13h30</div><div class="tl-dot dot-activity">🚗</div><div class="tl-content"><div class="tl-title">Sixt — location voiture</div><div class="tl-sub">⚠️ Longues files en juillet — prévoir ~40 min</div><div class="tl-row"><span class="tag orange">~40 min</span></div></div></div>
+        <div class="tl-item"><div class="tl-time">13h30</div><div class="tl-dot dot-activity">🚗</div><div class="tl-content"><div class="tl-title">Sixt — location voiture</div><div class="tl-sub">⚠️ Longues files en juillet — prévoir ~40 min</div><div class="tl-row"><span class="tag orange">~40 min</span></div><button class="resa-btn" onclick="openResa('sixt-stoupel','Sixt — Stoupel')">📄 Résa</button></div></div>
         <div class="tl-item"><div class="tl-time">~14h15</div><div class="tl-dot dot-home">🏠</div><div class="tl-content"><div class="tl-title">Route vers la maison · ~45 min</div><div class="tl-row"><span class="tag orange">Arrivée ~15h00</span><a class="waze-inline" href="https://waze.com/ul?ll=41.6532357,9.3511&navigate=yes" target="_blank">🗺️ Waze maison</a></div></div></div>
       </div>
     </div>
@@ -701,7 +701,7 @@
       <div class="timeline">
         <div class="tl-item"><div class="tl-time">14h40</div><div class="tl-dot dot-plane">✈️</div><div class="tl-content"><div class="tl-title">FR4566 Ryanair — départ Charleroi</div><div class="tl-row"><span class="tag yellow">FR4566</span><span class="tag">Ryanair</span><span class="tag green">2h05</span></div></div></div>
         <div class="tl-item"><div class="tl-time">16h45</div><div class="tl-dot dot-plane">🛬</div><div class="tl-content"><div class="tl-title">Atterrissage Figari</div></div></div>
-        <div class="tl-item"><div class="tl-time">16h50</div><div class="tl-dot dot-activity">🚗</div><div class="tl-content"><div class="tl-title">Sixt — location voiture</div><div class="tl-sub">⚠️ Prévoir ~40 min de file</div><div class="tl-row"><span class="tag orange">~40 min</span></div></div></div>
+        <div class="tl-item"><div class="tl-time">16h50</div><div class="tl-dot dot-activity">🚗</div><div class="tl-content"><div class="tl-title">Sixt — location voiture</div><div class="tl-sub">⚠️ Prévoir ~40 min de file</div><div class="tl-row"><span class="tag orange">~40 min</span></div><button class="resa-btn" onclick="openResa('sixt-carniol','Sixt — Carniol')">📄 Résa</button></div></div>
         <div class="tl-item"><div class="tl-time">~17h35</div><div class="tl-dot dot-home">🏠</div><div class="tl-content"><div class="tl-title">Route vers la maison · ~45 min</div><div class="tl-row"><span class="tag orange">Arrivée ~18h20</span><a class="waze-inline" href="https://waze.com/ul?ll=41.6532357,9.3511&navigate=yes" target="_blank">🗺️ Waze maison</a></div></div></div>
       </div>
     </div>
@@ -1395,7 +1395,7 @@ const IMG={
   water:'https://images.unsplash.com/photo-1530870110042-98b2cb110834?w=160&h=130&fit=crop&q=70'
 };
 const DAYS=[
-  {date:'2026-07-04',name:'Arrivée — 3 familles',short:'Sam 4/07',items:[{ic:'✈️',t:'Vol Lille → Figari',time:'11h20',img:IMG.plane},{ic:'🚗',t:'Location voiture (Sixt)',time:'13h30',img:IMG.car},{ic:'🥂',t:'Apéro de bienvenue',time:'18h30',img:IMG.sunset}]},
+  {date:'2026-07-04',name:'Arrivée — 3 familles',short:'Sam 4/07',items:[{ic:'✈️',t:'Vol Lille → Figari',time:'11h20',img:IMG.plane},{ic:'🚗',t:'Sixt — Stoupel',time:'13h30',img:IMG.car,resa:'sixt-stoupel',resaLabel:'Sixt — Stoupel'},{ic:'🚗',t:'Sixt — Carniol',time:'16h50',img:IMG.car,resa:'sixt-carniol',resaLabel:'Sixt — Carniol'},{ic:'🥂',t:'Apéro de bienvenue',time:'18h30',img:IMG.sunset}]},
   {date:'2026-07-05',name:'Dimanche — Farniente',short:'Dim 5/07',items:[{ic:'🌅',t:'Premier réveil en Corse',time:'Matin',img:IMG.beach},{ic:'🍽️',t:'Déjeuner — Playarellu',time:'12h30',img:IMG.food,waze:'41.67656,9.37259'},{ic:'🏠',t:'Soirée maison',time:'Soir',img:IMG.home}]},
   {date:'2026-07-06',name:'Lundi — Golf',short:'Lun 6/07',items:[{ic:'⛳',t:'Golf de Spérone — 18 trous',time:'09h00',img:IMG.golf},{ic:'🍽️',t:'Déjeuner — Tamaricciu',time:'12h30',img:IMG.food,waze:'41.553447,9.3181647'},{ic:'🏠',t:'Soirée maison',time:'Soir',img:IMG.home}]},
   {date:'2026-07-07',name:'Mardi — Plage',short:'Mar 7/07',items:[{ic:'🌊',t:'Plage libre',time:'Matin',img:IMG.beach},{ic:'🍽️',t:'Déjeuner — Le Cabanon Bleu',time:'12h30',img:IMG.food,waze:'41.64124,9.35670'},{ic:'🏠',t:'Soirée maison',time:'Soir',img:IMG.home}]},

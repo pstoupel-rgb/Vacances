@@ -258,6 +258,20 @@
   .wc-final-note{font-size:.62rem;opacity:.6;text-align:center;width:100%;padding-top:2px;}
   @keyframes wcblink{0%,100%{opacity:1}50%{opacity:.4}}
   .wc-dot{animation:wcblink 1.2s infinite;}
+  /* World Cup overlay (sheet) */
+  .wc-ov-nav{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:14px;}
+  .wc-ov-arrow{width:42px;height:42px;border-radius:50%;border:none;background:var(--bg2);color:var(--brown);font-size:1.5rem;line-height:1;font-weight:700;cursor:pointer;flex-shrink:0;display:grid;place-items:center;transition:transform .15s,opacity .15s;}
+  .wc-ov-arrow:active{transform:scale(.9);}
+  .wc-ov-arrow:disabled{opacity:.25;cursor:default;}
+  .wc-ov-daywrap{flex:1;min-width:0;text-align:center;}
+  .wc-ov-daylabel{font-size:.98rem;font-weight:700;color:var(--text);text-transform:capitalize;line-height:1.2;}
+  .wc-ov-phase{font-size:.66rem;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-top:3px;font-weight:700;}
+  .wc-ov-content{min-height:130px;touch-action:pan-y;}
+  .wc-ov-content .wc-card{padding:4px 13px 8px;}
+  .wc-ov-msg{text-align:center;color:var(--muted);font-size:.86rem;padding:42px 0;}
+  .wc-ov-hint{text-align:center;font-size:.72rem;color:var(--muted);margin-top:16px;}
+  @keyframes wcSlideNext{from{opacity:0;transform:translateX(34px)}to{opacity:1;transform:none}}
+  @keyframes wcSlidePrev{from{opacity:0;transform:translateX(-34px)}to{opacity:1;transform:none}}
 
   /* ===== MÉTÉO ===== */
   .weather-wrap{padding:16px 16px 0;}
@@ -486,6 +500,7 @@
         <button class="hero-menu-btn" onclick="toggleMenu(event)" aria-label="Menu">☰</button>
         <div class="menu-drop" id="menu-drop">
           <button class="menu-item" onclick="openTeam()"><span class="mi-ico">👥</span>LA TEAM</button>
+          <button class="menu-item" onclick="openWorldCup()"><span class="mi-ico">⚽</span>World Cup</button>
           <button class="menu-item" onclick="closeMenu();showPage('profil',document.getElementById('nav-profil'))"><span class="mi-ico">💳</span>Partage des frais</button>
           <button class="menu-item" onclick="openNumeros()"><span class="mi-ico">📞</span>Numéros utiles</button>
         </div>
@@ -1096,6 +1111,24 @@
   </div>
 </div>
 
+<!-- WORLD CUP OVERLAY -->
+<div class="team-overlay" id="wc-overlay" onclick="if(event.target===this)closeWorldCup()">
+  <div class="team-sheet" id="wc-ov-sheet">
+    <div class="team-grip"></div>
+    <div class="team-head"><h2>⚽ World Cup 2026</h2></div>
+    <div class="wc-ov-nav">
+      <button class="wc-ov-arrow" id="wc-ov-prev" onclick="_wcOvShift(-1)" aria-label="Jour précédent">‹</button>
+      <div class="wc-ov-daywrap">
+        <div class="wc-ov-daylabel" id="wc-ov-daylabel">—</div>
+        <div class="wc-ov-phase" id="wc-ov-phase"></div>
+      </div>
+      <button class="wc-ov-arrow" id="wc-ov-next" onclick="_wcOvShift(1)" aria-label="Jour suivant">›</button>
+    </div>
+    <div class="wc-ov-content" id="wc-ov-content"></div>
+    <div class="wc-ov-hint">👉 Glisse vers la droite pour voir le jour suivant</div>
+  </div>
+</div>
+
 <!-- CROPPER -->
 <div class="crop-overlay" id="crop-overlay">
   <div class="crop-stage" id="crop-stage">
@@ -1635,7 +1668,7 @@ async function deleteCurrent(){if(!_cur)return;if(!confirm('Supprimer cette phot
   catch(e){alert('Erreur suppression.');}
   closeLightbox();
 }
-window.addEventListener('keydown',e=>{if(e.key==='Escape'){closeLightbox();closeTeam();closeNumeros();closeMenu();cropCancel();}});
+window.addEventListener('keydown',e=>{if(e.key==='Escape'){closeLightbox();closeTeam();closeNumeros();closeWorldCup();closeMenu();cropCancel();}});
 
 /* 🏠 GALERIE MAISON (intérieur / extérieur) */
 const MKEY='corse2026-maison';
@@ -1889,6 +1922,157 @@ async function loadWorldCup(){
   setTimeout(loadWorldCup,hasLive?60*1000:3*60*1000);
 }
 loadWorldCup();
+
+/* ⚽ WORLD CUP — panneau jour par jour (matchs + résultats, swipe) */
+const WC_OV_MIN=new Date('2026-06-11T00:00:00');
+const WC_OV_MAX=new Date('2026-07-19T00:00:00');
+let _wcOvDate=null,_wcOvReqId=0,_wcOvTimer=null;
+function _wcSameDay(a,b){return a.toDateString()===b.toDateString();}
+function openWorldCup(){
+  closeMenu();
+  document.getElementById('wc-overlay').classList.add('open');
+  if(!_wcOvDate){
+    let d=new Date();
+    if(d<WC_OV_MIN)d=new Date(WC_OV_MIN);
+    if(d>WC_OV_MAX)d=new Date(WC_OV_MAX);
+    d.setHours(12,0,0,0);
+    _wcOvDate=d;
+  }
+  _wcOvLoad(0);
+}
+function closeWorldCup(){
+  document.getElementById('wc-overlay').classList.remove('open');
+  clearTimeout(_wcOvTimer);
+}
+function _wcOvShift(dir){
+  const nd=new Date(_wcOvDate);nd.setDate(nd.getDate()+dir);
+  if(nd<WC_OV_MIN||nd>WC_OV_MAX)return;
+  _wcOvDate=nd;
+  _wcOvLoad(dir);
+}
+function _wcOvUpdateNav(){
+  let txt=_wcOvDate.toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long'});
+  if(_wcSameDay(_wcOvDate,new Date()))txt="Aujourd'hui · "+txt;
+  document.getElementById('wc-ov-daylabel').textContent=txt;
+  const ph=_wcPhase(_wcOvDate);
+  document.getElementById('wc-ov-phase').textContent=ph?ph.label:'';
+  const prev=new Date(_wcOvDate);prev.setDate(prev.getDate()-1);
+  const next=new Date(_wcOvDate);next.setDate(next.getDate()+1);
+  document.getElementById('wc-ov-prev').disabled=prev<WC_OV_MIN;
+  document.getElementById('wc-ov-next').disabled=next>WC_OV_MAX;
+}
+function _wcOvAnim(dir){
+  const c=document.getElementById('wc-ov-content');
+  if(!dir)return;
+  c.style.animation='none';void c.offsetWidth;
+  c.style.animation=(dir>0?'wcSlideNext':'wcSlidePrev')+' .26s ease';
+}
+async function _wcOvLoad(dir){
+  _wcOvUpdateNav();
+  _wcOvAnim(dir);
+  const content=document.getElementById('wc-ov-content');
+  const reqId=++_wcOvReqId;
+  clearTimeout(_wcOvTimer);
+  content.innerHTML='<div class="wc-ov-msg">Chargement…</div>';
+  let res=null;
+  try{res=await _wcFetchDay(_wcOvDate);}catch(e){}
+  if(reqId!==_wcOvReqId)return;
+  if(!res||!res.evs||!res.evs.length){
+    content.innerHTML='<div class="wc-ov-msg">Aucun match prévu ce jour ⚽</div>';
+    return;
+  }
+  const rows=res.src==='espn'?_wcOvRowsEspn(res.evs):_wcOvRowsSS(res.evs);
+  content.innerHTML='<div class="wc-card">'+rows+'</div>';
+  /* rafraîchit le jour courant si matchs en direct possibles */
+  if(_wcSameDay(_wcOvDate,new Date())){
+    _wcOvTimer=setTimeout(()=>{
+      if(document.getElementById('wc-overlay').classList.contains('open'))_wcOvLoad(0);
+    },60000);
+  }
+}
+function _wcOvRowsEspn(evs){
+  const now=Date.now();let h='';
+  for(const ev of evs){
+    const c=ev.competitions[0];
+    const hm=c.competitors?.find(x=>x.homeAway==='home');
+    const aw=c.competitors?.find(x=>x.homeAway==='away');
+    const st=c.status?.type?.name||'';
+    const minElapsed=(now-new Date(ev.date).getTime())/60000;
+    const timeDone=minElapsed>110;
+    const timeLive=minElapsed>0&&minElapsed<=110;
+    const isDone=st==='STATUS_FINAL'||st==='STATUS_FULL_TIME'||c.status?.type?.completed===true||timeDone;
+    const isLive=!isDone&&(st==='STATUS_IN_PROGRESS'||st==='STATUS_HALFTIME'||st==='STATUS_END_PERIOD'||timeLive);
+    let mid='';
+    if(isDone){
+      const badge=c.status?.type?.shortDetail||'FT';
+      mid=`<span class="wc-score">${hm?.score??'—'}&nbsp;-&nbsp;${aw?.score??'—'}</span><span class="wc-badge">${badge}</span>`;
+    }else if(isLive){
+      mid=`<span class="wc-score wc-live">${hm?.score??'0'}&nbsp;-&nbsp;${aw?.score??'0'}</span><span class="wc-dot">🔴 ${c.status?.displayClock||'⏱'}</span>`;
+    }else{
+      const t=new Date(ev.date).toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit',timeZone:'Europe/Paris'});
+      mid=`<span class="wc-time">${t}</span>`;
+    }
+    const hF=hm?.team?.flag||hm?.team?.logo||'';
+    const aF=aw?.team?.flag||aw?.team?.logo||'';
+    const hN=hm?.team?.shortDisplayName||hm?.team?.abbreviation||hm?.team?.displayName||'?';
+    const aN=aw?.team?.shortDisplayName||aw?.team?.abbreviation||aw?.team?.displayName||'?';
+    h+=`<div class="wc-match">
+      <div class="wc-team">${hF?`<img class="wc-flag" src="${hF}" alt="">`:'🏳'} <span>${hN}</span></div>
+      <div class="wc-mid">${mid}</div>
+      <div class="wc-team wc-team-r"><span>${aN}</span> ${aF?`<img class="wc-flag" src="${aF}" alt="">`:'🏳'}</div>
+    </div>`;
+  }
+  return h;
+}
+function _wcOvRowsSS(evs){
+  let h='';
+  for(const ev of evs){
+    const s=ev.status||{};
+    const stStr=typeof s.type==='string'?s.type:(s.type?.type||'');
+    const code=typeof s.code==='number'?s.code:(s.type?.id||0);
+    const desc=(s.description||'').toLowerCase();
+    const isDone=stStr==='finished'||code===100||desc==='ended'||desc==='ft';
+    const isLive=!isDone&&(stStr==='inprogress'||stStr==='halftime'||(code>0&&code<100)||desc.includes('half'));
+    const started=(ev.startTimestamp||0)*1000<Date.now()-60000;
+    const hasScore=ev.homeScore?.current!==undefined;
+    const showScore=isDone||isLive||(started&&hasScore);
+    const hS=showScore?(ev.homeScore?.current??'—'):'';
+    const aS=showScore?(ev.awayScore?.current??'—'):'';
+    let mid='';
+    if(isDone||(started&&hasScore&&!isLive)){
+      mid=`<span class="wc-score">${hS}&nbsp;-&nbsp;${aS}</span><span class="wc-badge">FT</span>`;
+    }else if(isLive||(started&&hasScore)){
+      mid=`<span class="wc-score wc-live">${hS}&nbsp;-&nbsp;${aS}</span><span class="wc-dot">🔴 ${desc}</span>`;
+    }else{
+      const t=new Date((ev.startTimestamp||0)*1000).toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit',timeZone:'Europe/Paris'});
+      mid=`<span class="wc-time">${t}</span>`;
+    }
+    const hN=ev.homeTeam?.shortName||ev.homeTeam?.name||'?';
+    const aN=ev.awayTeam?.shortName||ev.awayTeam?.name||'?';
+    h+=`<div class="wc-match">
+      <div class="wc-team">🏳 <span>${hN}</span></div>
+      <div class="wc-mid">${mid}</div>
+      <div class="wc-team wc-team-r"><span>${aN}</span> 🏳</div>
+    </div>`;
+  }
+  return h;
+}
+/* Swipe : vers la droite → jour suivant, vers la gauche → jour précédent */
+(function(){
+  const sheet=document.getElementById('wc-ov-sheet');
+  if(!sheet)return;
+  let x0=null,y0=null;
+  sheet.addEventListener('touchstart',e=>{const t=e.changedTouches[0];x0=t.clientX;y0=t.clientY;},{passive:true});
+  sheet.addEventListener('touchend',e=>{
+    if(x0==null)return;
+    const t=e.changedTouches[0];
+    const dx=t.clientX-x0,dy=t.clientY-y0;
+    x0=null;y0=null;
+    if(Math.abs(dx)>50&&Math.abs(dx)>Math.abs(dy)*1.4){
+      _wcOvShift(dx>0?1:-1);
+    }
+  },{passive:true});
+})();
 
 /* 🍾 BOUTEILLES */
 const BOTTLES={rouge:0,blanc:0,rose:0,champagne:0};

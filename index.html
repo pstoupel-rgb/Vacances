@@ -1852,16 +1852,16 @@ async function changeBottle(key,delta){
 async function initBottles(){
   const now=new Date();
   const vacStart=new Date('2026-07-04T11:00:00');
-  const vacEnd=new Date('2026-07-19T00:00:00'); /* jusqu'à la fin du 18 */
   const countdown=document.getElementById('countdown-card');
   const section=document.getElementById('bottles-section');
   const wc=document.getElementById('wc-widget');
-  if(now>=vacStart&&now<vacEnd){
-    /* Pendant le séjour : foot → compteur bouteilles */
-    if(countdown)countdown.style.display='none';
+  if(now<vacStart){
+    /* Avant le 4 juillet : foot caché, bouteilles visibles */
     if(wc)wc.style.display='none';
     if(section)section.style.display='block';
   }else{
+    /* À partir du 4 juillet : décompte caché, foot visible, bouteilles cachées */
+    if(countdown)countdown.style.display='none';
     if(section)section.style.display='none';
     if(wc)wc.style.display='';
     return;

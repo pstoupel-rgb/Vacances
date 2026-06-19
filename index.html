@@ -1092,9 +1092,9 @@
   <div class="lb-bar">
     <button onclick="closeLightbox()">✕</button>
     <div class="lb-actions">
-      <button onclick="downloadCurrent()">⤓</button>
-      <button onclick="shareCurrent()">⤴</button>
-      <button onclick="deleteCurrent()">🗑️</button>
+      <button onclick="downloadCurrent()" title="Enregistrer">⤓</button>
+      <button onclick="shareCurrent()" title="Partager">⤴</button>
+      <button onclick="deleteCurrent()" title="Supprimer">🗑</button>
     </div>
   </div>
   <div class="lb-img" id="lb-img"></div>
@@ -1743,8 +1743,29 @@ async function blobOf(id){
   if(ph&&ph.url){try{const r=await fetch(ph.url);if(r.ok)return await r.blob();}catch(e){}}
   const f=await FileDB.get(id);return f?f.blob:null;
 }
-async function downloadCurrent(){if(!_cur)return;const b=await blobOf(_cur.id);if(!b)return;const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='corse-'+_cur.id+'.jpg';document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),1500);}
-async function shareCurrent(){if(!_cur)return;const b=await blobOf(_cur.id);if(!b)return;try{const file=new File([b],'corse-'+_cur.id+'.jpg',{type:'image/jpeg'});if(navigator.canShare&&navigator.canShare({files:[file]})){await navigator.share({files:[file]});return;}}catch(e){if(e.name==='AbortError')return;}downloadCurrent();}
+async function downloadCurrent(){
+  if(!_cur)return;
+  /* iOS Safari PWA : <a download> ne fonctionne pas sur les URLs cross-origin.
+     On essaie le blob, et en fallback on ouvre l'image dans un nouvel onglet
+     où l'utilisateur peut appuyer longuement → "Enregistrer l'image". */
+  try{
+    const b=await blobOf(_cur.id);
+    if(b){const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='corse-'+_cur.id+'.jpg';document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),1500);return;}
+  }catch(e){}
+  if(_cur.url)window.open(_cur.url,'_blank');
+}
+async function shareCurrent(){
+  if(!_cur)return;
+  /* Essai 1 : partage de fichier (iOS → propose d'enregistrer dans Photos) */
+  try{
+    const b=await blobOf(_cur.id);
+    if(b){const file=new File([b],'corse-'+_cur.id+'.jpg',{type:'image/jpeg'});if(navigator.canShare&&navigator.canShare({files:[file]})){await navigator.share({files:[file]});return;}}
+  }catch(e){if(e.name==='AbortError')return;}
+  /* Essai 2 : partage de l'URL */
+  try{if(navigator.share){await navigator.share({url:_cur.url});return;}}catch(e){if(e.name==='AbortError')return;}
+  /* Fallback : ouvrir dans un nouvel onglet */
+  if(_cur.url)window.open(_cur.url,'_blank');
+}
 async function deleteCurrent(){if(!_cur)return;if(!confirm('Supprimer cette photo ?'))return;
   try{await _fbDb.collection('photos').doc(_cur.id).delete();try{await _fbSt.ref('photos/'+_cur.id+'.jpg').delete();}catch(e){}}
   catch(e){alert('Erreur suppression.');}

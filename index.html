@@ -1092,8 +1092,7 @@
   <div class="lb-bar">
     <button onclick="closeLightbox()">✕</button>
     <div class="lb-actions">
-      <button onclick="downloadCurrent()" title="Enregistrer">⤓</button>
-      <button onclick="shareCurrent()" title="Partager">⤴</button>
+      <button onclick="saveCurrent()" style="font-size:.75rem;padding:0 12px;width:auto;font-weight:700">📷 Enregistrer</button>
       <button onclick="deleteCurrent()" title="Supprimer">🗑</button>
     </div>
   </div>
@@ -1104,7 +1103,7 @@
 <div class="photo-dl-bar" id="photo-dl-bar">
   <span class="dl-count" id="photo-dl-count">Aucune sélection</span>
   <div class="dl-btns">
-    <button onclick="downloadSelected()">⤓ Télécharger</button>
+    <button onclick="downloadSelected()">📷 Enregistrer dans Photos</button>
     <button onclick="toggleSelectMode()">Annuler</button>
   </div>
 </div>
@@ -1760,27 +1759,34 @@ async function blobOf(id){
   if(ph&&ph.url){try{const r=await fetch(ph.url);if(r.ok)return await r.blob();}catch(e){}}
   const f=await FileDB.get(id);return f?f.blob:null;
 }
-async function downloadCurrent(){
+async function saveCurrent(){
   if(!_cur)return;
-  /* iOS Safari PWA : <a download> ne fonctionne pas sur les URLs cross-origin.
-     On essaie le blob, et en fallback on ouvre l'image dans un nouvel onglet
-     où l'utilisateur peut appuyer longuement → "Enregistrer l'image". */
+  /* Sur iOS : seule la feuille de partage avec fichier permet de sauver dans la Pellicule.
+     On tente d'abord le canvas (image déjà affichée), puis un fetch blob, puis fallback URL. */
+  let blob=null;
+  // Essai 1 : canvas depuis l'img du lightbox (contourne potentiels problèmes CORS)
   try{
-    const b=await blobOf(_cur.id);
-    if(b){const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='corse-'+_cur.id+'.jpg';document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),1500);return;}
+    const img=document.querySelector('#lb-img img');
+    if(img&&img.complete&&img.naturalWidth){
+      const c=document.createElement('canvas');c.width=img.naturalWidth;c.height=img.naturalHeight;
+      c.getContext('2d').drawImage(img,0,0);
+      blob=await new Promise(r=>c.toBlob(r,'image/jpeg',0.93));
+    }
   }catch(e){}
-  if(_cur.url)window.open(_cur.url,'_blank');
-}
-async function shareCurrent(){
-  if(!_cur)return;
-  /* Essai 1 : partage de fichier (iOS → propose d'enregistrer dans Photos) */
-  try{
-    const b=await blobOf(_cur.id);
-    if(b){const file=new File([b],'corse-'+_cur.id+'.jpg',{type:'image/jpeg'});if(navigator.canShare&&navigator.canShare({files:[file]})){await navigator.share({files:[file]});return;}}
-  }catch(e){if(e.name==='AbortError')return;}
-  /* Essai 2 : partage de l'URL */
-  try{if(navigator.share){await navigator.share({url:_cur.url});return;}}catch(e){if(e.name==='AbortError')return;}
-  /* Fallback : ouvrir dans un nouvel onglet */
+  // Essai 2 : fetch blob
+  if(!blob)try{blob=await blobOf(_cur.id);}catch(e){}
+  if(blob){
+    const file=new File([blob],'corse-'+_cur.id+'.jpg',{type:'image/jpeg'});
+    // iOS : share sheet → "Enregistrer l'image" → Pellicule
+    if(navigator.canShare&&navigator.canShare({files:[file]})){
+      try{await navigator.share({files:[file]});return;}catch(e){if(e.name==='AbortError')return;}
+    }
+    // Android/desktop : téléchargement direct
+    const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='corse-'+_cur.id+'.jpg';
+    document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),1500);
+    return;
+  }
+  // Dernier recours : ouvrir dans Safari → appui long → Enregistrer l'image
   if(_cur.url)window.open(_cur.url,'_blank');
 }
 async function deleteCurrent(){if(!_cur)return;if(!confirm('Supprimer cette photo ?'))return;

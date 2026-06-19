@@ -1,6 +1,6 @@
 /* Service Worker — network-first pour HTML (toujours la dernière version),
    cache-first pour les assets statiques (offline OK). */
-const CACHE = 'corse-2026-v135';
+const CACHE = 'corse-2026-v136';
 const ASSETS = [
   './',
   './index.html',

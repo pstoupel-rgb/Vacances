@@ -1751,9 +1751,16 @@ async function renderPhotos(){
     }
   }
 }
-let _cur=null;
-function openLightbox(id,url){_cur={id,url};document.getElementById('lb-img').innerHTML='<img src="'+url+'" alt="">';document.getElementById('lightbox').classList.add('open');}
-function closeLightbox(){document.getElementById('lightbox').classList.remove('open');document.getElementById('lb-img').innerHTML='';_cur=null;}
+let _cur=null,_curBlob=null;
+function openLightbox(id,url){
+  _cur={id,url};_curBlob=null;
+  document.getElementById('lb-img').innerHTML='<img src="'+url+'" alt="">';
+  document.getElementById('lightbox').classList.add('open');
+  /* Pré-charge le blob dès l'ouverture : saveCurrent() n'a plus besoin d'await
+     → le geste iOS est préservé et la feuille de partage s'ouvre correctement. */
+  blobOf(id).then(b=>{_curBlob=b;}).catch(()=>{});
+}
+function closeLightbox(){document.getElementById('lightbox').classList.remove('open');document.getElementById('lb-img').innerHTML='';_cur=null;_curBlob=null;}
 async function blobOf(id){
   const ph=PHOTOS.find(x=>x.id===id)||(_cur&&_cur.id===id?_cur:null);
   if(ph&&ph.url){try{const r=await fetch(ph.url);if(r.ok)return await r.blob();}catch(e){}}
@@ -1761,32 +1768,17 @@ async function blobOf(id){
 }
 async function saveCurrent(){
   if(!_cur)return;
-  /* Sur iOS : seule la feuille de partage avec fichier permet de sauver dans la Pellicule.
-     On tente d'abord le canvas (image déjà affichée), puis un fetch blob, puis fallback URL. */
-  let blob=null;
-  // Essai 1 : canvas depuis l'img du lightbox (contourne potentiels problèmes CORS)
-  try{
-    const img=document.querySelector('#lb-img img');
-    if(img&&img.complete&&img.naturalWidth){
-      const c=document.createElement('canvas');c.width=img.naturalWidth;c.height=img.naturalHeight;
-      c.getContext('2d').drawImage(img,0,0);
-      blob=await new Promise(r=>c.toBlob(r,'image/jpeg',0.93));
-    }
-  }catch(e){}
-  // Essai 2 : fetch blob
-  if(!blob)try{blob=await blobOf(_cur.id);}catch(e){}
+  const blob=_curBlob; /* synchrone, pas d'await → geste iOS préservé */
   if(blob){
     const file=new File([blob],'corse-'+_cur.id+'.jpg',{type:'image/jpeg'});
-    // iOS : share sheet → "Enregistrer l'image" → Pellicule
     if(navigator.canShare&&navigator.canShare({files:[file]})){
       try{await navigator.share({files:[file]});return;}catch(e){if(e.name==='AbortError')return;}
     }
-    // Android/desktop : téléchargement direct
     const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='corse-'+_cur.id+'.jpg';
     document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),1500);
     return;
   }
-  // Dernier recours : ouvrir dans Safari → appui long → Enregistrer l'image
+  /* Blob pas encore prêt ou CORS indispo : window.open synchrone → pas bloqué par iOS */
   if(_cur.url)window.open(_cur.url,'_blank');
 }
 async function deleteCurrent(){if(!_cur)return;if(!confirm('Supprimer cette photo ?'))return;

@@ -457,6 +457,16 @@
   .photo-cell img{width:100%;height:100%;object-fit:cover;display:block;}
   .photo-cell:active img{opacity:.85;}
   .photo-empty{grid-column:1/-1;text-align:center;color:var(--muted);font-size:.82rem;padding:30px 10px;line-height:1.6;}
+  .photo-quality{position:absolute;bottom:4px;right:5px;background:rgba(0,0,0,.55);color:#fff;font-size:.58rem;font-weight:700;border-radius:6px;padding:1px 5px;pointer-events:none;line-height:1.5;}
+  .photo-cell.selected{outline:3px solid var(--brown);outline-offset:-3px;}
+  .photo-cell.selected::after{content:'✓';position:absolute;inset:0;background:rgba(157,110,60,.4);display:grid;place-items:center;font-size:1.8rem;color:#fff;font-weight:900;}
+  .photo-select-btn{background:var(--card);border:1px solid var(--border);color:var(--text);border-radius:20px;padding:6px 14px;font-size:.82rem;font-weight:700;cursor:pointer;font-family:inherit;white-space:nowrap;}
+  .photo-select-btn.active{background:var(--brown);border-color:var(--brown);color:#fff;}
+  .photo-dl-bar{position:fixed;bottom:calc(60px + env(safe-area-inset-bottom));left:0;right:0;z-index:500;background:var(--brown);color:#fff;display:none;align-items:center;justify-content:space-between;padding:11px 16px;gap:10px;}
+  .photo-dl-bar.visible{display:flex;}
+  .photo-dl-bar .dl-count{font-size:.85rem;font-weight:700;}
+  .photo-dl-bar .dl-btns{display:flex;gap:8px;}
+  .photo-dl-bar .dl-btns button{background:rgba(255,255,255,.22);border:none;color:#fff;border-radius:20px;padding:6px 14px;font-size:.82rem;font-weight:700;cursor:pointer;font-family:inherit;}
   .lightbox{position:fixed;inset:0;background:rgba(10,8,6,.96);z-index:600;display:none;flex-direction:column;}
   .lightbox.open{display:flex;}
   .lb-bar{display:flex;justify-content:space-between;align-items:center;padding:calc(12px + env(safe-area-inset-top)) 16px 12px;}
@@ -1069,7 +1079,10 @@
       <div class="photo-how-row"><span class="photo-how-ic">👁</span><span>Tape une photo pour la voir en grand</span></div>
       <div class="photo-how-row"><span class="photo-how-ic">⤓</span><span>Dans la visionneuse, télécharge-la dans ton iPhone</span></div>
     </div>
-    <button class="btn-add" id="btn-add-photo" onclick="addPhotos()">＋ Ajouter une photo</button>
+    <div style="display:flex;gap:8px;align-items:center;margin-bottom:10px">
+      <button class="btn-add" id="btn-add-photo" onclick="addPhotos()" style="flex:1;margin-bottom:0">＋ Ajouter une photo</button>
+      <button class="photo-select-btn" id="btn-select-photos" onclick="toggleSelectMode()">Sélectionner</button>
+    </div>
     <div class="photo-grid" id="photo-grid"></div>
   </div>
 </div>
@@ -1085,6 +1098,15 @@
     </div>
   </div>
   <div class="lb-img" id="lb-img"></div>
+</div>
+
+<!-- PHOTO SELECTION BAR -->
+<div class="photo-dl-bar" id="photo-dl-bar">
+  <span class="dl-count" id="photo-dl-count">Aucune sélection</span>
+  <div class="dl-btns">
+    <button onclick="downloadSelected()">⤓ Télécharger</button>
+    <button onclick="toggleSelectMode()">Annuler</button>
+  </div>
 </div>
 
 <!-- NUMÉROS UTILES MODAL -->
@@ -1642,16 +1664,75 @@ async function addPhotos(){
   finally{if(btn){btn.disabled=false;btn.textContent='＋ Ajouter une photo';}}
 }
 let _urls=[];
+let _selectMode=false;
+const _selected=new Set();
+function toggleSelectMode(){
+  _selectMode=!_selectMode;
+  const btn=document.getElementById('btn-select-photos');
+  const bar=document.getElementById('photo-dl-bar');
+  if(_selectMode){
+    if(btn){btn.textContent='Annuler';btn.classList.add('active');}
+    if(bar)bar.classList.add('visible');
+  }else{
+    _selected.clear();
+    if(btn){btn.textContent='Sélectionner';btn.classList.remove('active');}
+    if(bar)bar.classList.remove('visible');
+    document.querySelectorAll('.photo-cell.selected').forEach(c=>c.classList.remove('selected'));
+  }
+  updateDlBar();
+}
+function toggleSelectPhoto(id){
+  if(_selected.has(id))_selected.delete(id);else _selected.add(id);
+  const cell=document.querySelector('.photo-cell[data-id="'+id+'"]');
+  if(cell)cell.classList.toggle('selected',_selected.has(id));
+  updateDlBar();
+}
+function updateDlBar(){
+  const count=document.getElementById('photo-dl-count');if(!count)return;
+  const n=_selected.size;
+  count.textContent=n===0?'Aucune sélection':n===1?'1 photo sélectionnée':n+' photos sélectionnées';
+}
+async function downloadSelected(){
+  if(!_selected.size)return;
+  const ids=[..._selected];
+  const blobs=[];
+  for(const id of ids){const b=await blobOf(id);if(b)blobs.push({id,blob:b});}
+  if(!blobs.length)return;
+  try{
+    const files=blobs.map(({id,blob})=>new File([blob],'corse-'+id+'.jpg',{type:'image/jpeg'}));
+    if(navigator.canShare&&navigator.canShare({files})){await navigator.share({files});return;}
+  }catch(e){if(e.name==='AbortError')return;}
+  for(const {id,blob} of blobs){
+    const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='corse-'+id+'.jpg';
+    document.body.appendChild(a);a.click();a.remove();
+    setTimeout(()=>URL.revokeObjectURL(a.href),1500);
+    await new Promise(r=>setTimeout(r,300));
+  }
+}
 async function renderPhotos(){
   const grid=document.getElementById('photo-grid');if(!grid)return;
   if(!PHOTOS.length){grid.innerHTML='<div class="photo-empty">Aucune photo pour l\'instant 📷<br>Soyez les premiers à immortaliser la Corse !</div>';return;}
+  function addQuality(img,qual){img.onload=()=>{const mp=Math.round(img.naturalWidth*img.naturalHeight/1e5)/10;if(mp>0&&qual){qual.textContent=mp.toFixed(1)+' MP';qual.style.display='';}};}
   if(_isFbReady()){
-    grid.innerHTML=PHOTOS.map(p=>'<div class="photo-cell" data-id="'+p.id+'"><img loading="lazy" src="'+p.url+'" alt=""></div>').join('');
-    grid.querySelectorAll('.photo-cell').forEach(cell=>{const id=cell.dataset.id;const p=PHOTOS.find(x=>x.id===id);if(p)cell.onclick=()=>openLightbox(p.id,p.url);});
+    grid.innerHTML=PHOTOS.map(p=>'<div class="photo-cell" data-id="'+p.id+'"><img loading="lazy" src="'+p.url+'" alt=""><span class="photo-quality" style="display:none"></span></div>').join('');
+    grid.querySelectorAll('.photo-cell').forEach(cell=>{
+      const id=cell.dataset.id;const p=PHOTOS.find(x=>x.id===id);if(!p)return;
+      addQuality(cell.querySelector('img'),cell.querySelector('.photo-quality'));
+      cell.onclick=()=>{if(_selectMode)toggleSelectPhoto(id);else openLightbox(p.id,p.url);};
+    });
   }else{
     _urls.forEach(u=>URL.revokeObjectURL(u));_urls=[];
-    grid.innerHTML=PHOTOS.map(p=>'<div class="photo-cell" data-id="'+p.id+'"><img loading="lazy" alt=""></div>').join('');
-    for(const p of PHOTOS){const f=await FileDB.get(p.id);if(!f)continue;const url=URL.createObjectURL(f.blob);_urls.push(url);const cell=grid.querySelector('.photo-cell[data-id="'+p.id+'"]');if(cell){cell.querySelector('img').src=url;cell.onclick=()=>openLightbox(p.id,url);}}
+    grid.innerHTML=PHOTOS.map(p=>'<div class="photo-cell" data-id="'+p.id+'"><img loading="lazy" alt=""><span class="photo-quality" style="display:none"></span></div>').join('');
+    for(const p of PHOTOS){
+      const f=await FileDB.get(p.id);if(!f)continue;
+      const url=URL.createObjectURL(f.blob);_urls.push(url);
+      const cell=grid.querySelector('.photo-cell[data-id="'+p.id+'"]');
+      if(cell){
+        const img=cell.querySelector('img');img.src=url;
+        addQuality(img,cell.querySelector('.photo-quality'));
+        cell.onclick=()=>{if(_selectMode)toggleSelectPhoto(p.id);else openLightbox(p.id,url);};
+      }
+    }
   }
 }
 let _cur=null;

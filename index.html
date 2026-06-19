@@ -1695,17 +1695,34 @@ function updateDlBar(){
 async function downloadSelected(){
   if(!_selected.size)return;
   const ids=[..._selected];
-  const blobs=[];
-  for(const id of ids){const b=await blobOf(id);if(b)blobs.push({id,blob:b});}
-  if(!blobs.length)return;
-  try{
-    const files=blobs.map(({id,blob})=>new File([blob],'corse-'+id+'.jpg',{type:'image/jpeg'}));
-    if(navigator.canShare&&navigator.canShare({files})){await navigator.share({files});return;}
-  }catch(e){if(e.name==='AbortError')return;}
-  for(const {id,blob} of blobs){
-    const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='corse-'+id+'.jpg';
-    document.body.appendChild(a);a.click();a.remove();
-    setTimeout(()=>URL.revokeObjectURL(a.href),1500);
+  /* Construit la liste {id, blob?, url?} pour chaque photo sélectionnée */
+  const items=[];
+  for(const id of ids){
+    const ph=PHOTOS.find(x=>x.id===id);
+    let blob=null;
+    try{if(ph&&ph.url){const r=await fetch(ph.url);if(r.ok)blob=await r.blob();}}catch(e){}
+    if(!blob){const f=await FileDB.get(id);if(f)blob=f.blob;}
+    items.push({id,blob,url:ph?ph.url:null});
+  }
+  const withBlobs=items.filter(x=>x.blob);
+  if(withBlobs.length){
+    /* Essai Web Share (iOS → enregistrer dans Photos) */
+    try{
+      const files=withBlobs.map(({id,blob})=>new File([blob],'corse-'+id+'.jpg',{type:'image/jpeg'}));
+      if(navigator.canShare&&navigator.canShare({files})){await navigator.share({files});return;}
+    }catch(e){if(e.name==='AbortError')return;}
+    /* Fallback : téléchargement séquentiel blob */
+    for(const {id,blob} of withBlobs){
+      const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='corse-'+id+'.jpg';
+      document.body.appendChild(a);a.click();a.remove();
+      setTimeout(()=>URL.revokeObjectURL(a.href),1500);
+      await new Promise(r=>setTimeout(r,300));
+    }
+    return;
+  }
+  /* Aucun blob dispo : ouvre chaque URL dans un nouvel onglet (appui long → Enregistrer) */
+  for(const {url} of items.filter(x=>x.url)){
+    window.open(url,'_blank');
     await new Promise(r=>setTimeout(r,300));
   }
 }

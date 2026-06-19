@@ -1091,19 +1091,33 @@
 <div class="lightbox" id="lightbox">
   <div class="lb-bar">
     <button onclick="closeLightbox()">✕</button>
-    <div class="lb-actions">
-      <button onclick="saveCurrent()" style="font-size:.75rem;padding:0 12px;width:auto;font-weight:700">📷 Enregistrer</button>
-      <button onclick="deleteCurrent()" title="Supprimer">🗑</button>
-    </div>
+    <span style="font-size:.72rem;color:rgba(255,255,255,.55)">Appuie longuement → 📷 Enregistrer</span>
+    <button onclick="deleteCurrent()">🗑</button>
   </div>
   <div class="lb-img" id="lb-img"></div>
+</div>
+
+<!-- SAVE MODAL (sélection multiple) -->
+<div id="save-modal" style="display:none;position:fixed;inset:0;z-index:700;background:#000;flex-direction:column">
+  <div style="display:flex;justify-content:space-between;align-items:center;padding:calc(14px + env(safe-area-inset-top)) 16px 10px">
+    <button onclick="closeSaveModal()" style="background:rgba(255,255,255,.15);border:none;color:#fff;padding:7px 14px;border-radius:20px;font-size:.82rem;cursor:pointer">✕ Fermer</button>
+    <span id="save-progress" style="font-size:.78rem;color:rgba(255,255,255,.6)"></span>
+    <button id="save-next-btn" onclick="saveNext()" style="background:rgba(255,255,255,.15);border:none;color:#fff;padding:7px 14px;border-radius:20px;font-size:.82rem;cursor:pointer">Suivante →</button>
+  </div>
+  <div style="flex:1;display:grid;place-items:center;padding:8px;overflow:hidden">
+    <img id="save-modal-img" style="max-width:100%;max-height:100%;object-fit:contain;border-radius:10px" src="" alt="">
+  </div>
+  <div style="text-align:center;padding:14px 16px calc(14px + env(safe-area-inset-bottom));color:rgba(255,255,255,.75);font-size:.88rem;line-height:1.5">
+    👇 Appuie <b>longuement</b> sur la photo → "Enregistrer l'image"<br>
+    <span style="font-size:.75rem;opacity:.6">puis passe à la suivante</span>
+  </div>
 </div>
 
 <!-- PHOTO SELECTION BAR -->
 <div class="photo-dl-bar" id="photo-dl-bar">
   <span class="dl-count" id="photo-dl-count">Aucune sélection</span>
   <div class="dl-btns">
-    <button onclick="downloadSelected()">📷 Enregistrer dans Photos</button>
+    <button onclick="startBatchSave()">📷 Enregistrer dans Photos</button>
     <button onclick="toggleSelectMode()">Annuler</button>
   </div>
 </div>
@@ -1691,40 +1705,25 @@ function updateDlBar(){
   const n=_selected.size;
   count.textContent=n===0?'Aucune sélection':n===1?'1 photo sélectionnée':n+' photos sélectionnées';
 }
-async function downloadSelected(){
+let _saveQueue=[],_saveIdx=0;
+function startBatchSave(){
   if(!_selected.size)return;
-  const ids=[..._selected];
-  /* Construit la liste {id, blob?, url?} pour chaque photo sélectionnée */
-  const items=[];
-  for(const id of ids){
-    const ph=PHOTOS.find(x=>x.id===id);
-    let blob=null;
-    try{if(ph&&ph.url){const r=await fetch(ph.url);if(r.ok)blob=await r.blob();}}catch(e){}
-    if(!blob){const f=await FileDB.get(id);if(f)blob=f.blob;}
-    items.push({id,blob,url:ph?ph.url:null});
-  }
-  const withBlobs=items.filter(x=>x.blob);
-  if(withBlobs.length){
-    /* Essai Web Share (iOS → enregistrer dans Photos) */
-    try{
-      const files=withBlobs.map(({id,blob})=>new File([blob],'corse-'+id+'.jpg',{type:'image/jpeg'}));
-      if(navigator.canShare&&navigator.canShare({files})){await navigator.share({files});return;}
-    }catch(e){if(e.name==='AbortError')return;}
-    /* Fallback : téléchargement séquentiel blob */
-    for(const {id,blob} of withBlobs){
-      const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='corse-'+id+'.jpg';
-      document.body.appendChild(a);a.click();a.remove();
-      setTimeout(()=>URL.revokeObjectURL(a.href),1500);
-      await new Promise(r=>setTimeout(r,300));
-    }
-    return;
-  }
-  /* Aucun blob dispo : ouvre chaque URL dans un nouvel onglet (appui long → Enregistrer) */
-  for(const {url} of items.filter(x=>x.url)){
-    window.open(url,'_blank');
-    await new Promise(r=>setTimeout(r,300));
-  }
+  _saveQueue=[..._selected].map(id=>{const ph=PHOTOS.find(x=>x.id===id);return ph?ph.url:null;}).filter(Boolean);
+  _saveIdx=0;
+  if(_saveQueue.length)_showSaveModal();
 }
+function _showSaveModal(){
+  const modal=document.getElementById('save-modal');
+  const img=document.getElementById('save-modal-img');
+  const prog=document.getElementById('save-progress');
+  const nxt=document.getElementById('save-next-btn');
+  img.src=_saveQueue[_saveIdx];
+  prog.textContent=(_saveIdx+1)+' / '+_saveQueue.length;
+  nxt.style.display=_saveIdx<_saveQueue.length-1?'':'none';
+  modal.style.display='flex';
+}
+function saveNext(){_saveIdx++;if(_saveIdx<_saveQueue.length)_showSaveModal();else closeSaveModal();}
+function closeSaveModal(){document.getElementById('save-modal').style.display='none';_saveQueue=[];_saveIdx=0;}
 async function renderPhotos(){
   const grid=document.getElementById('photo-grid');if(!grid)return;
   if(!PHOTOS.length){grid.innerHTML='<div class="photo-empty">Aucune photo pour l\'instant 📷<br>Soyez les premiers à immortaliser la Corse !</div>';return;}
@@ -1786,7 +1785,7 @@ async function deleteCurrent(){if(!_cur)return;if(!confirm('Supprimer cette phot
   catch(e){alert('Erreur suppression.');}
   closeLightbox();
 }
-window.addEventListener('keydown',e=>{if(e.key==='Escape'){closeLightbox();closeTeam();closeNumeros();closeWorldCup();closeMenu();cropCancel();}});
+window.addEventListener('keydown',e=>{if(e.key==='Escape'){closeLightbox();closeSaveModal();closeTeam();closeNumeros();closeWorldCup();closeMenu();cropCancel();}});
 
 /* 🏠 GALERIE MAISON (intérieur / extérieur) */
 const MKEY='corse2026-maison';

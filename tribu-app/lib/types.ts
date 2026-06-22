@@ -24,3 +24,28 @@ export interface Payment {
   id: string; event_id: string; user_id: string; amount: number;
   status: string; stripe_session_id: string | null; created_at: string;
 }
+
+export type WineColor = 'rouge' | 'blanc' | 'rose' | 'petillant';
+export const WINE_COLORS: Record<WineColor, { label: string; emoji: string; color: string }> = {
+  rouge:     { label: 'Rouge',     emoji: '🍷', color: '#b91c1c' },
+  blanc:     { label: 'Blanc',     emoji: '🥂', color: '#ca8a04' },
+  rose:      { label: 'Rosé',      emoji: '🌸', color: '#ec4899' },
+  petillant: { label: 'Pétillant', emoji: '🍾', color: '#0ea5e9' },
+};
+
+export interface WineOrder {
+  id: string; group_id: string; title: string; status: 'open' | 'closed';
+  organizer_id: string; deadline: string | null; min_bottles: number;
+  delivery_note: string | null; created_at: string;
+}
+export interface WineItem {
+  id: string; order_id: string; name: string; domaine: string | null;
+  color: WineColor; vintage: number | null; price: number; created_at: string;
+}
+export interface WinePick {
+  order_id: string; item_id: string; user_id: string; quantity: number;
+}
+export interface WinePayment {
+  id: string; order_id: string; user_id: string; amount: number;
+  status: string; stripe_session_id: string | null; created_at: string;
+}

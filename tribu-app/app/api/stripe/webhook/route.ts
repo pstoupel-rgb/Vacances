@@ -20,21 +20,21 @@ export async function POST(request: NextRequest) {
 
   if (event.type === 'checkout.session.completed') {
     const session = event.data.object as Stripe.Checkout.Session;
-    const eventId = session.metadata?.eventId;
     const userId = session.metadata?.userId;
     const amount = (session.amount_total || 0) / 100;
+    const admin = createAdminClient(); // service_role : contourne la RLS
 
-    if (eventId && userId) {
-      const admin = createAdminClient(); // service_role : contourne la RLS
+    if (session.metadata?.kind === 'wine' && session.metadata.orderId && userId) {
+      // Paiement d'un panier de vin.
+      await admin.from('wine_payments').upsert(
+        { order_id: session.metadata.orderId, user_id: userId, amount, status: 'paid', stripe_session_id: session.id },
+        { onConflict: 'stripe_session_id' }
+      );
+    } else if (session.metadata?.eventId && userId) {
+      // Paiement d'une part / cagnotte d'événement.
       // upsert sur stripe_session_id => idempotent (pas de doublon si Stripe rejoue l'event).
       await admin.from('payments').upsert(
-        {
-          event_id: eventId,
-          user_id: userId,
-          amount,
-          status: 'paid',
-          stripe_session_id: session.id,
-        },
+        { event_id: session.metadata.eventId, user_id: userId, amount, status: 'paid', stripe_session_id: session.id },
         { onConflict: 'stripe_session_id' }
       );
     }

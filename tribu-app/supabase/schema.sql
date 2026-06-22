@@ -185,3 +185,86 @@ drop trigger if exists on_group_created on public.groups;
 create trigger on_group_created
   after insert on public.groups
   for each row execute function public.add_creator_as_member();
+
+-- ============================================================
+--  COMMANDES GROUPÉES DE VIN
+-- ============================================================
+create table if not exists public.wine_orders (
+  id uuid primary key default gen_random_uuid(),
+  group_id uuid not null references public.groups(id) on delete cascade,
+  title text not null,
+  status text not null default 'open',        -- open | closed
+  organizer_id uuid not null references auth.users(id) on delete cascade,
+  deadline date,
+  min_bottles int not null default 0,          -- seuil minimum de bouteilles
+  delivery_note text,
+  created_at timestamptz not null default now()
+);
+
+create table if not exists public.wine_items (
+  id uuid primary key default gen_random_uuid(),
+  order_id uuid not null references public.wine_orders(id) on delete cascade,
+  name text not null,
+  domaine text,
+  color text not null default 'rouge',         -- rouge | blanc | rose | petillant
+  vintage int,                                  -- millésime
+  price numeric(10,2) not null default 0,       -- prix par bouteille
+  created_at timestamptz not null default now()
+);
+
+create table if not exists public.wine_picks (
+  order_id uuid not null references public.wine_orders(id) on delete cascade,
+  item_id uuid not null references public.wine_items(id) on delete cascade,
+  user_id uuid not null references auth.users(id) on delete cascade,
+  quantity int not null default 0,
+  primary key (item_id, user_id)
+);
+
+create table if not exists public.wine_payments (
+  id uuid primary key default gen_random_uuid(),
+  order_id uuid not null references public.wine_orders(id) on delete cascade,
+  user_id uuid not null references auth.users(id) on delete cascade,
+  amount numeric(10,2) not null,
+  status text not null default 'paid',
+  stripe_session_id text unique,
+  created_at timestamptz not null default now()
+);
+
+create or replace function public.order_group(oid uuid)
+returns uuid language sql security definer stable set search_path = public as $$
+  select group_id from public.wine_orders where id = oid;
+$$;
+
+alter table public.wine_orders   enable row level security;
+alter table public.wine_items    enable row level security;
+alter table public.wine_picks    enable row level security;
+alter table public.wine_payments enable row level security;
+
+-- Commandes : visibles/créables par les membres du groupe ; gérées par l'organisateur.
+drop policy if exists "wo_read" on public.wine_orders;
+create policy "wo_read" on public.wine_orders for select using (public.is_group_member(group_id));
+drop policy if exists "wo_insert" on public.wine_orders;
+create policy "wo_insert" on public.wine_orders for insert with check (public.is_group_member(group_id) and organizer_id = auth.uid());
+drop policy if exists "wo_update" on public.wine_orders;
+create policy "wo_update" on public.wine_orders for update using (organizer_id = auth.uid());
+drop policy if exists "wo_delete" on public.wine_orders;
+create policy "wo_delete" on public.wine_orders for delete using (organizer_id = auth.uid());
+
+-- Catalogue : visible par les membres ; édité par l'organisateur de la commande.
+drop policy if exists "wi_read" on public.wine_items;
+create policy "wi_read" on public.wine_items for select using (public.is_group_member(public.order_group(order_id)));
+drop policy if exists "wi_write" on public.wine_items;
+create policy "wi_write" on public.wine_items for all
+  using (auth.uid() = (select organizer_id from public.wine_orders where id = order_id))
+  with check (auth.uid() = (select organizer_id from public.wine_orders where id = order_id));
+
+-- Sélections : visibles par les membres ; chacun gère uniquement les siennes.
+drop policy if exists "wp_read" on public.wine_picks;
+create policy "wp_read" on public.wine_picks for select using (public.is_group_member(public.order_group(order_id)));
+drop policy if exists "wp_write" on public.wine_picks;
+create policy "wp_write" on public.wine_picks for all
+  using (user_id = auth.uid()) with check (user_id = auth.uid() and public.is_group_member(public.order_group(order_id)));
+
+-- Paiements vin : lecture par les membres ; écriture via webhook (service_role).
+drop policy if exists "wpay_read" on public.wine_payments;
+create policy "wpay_read" on public.wine_payments for select using (public.is_group_member(public.order_group(order_id)));

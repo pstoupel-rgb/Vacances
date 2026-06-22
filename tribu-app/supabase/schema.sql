@@ -1,0 +1,187 @@
+-- ============================================================
+--  TRIBU — schéma Supabase (Postgres + RLS)
+--  À coller dans Supabase > SQL Editor > Run.
+-- ============================================================
+
+-- ---------- Profils (1 par utilisateur auth) ----------
+create table if not exists public.profiles (
+  id uuid primary key references auth.users(id) on delete cascade,
+  name text not null default 'Ami',
+  emoji text not null default '😎',
+  created_at timestamptz not null default now()
+);
+
+-- Crée automatiquement un profil à l'inscription
+create or replace function public.handle_new_user()
+returns trigger language plpgsql security definer set search_path = public as $$
+begin
+  insert into public.profiles (id, name, emoji)
+  values (new.id, coalesce(new.raw_user_meta_data->>'name', split_part(new.email,'@',1)), '😎')
+  on conflict (id) do nothing;
+  return new;
+end; $$;
+
+drop trigger if exists on_auth_user_created on auth.users;
+create trigger on_auth_user_created
+  after insert on auth.users
+  for each row execute function public.handle_new_user();
+
+-- ---------- Groupes ----------
+create table if not exists public.groups (
+  id uuid primary key default gen_random_uuid(),
+  name text not null,
+  emoji text not null default '🎾',
+  invite_code text not null unique default substr(md5(random()::text), 1, 8),
+  created_by uuid not null references auth.users(id) on delete cascade,
+  created_at timestamptz not null default now()
+);
+
+create table if not exists public.group_members (
+  group_id uuid not null references public.groups(id) on delete cascade,
+  user_id uuid not null references auth.users(id) on delete cascade,
+  joined_at timestamptz not null default now(),
+  primary key (group_id, user_id)
+);
+
+-- ---------- Événements ----------
+create table if not exists public.events (
+  id uuid primary key default gen_random_uuid(),
+  group_id uuid not null references public.groups(id) on delete cascade,
+  type text not null default 'diner',          -- diner | resto | tennis | padel | sortie | autre
+  title text not null,
+  event_date date,
+  event_time text,
+  place text,
+  note text,
+  organizer_id uuid not null references auth.users(id) on delete cascade,
+  payment_mode text not null default 'split',  -- split | cagnotte
+  cost numeric(10,2) not null default 0,
+  created_at timestamptz not null default now()
+);
+
+create table if not exists public.event_participants (
+  event_id uuid not null references public.events(id) on delete cascade,
+  user_id uuid not null references auth.users(id) on delete cascade,
+  primary key (event_id, user_id)
+);
+
+-- ---------- Paiements (alimenté par le webhook Stripe) ----------
+create table if not exists public.payments (
+  id uuid primary key default gen_random_uuid(),
+  event_id uuid not null references public.events(id) on delete cascade,
+  user_id uuid not null references auth.users(id) on delete cascade,
+  amount numeric(10,2) not null,
+  status text not null default 'pending',       -- pending | paid
+  stripe_session_id text unique,
+  created_at timestamptz not null default now()
+);
+
+-- ---------- Comptes Stripe Connect (pour reverser aux organisateurs) ----------
+create table if not exists public.stripe_accounts (
+  user_id uuid primary key references auth.users(id) on delete cascade,
+  account_id text not null,
+  charges_enabled boolean not null default false,
+  created_at timestamptz not null default now()
+);
+
+-- ============================================================
+--  Fonction d'aide : l'utilisateur courant est-il membre du groupe ?
+--  SECURITY DEFINER => évite la récursion RLS sur group_members.
+-- ============================================================
+create or replace function public.is_group_member(gid uuid)
+returns boolean language sql security definer stable set search_path = public as $$
+  select exists (
+    select 1 from public.group_members
+    where group_id = gid and user_id = auth.uid()
+  );
+$$;
+
+create or replace function public.event_group(eid uuid)
+returns uuid language sql security definer stable set search_path = public as $$
+  select group_id from public.events where id = eid;
+$$;
+
+-- ============================================================
+--  RLS
+-- ============================================================
+alter table public.profiles            enable row level security;
+alter table public.groups              enable row level security;
+alter table public.group_members       enable row level security;
+alter table public.events              enable row level security;
+alter table public.event_participants  enable row level security;
+alter table public.payments            enable row level security;
+alter table public.stripe_accounts     enable row level security;
+
+-- Profils : chacun lit tous les profils des groupes qu'il partage ; modifie le sien.
+drop policy if exists "profiles_read" on public.profiles;
+create policy "profiles_read" on public.profiles for select using (true);
+drop policy if exists "profiles_upsert" on public.profiles;
+create policy "profiles_upsert" on public.profiles for insert with check (id = auth.uid());
+drop policy if exists "profiles_update" on public.profiles;
+create policy "profiles_update" on public.profiles for update using (id = auth.uid());
+
+-- Groupes : visibles par leurs membres ; créables par tout utilisateur connecté.
+drop policy if exists "groups_read" on public.groups;
+create policy "groups_read" on public.groups for select using (public.is_group_member(id) or created_by = auth.uid());
+drop policy if exists "groups_insert" on public.groups;
+create policy "groups_insert" on public.groups for insert with check (created_by = auth.uid());
+drop policy if exists "groups_update" on public.groups;
+create policy "groups_update" on public.groups for update using (created_by = auth.uid());
+drop policy if exists "groups_delete" on public.groups;
+create policy "groups_delete" on public.groups for delete using (created_by = auth.uid());
+
+-- Membres : visibles par les membres du groupe ; on peut s'ajouter soi-même (rejoindre).
+drop policy if exists "members_read" on public.group_members;
+create policy "members_read" on public.group_members for select using (public.is_group_member(group_id));
+drop policy if exists "members_join" on public.group_members;
+create policy "members_join" on public.group_members for insert with check (user_id = auth.uid());
+drop policy if exists "members_leave" on public.group_members;
+create policy "members_leave" on public.group_members for delete using (user_id = auth.uid());
+
+-- Événements : visibles/créables par les membres du groupe.
+drop policy if exists "events_read" on public.events;
+create policy "events_read" on public.events for select using (public.is_group_member(group_id));
+drop policy if exists "events_insert" on public.events;
+create policy "events_insert" on public.events for insert with check (public.is_group_member(group_id) and organizer_id = auth.uid());
+drop policy if exists "events_update" on public.events;
+create policy "events_update" on public.events for update using (organizer_id = auth.uid());
+drop policy if exists "events_delete" on public.events;
+create policy "events_delete" on public.events for delete using (organizer_id = auth.uid());
+
+-- Participants : visibles par les membres du groupe ; on s'inscrit/désinscrit soi-même.
+drop policy if exists "parts_read" on public.event_participants;
+create policy "parts_read" on public.event_participants for select using (public.is_group_member(public.event_group(event_id)));
+-- Tout membre du groupe peut ajouter des participants (ex. l'organisateur compose le partage).
+drop policy if exists "parts_join" on public.event_participants;
+create policy "parts_join" on public.event_participants for insert with check (public.is_group_member(public.event_group(event_id)));
+-- On peut se retirer soi-même, ou l'organisateur peut retirer quelqu'un.
+drop policy if exists "parts_leave" on public.event_participants;
+create policy "parts_leave" on public.event_participants for delete using (
+  user_id = auth.uid()
+  or auth.uid() = (select organizer_id from public.events where id = event_id)
+);
+
+-- Paiements : lecture par les membres du groupe. L'écriture se fait via le webhook (service_role, qui contourne la RLS).
+drop policy if exists "payments_read" on public.payments;
+create policy "payments_read" on public.payments for select using (public.is_group_member(public.event_group(event_id)));
+
+-- Comptes Stripe : chacun ne voit/écrit que le sien.
+drop policy if exists "stripe_self" on public.stripe_accounts;
+create policy "stripe_self" on public.stripe_accounts for all using (user_id = auth.uid()) with check (user_id = auth.uid());
+
+-- ============================================================
+--  Astuce : à la création d'un groupe, ajouter le créateur comme membre.
+-- ============================================================
+create or replace function public.add_creator_as_member()
+returns trigger language plpgsql security definer set search_path = public as $$
+begin
+  insert into public.group_members (group_id, user_id)
+  values (new.id, new.created_by)
+  on conflict do nothing;
+  return new;
+end; $$;
+
+drop trigger if exists on_group_created on public.groups;
+create trigger on_group_created
+  after insert on public.groups
+  for each row execute function public.add_creator_as_member();

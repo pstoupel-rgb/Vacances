@@ -80,6 +80,69 @@ export async function createEvent(formData: FormData) {
   redirect(`/event/${ev.id}`);
 }
 
+// Flux « dîner » : on invite des gens par email, et le groupe est créé au moment où on valide.
+export async function createDinner(formData: FormData) {
+  const { supabase, user } = await requireUser();
+  const title = String(formData.get('title') || '').trim();
+  if (!title) return;
+  const ephemeral = String(formData.get('ephemeral') || '') === 'on';
+  const groupName = String(formData.get('group_name') || '').trim() || `Dîner — ${title}`;
+
+  // 1) le groupe se crée
+  const { data: group, error: gErr } = await supabase
+    .from('groups')
+    .insert({ name: groupName, emoji: '🍝', created_by: user.id, ephemeral })
+    .select('id')
+    .single();
+  if (gErr || !group) throw new Error(gErr?.message || 'Création du groupe impossible');
+
+  // 2) le dîner
+  const cost = parseFloat(String(formData.get('cost') || '0')) || 0;
+  const { data: ev, error: eErr } = await supabase
+    .from('events')
+    .insert({
+      group_id: group.id,
+      type: 'diner',
+      title,
+      event_date: String(formData.get('event_date') || '') || null,
+      event_time: String(formData.get('event_time') || '') || null,
+      place: String(formData.get('place') || '').trim() || null,
+      note: String(formData.get('note') || '').trim() || null,
+      organizer_id: user.id,
+      payment_mode: 'split',
+      cost,
+    })
+    .select('id')
+    .single();
+  if (eErr || !ev) throw new Error(eErr?.message || 'Création du dîner impossible');
+  await supabase.from('event_participants').insert({ event_id: ev.id, user_id: user.id, status: 'yes' });
+
+  // 3) invitations individuelles par email
+  const emails = Array.from(
+    new Set(
+      formData
+        .getAll('email')
+        .map((v) => String(v).trim().toLowerCase())
+        .filter((e) => e && e.includes('@') && e !== (user.email || '').toLowerCase())
+    )
+  );
+  if (emails.length) {
+    await supabase.from('group_invites').insert(emails.map((email) => ({ group_id: group.id, email, invited_by: user.id })));
+  }
+
+  redirect(`/event/${ev.id}`);
+}
+
+// À appeler à l'ouverture de l'app : rejoint les groupes où l'utilisateur a été invité par email.
+export async function claimInvites() {
+  const supabase = createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return;
+  await supabase.rpc('claim_invites');
+}
+
 export async function joinEvent(eventId: string, groupId: string) {
   const { supabase, user } = await requireUser();
   await supabase.from('event_participants').insert({ event_id: eventId, user_id: user.id });

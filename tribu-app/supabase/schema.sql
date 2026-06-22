@@ -278,3 +278,43 @@ alter table public.event_participants
 -- Nombre de bouteilles par lot (ex. "Pack Découverte" = 6 bouteilles)
 alter table public.wine_items
   add column if not exists bottles int not null default 1;
+
+-- ============================================================
+--  DÎNERS : invitation par email + groupe éphémère/réutilisable
+-- ============================================================
+alter table public.groups
+  add column if not exists ephemeral boolean not null default false;
+
+create table if not exists public.group_invites (
+  id uuid primary key default gen_random_uuid(),
+  group_id uuid not null references public.groups(id) on delete cascade,
+  email text not null,
+  invited_by uuid not null references auth.users(id) on delete cascade,
+  accepted boolean not null default false,
+  created_at timestamptz not null default now()
+);
+create index if not exists group_invites_email_idx on public.group_invites (lower(email));
+
+alter table public.group_invites enable row level security;
+drop policy if exists "gi_read" on public.group_invites;
+create policy "gi_read" on public.group_invites for select using (public.is_group_member(group_id));
+drop policy if exists "gi_insert" on public.group_invites;
+create policy "gi_insert" on public.group_invites for insert with check (public.is_group_member(group_id) and invited_by = auth.uid());
+drop policy if exists "gi_delete" on public.group_invites;
+create policy "gi_delete" on public.group_invites for delete using (invited_by = auth.uid());
+
+-- À la connexion : l'utilisateur rejoint automatiquement les groupes où son email a été invité.
+-- SECURITY DEFINER => contourne la RLS pour lire/écrire les invitations.
+create or replace function public.claim_invites()
+returns void language plpgsql security definer set search_path = public as $$
+begin
+  insert into public.group_members (group_id, user_id)
+    select gi.group_id, auth.uid()
+    from public.group_invites gi
+    where lower(gi.email) = lower(auth.email()) and gi.accepted = false
+  on conflict do nothing;
+
+  update public.group_invites
+    set accepted = true
+    where lower(email) = lower(auth.email()) and accepted = false;
+end; $$;

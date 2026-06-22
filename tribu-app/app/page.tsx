@@ -12,6 +12,9 @@ export default async function HomePage() {
   } = await supabase.auth.getUser();
   if (!user) redirect('/login');
 
+  // Rejoint automatiquement les groupes où l'utilisateur a été invité par email.
+  await supabase.rpc('claim_invites');
+
   const { data: profile } = await supabase.from('profiles').select('name, emoji').eq('id', user.id).single();
 
   const { data: memberships } = await supabase
@@ -51,6 +54,15 @@ export default async function HomePage() {
       </div>
 
       <div className="wrap">
+        <Link href="/dinner/new" className="act" style={{ background: 'var(--gor)', color: '#fff', marginTop: 4 }}>
+          <div className="thumb" style={{ background: 'rgba(255,255,255,.22)' }}>🍝</div>
+          <div style={{ flex: 1 }}>
+            <div className="a-title" style={{ color: '#fff' }}>Organiser un dîner</div>
+            <div style={{ fontSize: '.78rem', opacity: 0.92 }}>Invite par email, le groupe se crée tout seul</div>
+          </div>
+          <div className="chev" style={{ color: '#fff' }}>›</div>
+        </Link>
+
         <div className="sec">
           <h3>Mes groupes</h3>
           <Link href="/groups" className="link">Voir tout</Link>

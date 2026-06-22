@@ -68,6 +68,7 @@ export default async function GroupPage({ params, searchParams }: { params: { id
     (cc || []).forEach((c: any) => { if (c.status === 'paid') collectedByCag[c.cagnotte_id] = (collectedByCag[c.cagnotte_id] || 0) + Number(c.amount); });
   }
 
+  const net = groupBalances(events, partsByEvent, paysByEvent, members.map((m: any) => m.id));
   const avs = members.slice(0, 6).map((m: any) => <div key={m.id} className="a">{m.emoji}</div>);
 
   return (
@@ -195,50 +196,31 @@ export default async function GroupPage({ params, searchParams }: { params: { id
           )}
 
           {tab === 'membres' && (
-            <div className="card">
-              {members.map((m: any) => (
-                <div key={m.id} className="lrow">
-                  <div className="av" style={{ width: 42, height: 42, fontSize: '1.15rem' }}>{m.emoji}</div>
-                  <div style={{ flex: 1 }}>
-                    <div className="l-name">{m.name} {m.id === user.id && <span className="badge purple">toi</span>}</div>
-                  </div>
-                </div>
-              ))}
-              <div className="hr" />
-              <p className="muted" style={{ fontSize: '.82rem' }}>
-                Invite un ami avec ce code : <b style={{ color: 'var(--text)' }}>{group.invite_code}</b>
-              </p>
-            </div>
+            <>
+              <div className="card">
+                {members.map((m: any) => {
+                  const n = net[m.id] || 0;
+                  const cls = Math.abs(n) < 0.01 ? '' : n > 0 ? 'pos' : 'neg';
+                  const txt = Math.abs(n) < 0.01 ? '' : n > 0 ? '+' + eur(n) : '−' + eur(-n);
+                  return (
+                    <div key={m.id} className="lrow">
+                      <div className="av" style={{ width: 42, height: 42, fontSize: '1.15rem' }}>{m.emoji}</div>
+                      <div style={{ flex: 1 }}>
+                        <div className="l-name">{m.name} {m.id === user.id && <span className="badge purple">toi</span>}</div>
+                        {Math.abs(n) >= 0.01 && <div className="l-sub">{n > 0 ? 'on lui doit' : 'doit au groupe'}</div>}
+                      </div>
+                      {txt && <div className={`amount ${cls}`}>{txt}</div>}
+                    </div>
+                  );
+                })}
+              </div>
+              <div className="banner" style={{ marginTop: 14 }}>
+                🔗 Invite un ami avec ce code : <b style={{ color: 'var(--text)' }}>&nbsp;{group.invite_code}</b>
+              </div>
+            </>
           )}
         </div>
       </div>
-    </div>
-  );
-}
-
-function Balances({ events, partsByEvent, paysByEvent, members, meId }: any) {
-  const hasSplit = events.some((e: EventRow) => e.payment_mode === 'split');
-  if (!hasSplit) {
-    return <div className="empty"><div className="big">⚖️</div><h3>Aucun solde</h3><p>Les soldes apparaissent avec les activités en partage d&apos;addition.</p></div>;
-  }
-  const net = groupBalances(events, partsByEvent, paysByEvent, members.map((m: any) => m.id));
-  return (
-    <div className="card">
-      {members.map((m: any) => {
-        const n = net[m.id] || 0;
-        const cls = Math.abs(n) < 0.01 ? '' : n > 0 ? 'pos' : 'neg';
-        const txt = Math.abs(n) < 0.01 ? 'à jour' : n > 0 ? '+' + eur(n) : '−' + eur(-n);
-        return (
-          <div key={m.id} className="lrow">
-            <div className="av" style={{ width: 42, height: 42, fontSize: '1.15rem' }}>{m.emoji}</div>
-            <div style={{ flex: 1 }}>
-              <div className="l-name">{m.name} {m.id === meId && <span className="badge purple">toi</span>}</div>
-              <div className="l-sub">{n > 0 ? 'on lui doit' : n < -0.01 ? 'doit au groupe' : 'équilibré'}</div>
-            </div>
-            <div className={`amount ${cls}`}>{txt}</div>
-          </div>
-        );
-      })}
     </div>
   );
 }

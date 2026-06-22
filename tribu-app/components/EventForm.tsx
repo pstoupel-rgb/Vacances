@@ -2,12 +2,11 @@
 
 import { useState } from 'react';
 import { createEvent } from '@/app/actions';
-import { TYPES, type EventType, type PaymentMode } from '@/lib/types';
+import { TYPES, type EventType } from '@/lib/types';
 
 export default function EventForm({ groupId, members }: { groupId: string; members: any[] }) {
   const [open, setOpen] = useState(false);
   const [type, setType] = useState<EventType>('diner');
-  const [mode, setMode] = useState<PaymentMode>('split');
   const [parts, setParts] = useState<string[]>([]);
 
   function toggle(id: string) {
@@ -17,7 +16,7 @@ export default function EventForm({ groupId, members }: { groupId: string; membe
   if (!open) {
     return (
       <button className="btn" onClick={() => setOpen(true)}>
-        ＋ Proposer une sortie
+        ＋ Proposer une activité
       </button>
     );
   }
@@ -26,7 +25,7 @@ export default function EventForm({ groupId, members }: { groupId: string; membe
     <form action={createEvent} className="card">
       <input type="hidden" name="group_id" value={groupId} />
       <input type="hidden" name="type" value={type} />
-      <input type="hidden" name="payment_mode" value={mode} />
+      <input type="hidden" name="payment_mode" value="split" />
 
       <label className="fld">
         <span className="lab">Type</span>
@@ -62,42 +61,27 @@ export default function EventForm({ groupId, members }: { groupId: string; membe
       </label>
 
       <label className="fld">
-        <span className="lab">Mode de paiement</span>
-        <div className="pick">
-          <button type="button" className={mode === 'split' ? 'on' : ''} onClick={() => setMode('split')}>
-            <span className="pe">⇄</span>
-            Partage
-          </button>
-          <button type="button" className={mode === 'cagnotte' ? 'on' : ''} onClick={() => setMode('cagnotte')}>
-            <span className="pe">🏆</span>
-            Cagnotte
-          </button>
-        </div>
+        <span className="lab">Montant total de l&apos;addition (€, optionnel)</span>
+        <input className="input" type="number" inputMode="decimal" name="cost" placeholder="0" min="0" step="0.01" />
+        <span className="muted" style={{ fontSize: '.76rem', marginTop: 6, display: 'block' }}>
+          Réparti entre les participants qui répondent « Je participe ».
+        </span>
       </label>
 
       <label className="fld">
-        <span className="lab">
-          {mode === 'split' ? "Montant total de l'addition (€)" : 'Objectif de la cagnotte (€, optionnel)'}
-        </span>
-        <input className="input" type="number" inputMode="decimal" name="cost" placeholder="0" min="0" step="0.01" />
-      </label>
-
-      {mode === 'split' && (
-        <label className="fld">
-          <span className="lab">Participants</span>
-          <div className="chips">
-            {members.map((m) => (
-              <div key={m.id} className={`chip ${parts.includes(m.id) ? 'on' : ''}`} onClick={() => toggle(m.id)}>
-                {m.emoji} {m.name?.split(' ')[0]}
-                {parts.includes(m.id) && <span style={{ color: 'var(--brand2)', fontWeight: 700 }}>✓</span>}
-              </div>
-            ))}
-          </div>
-          {parts.map((id) => (
-            <input key={id} type="hidden" name="participant" value={id} />
+        <span className="lab">Pré-sélectionner des participants</span>
+        <div className="chips">
+          {members.map((m) => (
+            <div key={m.id} className={`chip ${parts.includes(m.id) ? 'on' : ''}`} onClick={() => toggle(m.id)}>
+              {m.emoji} {m.name?.split(' ')[0]}
+              {parts.includes(m.id) && <span style={{ color: 'var(--purple)', fontWeight: 700 }}>✓</span>}
+            </div>
           ))}
-        </label>
-      )}
+        </div>
+        {parts.map((id) => (
+          <input key={id} type="hidden" name="participant" value={id} />
+        ))}
+      </label>
 
       <div className="row">
         <button type="button" className="btn ghost" onClick={() => setOpen(false)}>

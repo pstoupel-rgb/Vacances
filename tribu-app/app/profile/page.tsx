@@ -30,6 +30,16 @@ export default async function ProfilePage() {
       <div className="wrap">
         <ProfileEditor name={profile?.name || ''} emoji={profile?.emoji || '😎'} />
 
+        <div style={{ height: 14 }} />
+        <a href="/orders" className="act">
+          <div className="thumb" style={{ background: 'var(--gtl)' }}>🍷</div>
+          <div style={{ flex: 1 }}>
+            <div className="a-title">Mes commandes de vin</div>
+            <div className="a-meta"><span>Suivi de tes commandes groupées</span></div>
+          </div>
+          <div className="chev">›</div>
+        </a>
+
         <div className="banner" style={{ marginTop: 16 }}>
           ⚡ Active les encaissements pour recevoir l&apos;argent des sorties &amp; commandes que tu organises.
         </div>

@@ -43,7 +43,7 @@ export default function TabBar() {
         {Icon.groups}
         <span>Groupes</span>
       </Link>
-      <Link href="/groups" className="plus" aria-label="Créer">
+      <Link href="/new" className="plus" aria-label="Créer">
         +
       </Link>
       <Link href="/activities" className={on('/activities') ? 'on' : ''}>

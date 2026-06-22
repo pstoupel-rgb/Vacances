@@ -8,12 +8,15 @@ import WineOrderForm from '@/components/WineOrderForm';
 import PollForm from '@/components/PollForm';
 import CagnotteForm from '@/components/CagnotteForm';
 import Ring from '@/components/Ring';
+import PhotoUploader from '@/components/PhotoUploader';
+import PhotoGrid from '@/components/PhotoGrid';
 
 const GRADS = ['var(--gp)', 'var(--gpk)', 'var(--gtl)', 'var(--gor)', 'var(--gbl)'];
 const TABS = [
   { id: 'acts', label: 'Activités', icon: '📅' },
   { id: 'cagnotte', label: 'Cagnotte', icon: '🐷' },
   { id: 'cmd', label: 'Commandes', icon: '🍷' },
+  { id: 'photos', label: 'Photos', icon: '📷' },
   { id: 'membres', label: 'Membres', icon: '👥' },
 ];
 
@@ -67,6 +70,18 @@ export default async function GroupPage({ params, searchParams }: { params: { id
     const { data: cc } = await supabase.from('cagnotte_contributions').select('cagnotte_id, amount, status').in('cagnotte_id', cagnottes.map((c: any) => c.id));
     (cc || []).forEach((c: any) => { if (c.status === 'paid') collectedByCag[c.cagnotte_id] = (collectedByCag[c.cagnotte_id] || 0) + Number(c.amount); });
   }
+
+  // Photos (+ URLs signées)
+  const { data: photoRows } = await supabase.from('photos').select('*').eq('group_id', params.id).order('created_at', { ascending: false });
+  const photos = photoRows || [];
+  const signed: Record<string, string> = {};
+  if (photos.length) {
+    const { data: urls } = await supabase.storage.from('photos').createSignedUrls(photos.map((p: any) => p.path), 3600);
+    (urls || []).forEach((u: any, i: number) => { if (u.signedUrl) signed[photos[i].path] = u.signedUrl; });
+  }
+  const photoItems = photos
+    .filter((p: any) => signed[p.path])
+    .map((p: any) => ({ id: p.id, url: signed[p.path], path: p.path, mine: p.user_id === user.id }));
 
   const net = groupBalances(events, partsByEvent, paysByEvent, members.map((m: any) => m.id));
   const avs = members.slice(0, 6).map((m: any) => <div key={m.id} className="a">{m.emoji}</div>);
@@ -192,6 +207,15 @@ export default async function GroupPage({ params, searchParams }: { params: { id
               )}
               <div className="sec"><h3>Nouvelle commande</h3></div>
               <WineOrderForm groupId={group.id} />
+            </>
+          )}
+
+          {tab === 'photos' && (
+            <>
+              <div style={{ marginBottom: 14 }}>
+                <PhotoUploader groupId={group.id} />
+              </div>
+              <PhotoGrid photos={photoItems} groupId={group.id} />
             </>
           )}
 

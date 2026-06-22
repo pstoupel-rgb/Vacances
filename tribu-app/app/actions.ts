@@ -326,3 +326,19 @@ export async function deleteCagnotte(cagnotteId: string, groupId: string) {
   await supabase.from('cagnottes').delete().eq('id', cagnotteId);
   redirect(`/group/${groupId}?tab=cagnotte`);
 }
+
+/* ----------------------- Photos ----------------------- */
+
+// Enregistre la ligne photo après l'upload du fichier dans le storage (fait côté client).
+export async function addPhoto(groupId: string, path: string) {
+  const { supabase, user } = await requireUser();
+  await supabase.from('photos').insert({ group_id: groupId, user_id: user.id, path });
+  revalidatePath(`/group/${groupId}`);
+}
+
+export async function deletePhoto(photoId: string, path: string, groupId: string) {
+  const { supabase } = await requireUser();
+  await supabase.storage.from('photos').remove([path]);
+  await supabase.from('photos').delete().eq('id', photoId);
+  revalidatePath(`/group/${groupId}`);
+}

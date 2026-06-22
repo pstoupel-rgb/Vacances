@@ -407,3 +407,37 @@ create policy "cag_delete" on public.cagnottes for delete using (organizer_id = 
 
 drop policy if exists "cagc_read" on public.cagnotte_contributions;
 create policy "cagc_read" on public.cagnotte_contributions for select using (public.is_group_member(public.cagnotte_group(cagnotte_id)));
+
+-- ============================================================
+--  PHOTOS (galerie par groupe, stockage Supabase Storage)
+-- ============================================================
+create table if not exists public.photos (
+  id uuid primary key default gen_random_uuid(),
+  group_id uuid not null references public.groups(id) on delete cascade,
+  user_id uuid not null references auth.users(id) on delete cascade,
+  path text not null,                 -- chemin dans le bucket: "<group_id>/<fichier>"
+  caption text,
+  created_at timestamptz not null default now()
+);
+alter table public.photos enable row level security;
+drop policy if exists "photos_read" on public.photos;
+create policy "photos_read" on public.photos for select using (public.is_group_member(group_id));
+drop policy if exists "photos_insert" on public.photos;
+create policy "photos_insert" on public.photos for insert with check (user_id = auth.uid() and public.is_group_member(group_id));
+drop policy if exists "photos_delete" on public.photos;
+create policy "photos_delete" on public.photos for delete using (user_id = auth.uid());
+
+-- Bucket privé "photos"
+insert into storage.buckets (id, name, public) values ('photos', 'photos', false)
+on conflict (id) do nothing;
+
+-- Accès au stockage restreint aux membres du groupe (1er segment du chemin = group_id)
+drop policy if exists "photos_obj_select" on storage.objects;
+create policy "photos_obj_select" on storage.objects for select to authenticated
+  using (bucket_id = 'photos' and public.is_group_member(((storage.foldername(name))[1])::uuid));
+drop policy if exists "photos_obj_insert" on storage.objects;
+create policy "photos_obj_insert" on storage.objects for insert to authenticated
+  with check (bucket_id = 'photos' and public.is_group_member(((storage.foldername(name))[1])::uuid));
+drop policy if exists "photos_obj_delete" on storage.objects;
+create policy "photos_obj_delete" on storage.objects for delete to authenticated
+  using (bucket_id = 'photos' and owner = auth.uid());

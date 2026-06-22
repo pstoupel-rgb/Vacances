@@ -59,3 +59,5 @@ export interface CagnotteContribution {
   id: string; cagnotte_id: string; user_id: string; amount: number;
   status: string; stripe_session_id: string | null; created_at: string;
 }
+
+export interface Photo { id: string; group_id: string; user_id: string; path: string; caption: string | null; created_at: string; }

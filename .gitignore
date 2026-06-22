@@ -1,0 +1,7 @@
+# Build artifacts / dependencies (apps have their own .gitignore too)
+.next/
+node_modules/
+*.tsbuildinfo
+.DS_Store
+.env
+.env.local

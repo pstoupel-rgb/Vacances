@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import { createClient } from '@/lib/supabase/server';
 import { redirect, notFound } from 'next/navigation';
-import { TYPES, type EventRow, type Payment, type WineOrder } from '@/lib/types';
+import { TYPES, ORDER_CATS, type EventRow, type Payment, type WineOrder } from '@/lib/types';
 import { eur, shareOf, isSettled, collected, groupBalances } from '@/lib/money';
 import EventForm from '@/components/EventForm';
 import WineOrderForm from '@/components/WineOrderForm';
@@ -193,12 +193,13 @@ export default async function GroupPage({ params, searchParams }: { params: { id
               ) : (
                 wineOrders.map((o) => {
                   const st = o.status === 'closed' ? { label: 'Clôturée', cls: 'green' } : { label: 'Ouverte', cls: 'purple' };
+                  const cat = ORDER_CATS[o.category] || ORDER_CATS.vin;
                   return (
                     <Link key={o.id} href={`/wine/${o.id}`} className="act">
-                      <div className="thumb" style={{ background: 'var(--gtl)' }}>🍷</div>
+                      <div className="thumb" style={{ background: cat.grad }}>{cat.emoji}</div>
                       <div style={{ flex: 1 }}>
                         <div className="a-title">{o.title}</div>
-                        <div className="a-meta"><span>{o.min_bottles ? `seuil ${o.min_bottles} bouteilles` : 'commande groupée'}{o.deadline ? ' · ' + o.deadline : ''}</span></div>
+                        <div className="a-meta"><span>{cat.label}{o.min_bottles ? ` · seuil ${o.min_bottles} ${cat.unit}` : ''}{o.deadline ? ' · ' + o.deadline : ''}</span></div>
                       </div>
                       <span className={`badge ${st.cls}`}>{st.label}</span>
                     </Link>

@@ -33,10 +33,18 @@ export const WINE_COLORS: Record<WineColor, { label: string; emoji: string; colo
   petillant: { label: 'Pétillant', emoji: '🍾', color: '#0ea5e9' },
 };
 
+export type OrderCategory = 'vin' | 'nourriture' | 'cadeaux' | 'autre';
+export const ORDER_CATS: Record<OrderCategory, { label: string; emoji: string; unit: string; grad: string }> = {
+  vin:        { label: 'Vin',        emoji: '🍷', unit: 'bouteilles', grad: 'var(--gtl)' },
+  nourriture: { label: 'Nourriture', emoji: '🍽️', unit: 'parts',      grad: 'var(--gor)' },
+  cadeaux:    { label: 'Cadeaux',    emoji: '🎁', unit: 'cadeaux',    grad: 'var(--gpk)' },
+  autre:      { label: 'Autre',      emoji: '📦', unit: 'articles',   grad: 'var(--gp)' },
+};
+
 export interface WineOrder {
   id: string; group_id: string; title: string; status: 'open' | 'closed';
   organizer_id: string; deadline: string | null; min_bottles: number;
-  delivery_note: string | null; created_at: string;
+  delivery_note: string | null; category: OrderCategory; created_at: string;
 }
 export interface WineItem {
   id: string; order_id: string; name: string; domaine: string | null;

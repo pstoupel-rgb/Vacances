@@ -441,3 +441,7 @@ create policy "photos_obj_insert" on storage.objects for insert to authenticated
 drop policy if exists "photos_obj_delete" on storage.objects;
 create policy "photos_obj_delete" on storage.objects for delete to authenticated
   using (bucket_id = 'photos' and owner = auth.uid());
+
+-- Catégorie d'une commande groupée (vin / nourriture / cadeaux / autre)
+alter table public.wine_orders
+  add column if not exists category text not null default 'vin';

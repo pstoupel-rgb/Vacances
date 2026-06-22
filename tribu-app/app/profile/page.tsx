@@ -32,10 +32,10 @@ export default async function ProfilePage() {
 
         <div style={{ height: 14 }} />
         <a href="/orders" className="act">
-          <div className="thumb" style={{ background: 'var(--gtl)' }}>🍷</div>
+          <div className="thumb" style={{ background: 'var(--gtl)' }}>🛍️</div>
           <div style={{ flex: 1 }}>
-            <div className="a-title">Mes commandes de vin</div>
-            <div className="a-meta"><span>Suivi de tes commandes groupées</span></div>
+            <div className="a-title">Mes commandes</div>
+            <div className="a-meta"><span>Vin, nourriture, cadeaux… suivi groupé</span></div>
           </div>
           <div className="chev">›</div>
         </a>

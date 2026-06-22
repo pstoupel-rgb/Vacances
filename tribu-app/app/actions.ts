@@ -207,6 +207,7 @@ export async function createWineOrder(formData: FormData) {
       title,
       organizer_id: user.id,
       min_bottles: minBottles,
+      category: String(formData.get('category') || 'vin'),
       deadline: String(formData.get('deadline') || '') || null,
       delivery_note: String(formData.get('delivery_note') || '').trim() || null,
     })

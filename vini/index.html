@@ -1,0 +1,845 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="format-detection" content="telephone=no">
+<title>Vini</title>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Vini">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#7c3aed">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icon.svg">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700;800&family=Inter:wght@400;500;600;700&display=swap');
+  *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+  :root{
+    --purple:#7c3aed; --purple-d:#6d28d9; --purple-l:#a855f7;
+    --pink:#ec2d6f; --orange:#f97316; --teal:#13b5a6; --blue:#3b82f6; --amber:#f59e0b; --green:#22c55e;
+    --bg:#f5f4fa; --card:#fff; --text:#1c1530; --muted:#8b8a9e; --line:#eceaf3; --soft:#f3f1fa;
+    --radius:20px; --shadow:0 10px 30px rgba(60,30,120,.08); --shadow-s:0 4px 14px rgba(60,30,120,.06);
+    --gp:linear-gradient(135deg,#7c3aed,#a855f7);
+    --gpk:linear-gradient(135deg,#f0327f,#ff7aa6);
+    --gor:linear-gradient(135deg,#fb923c,#f97316);
+    --gtl:linear-gradient(135deg,#16c2b1,#0e9488);
+    --gbl:linear-gradient(135deg,#60a5fa,#3b82f6);
+  }
+  html{-webkit-text-size-adjust:100%;height:100%;}
+  body{font-family:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;background:var(--bg);color:var(--text);
+    height:100%;overflow:hidden;-webkit-touch-callout:none;-webkit-user-select:none;user-select:none;}
+  h1,h2,h3,h4,.ff{font-family:'Poppins',sans-serif;letter-spacing:-.3px;}
+  button{font-family:inherit;cursor:pointer;border:none;background:none;color:inherit;}
+  input,textarea,select{font-family:inherit;}
+  ::-webkit-scrollbar{display:none;}
+
+  /* SPLASH */
+  #splash{position:fixed;inset:0;z-index:9999;background:var(--gp);display:flex;align-items:center;justify-content:center;transition:opacity .4s;}
+  #splash.hide{opacity:0;pointer-events:none;}
+  .sp-in{text-align:center;color:#fff;}
+  .sp-logo{font-size:3.4rem;animation:pop .6s cubic-bezier(.2,.9,.3,1.3);}
+  .sp-name{font-family:'Poppins';font-weight:800;font-size:2.1rem;margin-top:6px;}
+  .sp-sub{font-size:.85rem;opacity:.9;margin-top:2px;}
+  @keyframes pop{from{transform:scale(.5);opacity:0}to{transform:scale(1);opacity:1}}
+
+  /* SHELL */
+  #app{height:100%;display:flex;flex-direction:column;max-width:560px;margin:0 auto;position:relative;background:var(--bg);}
+  #view{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding-bottom:96px;}
+
+  /* gradient header */
+  .ghead{background:var(--gp);color:#fff;padding:calc(env(safe-area-inset-top) + 18px) 20px 26px;border-radius:0 0 26px 26px;position:relative;}
+  .ghead.pink{background:var(--gpk)} .ghead.orange{background:var(--gor)} .ghead.teal{background:var(--gtl)}
+  .ghead .htop{display:flex;align-items:center;gap:12px;}
+  .ghead h1{font-size:1.7rem;font-weight:800;line-height:1.05;flex:1;}
+  .ghead .hsub{font-size:.85rem;opacity:.92;margin-top:3px;}
+  .ic-btn{width:42px;height:42px;border-radius:50%;background:rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;font-size:1.15rem;flex:0 0 auto;backdrop-filter:blur(6px);}
+  .ic-btn.solid{background:#fff;}
+  .back{width:40px;height:40px;border-radius:50%;background:rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;font-size:1.25rem;flex:0 0 auto;color:#fff;}
+
+  .wrap{padding:18px 18px 0;}
+  .sec{display:flex;align-items:center;justify-content:space-between;margin:22px 2px 12px;}
+  .sec h3{font-size:1.05rem;font-weight:700;}
+  .sec .link{color:var(--purple);font-size:.82rem;font-weight:600;}
+  .muted{color:var(--muted);}
+
+  /* GROUP rail */
+  .rail{display:flex;gap:13px;overflow-x:auto;padding:2px 18px 4px;margin:0 -18px;}
+  .gtile{flex:0 0 auto;width:118px;cursor:pointer;}
+  .gtile .ph{height:96px;border-radius:18px;display:flex;align-items:flex-end;padding:10px;color:#fff;font-size:2rem;box-shadow:var(--shadow-s);position:relative;overflow:hidden;}
+  .gtile .nm{font-size:.82rem;font-weight:600;margin-top:8px;line-height:1.2;}
+  .gtile .mb{font-size:.72rem;color:var(--muted);margin-top:1px;}
+
+  /* CARD */
+  .card{background:var(--card);border-radius:var(--radius);padding:16px;box-shadow:var(--shadow-s);}
+  .card+.card{margin-top:12px;}
+  .row{display:flex;align-items:center;gap:12px;}
+  .between{display:flex;align-items:center;justify-content:space-between;gap:12px;}
+  .hr{height:1px;background:var(--line);margin:14px 0;}
+
+  /* activity list item */
+  .act{display:flex;gap:13px;align-items:center;background:var(--card);border-radius:18px;padding:13px;box-shadow:var(--shadow-s);margin-bottom:11px;cursor:pointer;}
+  .act .thumb{width:54px;height:54px;border-radius:15px;display:flex;align-items:center;justify-content:center;font-size:1.6rem;flex:0 0 auto;color:#fff;}
+  .act .a-title{font-weight:600;font-size:.98rem;}
+  .act .a-meta{color:var(--muted);font-size:.78rem;margin-top:3px;display:flex;flex-wrap:wrap;gap:2px 9px;}
+  .act .chev{color:var(--muted);font-size:1.3rem;margin-left:auto;}
+
+  .avs{display:flex;align-items:center;margin-top:9px;}
+  .avs .a{width:27px;height:27px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.78rem;margin-left:-7px;border:2px solid #fff;background:var(--soft);}
+  .avs .a:first-child{margin-left:0;}
+  .avs .more{font-size:.74rem;color:var(--muted);margin-left:6px;font-weight:600;}
+
+  /* big activity hero card */
+  .hero-act{border-radius:20px;overflow:hidden;box-shadow:var(--shadow);background:var(--card);margin-bottom:6px;}
+  .hero-act .img{height:140px;background-size:cover;background-position:center;display:flex;align-items:flex-start;justify-content:flex-end;padding:12px;}
+  .hero-act .pad{padding:15px 16px;}
+  .pill{display:inline-flex;align-items:center;gap:6px;background:var(--soft);color:var(--purple);font-size:.74rem;font-weight:700;padding:5px 11px;border-radius:30px;}
+
+  /* tabs (icon row) */
+  .gtabs{display:flex;justify-content:space-between;padding:14px 6px 4px;}
+  .gtabs button{display:flex;flex-direction:column;align-items:center;gap:5px;font-size:.7rem;font-weight:600;color:var(--muted);flex:1;}
+  .gtabs button .ti{width:42px;height:42px;border-radius:14px;background:var(--soft);display:flex;align-items:center;justify-content:center;font-size:1.15rem;color:var(--muted);transition:.15s;}
+  .gtabs button.on{color:var(--purple);}
+  .gtabs button.on .ti{background:var(--purple);color:#fff;}
+
+  /* poll */
+  .poll-opt{position:relative;background:var(--soft);border-radius:13px;padding:13px 14px;margin-bottom:9px;overflow:hidden;cursor:pointer;display:flex;justify-content:space-between;align-items:center;font-size:.9rem;font-weight:500;z-index:0;}
+  .poll-opt .bar{position:absolute;inset:0;background:rgba(124,58,237,.14);z-index:-1;border-radius:13px;transition:width .4s;}
+  .poll-opt.win .bar{background:rgba(124,58,237,.22);}
+  .poll-opt .v{font-size:.82rem;color:var(--muted);font-weight:600;}
+  .poll-opt.mine{border:1.5px solid var(--purple);}
+
+  /* RSVP */
+  .rsvp{display:flex;gap:9px;margin:14px 0 4px;}
+  .rsvp button{flex:1;padding:12px;border-radius:13px;font-weight:600;font-size:.88rem;background:var(--soft);color:var(--text);}
+  .rsvp button.yes.on{background:var(--green);color:#fff;}
+  .rsvp button.maybe.on{background:var(--amber);color:#fff;}
+  .rsvp button.no.on{background:#ef4444;color:#fff;}
+  .stats{display:flex;border-radius:15px;overflow:hidden;background:var(--soft);}
+  .stats .st{flex:1;text-align:center;padding:13px 4px;}
+  .stats .st b{font-size:1.25rem;font-weight:700;display:block;font-family:'Poppins';}
+  .stats .st span{font-size:.7rem;color:var(--muted);}
+  .stats .st+.st{border-left:1px solid var(--line);}
+
+  /* progress ring */
+  .ring-wrap{display:flex;align-items:center;gap:16px;}
+  .ring{position:relative;width:96px;height:96px;flex:0 0 auto;}
+  .ring svg{transform:rotate(-90deg);}
+  .ring .pct{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:'Poppins';font-weight:700;font-size:1.1rem;}
+
+  .progress{height:8px;border-radius:6px;background:var(--soft);overflow:hidden;margin-top:10px;}
+  .progress>i{display:block;height:100%;border-radius:6px;background:var(--gp);}
+
+  /* list rows */
+  .lrow{display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--line);}
+  .lrow:last-child{border-bottom:none;}
+  .av{border-radius:50%;display:flex;align-items:center;justify-content:center;flex:0 0 auto;background:var(--soft);}
+  .l-name{font-weight:600;font-size:.92rem;}
+  .l-sub{color:var(--muted);font-size:.76rem;margin-top:1px;}
+  .amount{font-weight:700;font-size:.95rem;font-variant-numeric:tabular-nums;}
+  .badge{font-size:.7rem;font-weight:700;padding:4px 10px;border-radius:30px;background:var(--soft);color:var(--muted);}
+  .badge.green{background:rgba(34,197,94,.14);color:#15803d;}
+  .badge.amber{background:rgba(245,158,11,.16);color:#b45309;}
+  .badge.purple{background:rgba(124,58,237,.12);color:var(--purple);}
+  .badge.red{background:rgba(239,68,68,.12);color:#dc2626;}
+
+  /* wine bottle product */
+  .wcard{border-radius:18px;overflow:hidden;box-shadow:var(--shadow-s);background:var(--card);margin-bottom:12px;}
+  .wcard .top{height:120px;background:var(--gtl);display:flex;align-items:center;justify-content:center;font-size:3rem;}
+  .stepper{display:flex;align-items:center;gap:0;background:var(--soft);border-radius:12px;overflow:hidden;}
+  .stepper button{width:42px;height:42px;font-size:1.3rem;color:var(--purple);font-weight:700;}
+  .stepper .q{width:48px;text-align:center;font-weight:700;font-family:'Poppins';}
+
+  /* buttons */
+  .btn{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:15px;border-radius:15px;font-weight:600;font-size:1rem;background:var(--gp);color:#fff;box-shadow:0 8px 20px rgba(124,58,237,.3);transition:transform .08s;}
+  .btn:active{transform:scale(.97);}
+  .btn.pink{background:var(--gpk);box-shadow:0 8px 20px rgba(240,50,127,.3);}
+  .btn.orange{background:var(--gor);box-shadow:0 8px 20px rgba(249,115,22,.3);}
+  .btn.teal{background:var(--gtl);box-shadow:0 8px 20px rgba(19,181,166,.3);}
+  .btn.green{background:var(--green);box-shadow:0 8px 20px rgba(34,197,94,.3);}
+  .btn.ghost{background:var(--soft);color:var(--text);box-shadow:none;}
+  .btn.outline{background:#fff;color:var(--purple);box-shadow:none;border:1.5px solid var(--line);}
+  .btn.small{padding:11px 16px;width:auto;font-size:.9rem;border-radius:12px;}
+  .btn.danger{background:#fff;color:#dc2626;box-shadow:none;border:1px solid rgba(220,38,38,.25);}
+
+  /* bottom nav */
+  #nav{position:fixed;left:0;right:0;bottom:0;z-index:90;max-width:560px;margin:0 auto;
+    background:rgba(255,255,255,.92);backdrop-filter:blur(16px);border-top:1px solid var(--line);
+    display:flex;align-items:center;justify-content:space-around;padding:8px 6px calc(env(safe-area-inset-bottom) + 8px);}
+  #nav button{display:flex;flex-direction:column;align-items:center;gap:3px;font-size:.66rem;font-weight:600;color:var(--muted);flex:1;}
+  #nav button.on{color:var(--purple);}
+  #nav button svg{width:23px;height:23px;}
+  #nav .plus{width:52px;height:52px;border-radius:17px;background:var(--gp);color:#fff;display:flex;align-items:center;justify-content:center;font-size:1.7rem;box-shadow:0 8px 18px rgba(124,58,237,.4);margin-top:-22px;}
+
+  /* form */
+  label.fld{display:block;margin-bottom:15px;}
+  label.fld .lab{font-size:.8rem;font-weight:600;color:var(--text);margin-bottom:7px;display:block;}
+  .input{width:100%;background:var(--soft);border:1.5px solid transparent;border-radius:13px;padding:14px;color:var(--text);font-size:1rem;outline:none;}
+  .input:focus{border-color:var(--purple);background:#fff;}
+  textarea.input{resize:none;min-height:76px;}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:11px;}
+
+  .pick{display:flex;gap:10px;flex-wrap:wrap;}
+  .pick button{flex:1 1 21%;min-width:70px;background:var(--soft);border:1.5px solid transparent;border-radius:15px;padding:14px 6px;display:flex;flex-direction:column;align-items:center;gap:6px;font-size:.78rem;font-weight:600;color:var(--muted);}
+  .pick button .pe{font-size:1.5rem;}
+  .pick button.on{border-color:var(--purple);background:rgba(124,58,237,.08);color:var(--text);}
+
+  .dots{display:flex;gap:11px;}
+  .dots button{width:34px;height:34px;border-radius:50%;border:3px solid transparent;}
+  .dots button.on{border-color:var(--text);}
+
+  .chips{display:flex;flex-wrap:wrap;gap:9px;}
+  .chip{display:flex;align-items:center;gap:7px;background:var(--soft);border:1.5px solid transparent;border-radius:30px;padding:7px 13px;font-size:.85rem;font-weight:500;cursor:pointer;}
+  .chip.on{border-color:var(--purple);background:rgba(124,58,237,.08);}
+
+  .empty{text-align:center;padding:46px 22px;color:var(--muted);}
+  .empty .big{font-size:2.8rem;margin-bottom:10px;}
+  .empty h3{color:var(--text);font-weight:700;margin-bottom:5px;}
+  .empty p{font-size:.86rem;line-height:1.5;}
+
+  /* sheet */
+  .scrim{position:fixed;inset:0;background:rgba(28,21,48,.45);z-index:200;opacity:0;pointer-events:none;transition:opacity .25s;max-width:560px;margin:0 auto;}
+  .scrim.show{opacity:1;pointer-events:auto;}
+  .sheet{position:fixed;left:0;right:0;bottom:0;z-index:201;max-width:560px;margin:0 auto;background:#fff;border-radius:26px 26px 0 0;
+    padding:8px 20px calc(env(safe-area-inset-bottom) + 22px);transform:translateY(110%);transition:transform .32s cubic-bezier(.2,.9,.3,1);max-height:93vh;overflow-y:auto;}
+  .sheet.show{transform:none;}
+  .grip{width:42px;height:5px;border-radius:5px;background:var(--line);margin:6px auto 16px;}
+  .sheet h2{font-size:1.3rem;font-weight:700;margin-bottom:4px;}
+  .sheet .sub{color:var(--muted);font-size:.86rem;margin-bottom:18px;}
+
+  /* stripe */
+  .stripe-amt-card{background:var(--gp);color:#fff;border-radius:18px;padding:16px;margin-bottom:16px;}
+  .stripe-amt-card .lbl{font-size:.8rem;opacity:.9;}
+  .stripe-amt-card .big{font-family:'Poppins';font-weight:800;font-size:2.1rem;margin-top:2px;}
+  .stripe-amt-card .for{font-size:.82rem;opacity:.9;margin-top:6px;}
+  .sumrow{display:flex;justify-content:space-between;font-size:.9rem;padding:7px 0;}
+  .sumrow.total{font-weight:700;border-top:1px solid var(--line);margin-top:6px;padding-top:12px;font-size:1rem;}
+  .pm-card{display:flex;align-items:center;gap:12px;background:var(--soft);border-radius:14px;padding:14px;margin:14px 0;}
+  .secure{text-align:center;color:var(--muted);font-size:.74rem;margin-top:12px;display:flex;align-items:center;justify-content:center;gap:5px;}
+  .spinner{width:20px;height:20px;border:2.5px solid rgba(255,255,255,.4);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  .pay-ok{text-align:center;padding:22px 8px;}
+  .pay-ok .ck{width:78px;height:78px;border-radius:50%;background:var(--green);display:flex;align-items:center;justify-content:center;font-size:2.5rem;color:#fff;margin:0 auto 14px;animation:pop .4s cubic-bezier(.2,.9,.3,1.3);}
+
+  #toast{position:fixed;left:50%;bottom:104px;translate:-50% 0;transform:translateY(16px);background:var(--text);color:#fff;padding:11px 18px;border-radius:30px;font-size:.85rem;font-weight:500;z-index:500;opacity:0;pointer-events:none;transition:opacity .25s,transform .25s;max-width:86%;text-align:center;}
+  #toast.show{opacity:1;transform:translateY(0);}
+  .banner{background:rgba(124,58,237,.08);border-radius:13px;padding:11px 14px;font-size:.78rem;color:var(--purple);display:flex;gap:8px;align-items:center;margin:0 0 14px;}
+</style>
+</head>
+<body>
+
+<div id="splash"><div class="sp-in"><div class="sp-logo">🍷</div><div class="sp-name">Vini</div><div class="sp-sub">Entre amis, on organise & on partage</div></div></div>
+
+<div id="app">
+  <div id="view"></div>
+  <div id="nav"></div>
+</div>
+
+<div class="scrim" id="scrim" onclick="closeSheet()"></div>
+<div class="sheet" id="sheet"></div>
+<div id="toast"></div>
+
+<script>
+/* ============================================================
+   VINI — prototype (paiement Stripe SIMULÉ, 100% local)
+   ============================================================ */
+const ACT_TYPES={
+  diner:{label:'Dîner',emoji:'🍝',grad:'var(--gor)'},
+  sortie:{label:'Sortie',emoji:'🎉',grad:'var(--gp)'},
+  sport:{label:'Sport',emoji:'🎾',grad:'var(--gtl)'},
+  autre:{label:'Autre',emoji:'📌',grad:'var(--gbl)'},
+};
+const WINE_COLORS={rouge:{label:'Rouge',emoji:'🍷'},blanc:{label:'Blanc',emoji:'🥂'},rose:{label:'Rosé',emoji:'🌸'},petillant:{label:'Pétillant',emoji:'🍾'}};
+const GRADS=['var(--gp)','var(--gpk)','var(--gtl)','var(--gor)','var(--gbl)'];
+const DOTCOLORS=['#7c3aed','#ec2d6f','#f59e0b','#22c55e','#3b82f6'];
+const EMOJIS=['😎','🦊','🐼','🦁','🐯','🐸','🦄','🐙','🐧','🤖','🔥','🌟','🍷','🎾'];
+const SERVICE_FEE=0.5;
+
+let DB=load(); let nav={screen:'home',params:{}}; let draft={};
+
+function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2,7);}
+function load(){try{return JSON.parse(localStorage.getItem('vini_db_v1'))||null;}catch(e){return null;}}
+function save(){localStorage.setItem('vini_db_v1',JSON.stringify(DB));}
+const $=(s,el=document)=>el.querySelector(s);
+const eur=n=>(Math.round(n*100)/100).toLocaleString('fr-FR',{minimumFractionDigits:n%1?2:0,maximumFractionDigits:2})+' €';
+const esc=s=>(s||'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+function fmtDate(d){if(!d)return '';return new Date(d+'T00:00:00').toLocaleDateString('fr-FR',{weekday:'short',day:'numeric',month:'short'});}
+function isoIn(days){const d=new Date();d.setDate(d.getDate()+days);return d.toISOString().slice(0,10);}
+function group(id){return DB.groups.find(g=>g.id===id);}
+function mem(g,id){return g.members.find(m=>m.id===id);}
+function firstName(n){return (n||'').split(' ')[0];}
+
+let toastT;
+function toast(m){const t=$('#toast');t.textContent=m;t.classList.add('show');clearTimeout(toastT);toastT=setTimeout(()=>t.classList.remove('show'),2200);}
+function openSheet(html){$('#sheet').innerHTML='<div class="grip"></div>'+html;$('#scrim').classList.add('show');$('#sheet').classList.add('show');}
+function closeSheet(){$('#scrim').classList.remove('show');$('#sheet').classList.remove('show');}
+function avatar(m,size=40){return `<div class="av" style="width:${size}px;height:${size}px;font-size:${size*0.45}px">${m?m.emoji:'🙂'}</div>`;}
+
+/* ---------- payment helpers ---------- */
+function actYes(a){return Object.values(a.rsvp||{}).filter(v=>v==='yes').length;}
+function actCount(a,v){return Object.values(a.rsvp||{}).filter(x=>x===v).length;}
+function actShare(a){const y=actYes(a);return y?(a.total||0)/y:(a.total||0);}
+function actPaid(a,uid){return (a.payments||[]).filter(p=>p.userId===uid).reduce((s,p)=>s+p.amount,0);}
+function cagCollected(c){return (c.contributions||[]).reduce((s,p)=>s+p.amount,0);}
+function wineUserQty(o,uid){let n=0;const pk=o.picks[uid]||{};Object.values(pk).forEach(q=>n+=q);return n;}
+function wineUserTotal(o,uid){const pk=o.picks[uid]||{};let t=0;o.products.forEach(p=>{t+=(pk[p.id]||0)*p.price;});return t;}
+function wineTotalBottles(o){let n=0;Object.keys(o.picks).forEach(u=>{const pk=o.picks[u];o.products.forEach(p=>n+=(pk[p.id]||0)*p.bottles);});return n;}
+function wineUserBottles(o,uid){const pk=o.picks[uid]||{};let n=0;o.products.forEach(p=>n+=(pk[p.id]||0)*p.bottles);return n;}
+function winePaid(o,uid){return (o.payments||[]).filter(p=>p.userId===uid).reduce((s,p)=>s+p.amount,0);}
+
+/* ============================================================ RENDER ============================================================ */
+function render(){const v=$('#view');
+  if(nav.screen==='home')renderHome(v);
+  else if(nav.screen==='groups')renderGroups(v);
+  else if(nav.screen==='group')renderGroup(v);
+  else if(nav.screen==='activity')renderActivity(v);
+  else if(nav.screen==='poll')renderPoll(v);
+  else if(nav.screen==='cagnotte')renderCagnotte(v);
+  else if(nav.screen==='wine')renderWine(v);
+  else if(nav.screen==='activities')renderActivitiesFeed(v);
+  else if(nav.screen==='profile')renderProfile(v);
+  renderNav();v.scrollTop=0;
+}
+function go(screen,params={}){nav={screen,params};render();}
+
+function renderNav(){
+  const cur=nav.screen;
+  const tab=(id,label,icon)=>`<button class="${cur===id?'on':''}" onclick="go('${id}')">${icon}<span>${label}</span></button>`;
+  const I={home:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 11l9-8 9 8M5 10v10h14V10"/></svg>',
+    groups:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="8" r="3"/><circle cx="17" cy="9" r="2.3"/><path d="M3 20c0-3 3-5 6-5s6 2 6 5M15 20c0-2 1-3.4 3-3.4"/></svg>',
+    acts:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8L12 21l8.8-8.6a5.5 5.5 0 0 0 0-7.8z"/></svg>',
+    profile:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg>'};
+  $('#nav').innerHTML=
+    tab('home','Accueil',I.home)+
+    tab('groups','Groupes',I.groups)+
+    `<button class="plus" onclick="sheetCreate()">+</button>`+
+    tab('activities','Activités',I.acts)+
+    tab('profile','Profil',I.profile);
+}
+
+/* ---------- HOME ---------- */
+function renderHome(v){
+  const me=DB.me;
+  const tiles=DB.groups.map((g,i)=>`<div class="gtile" onclick="go('group',{id:'${g.id}'})">
+    <div class="ph" style="background:${g.grad}">${g.emoji}</div>
+    <div class="nm">${esc(g.name)}</div><div class="mb">${g.members.length} membres</div></div>`).join('')
+    +`<div class="gtile" onclick="sheetNewGroup()"><div class="ph" style="background:var(--soft);color:var(--purple);font-size:2rem;border:1.5px dashed #d7d2ea">+</div><div class="nm">Créer<br>un groupe</div></div>`;
+
+  // upcoming activities across groups
+  let ups=[];
+  DB.groups.forEach(g=>g.activities.forEach(a=>ups.push({g,a})));
+  ups=ups.filter(x=>!x.a.date||x.a.date>=isoIn(-1)).sort((x,y)=>(x.a.date||'').localeCompare(y.a.date||'')).slice(0,4);
+  const upHtml=ups.length?ups.map(({g,a})=>actRow(g,a)).join(''):`<div class="card center" style="text-align:center;color:var(--muted);font-size:.86rem;padding:22px">Aucune activité à venir.<br>Crée-en une dans un groupe 👇</div>`;
+
+  v.innerHTML=`
+    <div class="ghead">
+      <div class="htop">
+        <div style="flex:1"><h1>Bonjour ${esc(firstName(me.name))} 👋</h1><div class="hsub">Tes groupes & activités</div></div>
+        <div class="ic-btn">🔔</div>
+        <div class="ic-btn solid" style="color:var(--purple)" onclick="go('profile')">${me.emoji}</div>
+      </div>
+    </div>
+    <div class="wrap">
+      <div class="sec"><h3>Mes groupes</h3><span class="link" onclick="go('groups')">Voir tout</span></div>
+      <div class="rail">${tiles}</div>
+      <div class="sec"><h3>À venir</h3><span class="link" onclick="go('activities')">Voir tout</span></div>
+      ${upHtml}
+    </div>`;
+}
+function actRow(g,a){const t=ACT_TYPES[a.type];const avs=Object.keys(a.rsvp||{}).filter(u=>a.rsvp[u]==='yes').slice(0,4).map(u=>`<div class="a">${(mem(g,u)||{}).emoji||'🙂'}</div>`).join('');const extra=actYes(a)-4;
+  return `<div class="act" onclick="go('activity',{gid:'${g.id}',id:'${a.id}'})">
+    <div class="thumb" style="background:${t.grad}">${t.emoji}</div>
+    <div style="flex:1;min-width:0">
+      <div class="a-title">${esc(a.title)}</div>
+      <div class="a-meta">${a.date?`<span>${fmtDate(a.date)}${a.time?' · '+a.time:''}</span>`:''}${a.place?`<span>📍 ${esc(a.place)}</span>`:''}</div>
+      <div class="avs">${avs}${extra>0?`<span class="more">+${extra}</span>`:''}</div>
+    </div><div class="chev">›</div></div>`;
+}
+
+/* ---------- GROUPS LIST ---------- */
+function renderGroups(v){
+  const cards=DB.groups.map((g,i)=>`<div class="act" onclick="go('group',{id:'${g.id}'})">
+    <div class="thumb" style="background:${g.grad};font-size:1.7rem">${g.emoji}</div>
+    <div style="flex:1"><div class="a-title">${esc(g.name)}</div><div class="a-meta"><span>${g.members.length} membres · ${g.activities.length} activités</span></div></div>
+    <div class="chev">›</div></div>`).join('')||`<div class="empty"><div class="big">👥</div><h3>Aucun groupe</h3><p>Crée ton premier cercle d'amis.</p></div>`;
+  v.innerHTML=`<div class="ghead"><div class="htop"><div style="flex:1"><h1>Mes groupes</h1><div class="hsub">${DB.groups.length} groupe${DB.groups.length>1?'s':''}</div></div><div class="ic-btn" onclick="sheetNewGroup()">+</div></div></div>
+    <div class="wrap">${cards}<div style="height:10px"></div><button class="btn outline" onclick="sheetNewGroup()">+ Créer un groupe</button></div>`;
+}
+
+/* ---------- GROUP DETAIL ---------- */
+function renderGroup(v){
+  const g=group(nav.params.id);if(!g)return go('home');
+  const tab=nav.params.tab||'acts';
+  const avs=g.members.slice(0,6).map(m=>`<div class="a">${m.emoji}</div>`).join('');
+  let body='';
+  if(tab==='acts')body=tabActs(g);
+  else if(tab==='cagnotte')body=tabCagnottes(g);
+  else if(tab==='cmd')body=tabCommandes(g);
+  else if(tab==='membres')body=tabMembres(g);
+  else body=tabParams(g);
+  const T=(id,label,ic)=>`<button class="${tab===id?'on':''}" onclick="go('group',{id:'${g.id}',tab:'${id}'})"><div class="ti">${ic}</div>${label}</button>`;
+  v.innerHTML=`
+    <div class="ghead" style="background:${g.grad}">
+      <div class="htop"><div class="back" onclick="go('home')">‹</div><div style="flex:1"></div><div class="ic-btn" onclick="go('group',{id:'${g.id}',tab:'params'})">⚙️</div></div>
+      <div style="text-align:center;margin-top:6px">
+        <div style="font-size:3rem">${g.emoji}</div>
+        <h1 style="margin-top:6px">${esc(g.name)}</h1>
+        <div class="hsub">${g.members.length} membres</div>
+        <div class="avs" style="justify-content:center;margin-top:10px">${avs}${g.members.length>6?`<span class="more" style="color:#fff;opacity:.9">+${g.members.length-6}</span>`:''}</div>
+      </div>
+    </div>
+    <div class="wrap" style="padding-top:0">
+      <div class="gtabs">
+        ${T('acts','Activités','📅')}${T('cagnotte','Cagnotte','🐷')}${T('cmd','Commandes','🍷')}${T('membres','Membres','👥')}${T('params','Réglages','⚙️')}
+      </div>
+      <div style="margin-top:8px">${body}</div>
+    </div>`;
+}
+
+function tabActs(g){
+  let html='';
+  const up=[...g.activities].sort((a,b)=>(a.date||'').localeCompare(b.date||''))[0];
+  if(up){const t=ACT_TYPES[up.type];
+    html+=`<div class="sec" style="margin-top:8px"><h3>Prochaine activité</h3></div>
+    <div class="hero-act" onclick="go('activity',{gid:'${g.id}',id:'${up.id}'})">
+      <div class="img" style="background:${t.grad}"><span class="pill" style="background:rgba(255,255,255,.85)">${t.emoji} ${t.label}</span></div>
+      <div class="pad"><div class="between"><div><div style="font-weight:700;font-size:1.05rem">${esc(up.title)}</div>
+      <div class="a-meta" style="margin-top:4px">${up.date?`<span>${fmtDate(up.date)}${up.time?' · '+up.time:''}</span>`:''}${up.place?`<span>📍 ${esc(up.place)}</span>`:''}</div></div></div>
+      <div class="between" style="margin-top:12px"><span class="pill">👥 ${actYes(up)} participants</span><button class="btn small" onclick="event.stopPropagation();go('activity',{gid:'${g.id}',id:'${up.id}'})">Voir</button></div></div></div>`;
+  }
+  // polls
+  if(g.polls.length){const p=g.polls[0];const total=p.options.reduce((s,o)=>s+o.votes.length,0);
+    html+=`<div class="sec"><h3>Sondage en cours</h3></div>
+    <div class="card" onclick="go('poll',{gid:'${g.id}',id:'${p.id}'})" style="cursor:pointer">
+      <div style="font-weight:600;margin-bottom:12px">${esc(p.question)}</div>
+      ${p.options.slice(0,3).map(o=>pollOptHtml(o,total,false)).join('')}
+      <div class="link" style="text-align:center;margin-top:6px">Voir tous les sondages</div></div>`;
+  }
+  html+=`<div class="sec"><h3>Toutes les activités</h3></div>`;
+  html+= g.activities.length? g.activities.map(a=>actRow(g,a)).join('') : `<div class="empty"><div class="big">🎈</div><h3>Aucune activité</h3><p>Propose un dîner, un sport, une sortie…</p></div>`;
+  html+=`<div style="height:12px"></div><div class="grid2"><button class="btn" onclick="sheetNewActivity('${g.id}')">+ Activité</button><button class="btn ghost" onclick="sheetNewPoll('${g.id}')">📊 Sondage</button></div>`;
+  return html;
+}
+function pollOptHtml(o,total){const pct=total?Math.round(o.votes.length/total*100):0;const mine=o.votes.includes(DB.me.id);
+  return `<div class="poll-opt ${mine?'mine':''}"><div class="bar" style="width:${pct}%"></div><span>${esc(o.label)}</span><span class="v">${o.votes.length}</span></div>`;}
+
+function tabCagnottes(g){
+  let html=g.cagnottes.map(c=>{const col=cagCollected(c);const pct=c.goal?Math.min(100,col/c.goal*100):0;
+    return `<div class="card" onclick="go('cagnotte',{gid:'${g.id}',id:'${c.id}'})" style="cursor:pointer">
+      <div class="between"><div style="font-weight:700">${esc(c.title)}</div><span class="badge purple">${c.contributions.length} 👤</span></div>
+      <div class="ring-wrap" style="margin-top:12px">${ring(pct,c.grad||'var(--gor)')}
+      <div><div style="font-family:'Poppins';font-weight:700;font-size:1.3rem">${eur(col)}</div><div class="muted" style="font-size:.8rem">sur ${eur(c.goal)} objectif</div>
+      <button class="btn ${c.style||'orange'} small" style="margin-top:10px" onclick="event.stopPropagation();sheetContribute('${g.id}','${c.id}')">Contribuer</button></div></div></div>`;
+  }).join('');
+  if(!g.cagnottes.length)html=`<div class="empty"><div class="big">🐷</div><h3>Aucune cagnotte</h3><p>Collecte pour un cadeau, un resto, une commande de vin…</p></div>`;
+  html+=`<div style="height:12px"></div><button class="btn orange" onclick="sheetNewCagnotte('${g.id}')">+ Nouvelle cagnotte</button>`;
+  return html;
+}
+
+function tabCommandes(g){
+  const STAT={open:{label:'En cours',cls:'purple'},preparation:{label:'En préparation',cls:'amber'},delivered:{label:'Livrée',cls:'green'}};
+  let html=g.wineOrders.map((o,i)=>{const st=STAT[o.status]||STAT.open;const bottles=wineTotalBottles(o);const total=Object.keys(o.picks).reduce((s,u)=>s+wineUserTotal(o,u),0);
+    return `<div class="card" onclick="go('wine',{gid:'${g.id}',id:'${o.id}'})" style="cursor:pointer">
+      <div class="between"><div style="font-weight:700">${esc(o.title)}</div><span class="badge ${st.cls}">${st.label}</span></div>
+      <div class="row" style="margin-top:10px;gap:10px"><div class="thumb" style="width:46px;height:46px;border-radius:13px;background:var(--gtl);font-size:1.4rem">🍷</div>
+      <div style="flex:1"><div style="font-weight:600;font-size:.92rem">${bottles} bouteille${bottles>1?'s':''} · ${eur(total)}</div>
+      <div class="muted" style="font-size:.78rem">${o.status==='delivered'?'Livrée le '+fmtDate(o.deliveryDate):o.deliveryDate?'Livraison prévue '+fmtDate(o.deliveryDate):'Commande ouverte'}</div></div></div></div>`;
+  }).join('');
+  if(!g.wineOrders.length)html=`<div class="empty"><div class="big">🍷</div><h3>Aucune commande</h3><p>Lance une commande groupée de vin pour le groupe.</p></div>`;
+  html+=`<div style="height:12px"></div><button class="btn teal" onclick="sheetNewWine('${g.id}')">+ Nouvelle commande de vin</button>`;
+  return html;
+}
+
+function tabMembres(g){
+  let rows=g.members.map(m=>`<div class="lrow">${avatar(m,42)}<div style="flex:1"><div class="l-name">${esc(m.name)}${m.id===DB.me.id?' <span class="badge purple">toi</span>':''}</div></div>${m.id!==DB.me.id?`<button class="link" style="color:var(--muted)" onclick="rmMember('${g.id}','${m.id}')">Retirer</button>`:''}</div>`).join('');
+  return `<div class="card">${rows}</div><div style="height:12px"></div><button class="btn outline" onclick="sheetAddMember('${g.id}')">+ Ajouter un ami</button>`;
+}
+function tabParams(g){
+  return `<div class="card"><div class="between"><span class="muted">Nom du groupe</span><b>${esc(g.name)}</b></div><div class="hr"></div>
+    <div class="between"><span class="muted">Membres</span><b>${g.members.length}</b></div><div class="hr"></div>
+    <div class="between"><span class="muted">Activités</span><b>${g.activities.length}</b></div></div>
+    <div style="height:14px"></div><button class="btn danger" onclick="delGroup('${g.id}')">Supprimer le groupe</button>`;
+}
+
+/* ---------- ACTIVITY DETAIL ---------- */
+function renderActivity(v){
+  const g=group(nav.params.gid);if(!g)return go('home');
+  const a=g.activities.find(x=>x.id===nav.params.id);if(!a)return go('group',{id:g.id});
+  const t=ACT_TYPES[a.type];const myr=(a.rsvp||{})[DB.me.id];
+  const share=actShare(a);const myPaid=actPaid(a,DB.me.id);const settled=myPaid>=share-0.01&&share>0;
+  const yesAvs=Object.keys(a.rsvp||{}).filter(u=>a.rsvp[u]==='yes').slice(0,7).map(u=>`<div class="a">${(mem(g,u)||{}).emoji||'🙂'}</div>`).join('');
+  v.innerHTML=`
+  <div class="hero-act" style="border-radius:0 0 26px 26px;margin-bottom:0">
+    <div class="img" style="height:200px;background:${t.grad};padding-top:calc(env(safe-area-inset-top) + 14px);align-items:flex-start;justify-content:space-between">
+      <div class="back" onclick="go('group',{id:'${g.id}'})">‹</div><div class="ic-btn">⋯</div>
+    </div>
+    <div class="pad" style="padding:16px 18px"><span class="pill">${t.emoji} ${t.label}</span>
+      <h1 style="font-size:1.4rem;margin-top:10px">${esc(a.title)}</h1>
+      <div class="a-meta" style="margin-top:8px;font-size:.85rem">${a.date?`<span>📅 ${fmtDate(a.date)}${a.time?' · '+a.time:''}</span>`:''}${a.place?`<span>📍 ${esc(a.place)}</span>`:''}</div>
+      ${a.desc?`<div class="muted" style="font-size:.85rem;margin-top:8px;line-height:1.5">${esc(a.desc)}</div>`:''}</div>
+  </div>
+  <div class="wrap" style="padding-top:14px">
+    <div class="rsvp">
+      <button class="yes ${myr==='yes'?'on':''}" onclick="setRsvp('${g.id}','${a.id}','yes')">Je participe</button>
+      <button class="maybe ${myr==='maybe'?'on':''}" onclick="setRsvp('${g.id}','${a.id}','maybe')">Peut-être</button>
+      <button class="no ${myr==='no'?'on':''}" onclick="setRsvp('${g.id}','${a.id}','no')">Non</button>
+    </div>
+    <div class="stats" style="margin-top:14px">
+      <div class="st"><b>${Object.keys(a.rsvp||{}).length}</b><span>réponses</span></div>
+      <div class="st"><b>${actCount(a,'yes')}</b><span>oui</span></div>
+      <div class="st"><b>${actCount(a,'maybe')}</b><span>peut-être</span></div>
+      <div class="st"><b>${actCount(a,'no')}</b><span>non</span></div>
+    </div>
+    ${a.total?`
+    <div class="sec"><h3>Paiement</h3></div>
+    <div class="card">
+      <div class="sumrow"><span class="muted">Montant total estimé</span><b>${eur(a.total)}</b></div>
+      <div class="sumrow"><span class="muted">Ma part (${actYes(a)} participants)</span><b>${eur(share)}</b></div>
+      ${myr==='yes'?(settled?`<div class="badge green" style="margin-top:12px;display:inline-block">✓ Ta part est réglée</div>`
+        :`<button class="btn" style="margin-top:12px" onclick="sheetPay({kind:'act',gid:'${g.id}',id:'${a.id}',amount:${(share-myPaid).toFixed(2)},label:'${esc(a.title)}',total:${a.total},part:${share.toFixed(2)},paid:${myPaid.toFixed(2)}})">Payer ma part · ${eur(share-myPaid)}</button>`)
+        :`<div class="muted" style="font-size:.82rem;margin-top:12px">Indique « Je participe » pour régler ta part.</div>`}
+    </div>`:''}
+    <div class="sec"><h3>Participants</h3><span class="muted" style="font-size:.82rem">${actYes(a)}</span></div>
+    <div class="card"><div class="avs">${yesAvs||'<span class="muted" style="font-size:.85rem">Personne pour l\u2019instant</span>'}${actYes(a)>7?`<span class="more">+${actYes(a)-7}</span>`:''}</div></div>
+    <div style="height:12px"></div>${a.organizerId===DB.me.id?`<button class="btn danger" onclick="delActivity('${g.id}','${a.id}')">Supprimer l\u2019activité</button>`:''}
+  </div>`;
+}
+
+/* ---------- POLL ---------- */
+function renderPoll(v){
+  const g=group(nav.params.gid);if(!g)return go('home');
+  const p=g.polls.find(x=>x.id===nav.params.id);if(!p)return go('group',{id:g.id,tab:'acts'});
+  const total=p.options.reduce((s,o)=>s+o.votes.length,0);const max=Math.max(0,...p.options.map(o=>o.votes.length));
+  const opts=p.options.map(o=>{const pct=total?Math.round(o.votes.length/total*100):0;const mine=o.votes.includes(DB.me.id);
+    return `<div class="poll-opt ${mine?'mine':''} ${o.votes.length===max&&max>0?'win':''}" onclick="votePoll('${g.id}','${p.id}','${o.id}')"><div class="bar" style="width:${pct}%"></div><span>${esc(o.label)}</span><span class="v">${o.votes.length} vote${o.votes.length>1?'s':''}</span></div>`;}).join('');
+  v.innerHTML=`
+  <div class="ghead"><div class="htop"><div class="back" onclick="go('group',{id:'${g.id}',tab:'acts'})">‹</div><div style="flex:1;text-align:center;font-weight:700;font-family:Poppins">Sondage</div><div style="width:40px"></div></div></div>
+  <div class="wrap">
+    <div style="text-align:center;margin:6px 0 18px"><div style="font-size:2.2rem">🗳️</div><h2 style="font-size:1.3rem;margin-top:6px">${esc(p.question)}</h2></div>
+    ${opts}
+    <button class="btn ghost" style="margin-top:6px" onclick="sheetAddOption('${g.id}','${p.id}')">+ Ajouter une option</button>
+    <div class="muted" style="text-align:center;font-size:.8rem;margin-top:14px">${total} vote${total>1?'s':''} au sondage</div>
+    <div style="height:12px"></div>${p.authorId===DB.me.id?`<button class="btn danger" onclick="delPoll('${g.id}','${p.id}')">Supprimer le sondage</button>`:''}
+  </div>`;
+}
+
+/* ---------- CAGNOTTE ---------- */
+function renderCagnotte(v){
+  const g=group(nav.params.gid);if(!g)return go('home');
+  const c=g.cagnottes.find(x=>x.id===nav.params.id);if(!c)return go('group',{id:g.id,tab:'cagnotte'});
+  const col=cagCollected(c);const pct=c.goal?Math.min(100,col/c.goal*100):0;
+  const rows=[...c.contributions].sort((a,b)=>b.amount-a.amount).map(ct=>`<div class="lrow">${avatar(mem(g,ct.userId)||{emoji:'🙂'},38)}<div style="flex:1"><div class="l-name">${esc((mem(g,ct.userId)||{}).name||'Ami')}</div></div><span class="amount" style="color:var(--orange)">${eur(ct.amount)}</span></div>`).join('')||'<span class="muted" style="font-size:.85rem">Aucun contributeur pour l\u2019instant</span>';
+  v.innerHTML=`
+  <div class="ghead orange"><div class="htop"><div class="back" onclick="go('group',{id:'${g.id}',tab:'cagnotte'})">‹</div><div style="flex:1;text-align:center;font-weight:700;font-family:Poppins">${esc(c.title)}</div><div class="ic-btn">⚙️</div></div></div>
+  <div class="wrap">
+    <div class="card" style="text-align:center"><div class="ring-wrap" style="justify-content:center">${ring(pct,'var(--gor)')}
+      <div style="text-align:left"><div class="muted" style="font-size:.8rem">Objectif</div><div style="font-family:Poppins;font-weight:800;font-size:1.5rem">${eur(c.goal)}</div>
+      <div class="muted" style="font-size:.82rem;margin-top:6px">${eur(col)} collectés · ${c.contributions.length} contributeurs</div></div></div>
+      <button class="btn orange" style="margin-top:16px" onclick="sheetContribute('${g.id}','${c.id}')">💳 Contribuer</button>
+    </div>
+    <div class="sec"><h3>Contributeurs</h3><span class="muted" style="font-size:.82rem">${c.contributions.length}</span></div>
+    <div class="card">${rows}</div>
+    <div style="height:12px"></div>${c.authorId===DB.me.id?`<button class="btn danger" onclick="delCagnotte('${g.id}','${c.id}')">Supprimer la cagnotte</button>`:''}
+  </div>`;
+}
+
+/* ---------- WINE ORDER ---------- */
+function renderWine(v){
+  const g=group(nav.params.gid);if(!g)return go('home');
+  const o=g.wineOrders.find(x=>x.id===nav.params.id);if(!o)return go('group',{id:g.id,tab:'cmd'});
+  const isOrg=o.organizerId===DB.me.id;
+  const prods=o.products.map(p=>{const wc=WINE_COLORS[p.color]||WINE_COLORS.rouge;const q=(o.picks[DB.me.id]||{})[p.id]||0;
+    return `<div class="wcard"><div class="top">🍷🍷🍾</div>
+      <div style="padding:15px 16px">
+        <div class="between"><div style="font-weight:700;font-size:1.02rem">${wc.emoji} ${esc(p.name)}</div><b>${eur(p.price)}</b></div>
+        <div class="muted" style="font-size:.8rem;margin-top:3px">${p.bottles} bouteille${p.bottles>1?'s':''}${p.domaine?' · '+esc(p.domaine):''}</div>
+        ${p.desc?`<div class="muted" style="font-size:.82rem;margin-top:8px;line-height:1.5">${esc(p.desc)}</div>`:''}
+        <div class="between" style="margin-top:14px">
+          <div class="stepper"><button onclick="setWineQty('${g.id}','${o.id}','${p.id}',${q-1})">−</button><div class="q">${q}</div><button onclick="setWineQty('${g.id}','${o.id}','${p.id}',${q+1})">+</button></div>
+          <span class="muted" style="font-size:.85rem">${q>0?eur(q*p.price):''}</span>
+        </div>
+      </div></div>`;}).join('')||`<div class="empty"><div class="big">🍇</div><h3>Catalogue vide</h3><p>${isOrg?'Ajoute des vins à proposer au groupe.':'L\u2019organisateur n\u2019a pas encore ajouté de vins.'}</p></div>`;
+  const myTotal=wineUserTotal(o,DB.me.id);const myBottles=wineUserBottles(o,DB.me.id);const myPaid=winePaid(o,DB.me.id);const settled=myTotal>0&&myPaid>=myTotal-0.01;
+  const allBottles=wineTotalBottles(o);
+  const STAT={open:{label:'Commande ouverte',cls:'purple'},preparation:{label:'En préparation',cls:'amber'},delivered:{label:'Livrée',cls:'green'}};
+  const st=STAT[o.status]||STAT.open;
+  // who ordered
+  const participants=Object.keys(o.picks).filter(u=>wineUserBottles(o,u)>0);
+  const partRows=participants.map(u=>`<div class="lrow">${avatar(mem(g,u)||{emoji:'🙂'},38)}<div style="flex:1"><div class="l-name">${esc((mem(g,u)||{}).name||'Ami')}</div><div class="l-sub">${wineUserBottles(o,u)} bouteilles</div></div><span class="amount">${eur(wineUserTotal(o,u))}</span></div>`).join('')||'<span class="muted" style="font-size:.85rem">Aucune sélection pour l\u2019instant</span>';
+  v.innerHTML=`
+  <div class="ghead teal"><div class="htop"><div class="back" onclick="go('group',{id:'${g.id}',tab:'cmd'})">‹</div><div style="flex:1;text-align:center;font-weight:700;font-family:Poppins">Commande de vin</div><div class="ic-btn">⋯</div></div>
+    <div style="text-align:center;margin-top:8px"><div style="font-size:2.6rem">🍷</div><h1 style="margin-top:4px">${esc(o.title)}</h1>
+    <span class="badge" style="background:rgba(255,255,255,.25);color:#fff;margin-top:8px;display:inline-block">${st.label}</span></div>
+  </div>
+  <div class="wrap">
+    ${o.minBottles?`<div class="card" style="margin-bottom:14px"><div class="between"><span class="muted" style="font-size:.85rem">Seuil de la commande</span><b>${allBottles}/${o.minBottles} bouteilles</b></div>
+      <div class="progress"><i style="width:${Math.min(100,allBottles/o.minBottles*100)}%;background:var(--gtl)"></i></div>
+      <div class="muted" style="font-size:.76rem;margin-top:7px">${allBottles>=o.minBottles?'✓ Seuil atteint, la commande peut être validée !':`Encore ${o.minBottles-allBottles} bouteille(s) pour valider la commande groupée.`}</div></div>`:''}
+    <div class="sec" style="margin-top:4px"><h3>Le catalogue</h3></div>
+    ${prods}
+    ${isOrg?`<button class="btn ghost" onclick="sheetAddWineItem('${g.id}','${o.id}')">+ Ajouter un vin</button>`:''}
+    <div class="sec"><h3>Mon panier</h3></div>
+    <div class="card">
+      <div class="sumrow"><span class="muted">Mes bouteilles</span><b>${myBottles}</b></div>
+      <div class="sumrow"><span class="muted">Montant total</span><b>${eur(myTotal)}</b></div>
+      <div class="sumrow"><span class="muted">Déjà payé</span><b>${eur(myPaid)}</b></div>
+      <div class="sumrow total"><span>Reste à payer</span><span>${eur(Math.max(0,myTotal-myPaid))}</span></div>
+      ${settled?`<div class="badge green" style="margin-top:12px;display:inline-block">✓ Panier réglé</div>`
+        :`<button class="btn teal" style="margin-top:12px" onclick="sheetPay({kind:'wine',gid:'${g.id}',id:'${o.id}',amount:${(myTotal-myPaid).toFixed(2)},label:'${esc(o.title)}',total:${myTotal.toFixed(2)},part:${myTotal.toFixed(2)},paid:${myPaid.toFixed(2)}})" ${myTotal-myPaid<=0?'disabled style="opacity:.5;margin-top:12px"':''}>Payer maintenant · ${eur(Math.max(0,myTotal-myPaid))}</button>`}
+    </div>
+    <div class="sec"><h3>Qui commande quoi</h3><span class="muted" style="font-size:.82rem">${participants.length}</span></div>
+    <div class="card">${partRows}</div>
+    ${isOrg?`<div style="height:12px"></div><div class="grid2">
+      <button class="btn ghost" onclick="cycleWineStatus('${g.id}','${o.id}')">Statut : ${st.label}</button>
+      <button class="btn danger" onclick="delWine('${g.id}','${o.id}')">Supprimer</button></div>`:''}
+  </div>`;
+}
+
+/* ---------- ACTIVITIES FEED ---------- */
+function renderActivitiesFeed(v){
+  let all=[];DB.groups.forEach(g=>g.activities.forEach(a=>all.push({g,a})));
+  all.sort((x,y)=>(x.a.date||'').localeCompare(y.a.date||''));
+  const html=all.length?all.map(({g,a})=>`<div style="margin-bottom:4px"><div class="muted" style="font-size:.74rem;margin:0 2px 6px;font-weight:600">${g.emoji} ${esc(g.name)}</div>${actRow(g,a)}</div>`).join(''):`<div class="empty"><div class="big">🗓️</div><h3>Aucune activité</h3><p>Tes activités à venir apparaîtront ici.</p></div>`;
+  v.innerHTML=`<div class="ghead"><div class="htop"><div style="flex:1"><h1>Activités</h1><div class="hsub">Tout ce qui arrive</div></div></div></div><div class="wrap">${html}</div>`;
+}
+
+/* ---------- PROFILE ---------- */
+function renderProfile(v){
+  const me=DB.me;
+  v.innerHTML=`<div class="ghead"><div class="htop"><div style="flex:1"><h1>Profil</h1></div></div>
+    <div style="text-align:center;margin-top:6px"><div class="ic-btn solid" style="width:84px;height:84px;font-size:2.4rem;margin:0 auto;color:var(--purple)">${me.emoji}</div>
+    <h2 style="margin-top:12px">${esc(me.name)}</h2></div></div>
+  <div class="wrap">
+    <button class="btn outline" onclick="sheetEditMe()">Modifier mon profil</button>
+    <div class="banner" style="margin-top:16px">⚡ Prototype : les paiements Stripe sont <b>&nbsp;simulés</b>. Aucune carte n'est débitée.</div>
+    <div class="card"><div class="between" onclick="exportData()" style="padding:6px 0;cursor:pointer"><span>📤 Sauvegarder mes données</span><span class="muted">›</span></div>
+      <div class="hr"></div><label class="between" style="padding:6px 0;cursor:pointer"><span>📥 Importer une sauvegarde</span><input type="file" accept="application/json" style="display:none" onchange="importData(this)"></label></div>
+    <div style="height:14px"></div><button class="btn danger" onclick="resetAll()">Tout réinitialiser</button>
+    <p class="muted center" style="font-size:.74rem;margin-top:18px">Vini · prototype v1</p>
+  </div>`;
+}
+
+/* ---------- progress ring svg ---------- */
+function ring(pct,grad){const r=42,c=2*Math.PI*r,off=c*(1-pct/100);const id='g'+Math.random().toString(36).slice(2,6);
+  return `<div class="ring"><svg width="96" height="96" viewBox="0 0 96 96">
+    <defs><linearGradient id="${id}" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fb923c"/><stop offset="1" stop-color="#f97316"/></linearGradient></defs>
+    <circle cx="48" cy="48" r="${r}" fill="none" stroke="#f0eef8" stroke-width="9"/>
+    <circle cx="48" cy="48" r="${r}" fill="none" stroke="url(#${id})" stroke-width="9" stroke-linecap="round" stroke-dasharray="${c}" stroke-dashoffset="${off}"/>
+  </svg><div class="pct">${Math.round(pct)}%</div></div>`;}
+
+/* ============================================================ ACTIONS / SHEETS ============================================================ */
+function sheetCreate(){
+  openSheet(`<h2>Créer</h2><div class="sub">Que veux-tu lancer ?</div>
+  <div style="display:flex;flex-direction:column;gap:10px">
+    ${ccBtn('👥','Un groupe','Réunis tes amis','sheetNewGroup()')}
+    ${ccBtn('📅','Une activité','Dîner, sport, sortie…','pickGroupThen(\'activity\')')}
+    ${ccBtn('📊','Un sondage','Décidez ensemble','pickGroupThen(\'poll\')')}
+    ${ccBtn('🐷','Une cagnotte','Collectez de l\u2019argent','pickGroupThen(\'cagnotte\')')}
+    ${ccBtn('🍷','Une commande de vin','Commande groupée','pickGroupThen(\'wine\')')}
+  </div>`);
+}
+function ccBtn(e,t,s,fn){return `<button class="card" style="display:flex;align-items:center;gap:13px;text-align:left;width:100%" onclick="closeSheet();${fn}">
+  <div class="thumb" style="width:46px;height:46px;border-radius:13px;background:var(--soft);color:var(--purple);font-size:1.4rem">${e}</div>
+  <div><div style="font-weight:700">${t}</div><div class="muted" style="font-size:.8rem">${s}</div></div></button>`;}
+function pickGroupThen(kind){
+  if(!DB.groups.length){toast('Crée d\u2019abord un groupe');return sheetNewGroup();}
+  if(DB.groups.length===1){const id=DB.groups[0].id;return openByKind(kind,id);}
+  openSheet(`<h2>Choisis un groupe</h2><div class="sub">Pour quel groupe ?</div>
+    ${DB.groups.map(g=>`<button class="card" style="display:flex;align-items:center;gap:12px;width:100%;text-align:left;margin-bottom:8px" onclick="closeSheet();openByKind('${kind}','${g.id}')"><div class="thumb" style="width:42px;height:42px;border-radius:12px;background:${g.grad};font-size:1.3rem">${g.emoji}</div><b>${esc(g.name)}</b></button>`).join('')}`);
+}
+function openByKind(kind,gid){if(kind==='activity')sheetNewActivity(gid);else if(kind==='poll')sheetNewPoll(gid);else if(kind==='cagnotte')sheetNewCagnotte(gid);else if(kind==='wine')sheetNewWine(gid);}
+
+/* groups */
+function sheetNewGroup(){draft={emoji:'🍷',grad:GRADS[0]};
+  const emos=['🍷','🎾','🏖️','🍻','🎉','⚽','🏔️','🍝','🎿','🥂'];
+  openSheet(`<h2>Créer un groupe</h2><div class="sub">Réunis tes amis dans un cercle privé.</div>
+    <label class="fld"><span class="lab">Nom du groupe</span><input class="input" id="g-name" placeholder="Weekend à Lisbonne ✈️" maxlength="30"></label>
+    <label class="fld"><span class="lab">Emoji</span><div class="chips" id="g-emo">${emos.map((e,i)=>`<div class="chip ${i===0?'on':''}" style="font-size:1.3rem;padding:6px 12px" onclick="pickGEmo('${e}',this)">${e}</div>`).join('')}</div></label>
+    <label class="fld"><span class="lab">Couleur</span><div class="dots" id="g-dot">${GRADS.map((gr,i)=>`<button class="${i===0?'on':''}" style="background:${gr}" onclick="pickGDot('${gr}',this)"></button>`).join('')}</div></label>
+    <button class="btn" onclick="createGroup()">Créer le groupe</button>`);
+  setTimeout(()=>$('#g-name').focus(),300);
+}
+function pickGEmo(e,el){draft.emoji=e;document.querySelectorAll('#g-emo .chip').forEach(b=>b.classList.remove('on'));el.classList.add('on');}
+function pickGDot(g,el){draft.grad=g;document.querySelectorAll('#g-dot button').forEach(b=>b.classList.remove('on'));el.classList.add('on');}
+function createGroup(){const name=$('#g-name').value.trim();if(!name)return toast('Donne un nom au groupe');
+  const g={id:uid(),name,emoji:draft.emoji,grad:draft.grad,members:[{...DB.me}],activities:[],polls:[],cagnottes:[],wineOrders:[]};
+  DB.groups.push(g);save();closeSheet();go('group',{id:g.id});toast('Groupe créé 🎉');}
+
+function sheetAddMember(gid){draft={emoji:EMOJIS[Math.floor(Math.random()*EMOJIS.length)]};
+  openSheet(`<h2>Ajouter un ami</h2><div class="sub">Démo : prénom + avatar.</div>
+    <label class="fld"><span class="lab">Prénom</span><input class="input" id="m-name" placeholder="Alex" maxlength="20"></label>
+    <label class="fld"><span class="lab">Avatar</span><div class="chips" id="m-emo">${EMOJIS.map((e,i)=>`<div class="chip ${e===draft.emoji?'on':''}" style="font-size:1.3rem;padding:6px 12px" onclick="draft.emoji='${e}';document.querySelectorAll('#m-emo .chip').forEach(b=>b.classList.remove('on'));this.classList.add('on')">${e}</div>`).join('')}</div></label>
+    <button class="btn" onclick="addMember('${gid}')">Ajouter</button>`);
+  setTimeout(()=>$('#m-name').focus(),300);}
+function addMember(gid){const g=group(gid);const name=$('#m-name').value.trim();if(!name)return toast('Indique un prénom');
+  g.members.push({id:uid(),name,emoji:draft.emoji});save();closeSheet();render();toast(name+' ajouté');}
+function rmMember(gid,mid){const g=group(gid);g.members=g.members.filter(m=>m.id!==mid);save();render();}
+function delGroup(gid){if(!confirm('Supprimer ce groupe ?'))return;DB.groups=DB.groups.filter(g=>g.id!==gid);save();go('home');}
+
+/* activity */
+function sheetNewActivity(gid){draft={type:'diner'};
+  openSheet(`<h2>Nouvelle activité</h2><div class="sub">Propose une sortie au groupe.</div>
+    <label class="fld"><span class="lab">Type</span><div class="pick" id="a-type">${Object.entries(ACT_TYPES).map(([k,t])=>`<button class="${k==='diner'?'on':''}" onclick="pickAType('${k}',this)"><span class="pe">${t.emoji}</span>${t.label}</button>`).join('')}</div></label>
+    <label class="fld"><span class="lab">Titre</span><input class="input" id="a-title" placeholder="Soirée tapas & vin 🍷" maxlength="40"></label>
+    <div class="grid2"><label class="fld"><span class="lab">Date</span><input class="input" type="date" id="a-date"></label><label class="fld"><span class="lab">Heure</span><input class="input" type="time" id="a-time"></label></div>
+    <label class="fld"><span class="lab">Lieu</span><input class="input" id="a-place" placeholder="Bodega Española, Bruxelles" maxlength="40"></label>
+    <label class="fld"><span class="lab">Description (optionnel)</span><textarea class="input" id="a-desc" placeholder="Tapas, bons vins et bonne humeur !"></textarea></label>
+    <label class="fld"><span class="lab">Budget estimé (€, optionnel)</span><input class="input" type="number" id="a-cost" placeholder="0" min="0"></label>
+    <button class="btn" onclick="createActivity('${gid}')">Créer l'activité</button>`);
+  setTimeout(()=>$('#a-title').focus(),300);}
+function pickAType(k,el){draft.type=k;document.querySelectorAll('#a-type button').forEach(b=>b.classList.remove('on'));el.classList.add('on');}
+function createActivity(gid){const g=group(gid);const title=$('#a-title').value.trim();if(!title)return toast('Donne un titre');
+  const a={id:uid(),type:draft.type,title,date:$('#a-date').value,time:$('#a-time').value,place:$('#a-place').value.trim(),desc:$('#a-desc').value.trim(),total:parseFloat($('#a-cost').value)||0,organizerId:DB.me.id,rsvp:{[DB.me.id]:'yes'},payments:[]};
+  g.activities.push(a);save();closeSheet();go('activity',{gid,id:a.id});toast('Activité créée 🎉');}
+function setRsvp(gid,aid,val){const a=group(gid).activities.find(x=>x.id===aid);a.rsvp=a.rsvp||{};a.rsvp[DB.me.id]=val;save();render();}
+function delActivity(gid,aid){if(!confirm('Supprimer cette activité ?'))return;const g=group(gid);g.activities=g.activities.filter(a=>a.id!==aid);save();go('group',{id:gid});}
+
+/* poll */
+function sheetNewPoll(gid){draft={opts:['','']};
+  openSheet(`<h2>Nouveau sondage</h2><div class="sub">Laisse le groupe décider.</div>
+    <label class="fld"><span class="lab">Question</span><input class="input" id="p-q" placeholder="Quel jour vous arrange ?" maxlength="60"></label>
+    <div class="lab" style="font-size:.8rem;font-weight:600;margin-bottom:7px">Options</div>
+    <div id="p-opts"></div>
+    <button class="btn ghost small" style="margin:2px 0 16px" onclick="addPollOptField()">+ Ajouter une option</button>
+    <button class="btn" onclick="createPoll('${gid}')">Créer le sondage</button>`);
+  renderPollFields();setTimeout(()=>$('#p-q').focus(),300);}
+function renderPollFields(){$('#p-opts').innerHTML=draft.opts.map((o,i)=>`<input class="input" style="margin-bottom:9px" placeholder="Option ${i+1}" value="${esc(o)}" oninput="draft.opts[${i}]=this.value">`).join('');}
+function addPollOptField(){draft.opts.push('');renderPollFields();}
+function createPoll(gid){const g=group(gid);const q=$('#p-q').value.trim();if(!q)return toast('Pose une question');
+  const opts=draft.opts.map(o=>o.trim()).filter(Boolean);if(opts.length<2)return toast('Au moins 2 options');
+  const p={id:uid(),question:q,authorId:DB.me.id,options:opts.map(l=>({id:uid(),label:l,votes:[]}))};
+  g.polls.unshift(p);save();closeSheet();go('poll',{gid,id:p.id});toast('Sondage créé 📊');}
+function votePoll(gid,pid,oid){const p=group(gid).polls.find(x=>x.id===pid);p.options.forEach(o=>{o.votes=o.votes.filter(u=>u!==DB.me.id);});const o=p.options.find(x=>x.id===oid);o.votes.push(DB.me.id);save();render();}
+function sheetAddOption(gid,pid){openSheet(`<h2>Ajouter une option</h2><label class="fld" style="margin-top:6px"><input class="input" id="po" placeholder="Ta proposition" maxlength="40"></label><button class="btn" onclick="addOption('${gid}','${pid}')">Ajouter</button>`);setTimeout(()=>$('#po').focus(),300);}
+function addOption(gid,pid){const v=$('#po').value.trim();if(!v)return toast('Entre une option');const p=group(gid).polls.find(x=>x.id===pid);p.options.push({id:uid(),label:v,votes:[]});save();closeSheet();render();}
+function delPoll(gid,pid){if(!confirm('Supprimer ce sondage ?'))return;const g=group(gid);g.polls=g.polls.filter(p=>p.id!==pid);save();go('group',{id:gid,tab:'acts'});}
+
+/* cagnotte */
+function sheetNewCagnotte(gid){
+  openSheet(`<h2>Nouvelle cagnotte</h2><div class="sub">Collecte pour un projet commun.</div>
+    <label class="fld"><span class="lab">Intitulé</span><input class="input" id="c-title" placeholder="Cagnotte vin rouge 🍷" maxlength="40"></label>
+    <label class="fld"><span class="lab">Objectif (€)</span><input class="input" type="number" id="c-goal" placeholder="200" min="1"></label>
+    <button class="btn orange" onclick="createCagnotte('${gid}')">Créer la cagnotte</button>`);
+  setTimeout(()=>$('#c-title').focus(),300);}
+function createCagnotte(gid){const g=group(gid);const title=$('#c-title').value.trim();if(!title)return toast('Donne un intitulé');const goal=parseFloat($('#c-goal').value)||0;if(goal<=0)return toast('Fixe un objectif');
+  const c={id:uid(),title,goal,authorId:DB.me.id,grad:'var(--gor)',style:'orange',contributions:[]};
+  g.cagnottes.unshift(c);save();closeSheet();go('cagnotte',{gid,id:c.id});toast('Cagnotte créée 🐷');}
+function sheetContribute(gid,cid){const c=group(gid).cagnottes.find(x=>x.id===cid);
+  openSheet(`<h2>Contribuer</h2><div class="sub">${esc(c.title)}</div>
+    <div class="pick" style="margin-bottom:14px">${[10,20,50].map(a=>`<button onclick="$('#c-amt').value=${a}"><span class="pe">${a}€</span></button>`).join('')}</div>
+    <label class="fld"><span class="lab">Montant (€)</span><input class="input" type="number" id="c-amt" placeholder="20" min="1"></label>
+    <button class="btn orange" onclick="goContribute('${gid}','${cid}')">Continuer vers le paiement</button>`);
+  setTimeout(()=>$('#c-amt').focus(),300);}
+function goContribute(gid,cid){const amt=parseFloat($('#c-amt').value);if(!amt||amt<=0)return toast('Entre un montant');const c=group(gid).cagnottes.find(x=>x.id===cid);
+  sheetPay({kind:'cagnotte',gid,id:cid,amount:amt.toFixed(2),label:c.title,total:amt,part:amt,paid:0,style:'orange'});}
+
+/* wine */
+function sheetNewWine(gid){draft={};
+  openSheet(`<h2>Nouvelle commande de vin</h2><div class="sub">Commande groupée pour le groupe.</div>
+    <label class="fld"><span class="lab">Titre</span><input class="input" id="w-title" placeholder="Commande de printemps 🍷" maxlength="40"></label>
+    <div class="grid2"><label class="fld"><span class="lab">Seuil min. (bouteilles)</span><input class="input" type="number" id="w-min" placeholder="12" min="0"></label>
+    <label class="fld"><span class="lab">Livraison prévue</span><input class="input" type="date" id="w-date"></label></div>
+    <button class="btn teal" onclick="createWine('${gid}')">Créer la commande</button>`);
+  setTimeout(()=>$('#w-title').focus(),300);}
+function createWine(gid){const g=group(gid);const title=$('#w-title').value.trim();if(!title)return toast('Donne un titre');
+  const o={id:uid(),title,status:'open',organizerId:DB.me.id,minBottles:parseInt($('#w-min').value)||0,deliveryDate:$('#w-date').value,products:[],picks:{},payments:[]};
+  g.wineOrders.unshift(o);save();closeSheet();go('wine',{gid,id:o.id});toast('Commande créée 🍷');}
+function sheetAddWineItem(gid,oid){draft={color:'rouge'};
+  openSheet(`<h2>Ajouter un vin</h2><div class="sub">Un lot proposé au groupe.</div>
+    <label class="fld"><span class="lab">Nom</span><input class="input" id="wi-name" placeholder="Pack Découverte" maxlength="40"></label>
+    <label class="fld"><span class="lab">Couleur</span><div class="pick" id="wi-col">${Object.entries(WINE_COLORS).map(([k,c],i)=>`<button class="${i===0?'on':''}" onclick="draft.color='${k}';document.querySelectorAll('#wi-col button').forEach(b=>b.classList.remove('on'));this.classList.add('on')"><span class="pe">${c.emoji}</span>${c.label}</button>`).join('')}</div></label>
+    <div class="grid2"><label class="fld"><span class="lab">Nb bouteilles</span><input class="input" type="number" id="wi-bot" placeholder="6" min="1"></label>
+    <label class="fld"><span class="lab">Prix du lot (€)</span><input class="input" type="number" id="wi-price" placeholder="75" min="0"></label></div>
+    <label class="fld"><span class="lab">Domaine (optionnel)</span><input class="input" id="wi-dom" placeholder="Sélection du sommelier" maxlength="40"></label>
+    <label class="fld"><span class="lab">Description (optionnel)</span><textarea class="input" id="wi-desc" placeholder="Vins rouges et blancs sélectionnés."></textarea></label>
+    <button class="btn teal" onclick="addWineItem('${gid}','${oid}')">Ajouter au catalogue</button>`);
+  setTimeout(()=>$('#wi-name').focus(),300);}
+function addWineItem(gid,oid){const o=group(gid).wineOrders.find(x=>x.id===oid);const name=$('#wi-name').value.trim();if(!name)return toast('Donne un nom');
+  o.products.push({id:uid(),name,color:draft.color,bottles:parseInt($('#wi-bot').value)||1,price:parseFloat($('#wi-price').value)||0,domaine:$('#wi-dom').value.trim(),desc:$('#wi-desc').value.trim()});
+  save();closeSheet();render();toast('Vin ajouté 🍇');}
+function setWineQty(gid,oid,pid,q){q=Math.max(0,q);const o=group(gid).wineOrders.find(x=>x.id===oid);o.picks[DB.me.id]=o.picks[DB.me.id]||{};if(q===0)delete o.picks[DB.me.id][pid];else o.picks[DB.me.id][pid]=q;save();render();}
+function cycleWineStatus(gid,oid){const o=group(gid).wineOrders.find(x=>x.id===oid);const order=['open','preparation','delivered'];o.status=order[(order.indexOf(o.status)+1)%3];if(o.status==='delivered'&&!o.deliveryDate)o.deliveryDate=isoIn(0);save();render();}
+function delWine(gid,oid){if(!confirm('Supprimer cette commande ?'))return;const g=group(gid);g.wineOrders=g.wineOrders.filter(o=>o.id!==oid);save();go('group',{id:gid,tab:'cmd'});}
+
+/* ============================================================ PAIEMENT (simulé) ============================================================ */
+function sheetPay(o){
+  const fee=SERVICE_FEE;const totalToPay=(parseFloat(o.amount)+fee);
+  const style=o.style||(o.kind==='wine'?'teal':o.kind==='cagnotte'?'orange':'');
+  const amtGrad=style==='orange'?'var(--gor)':style==='teal'?'var(--gtl)':'var(--gp)';
+  openSheet(`
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px"><span class="muted" style="font-size:.85rem">🔒 Paiement sécurisé</span><span style="font-weight:800;color:#635bff;font-family:Poppins">stripe</span></div>
+    <div class="stripe-amt-card" style="background:${amtGrad}"><div class="lbl">Ma part</div><div class="big">${eur(parseFloat(o.amount))}</div><div class="for">${esc(o.label)}</div></div>
+    <div class="sumrow"><span class="muted">Montant total</span><span>${eur(o.total)}</span></div>
+    <div class="sumrow"><span class="muted">Ma part</span><span>${eur(o.part)}</span></div>
+    ${o.paid>0?`<div class="sumrow"><span class="muted">Déjà payé</span><span>−${eur(o.paid)}</span></div>`:''}
+    <div class="sumrow"><span class="muted">Frais de service</span><span>${eur(fee)}</span></div>
+    <div class="sumrow total"><span>Total à payer</span><span>${eur(totalToPay)}</span></div>
+    <div class="pm-card"><div style="font-size:1.4rem">💳</div><div style="flex:1"><div style="font-weight:600;font-size:.9rem">Mastercard •••• 4242</div><div class="muted" style="font-size:.74rem">Expire 12/28</div></div><span class="link">Changer</span></div>
+    <button class="btn ${style}" id="pay-btn" onclick="doPay(${JSON.stringify(o).replace(/"/g,'&quot;')})">Payer ${eur(totalToPay)}</button>
+    <div class="secure">🔒 Démo — aucun paiement réel n'est effectué</div>`);
+}
+function doPay(o){const btn=$('#pay-btn');btn.innerHTML='<span class="spinner"></span>';btn.style.pointerEvents='none';
+  setTimeout(()=>{
+    const amt=parseFloat(o.amount);const g=group(o.gid);
+    if(o.kind==='act'){const a=g.activities.find(x=>x.id===o.id);a.payments.push({userId:DB.me.id,amount:amt,ts:Date.now()});}
+    else if(o.kind==='cagnotte'){const c=g.cagnottes.find(x=>x.id===o.id);const ex=c.contributions.find(x=>x.userId===DB.me.id);if(ex)ex.amount+=amt;else c.contributions.push({userId:DB.me.id,amount:amt});}
+    else if(o.kind==='wine'){const w=g.wineOrders.find(x=>x.id===o.id);w.payments.push({userId:DB.me.id,amount:amt,ts:Date.now()});}
+    save();
+    $('#sheet').innerHTML=`<div class="grip"></div><div class="pay-ok"><div class="ck">✓</div><h2>Paiement confirmé</h2><p class="muted" style="margin-top:8px">${eur(amt)} · ${esc(o.label)}</p><button class="btn" style="margin-top:20px" onclick="closeSheet();render()">Terminé</button></div>`;
+  },1300);
+}
+
+/* ---------- profile / data ---------- */
+function sheetEditMe(){draft={emoji:DB.me.emoji};
+  openSheet(`<h2>Mon profil</h2><div class="sub">Visible par tes amis.</div>
+    <label class="fld"><span class="lab">Prénom</span><input class="input" id="me-name" value="${esc(DB.me.name)}" maxlength="20"></label>
+    <label class="fld"><span class="lab">Avatar</span><div class="chips" id="me-emo">${EMOJIS.map(e=>`<div class="chip ${e===DB.me.emoji?'on':''}" style="font-size:1.3rem;padding:6px 12px" onclick="draft.emoji='${e}';document.querySelectorAll('#me-emo .chip').forEach(b=>b.classList.remove('on'));this.classList.add('on')">${e}</div>`).join('')}</div></label>
+    <button class="btn" onclick="saveMe()">Enregistrer</button>`);}
+function saveMe(){const name=$('#me-name').value.trim();if(!name)return toast('Indique ton prénom');DB.me.name=name;DB.me.emoji=draft.emoji;
+  DB.groups.forEach(g=>{const m=mem(g,DB.me.id);if(m){m.name=name;m.emoji=draft.emoji;}});save();closeSheet();render();toast('Profil mis à jour');}
+function exportData(){const b=new Blob([JSON.stringify(DB,null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='vini-sauvegarde.json';a.click();toast('Sauvegarde téléchargée');}
+function importData(input){const f=input.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{try{DB=JSON.parse(r.result);save();go('home');toast('Données importées');}catch(e){toast('Fichier invalide');}};r.readAsText(f);}
+function resetAll(){if(!confirm('Tout effacer et recommencer ?'))return;localStorage.removeItem('vini_db_v1');location.reload();}
+
+/* ============================================================ ONBOARDING + SEED ============================================================ */
+function onboard(){draft={emoji:'😎'};
+  openSheet(`<h2>Bienvenue sur Vini 🍷</h2><div class="sub">L'app des amis qui organisent, partagent et profitent ensemble.</div>
+    <label class="fld"><span class="lab">Ton prénom</span><input class="input" id="ob-name" placeholder="Ton prénom" maxlength="20"></label>
+    <label class="fld"><span class="lab">Ton avatar</span><div class="chips" id="ob-emo">${EMOJIS.map((e,i)=>`<div class="chip ${i===0?'on':''}" style="font-size:1.3rem;padding:6px 12px" onclick="draft.emoji='${e}';document.querySelectorAll('#ob-emo .chip').forEach(b=>b.classList.remove('on'));this.classList.add('on')">${e}</div>`).join('')}</div></label>
+    <button class="btn" onclick="finishOnboard()">C'est parti 🚀</button>`);
+  $('#sheet').classList.add('show');$('#scrim').classList.add('show');setTimeout(()=>$('#ob-name').focus(),400);}
+function finishOnboard(){const name=$('#ob-name').value.trim();if(!name)return toast('Indique ton prénom');
+  DB={me:{id:uid(),name,emoji:draft.emoji},groups:[]};seedDemo();save();closeSheet();go('home');}
+function seedDemo(){
+  const tho={id:uid(),name:'Thomas',emoji:'🦊'},jul={id:uid(),name:'Julie',emoji:'🦄'},ant={id:uid(),name:'Antoine',emoji:'🐼'},lea={id:uid(),name:'Léa',emoji:'🐧'};
+  const g={id:uid(),name:'Les amis du dimanche',emoji:'🍷',grad:GRADS[0],members:[{...DB.me},tho,jul,ant,lea],activities:[],polls:[],cagnottes:[],wineOrders:[]};
+  g.activities.push({id:uid(),type:'diner',title:'Dîner italien',date:isoIn(3),time:'20:00',place:'Trattoria Bella',desc:'Pâtes fraîches et bon vin 🍝',total:240,organizerId:tho.id,
+    rsvp:{[DB.me.id]:'yes',[tho.id]:'yes',[jul.id]:'yes',[ant.id]:'maybe',[lea.id]:'no'},payments:[]});
+  g.activities.push({id:uid(),type:'sport',title:'Padel & Apéro',date:isoIn(4),time:'17:00',place:'Padel House',total:48,organizerId:DB.me.id,
+    rsvp:{[DB.me.id]:'yes',[ant.id]:'yes',[jul.id]:'yes'},payments:[]});
+  g.polls.push({id:uid(),question:'Où veut-on aller samedi ?',authorId:tho.id,options:[
+    {id:uid(),label:'Bodega Española',votes:[tho.id,jul.id,ant.id]},
+    {id:uid(),label:'Le Petit Zinc',votes:[lea.id]},
+    {id:uid(),label:'Café des Sports',votes:[]}]});
+  const c={id:uid(),title:'Cagnotte vin rouge 🍷',goal:200,authorId:DB.me.id,grad:'var(--gor)',style:'orange',
+    contributions:[{userId:tho.id,amount:40},{userId:jul.id,amount:30},{userId:ant.id,amount:20},{userId:lea.id,amount:10},{userId:DB.me.id,amount:50}]};
+  g.cagnottes.push(c);
+  const o={id:uid(),title:'Pack Découverte printemps',status:'preparation',organizerId:DB.me.id,minBottles:12,deliveryDate:isoIn(6),
+    products:[{id:uid(),name:'Pack Découverte',color:'rouge',bottles:6,price:75,domaine:'Sélection du sommelier',desc:'Sélection de vins rouges et blancs par notre sommelier.'},
+              {id:uid(),name:'Trio Bordeaux',color:'rouge',bottles:3,price:54,domaine:'Médoc',desc:'Trois crus du Médoc à partager.'}],
+    picks:{},payments:[]};
+  o.picks[tho.id]={};o.picks[tho.id][o.products[0].id]=1;
+  g.wineOrders.push(o);
+  DB.groups.push(g);
+}
+
+/* ============================================================ BOOT ============================================================ */
+window.addEventListener('load',()=>{
+  setTimeout(()=>$('#splash').classList.add('hide'),850);
+  if(!DB||!DB.me){renderNav();setTimeout(onboard,900);}
+  else render();
+});
+if('serviceWorker' in navigator){navigator.serviceWorker.register('sw.js').catch(()=>{});}
+</script>
+</body>
+</html>

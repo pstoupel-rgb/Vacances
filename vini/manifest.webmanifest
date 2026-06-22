@@ -1,0 +1,14 @@
+{
+  "name": "Vini",
+  "short_name": "Vini",
+  "description": "L'app des amis qui organisent, partagent et profitent ensemble : groupes, événements, sondages, paiements et commandes de vin.",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#7c3aed",
+  "theme_color": "#7c3aed",
+  "icons": [
+    { "src": "icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }
+  ]
+}

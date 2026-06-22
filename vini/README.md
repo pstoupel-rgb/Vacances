@@ -15,7 +15,8 @@ Prototype mobile (PWA) fidèle aux maquettes : groupes privés, événements & s
 | ✅ **RSVP** | Je participe / Peut-être / Non, avec compteurs en direct. |
 | 📊 **Sondages** | « Quel jour ? », « Quel resto ? » — votez et ajoutez des options. |
 | 🐷 **Cagnottes** | Objectif + anneau de progression, liste des contributeurs. |
-| 🍷 **Commandes de vin** | Catalogue de lots, quantités par personne, seuil minimum, suivi (En préparation / Livrée). |
+| 🛍️ **Commandes groupées** | Vin, nourriture, cadeaux ou autre : catalogue de lots, quantités, seuil minimum, suivi (En préparation / Livrée). |
+| 📷 **Photos** | Galerie par groupe, ajout **depuis la pellicule iPhone**, **téléchargement / enregistrement** natif (partage iOS). Stockage local (IndexedDB). |
 | 💳 **Paiement (simulé)** | Écran façon Stripe : récap, frais de service, carte •••• 4242, confirmation. |
 
 Un groupe de démo **« Les amis du dimanche »** est pré-chargé au premier lancement.

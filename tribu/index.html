@@ -1,0 +1,833 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="format-detection" content="telephone=no">
+<title>Tribu</title>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Tribu">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#0f1020">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icon.svg">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Sora:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap');
+  *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+  :root{
+    --bg:#0f1020; --bg2:#16172b; --card:#1c1e36; --card2:#252846;
+    --text:#f4f4fb; --muted:#9a9cbf; --line:#2c2f52;
+    --brand:#7c5cff; --brand2:#a78bfa; --accent:#22d3ee;
+    --green:#34d399; --red:#fb7185; --amber:#fbbf24;
+    --radius:18px; --shadow:0 12px 34px rgba(0,0,0,.4);
+  }
+  html{-webkit-text-size-adjust:100%;height:100%;overflow:hidden;}
+  body{font-family:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;background:var(--bg);color:var(--text);
+    height:100%;overflow:hidden;-webkit-touch-callout:none;-webkit-user-select:none;user-select:none;}
+  h1,h2,h3,.ff{font-family:'Sora','Inter',sans-serif;}
+  button{font-family:inherit;cursor:pointer;border:none;background:none;color:inherit;}
+  input,textarea,select{font-family:inherit;}
+  ::-webkit-scrollbar{display:none;}
+
+  /* SPLASH */
+  #splash{position:fixed;inset:0;z-index:9999;background:radial-gradient(120% 80% at 50% 0%,#241b4d,var(--bg));
+    display:flex;align-items:center;justify-content:center;transition:opacity .45s;}
+  #splash.hide{opacity:0;pointer-events:none;}
+  .splash-logo{width:96px;height:96px;border-radius:28px;background:linear-gradient(140deg,var(--brand),var(--accent));
+    display:flex;align-items:center;justify-content:center;font-size:3rem;box-shadow:0 16px 40px rgba(124,92,255,.5);
+    animation:pop .6s cubic-bezier(.2,.9,.3,1.2);}
+  .splash-name{font-family:'Sora';font-weight:700;font-size:1.7rem;margin-top:18px;text-align:center;letter-spacing:-.5px;}
+  .splash-sub{color:var(--muted);font-size:.84rem;margin-top:4px;text-align:center;}
+  @keyframes pop{from{transform:scale(.5);opacity:0}to{transform:scale(1);opacity:1}}
+
+  /* APP SHELL */
+  #app{height:100%;display:flex;flex-direction:column;}
+  #view{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding-bottom:96px;}
+  .pt-safe{padding-top:calc(env(safe-area-inset-top) + 14px);}
+
+  /* HEADER */
+  .topbar{display:flex;align-items:center;gap:12px;padding:6px 18px 14px;}
+  .topbar .back{width:38px;height:38px;border-radius:12px;background:var(--card);display:flex;align-items:center;justify-content:center;font-size:1.1rem;flex:0 0 auto;}
+  .topbar h1{font-size:1.5rem;font-weight:700;letter-spacing:-.5px;flex:1;line-height:1.1;}
+  .topbar .sub{color:var(--muted);font-size:.8rem;font-weight:500;margin-top:2px;}
+  .topbar .pill{width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.15rem;flex:0 0 auto;box-shadow:var(--shadow);}
+
+  .wrap{padding:0 18px;}
+
+  /* CARDS */
+  .card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:16px;box-shadow:var(--shadow);}
+  .card+.card{margin-top:12px;}
+  .muted{color:var(--muted);}
+  .row{display:flex;align-items:center;gap:12px;}
+  .between{display:flex;align-items:center;justify-content:space-between;gap:12px;}
+
+  /* GROUP CARD */
+  .group-card{position:relative;overflow:hidden;border-radius:20px;padding:18px;color:#fff;box-shadow:var(--shadow);margin-bottom:14px;}
+  .group-card .gc-emoji{font-size:2.1rem;}
+  .group-card h3{font-size:1.2rem;font-weight:700;margin-top:8px;}
+  .group-card .gc-meta{font-size:.8rem;opacity:.9;margin-top:3px;}
+  .group-card .gc-bal{margin-top:14px;display:inline-flex;align-items:center;gap:6px;background:rgba(255,255,255,.18);
+    padding:7px 12px;border-radius:30px;font-size:.82rem;font-weight:600;backdrop-filter:blur(6px);}
+  .avstack{display:flex;margin-top:14px;}
+  .avstack .av{width:30px;height:30px;border-radius:50%;background:rgba(0,0,0,.25);display:flex;align-items:center;justify-content:center;
+    font-size:.9rem;margin-left:-8px;border:2px solid rgba(255,255,255,.5);}
+  .avstack .av:first-child{margin-left:0;}
+
+  /* SECTION TITLE */
+  .sec-title{font-family:'Sora';font-weight:600;font-size:.95rem;margin:22px 0 12px;display:flex;align-items:center;gap:8px;}
+  .sec-title .count{color:var(--muted);font-weight:500;font-size:.85rem;}
+
+  /* EVENT CARD */
+  .event{display:flex;gap:14px;align-items:flex-start;background:var(--card);border:1px solid var(--line);
+    border-radius:16px;padding:14px;margin-bottom:11px;box-shadow:var(--shadow);}
+  .event .ico{width:46px;height:46px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:1.4rem;flex:0 0 auto;}
+  .event .e-body{flex:1;min-width:0;}
+  .event .e-title{font-weight:600;font-size:1rem;}
+  .event .e-meta{color:var(--muted);font-size:.8rem;margin-top:3px;display:flex;flex-wrap:wrap;gap:4px 10px;}
+  .event .e-foot{display:flex;align-items:center;justify-content:space-between;margin-top:10px;gap:8px;}
+  .tag{font-size:.72rem;font-weight:600;padding:4px 9px;border-radius:20px;display:inline-flex;align-items:center;gap:4px;}
+  .tag.split{background:rgba(34,211,238,.14);color:var(--accent);}
+  .tag.cagnotte{background:rgba(167,139,250,.16);color:var(--brand2);}
+  .progress{height:7px;border-radius:6px;background:var(--card2);overflow:hidden;margin-top:10px;}
+  .progress > i{display:block;height:100%;border-radius:6px;background:linear-gradient(90deg,var(--brand),var(--accent));}
+
+  /* TABS */
+  .tabs{display:flex;gap:6px;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:5px;margin:4px 0 18px;}
+  .tabs button{flex:1;padding:9px;border-radius:10px;font-size:.85rem;font-weight:600;color:var(--muted);}
+  .tabs button.on{background:var(--brand);color:#fff;}
+
+  /* LIST ROW */
+  .lrow{display:flex;align-items:center;gap:12px;padding:13px 0;border-bottom:1px solid var(--line);}
+  .lrow:last-child{border-bottom:none;}
+  .lrow .av{width:42px;height:42px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.15rem;flex:0 0 auto;}
+  .lrow .l-name{font-weight:600;font-size:.95rem;}
+  .lrow .l-sub{color:var(--muted);font-size:.78rem;margin-top:1px;}
+  .amount{font-weight:700;font-size:.98rem;font-variant-numeric:tabular-nums;}
+  .amount.pos{color:var(--green);} .amount.neg{color:var(--red);}
+
+  /* BUTTONS */
+  .btn{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:15px;border-radius:15px;
+    font-weight:600;font-size:1rem;background:var(--brand);color:#fff;box-shadow:0 10px 24px rgba(124,92,255,.35);transition:transform .08s;}
+  .btn:active{transform:scale(.97);}
+  .btn.ghost{background:var(--card);color:var(--text);border:1px solid var(--line);box-shadow:none;}
+  .btn.green{background:var(--green);box-shadow:0 10px 24px rgba(52,211,153,.3);color:#06281d;}
+  .btn.small{padding:10px 16px;width:auto;font-size:.9rem;border-radius:12px;}
+  .btn.danger{background:transparent;color:var(--red);box-shadow:none;border:1px solid rgba(251,113,133,.3);}
+
+  /* FAB */
+  .fab{position:fixed;right:18px;bottom:calc(env(safe-area-inset-bottom) + 22px);width:60px;height:60px;border-radius:20px;
+    background:linear-gradient(140deg,var(--brand),var(--accent));display:flex;align-items:center;justify-content:center;
+    font-size:1.9rem;color:#fff;box-shadow:0 14px 30px rgba(124,92,255,.5);z-index:80;line-height:1;}
+
+  /* EMPTY */
+  .empty{text-align:center;padding:50px 24px;color:var(--muted);}
+  .empty .big{font-size:3rem;margin-bottom:12px;}
+  .empty h3{font-weight:600;color:var(--text);margin-bottom:6px;}
+  .empty p{font-size:.88rem;line-height:1.5;}
+
+  /* MODAL / SHEET */
+  .scrim{position:fixed;inset:0;background:rgba(5,5,15,.6);backdrop-filter:blur(3px);z-index:200;opacity:0;pointer-events:none;transition:opacity .25s;}
+  .scrim.show{opacity:1;pointer-events:auto;}
+  .sheet{position:fixed;left:0;right:0;bottom:0;z-index:201;background:var(--bg2);border-radius:26px 26px 0 0;
+    padding:10px 20px calc(env(safe-area-inset-bottom) + 24px);transform:translateY(110%);transition:transform .32s cubic-bezier(.2,.9,.3,1);
+    max-height:92vh;overflow-y:auto;border-top:1px solid var(--line);}
+  .sheet.show{transform:none;}
+  .grip{width:42px;height:5px;border-radius:5px;background:var(--line);margin:4px auto 16px;}
+  .sheet h2{font-size:1.25rem;font-weight:700;margin-bottom:4px;}
+  .sheet .sub{color:var(--muted);font-size:.85rem;margin-bottom:18px;}
+
+  /* FORM */
+  label.fld{display:block;margin-bottom:14px;}
+  label.fld .lab{font-size:.8rem;font-weight:600;color:var(--muted);margin-bottom:7px;display:block;}
+  .input{width:100%;background:var(--card);border:1px solid var(--line);border-radius:13px;padding:14px;color:var(--text);
+    font-size:1rem;outline:none;}
+  .input:focus{border-color:var(--brand);}
+  textarea.input{resize:none;min-height:70px;}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+
+  /* TYPE PICKER / EMOJI PICKER */
+  .pick{display:flex;gap:9px;flex-wrap:wrap;}
+  .pick button{flex:1 1 28%;min-width:84px;background:var(--card);border:1.5px solid var(--line);border-radius:14px;
+    padding:13px 8px;display:flex;flex-direction:column;align-items:center;gap:5px;font-size:.8rem;font-weight:600;color:var(--muted);}
+  .pick button .pe{font-size:1.5rem;}
+  .pick button.on{border-color:var(--brand);background:rgba(124,92,255,.12);color:var(--text);}
+  .epick{display:flex;gap:8px;flex-wrap:wrap;}
+  .epick button{width:46px;height:46px;border-radius:12px;background:var(--card);border:1.5px solid var(--line);font-size:1.4rem;}
+  .epick button.on{border-color:var(--brand);background:rgba(124,92,255,.14);}
+
+  /* CHIPS (participants) */
+  .chips{display:flex;flex-wrap:wrap;gap:9px;}
+  .chip{display:flex;align-items:center;gap:7px;background:var(--card);border:1.5px solid var(--line);border-radius:30px;
+    padding:7px 13px 7px 8px;font-size:.85rem;font-weight:500;}
+  .chip .ca{width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.85rem;}
+  .chip.on{border-color:var(--brand);background:rgba(124,92,255,.12);}
+  .chip .ck{margin-left:2px;color:var(--brand2);font-weight:700;}
+
+  /* STRIPE SHEET */
+  .stripe-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;}
+  .stripe-amount{font-family:'Sora';font-weight:700;font-size:2.4rem;text-align:center;margin:6px 0 4px;letter-spacing:-1px;}
+  .stripe-for{text-align:center;color:var(--muted);font-size:.85rem;margin-bottom:20px;}
+  .stripe-card{background:#fff;border-radius:14px;padding:4px 0;margin-bottom:14px;}
+  .stripe-card .sc-row{display:flex;align-items:center;padding:13px 14px;border-bottom:1px solid #eef;color:#1a1f36;}
+  .stripe-card .sc-row:last-child{border-bottom:none;}
+  .stripe-card input{flex:1;border:none;outline:none;font-size:.98rem;color:#1a1f36;background:transparent;}
+  .stripe-card input::placeholder{color:#aab;}
+  .stripe-card .brand{font-size:1.1rem;margin-right:6px;}
+  .stripe-secure{text-align:center;color:var(--muted);font-size:.74rem;margin-top:14px;display:flex;align-items:center;justify-content:center;gap:5px;}
+  .spinner{width:20px;height:20px;border:2.5px solid rgba(255,255,255,.35);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  .pay-ok{text-align:center;padding:24px 10px;}
+  .pay-ok .check{width:80px;height:80px;border-radius:50%;background:var(--green);display:flex;align-items:center;justify-content:center;
+    font-size:2.6rem;margin:0 auto 16px;animation:pop .4s cubic-bezier(.2,.9,.3,1.3);color:#06281d;}
+
+  /* toast */
+  #toast{position:fixed;left:50%;bottom:calc(env(safe-area-inset-bottom) + 100px);translate:-50% 0;transform:translateY(16px);
+    background:#000;color:#fff;padding:11px 18px;border-radius:30px;font-size:.85rem;font-weight:500;z-index:500;opacity:0;
+    pointer-events:none;transition:opacity .25s,transform .25s;max-width:86%;text-align:center;}
+  #toast.show{opacity:1;transform:translateY(0);}
+
+  .demo-banner{background:linear-gradient(90deg,rgba(124,92,255,.15),rgba(34,211,238,.12));border:1px solid var(--line);
+    border-radius:14px;padding:11px 14px;font-size:.78rem;color:var(--brand2);display:flex;align-items:center;gap:9px;margin-bottom:16px;}
+  .hr{height:1px;background:var(--line);margin:18px 0;}
+  .linkbtn{color:var(--brand2);font-weight:600;font-size:.85rem;}
+  .badge{font-size:.7rem;font-weight:700;padding:3px 8px;border-radius:20px;background:var(--card2);color:var(--muted);}
+  .badge.paid{background:rgba(52,211,153,.16);color:var(--green);}
+  .badge.due{background:rgba(251,113,133,.16);color:var(--red);}
+</style>
+</head>
+<body>
+
+<div id="splash">
+  <div style="display:flex;flex-direction:column;align-items:center;">
+    <div class="splash-logo">🤝</div>
+    <div class="splash-name">Tribu</div>
+    <div class="splash-sub">Vos sorties entre amis, réglées en un tap</div>
+  </div>
+</div>
+
+<div id="app">
+  <div id="view"></div>
+</div>
+
+<div id="fab-slot"></div>
+<div class="scrim" id="scrim" onclick="closeSheet()"></div>
+<div class="sheet" id="sheet"></div>
+<div id="toast"></div>
+
+<script>
+/* ============================================================
+   TRIBU — prototype front-end (paiement Stripe SIMULÉ)
+   100% local : aucune donnée ne quitte l'appareil.
+   ============================================================ */
+
+const TYPES = {
+  diner:  {label:'Dîner',  emoji:'🍽️', color:'#f59e0b'},
+  resto:  {label:'Resto',  emoji:'🍷', color:'#fb7185'},
+  tennis: {label:'Tennis', emoji:'🎾', color:'#84cc16'},
+  padel:  {label:'Padel',  emoji:'🏓', color:'#22d3ee'},
+  sortie: {label:'Sortie', emoji:'🎉', color:'#a855f7'},
+  autre:  {label:'Autre',  emoji:'📌', color:'#94a3b8'},
+};
+const GROUP_GRADIENTS = [
+  'linear-gradient(140deg,#7c5cff,#22d3ee)',
+  'linear-gradient(140deg,#f5576c,#f093fb)',
+  'linear-gradient(140deg,#11998e,#38ef7d)',
+  'linear-gradient(140deg,#fa709a,#fee140)',
+  'linear-gradient(140deg,#4facfe,#00f2fe)',
+  'linear-gradient(140deg,#a18cd1,#fbc2eb)',
+];
+const AVATAR_COLORS = ['#7c5cff','#22d3ee','#fb7185','#34d399','#fbbf24','#a855f7','#f59e0b','#38bdf8'];
+const EMOJIS = ['😎','🦊','🐼','🦁','🐯','🐸','🦄','🐙','🐧','🐨','🦖','👽','🤖','🎃','⚡','🌟','🔥','🍀'];
+
+/* ---------- State ---------- */
+let DB = load();
+let nav = {screen:'home', params:{}};
+
+function uid(){ return Date.now().toString(36)+Math.random().toString(36).slice(2,7); }
+function load(){
+  try{ return JSON.parse(localStorage.getItem('tribu_db_v1')) || null; }catch(e){ return null; }
+}
+function save(){ localStorage.setItem('tribu_db_v1', JSON.stringify(DB)); }
+
+/* ---------- Helpers ---------- */
+const $ = (s,el=document)=>el.querySelector(s);
+const eur = n => (Math.round(n*100)/100).toLocaleString('fr-FR',{minimumFractionDigits: n%1?2:0, maximumFractionDigits:2}) + ' €';
+const esc = s => (s||'').replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+function fmtDate(d){
+  if(!d) return '';
+  const dt = new Date(d+'T00:00:00');
+  return dt.toLocaleDateString('fr-FR',{weekday:'short',day:'numeric',month:'short'});
+}
+function group(id){ return DB.groups.find(g=>g.id===id); }
+function member(g,id){ return g.members.find(m=>m.id===id); }
+function ev(g,id){ return g.events.find(e=>e.id===id); }
+function avatar(m,size=42){
+  const c = m.color || '#7c5cff';
+  return `<div class="av" style="width:${size}px;height:${size}px;background:${c}22;border:1px solid ${c}55">${m.emoji||'🙂'}</div>`;
+}
+
+/* ---------- Toast ---------- */
+let toastT;
+function toast(msg){
+  const t = $('#toast'); t.textContent = msg; t.classList.add('show');
+  clearTimeout(toastT); toastT = setTimeout(()=>t.classList.remove('show'), 2200);
+}
+
+/* ---------- Sheets ---------- */
+function openSheet(html){
+  $('#sheet').innerHTML = '<div class="grip"></div>' + html;
+  $('#scrim').classList.add('show'); $('#sheet').classList.add('show');
+}
+function closeSheet(){
+  $('#scrim').classList.remove('show'); $('#sheet').classList.remove('show');
+}
+
+/* ============================================================
+   PAYMENT LOGIC (simulé)
+   ============================================================ */
+// share each participant owes for a SPLIT event
+function shareOf(e){ return e.participants.length ? e.cost / e.participants.length : 0; }
+// total paid by a member on an event
+function paidBy(e, mid){ return e.payments.filter(p=>p.memberId===mid).reduce((s,p)=>s+p.amount,0); }
+// total collected on event
+function collected(e){ return e.payments.reduce((s,p)=>s+p.amount,0); }
+// has a participant settled their split share?
+function isSettled(e, mid){ return paidBy(e,mid) >= shareOf(e) - 0.001; }
+
+// group balance: for split events, organizer fronts the bill; each participant owes their share.
+// net[mid] > 0  => on lui doit de l'argent ; < 0 => il doit de l'argent
+function balances(g){
+  const net = {}; g.members.forEach(m=>net[m.id]=0);
+  g.events.forEach(e=>{
+    if(e.paymentMode!=='split' || !e.participants.length) return;
+    const share = shareOf(e);
+    e.participants.forEach(mid=>{
+      const due = share - paidBy(e,mid);          // ce qu'il doit encore
+      if(net[e.organizerId]!==undefined) net[e.organizerId]+= due; // l'orga avance
+      if(net[mid]!==undefined) net[mid]-= due;
+    });
+  });
+  return net;
+}
+
+/* ============================================================
+   RENDER
+   ============================================================ */
+function render(){
+  const v = $('#view'); $('#fab-slot').innerHTML='';
+  if(nav.screen==='home') renderHome(v);
+  else if(nav.screen==='group') renderGroup(v);
+  else if(nav.screen==='event') renderEvent(v);
+  else if(nav.screen==='profile') renderProfile(v);
+  v.scrollTop = 0;
+}
+function go(screen, params={}){ nav={screen,params}; render(); }
+
+/* ---------- HOME ---------- */
+function renderHome(v){
+  const me = DB.me;
+  let cards = '';
+  if(!DB.groups.length){
+    cards = `<div class="empty"><div class="big">👋</div><h3>Aucun groupe pour l'instant</h3>
+      <p>Crée ton premier groupe d'amis pour organiser dîners, tennis, padel, restos… et régler ensemble.</p></div>`;
+  } else {
+    DB.groups.forEach((g,i)=>{
+      const net = balances(g)[me.id]||0;
+      let bal;
+      if(Math.abs(net)<0.01) bal = `✓ Tu es à jour`;
+      else if(net>0) bal = `On te doit ${eur(net)}`;
+      else bal = `Tu dois ${eur(-net)}`;
+      const avs = g.members.slice(0,5).map(m=>`<div class="av">${m.emoji||'🙂'}</div>`).join('');
+      cards += `<div class="group-card" style="background:${g.color}" onclick="go('group',{id:'${g.id}'})">
+        <div class="gc-emoji">${g.emoji}</div>
+        <h3>${esc(g.name)}</h3>
+        <div class="gc-meta">${g.members.length} membre${g.members.length>1?'s':''} · ${g.events.length} événement${g.events.length>1?'s':''}</div>
+        <div class="avstack">${avs}${g.members.length>5?`<div class="av">+${g.members.length-5}</div>`:''}</div>
+        <div class="gc-bal">${bal}</div>
+      </div>`;
+    });
+  }
+  v.innerHTML = `
+    <div class="pt-safe"></div>
+    <div class="topbar">
+      <div style="flex:1">
+        <h1>Salut ${esc(me.name.split(' ')[0])} 👋</h1>
+        <div class="sub">Tes groupes & sorties</div>
+      </div>
+      <div class="pill" style="background:${me.color}" onclick="go('profile')">${me.emoji}</div>
+    </div>
+    <div class="wrap">${cards}</div>`;
+  $('#fab-slot').innerHTML = `<button class="fab" onclick="sheetNewGroup()">＋</button>`;
+}
+
+/* ---------- GROUP ---------- */
+function renderGroup(v){
+  const g = group(nav.params.id); if(!g) return go('home');
+  const tab = nav.params.tab || 'events';
+  let body='';
+  if(tab==='events') body = groupEventsTab(g);
+  else if(tab==='members') body = groupMembersTab(g);
+  else body = groupBalancesTab(g);
+
+  v.innerHTML = `
+    <div class="pt-safe"></div>
+    <div class="topbar">
+      <button class="back" onclick="go('home')">‹</button>
+      <div style="flex:1">
+        <h1 style="font-size:1.3rem">${g.emoji} ${esc(g.name)}</h1>
+        <div class="sub">${g.members.length} membres</div>
+      </div>
+    </div>
+    <div class="wrap">
+      <div class="tabs">
+        <button class="${tab==='events'?'on':''}" onclick="go('group',{id:'${g.id}',tab:'events'})">Événements</button>
+        <button class="${tab==='balances'?'on':''}" onclick="go('group',{id:'${g.id}',tab:'balances'})">Soldes</button>
+        <button class="${tab==='members'?'on':''}" onclick="go('group',{id:'${g.id}',tab:'members'})">Membres</button>
+      </div>
+      ${body}
+    </div>`;
+  if(tab==='events') $('#fab-slot').innerHTML = `<button class="fab" onclick="sheetNewEvent('${g.id}')">＋</button>`;
+  if(tab==='members') $('#fab-slot').innerHTML = `<button class="fab" onclick="sheetAddMember('${g.id}')">＋</button>`;
+}
+
+function groupEventsTab(g){
+  if(!g.events.length) return `<div class="empty"><div class="big">🎈</div><h3>Aucun événement</h3>
+    <p>Lance une demande : dîner, tennis, padel, resto… et choisis comment vous réglez.</p></div>`;
+  const sorted = [...g.events].sort((a,b)=>(b.date||'').localeCompare(a.date||'')||0);
+  let out='';
+  sorted.forEach(e=>{
+    const t = TYPES[e.type];
+    let foot;
+    if(e.paymentMode==='split'){
+      const settled = e.participants.filter(m=>isSettled(e,m)).length;
+      foot = `<span class="tag split">⇄ Partage</span>
+        <span class="muted" style="font-size:.78rem">${settled}/${e.participants.length} ont payé · ${eur(shareOf(e))}/pers</span>`;
+    } else {
+      const c = collected(e), goal = e.cost||0;
+      foot = `<span class="tag cagnotte">🏆 Cagnotte</span>
+        <span class="muted" style="font-size:.78rem">${eur(c)}${goal?' / '+eur(goal):''}</span>`;
+    }
+    const prog = e.paymentMode==='cagnotte' && e.cost
+      ? `<div class="progress"><i style="width:${Math.min(100,collected(e)/e.cost*100)}%"></i></div>` : '';
+    out += `<div class="event" onclick="go('event',{gid:'${g.id}',id:'${e.id}'})">
+      <div class="ico" style="background:${t.color}22">${t.emoji}</div>
+      <div class="e-body">
+        <div class="e-title">${esc(e.title)}</div>
+        <div class="e-meta">${e.date?`<span>📅 ${fmtDate(e.date)}${e.time?' · '+e.time:''}</span>`:''}${e.place?`<span>📍 ${esc(e.place)}</span>`:''}</div>
+        <div class="e-foot">${foot}</div>
+        ${prog}
+      </div>
+    </div>`;
+  });
+  return out;
+}
+
+function groupMembersTab(g){
+  let rows = g.members.map(m=>{
+    const isMe = m.id===DB.me.id;
+    return `<div class="lrow">${avatar(m)}
+      <div style="flex:1"><div class="l-name">${esc(m.name)}${isMe?' <span class="badge">toi</span>':''}</div></div>
+      ${!isMe?`<button class="linkbtn" onclick="removeMember('${g.id}','${m.id}')">Retirer</button>`:''}
+    </div>`;
+  }).join('');
+  return `<div class="card">${rows}</div>
+    <div style="height:14px"></div>
+    <button class="btn danger" onclick="deleteGroup('${g.id}')">Supprimer le groupe</button>`;
+}
+
+function groupBalancesTab(g){
+  const net = balances(g);
+  const any = g.events.some(e=>e.paymentMode==='split');
+  if(!any) return `<div class="empty"><div class="big">⚖️</div><h3>Aucun solde</h3>
+    <p>Les soldes apparaissent quand vous créez des événements en <b>partage d'addition</b>.</p></div>`;
+  let rows = g.members.map(m=>{
+    const n = net[m.id]||0;
+    const cls = Math.abs(n)<0.01?'':(n>0?'pos':'neg');
+    const txt = Math.abs(n)<0.01?'à jour':(n>0?'+'+eur(n):'−'+eur(-n));
+    return `<div class="lrow">${avatar(m)}
+      <div style="flex:1"><div class="l-name">${esc(m.name)}${m.id===DB.me.id?' <span class="badge">toi</span>':''}</div>
+      <div class="l-sub">${n>0?'on lui doit':n<-0.01?'doit au groupe':'équilibré'}</div></div>
+      <div class="amount ${cls}">${txt}</div></div>`;
+  }).join('');
+  return `<div class="card">${rows}</div>
+    <p class="muted" style="font-size:.78rem;margin-top:12px;line-height:1.5;text-align:center">
+    L'organisateur d'un événement avance l'addition ; chaque participant règle sa part via paiement.</p>`;
+}
+
+/* ---------- EVENT DETAIL ---------- */
+function renderEvent(v){
+  const g = group(nav.params.gid); if(!g) return go('home');
+  const e = ev(g, nav.params.id); if(!e) return go('group',{id:g.id});
+  const t = TYPES[e.type];
+  const org = member(g,e.organizerId);
+
+  let payBlock;
+  if(e.paymentMode==='split'){
+    const meIn = e.participants.includes(DB.me.id);
+    const myShare = shareOf(e);
+    const myPaid = paidBy(e, DB.me.id);
+    const settled = isSettled(e, DB.me.id);
+    let myCta = '';
+    if(meIn && !settled){
+      myCta = `<button class="btn green" style="margin-top:14px" onclick="payStripe('${g.id}','${e.id}','${DB.me.id}',${(myShare-myPaid).toFixed(2)})">
+        💳 Payer ma part · ${eur(myShare-myPaid)}</button>`;
+    } else if(meIn && settled){
+      myCta = `<div class="badge paid" style="margin-top:14px;display:inline-block">✓ Ta part est réglée</div>`;
+    } else {
+      myCta = `<button class="btn ghost small" style="margin-top:14px" onclick="toggleParticipant('${g.id}','${e.id}','${DB.me.id}')">Rejoindre l'événement</button>`;
+    }
+    const rows = e.participants.map(mid=>{
+      const m = member(g,mid);
+      const settledM = isSettled(e,mid);
+      return `<div class="lrow">${avatar(m,38)}
+        <div style="flex:1"><div class="l-name" style="font-size:.9rem">${esc(m.name)}${mid===e.organizerId?' <span class="badge">orga</span>':''}</div></div>
+        <span class="badge ${settledM?'paid':'due'}">${settledM?'payé':eur(shareOf(e)-paidBy(e,mid))}</span></div>`;
+    }).join('');
+    payBlock = `
+      <div class="card">
+        <div class="between"><span class="muted">Addition totale</span><b>${eur(e.cost)}</b></div>
+        <div class="between" style="margin-top:8px"><span class="muted">Par personne (${e.participants.length})</span><b>${eur(myShare)}</b></div>
+        ${myCta}
+      </div>
+      <div class="sec-title">Participants <span class="count">${e.participants.length}</span></div>
+      <div class="card">${rows||'<span class="muted">Personne pour l\'instant</span>'}</div>`;
+  } else {
+    const c = collected(e), goal = e.cost||0;
+    const pct = goal?Math.min(100,c/goal*100):0;
+    const rows = e.payments.length ? e.payments.slice().reverse().map(p=>{
+      const m = member(g,p.memberId);
+      return `<div class="lrow">${avatar(m,38)}<div style="flex:1"><div class="l-name" style="font-size:.9rem">${esc(m?m.name:'?')}</div></div>
+        <span class="amount pos">+${eur(p.amount)}</span></div>`;
+    }).join('') : '<span class="muted">Aucune participation pour l\'instant</span>';
+    payBlock = `
+      <div class="card">
+        <div class="between"><span class="muted">Cagnotte récoltée</span><b style="font-size:1.2rem">${eur(c)}</b></div>
+        ${goal?`<div class="progress" style="margin-top:12px"><i style="width:${pct}%"></i></div>
+          <div class="muted" style="font-size:.78rem;margin-top:6px">Objectif ${eur(goal)} · ${Math.round(pct)}%</div>`:''}
+        <button class="btn green" style="margin-top:16px" onclick="sheetContribute('${g.id}','${e.id}')">💳 Participer à la cagnotte</button>
+      </div>
+      <div class="sec-title">Participations <span class="count">${e.payments.length}</span></div>
+      <div class="card">${rows}</div>`;
+  }
+
+  v.innerHTML = `
+    <div class="pt-safe"></div>
+    <div class="topbar">
+      <button class="back" onclick="go('group',{id:'${g.id}'})">‹</button>
+      <div style="flex:1"><h1 style="font-size:1.25rem">${esc(e.title)}</h1>
+        <div class="sub">${t.emoji} ${t.label}${org?' · organisé par '+esc(org.name.split(' ')[0]):''}</div></div>
+    </div>
+    <div class="wrap">
+      <div class="card" style="background:${t.color}1a;border-color:${t.color}44">
+        <div class="row" style="gap:14px">
+          <div class="ico" style="width:54px;height:54px;border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:1.7rem;background:${t.color}33">${t.emoji}</div>
+          <div>
+            ${e.date?`<div><b>${fmtDate(e.date)}</b>${e.time?' · '+e.time:''}</div>`:''}
+            ${e.place?`<div class="muted" style="font-size:.85rem;margin-top:2px">📍 ${esc(e.place)}</div>`:''}
+            ${e.note?`<div class="muted" style="font-size:.82rem;margin-top:6px">${esc(e.note)}</div>`:''}
+          </div>
+        </div>
+      </div>
+      <div style="height:12px"></div>
+      ${payBlock}
+      <div class="hr"></div>
+      <button class="btn danger" onclick="deleteEvent('${g.id}','${e.id}')">Supprimer l'événement</button>
+    </div>`;
+}
+
+/* ---------- PROFILE ---------- */
+function renderProfile(v){
+  const me = DB.me;
+  v.innerHTML = `
+    <div class="pt-safe"></div>
+    <div class="topbar"><button class="back" onclick="go('home')">‹</button><div style="flex:1"><h1>Profil</h1></div></div>
+    <div class="wrap">
+      <div class="card" style="text-align:center;padding:26px">
+        <div class="pill" style="width:78px;height:78px;font-size:2.2rem;margin:0 auto;background:${me.color}">${me.emoji}</div>
+        <h2 style="margin-top:14px">${esc(me.name)}</h2>
+        <button class="btn ghost small" style="margin:14px auto 0" onclick="sheetEditMe()">Modifier mon profil</button>
+      </div>
+      <div class="demo-banner" style="margin-top:16px">⚡ Prototype : les paiements Stripe sont <b>simulés</b>. Aucune carte n'est débitée, tout reste sur cet appareil.</div>
+      <div class="card">
+        <div class="between" onclick="exportData()" style="padding:6px 0"><span>📤 Sauvegarder mes données</span><span class="muted">›</span></div>
+        <div class="hr" style="margin:10px 0"></div>
+        <label class="between" style="padding:6px 0;cursor:pointer"><span>📥 Importer une sauvegarde</span>
+          <input type="file" accept="application/json" style="display:none" onchange="importData(this)"></label>
+      </div>
+      <div style="height:14px"></div>
+      <button class="btn danger" onclick="resetAll()">Tout réinitialiser</button>
+      <p class="muted" style="text-align:center;font-size:.74rem;margin-top:20px">Tribu · prototype v1</p>
+    </div>`;
+}
+
+/* ============================================================
+   SHEETS / ACTIONS
+   ============================================================ */
+let draft = {};
+
+function sheetNewGroup(){
+  draft = {emoji:'🎾', gi:0};
+  const emos = ['🎾','🍽️','🍷','🏓','⚽','🎉','🏖️','🍻','🎿','🏀'];
+  openSheet(`
+    <h2>Nouveau groupe</h2><div class="sub">Réunis tes amis pour organiser vos sorties.</div>
+    <label class="fld"><span class="lab">Nom du groupe</span>
+      <input class="input" id="g-name" placeholder="Les potes du tennis 🎾" maxlength="30"></label>
+    <label class="fld"><span class="lab">Emoji</span>
+      <div class="epick" id="g-emo">${emos.map((e,i)=>`<button class="${i===0?'on':''}" onclick="pickGEmo('${e}',this)">${e}</button>`).join('')}</div></label>
+    <button class="btn" onclick="createGroup()">Créer le groupe</button>`);
+  setTimeout(()=>$('#g-name').focus(),300);
+}
+function pickGEmo(e,el){ draft.emoji=e; document.querySelectorAll('#g-emo button').forEach(b=>b.classList.remove('on')); el.classList.add('on'); }
+function createGroup(){
+  const name = $('#g-name').value.trim();
+  if(!name) return toast('Donne un nom au groupe');
+  const g = {id:uid(), name, emoji:draft.emoji,
+    color:GROUP_GRADIENTS[DB.groups.length%GROUP_GRADIENTS.length],
+    members:[{...DB.me}], events:[]};
+  DB.groups.push(g); save(); closeSheet(); go('group',{id:g.id});
+  toast('Groupe créé 🎉');
+}
+
+function sheetAddMember(gid){
+  draft = {emoji:EMOJIS[Math.floor(Math.random()*EMOJIS.length)], color:AVATAR_COLORS[Math.floor(Math.random()*AVATAR_COLORS.length)]};
+  openSheet(`
+    <h2>Ajouter un ami</h2><div class="sub">Ajoute un membre à ce groupe (démo : nom + avatar).</div>
+    <label class="fld"><span class="lab">Prénom</span><input class="input" id="m-name" placeholder="Alex" maxlength="20"></label>
+    <label class="fld"><span class="lab">Avatar</span>
+      <div class="epick" id="m-emo">${EMOJIS.map((e,i)=>`<button class="${e===draft.emoji?'on':''}" onclick="pickMEmo('${e}',this)">${e}</button>`).join('')}</div></label>
+    <button class="btn" onclick="addMember('${gid}')">Ajouter</button>`);
+  setTimeout(()=>$('#m-name').focus(),300);
+}
+function pickMEmo(e,el){ draft.emoji=e; document.querySelectorAll('#m-emo button').forEach(b=>b.classList.remove('on')); el.classList.add('on'); }
+function addMember(gid){
+  const g=group(gid); const name=$('#m-name').value.trim();
+  if(!name) return toast('Indique un prénom');
+  g.members.push({id:uid(), name, emoji:draft.emoji, color:draft.color});
+  save(); closeSheet(); render(); toast(name+' ajouté');
+}
+function removeMember(gid,mid){
+  const g=group(gid);
+  if(g.events.some(e=>e.participants.includes(mid)||e.organizerId===mid))
+    return toast('Membre lié à un événement, impossible');
+  g.members=g.members.filter(m=>m.id!==mid); save(); render();
+}
+
+function sheetNewEvent(gid){
+  draft = {type:'diner', mode:'split', participants:[DB.me.id]};
+  openSheet(eventForm(gid));
+  setTimeout(()=>$('#e-title')&&$('#e-title').focus(),300);
+}
+function eventForm(gid){
+  const g=group(gid);
+  const typeBtns = Object.entries(TYPES).map(([k,t])=>
+    `<button class="${draft.type===k?'on':''}" onclick="pickType('${k}',this)"><span class="pe">${t.emoji}</span>${t.label}</button>`).join('');
+  const chips = g.members.map(m=>{
+    const on = draft.participants.includes(m.id);
+    return `<div class="chip ${on?'on':''}" onclick="togChip('${m.id}',this)">
+      <div class="ca" style="background:${(m.color||'#7c5cff')}33">${m.emoji||'🙂'}</div>${esc(m.name.split(' ')[0])}${on?'<span class="ck">✓</span>':''}</div>`;
+  }).join('');
+  return `
+    <h2>Nouvelle demande</h2><div class="sub">Propose une sortie au groupe.</div>
+    <label class="fld"><span class="lab">Type</span><div class="pick" id="e-type">${typeBtns}</div></label>
+    <label class="fld"><span class="lab">Titre</span><input class="input" id="e-title" placeholder="Padel dimanche matin" maxlength="40"></label>
+    <div class="grid2">
+      <label class="fld"><span class="lab">Date</span><input class="input" type="date" id="e-date"></label>
+      <label class="fld"><span class="lab">Heure</span><input class="input" type="time" id="e-time"></label>
+    </div>
+    <label class="fld"><span class="lab">Lieu</span><input class="input" id="e-place" placeholder="Padel Club Paris 12" maxlength="40"></label>
+
+    <label class="fld"><span class="lab">Mode de paiement</span>
+      <div class="pick" id="e-mode">
+        <button class="${draft.mode==='split'?'on':''}" onclick="pickMode('split',this)"><span class="pe">⇄</span>Partage<br>addition</button>
+        <button class="${draft.mode==='cagnotte'?'on':''}" onclick="pickMode('cagnotte',this)"><span class="pe">🏆</span>Cagnotte<br>commune</button>
+      </div>
+    </label>
+    <label class="fld"><span class="lab" id="cost-lab">${draft.mode==='split'?'Montant total de l\'addition (€)':'Objectif de la cagnotte (€, optionnel)'}</span>
+      <input class="input" type="number" inputmode="decimal" id="e-cost" placeholder="0" min="0"></label>
+
+    <label class="fld" id="part-wrap"><span class="lab">Participants (partage)</span>
+      <div class="chips" id="e-parts">${chips}</div></label>
+
+    <button class="btn" onclick="createEvent('${gid}')">Créer la demande</button>`;
+}
+function pickType(k,el){ draft.type=k; document.querySelectorAll('#e-type button').forEach(b=>b.classList.remove('on')); el.classList.add('on'); }
+function pickMode(m,el){
+  draft.mode=m; document.querySelectorAll('#e-mode button').forEach(b=>b.classList.remove('on')); el.classList.add('on');
+  $('#cost-lab').textContent = m==='split'?"Montant total de l'addition (€)":"Objectif de la cagnotte (€, optionnel)";
+  $('#part-wrap').style.display = m==='split'?'block':'none';
+}
+function togChip(mid,el){
+  if(draft.participants.includes(mid)) draft.participants=draft.participants.filter(x=>x!==mid);
+  else draft.participants.push(mid);
+  el.classList.toggle('on');
+  el.querySelector('.ck')?.remove();
+  if(draft.participants.includes(mid)){ const s=document.createElement('span'); s.className='ck'; s.textContent='✓'; el.appendChild(s); }
+}
+function createEvent(gid){
+  const g=group(gid);
+  const title=$('#e-title').value.trim();
+  if(!title) return toast('Donne un titre');
+  const cost=parseFloat($('#e-cost').value)||0;
+  if(draft.mode==='split' && cost<=0) return toast("Indique le montant de l'addition");
+  if(draft.mode==='split' && !draft.participants.length) return toast('Choisis au moins un participant');
+  const e={id:uid(), type:draft.type, title, date:$('#e-date').value, time:$('#e-time').value,
+    place:$('#e-place').value.trim(), note:'', organizerId:DB.me.id, paymentMode:draft.mode,
+    cost, participants:draft.mode==='split'?[...draft.participants]:[], payments:[]};
+  g.events.push(e); save(); closeSheet(); go('event',{gid,id:e.id}); toast('Demande créée 🎉');
+}
+
+function toggleParticipant(gid,eid,mid){
+  const e=ev(group(gid),eid);
+  if(!e.participants.includes(mid)) e.participants.push(mid);
+  save(); render();
+}
+
+function sheetContribute(gid,eid){
+  const e=ev(group(gid),eid);
+  openSheet(`
+    <h2>Participer à la cagnotte</h2><div class="sub">${esc(e.title)}</div>
+    <label class="fld"><span class="lab">Montant de ta participation (€)</span>
+      <input class="input" type="number" inputmode="decimal" id="c-amt" placeholder="20" min="1" autofocus></label>
+    <div class="pick" style="margin-bottom:16px">
+      ${[10,20,50].map(a=>`<button onclick="$('#c-amt').value=${a}"><span class="pe">${a}€</span></button>`).join('')}
+    </div>
+    <button class="btn" onclick="goPay('${gid}','${eid}')">Continuer vers le paiement</button>`);
+  setTimeout(()=>$('#c-amt').focus(),300);
+}
+function goPay(gid,eid){
+  const amt=parseFloat($('#c-amt').value);
+  if(!amt||amt<=0) return toast('Entre un montant');
+  payStripe(gid,eid,DB.me.id,amt);
+}
+
+/* ============================================================
+   STRIPE — écran de paiement SIMULÉ
+   ============================================================ */
+function payStripe(gid,eid,mid,amount){
+  amount = Math.round(amount*100)/100;
+  const g=group(gid), e=ev(g,eid);
+  openSheet(`
+    <div class="stripe-head">
+      <span class="muted" style="font-size:.85rem">🔒 Paiement sécurisé</span>
+      <span class="ff" style="font-weight:700;color:#a78bfa">stripe</span>
+    </div>
+    <div class="stripe-amount">${eur(amount)}</div>
+    <div class="stripe-for">${esc(e.title)} · ${g.emoji} ${esc(g.name)}</div>
+    <form id="stripe-form" onsubmit="return false">
+      <div class="stripe-card">
+        <div class="sc-row"><span class="brand">💳</span><input id="cc-num" placeholder="Numéro de carte" inputmode="numeric" value="4242 4242 4242 4242"></div>
+        <div class="sc-row"><input id="cc-exp" placeholder="MM / AA" value="12 / 28" style="border-right:1px solid #eef"><input id="cc-cvc" placeholder="CVC" value="123" style="padding-left:14px"></div>
+      </div>
+      <div class="stripe-card"><div class="sc-row"><span class="brand">👤</span><input id="cc-name" placeholder="Nom sur la carte" value="${esc(DB.me.name)}"></div></div>
+      <button class="btn" id="pay-btn" onclick="doPay('${gid}','${eid}','${mid}',${amount})">Payer ${eur(amount)}</button>
+      <div class="stripe-secure">🔒 Démo — aucun paiement réel n'est effectué</div>
+    </form>`);
+}
+function doPay(gid,eid,mid,amount){
+  const btn=$('#pay-btn'); btn.innerHTML='<span class="spinner"></span>'; btn.style.pointerEvents='none';
+  setTimeout(()=>{
+    const e=ev(group(gid),eid);
+    e.payments.push({memberId:mid, amount, ts:Date.now()});
+    save();
+    $('#sheet').innerHTML=`<div class="grip"></div><div class="pay-ok">
+      <div class="check">✓</div><h2>Paiement confirmé</h2>
+      <p class="muted" style="margin-top:8px">${eur(amount)} · ${esc(ev(group(gid),eid).title)}</p>
+      <button class="btn" style="margin-top:22px" onclick="closeSheet();render()">Terminé</button></div>`;
+  },1300);
+}
+
+/* ---------- delete / edit ---------- */
+function deleteEvent(gid,eid){
+  if(!confirm('Supprimer cet événement ?')) return;
+  const g=group(gid); g.events=g.events.filter(e=>e.id!==eid); save(); go('group',{id:gid});
+}
+function deleteGroup(gid){
+  if(!confirm('Supprimer ce groupe et tous ses événements ?')) return;
+  DB.groups=DB.groups.filter(g=>g.id!==gid); save(); go('home');
+}
+function sheetEditMe(){
+  draft={emoji:DB.me.emoji};
+  openSheet(`
+    <h2>Mon profil</h2><div class="sub">Visible par tes amis dans les groupes.</div>
+    <label class="fld"><span class="lab">Prénom</span><input class="input" id="me-name" value="${esc(DB.me.name)}" maxlength="20"></label>
+    <label class="fld"><span class="lab">Avatar</span>
+      <div class="epick" id="me-emo">${EMOJIS.map(e=>`<button class="${e===DB.me.emoji?'on':''}" onclick="draft.emoji='${e}';document.querySelectorAll('#me-emo button').forEach(b=>b.classList.remove('on'));this.classList.add('on')">${e}</button>`).join('')}</div></label>
+    <button class="btn" onclick="saveMe()">Enregistrer</button>`);
+}
+function saveMe(){
+  const name=$('#me-name').value.trim(); if(!name) return toast('Indique ton prénom');
+  DB.me.name=name; DB.me.emoji=draft.emoji;
+  // refléter dans les groupes
+  DB.groups.forEach(g=>{const m=member(g,DB.me.id); if(m){m.name=name;m.emoji=draft.emoji;}});
+  save(); closeSheet(); render(); toast('Profil mis à jour');
+}
+
+/* ---------- data ---------- */
+function exportData(){
+  const blob=new Blob([JSON.stringify(DB,null,2)],{type:'application/json'});
+  const a=document.createElement('a'); a.href=URL.createObjectURL(blob);
+  a.download='tribu-sauvegarde.json'; a.click(); toast('Sauvegarde téléchargée');
+}
+function importData(input){
+  const f=input.files[0]; if(!f) return;
+  const r=new FileReader();
+  r.onload=()=>{ try{ DB=JSON.parse(r.result); save(); go('home'); toast('Données importées'); }
+    catch(e){ toast('Fichier invalide'); } };
+  r.readAsText(f);
+}
+function resetAll(){
+  if(!confirm('Tout effacer et recommencer ?')) return;
+  localStorage.removeItem('tribu_db_v1'); location.reload();
+}
+
+/* ============================================================
+   ONBOARDING
+   ============================================================ */
+function onboard(){
+  draft={emoji:'😎'};
+  openSheet(`
+    <h2>Bienvenue sur Tribu 🤝</h2>
+    <div class="sub">Organise dîners, tennis, padel, restos avec tes amis — et réglez ensemble en un tap.</div>
+    <label class="fld"><span class="lab">Ton prénom</span><input class="input" id="ob-name" placeholder="Ton prénom" maxlength="20"></label>
+    <label class="fld"><span class="lab">Choisis ton avatar</span>
+      <div class="epick" id="ob-emo">${EMOJIS.map((e,i)=>`<button class="${i===0?'on':''}" onclick="draft.emoji='${e}';document.querySelectorAll('#ob-emo button').forEach(b=>b.classList.remove('on'));this.classList.add('on')">${e}</button>`).join('')}</div></label>
+    <button class="btn" onclick="finishOnboard()">C'est parti 🚀</button>`);
+  $('#sheet').classList.add('show'); $('#scrim').classList.add('show');
+  setTimeout(()=>$('#ob-name').focus(),400);
+}
+function finishOnboard(){
+  const name=$('#ob-name').value.trim(); if(!name) return toast('Indique ton prénom');
+  DB={ me:{id:uid(), name, emoji:draft.emoji, color:AVATAR_COLORS[0]}, groups:[] };
+  seedDemo();
+  save(); closeSheet(); go('home');
+}
+function seedDemo(){
+  // un groupe de démo pour découvrir l'app
+  const alex={id:uid(),name:'Alex',emoji:'🦊',color:'#22d3ee'};
+  const sam={id:uid(),name:'Sam',emoji:'🐼',color:'#fb7185'};
+  const lea={id:uid(),name:'Léa',emoji:'🦄',color:'#fbbf24'};
+  const g={id:uid(), name:'Les Potes 🎾', emoji:'🎾', color:GROUP_GRADIENTS[0],
+    members:[{...DB.me}, alex, sam, lea], events:[]};
+  const e1={id:uid(),type:'padel',title:'Padel + bières',date:isoIn(2),time:'18:30',place:'Padel Club Paris 12',
+    note:'Réservation du court 2h.',organizerId:DB.me.id,paymentMode:'split',cost:48,
+    participants:[DB.me.id,alex.id,sam.id],payments:[{memberId:alex.id,amount:16,ts:Date.now()}]};
+  const e2={id:uid(),type:'resto',title:'Resto anniversaire de Léa',date:isoIn(6),time:'20:00',place:'Le Petit Bistrot',
+    note:'On lui offre le repas 🎂',organizerId:alex.id,paymentMode:'cagnotte',cost:120,
+    participants:[],payments:[{memberId:alex.id,amount:30,ts:Date.now()},{memberId:sam.id,amount:25,ts:Date.now()}]};
+  g.events.push(e1,e2); DB.groups.push(g);
+}
+function isoIn(days){ const d=new Date(); d.setDate(d.getDate()+days); return d.toISOString().slice(0,10); }
+
+/* ============================================================
+   BOOT
+   ============================================================ */
+window.addEventListener('load', ()=>{
+  setTimeout(()=>$('#splash').classList.add('hide'), 900);
+  if(!DB || !DB.me){ render(); setTimeout(onboard, 950); }
+  else render();
+});
+if('serviceWorker' in navigator){ navigator.serviceWorker.register('sw.js').catch(()=>{}); }
+</script>
+</body>
+</html>

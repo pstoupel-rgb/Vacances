@@ -38,6 +38,23 @@ export default async function HomePage() {
   }
 
   const firstName = (profile?.name || 'Ami').split(' ')[0];
+  const emailPrefix = (user.email || '').split('@')[0].toLowerCase();
+  const needsProfile = (profile?.name || '').toLowerCase() === emailPrefix;
+
+  // Compte à rebours convivial pour une date d'activité.
+  function countdown(date: string | null): string {
+    if (!date) return '';
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const d = new Date(`${date}T00:00:00`);
+    const days = Math.round((d.getTime() - today.getTime()) / 86400000);
+    if (days < 0) return 'Passé';
+    if (days === 0) return "Aujourd'hui";
+    if (days === 1) return 'Demain';
+    if (days < 7) return `Dans ${days} j`;
+    if (days < 14) return 'La semaine prochaine';
+    return `Dans ${Math.round(days / 7)} sem.`;
+  }
 
   return (
     <div>
@@ -54,6 +71,12 @@ export default async function HomePage() {
       </div>
 
       <div className="wrap">
+        {needsProfile && (
+          <Link href="/profile" className="banner" style={{ marginBottom: 14, justifyContent: 'space-between' }}>
+            <span>👋 Complète ton profil (prénom & avatar)</span>
+            <span className="linktext">Modifier ›</span>
+          </Link>
+        )}
         <Link href="/dinner/new" className="act" style={{ background: 'var(--gor)', color: '#fff', marginTop: 4 }}>
           <div className="thumb" style={{ background: 'rgba(255,255,255,.22)' }}>🍝</div>
           <div style={{ flex: 1 }}>
@@ -102,7 +125,7 @@ export default async function HomePage() {
                   </div>
                   <div className="a-meta" style={{ marginTop: 4 }}>{g?.emoji} {g?.name}</div>
                 </div>
-                <div className="chev">›</div>
+                {countdown(e.event_date) ? <span className="pill" style={{ flex: '0 0 auto' }}>{countdown(e.event_date)}</span> : <div className="chev">›</div>}
               </Link>
             );
           })

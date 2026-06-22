@@ -69,3 +69,8 @@ export interface CagnotteContribution {
 }
 
 export interface Photo { id: string; group_id: string; user_id: string; path: string; caption: string | null; created_at: string; }
+
+export interface Settlement {
+  id: string; group_id: string; from_user: string; to_user: string;
+  amount: number; status: string; stripe_session_id: string | null; created_at: string;
+}

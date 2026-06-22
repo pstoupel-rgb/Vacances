@@ -2,7 +2,10 @@ import Link from 'next/link';
 import { createClient } from '@/lib/supabase/server';
 import { redirect, notFound } from 'next/navigation';
 import { TYPES, ORDER_CATS, type EventRow, type Payment, type WineOrder } from '@/lib/types';
-import { eur, shareOf, isSettled, collected, groupBalances } from '@/lib/money';
+import { eur, shareOf, isSettled, collected, groupBalances, computeTransfers } from '@/lib/money';
+import SettleButton from '@/components/SettleButton';
+import ShareInvite from '@/components/ShareInvite';
+import type { Settlement } from '@/lib/types';
 import EventForm from '@/components/EventForm';
 import WineOrderForm from '@/components/WineOrderForm';
 import PollForm from '@/components/PollForm';
@@ -83,7 +86,13 @@ export default async function GroupPage({ params, searchParams }: { params: { id
     .filter((p: any) => signed[p.path])
     .map((p: any) => ({ id: p.id, url: signed[p.path], path: p.path, mine: p.user_id === user.id }));
 
-  const net = groupBalances(events, partsByEvent, paysByEvent, members.map((m: any) => m.id));
+  const { data: settleRows } = await supabase.from('settlements').select('*').eq('group_id', params.id);
+  const settlements = (settleRows || []) as Settlement[];
+  const net = groupBalances(events, partsByEvent, paysByEvent, members.map((m: any) => m.id), settlements);
+  const transfers = computeTransfers(net);
+  const myTransfers = transfers.filter((t) => t.from === user.id);
+  const nameOf = (id: string) => members.find((m: any) => m.id === id)?.name || 'Ami';
+  const emojiOf = (id: string) => members.find((m: any) => m.id === id)?.emoji || '🙂';
   const avs = members.slice(0, 6).map((m: any) => <div key={m.id} className="a">{m.emoji}</div>);
 
   return (
@@ -222,6 +231,44 @@ export default async function GroupPage({ params, searchParams }: { params: { id
 
           {tab === 'membres' && (
             <>
+              {myTransfers.length > 0 && (
+                <>
+                  <div className="sec" style={{ marginTop: 4 }}><h3>À régler</h3></div>
+                  {myTransfers.map((t) => (
+                    <div key={t.to} className="card" style={{ marginBottom: 10 }}>
+                      <div className="between">
+                        <div className="row">
+                          <div className="av" style={{ width: 40, height: 40, fontSize: '1.1rem' }}>{emojiOf(t.to)}</div>
+                          <div>
+                            <div className="l-name">Tu dois à {nameOf(t.to).split(' ')[0]}</div>
+                            <div className="l-sub">{eur(t.amount)}</div>
+                          </div>
+                        </div>
+                        <SettleButton groupId={group.id} toUser={t.to} toName={nameOf(t.to)} amount={t.amount} />
+                      </div>
+                    </div>
+                  ))}
+                </>
+              )}
+              {transfers.length > 0 && (
+                <>
+                  <div className="sec"><h3>Qui rembourse qui</h3></div>
+                  <div className="card" style={{ marginBottom: 12 }}>
+                    {transfers.map((t, i) => (
+                      <div key={i} className="lrow">
+                        <div className="row" style={{ flex: 1 }}>
+                          <span>{emojiOf(t.from)}</span>
+                          <span className="muted">→</span>
+                          <span>{emojiOf(t.to)}</span>
+                          <span className="l-name" style={{ fontSize: '.86rem' }}>{nameOf(t.from).split(' ')[0]} → {nameOf(t.to).split(' ')[0]}</span>
+                        </div>
+                        <span className="amount">{eur(t.amount)}</span>
+                      </div>
+                    ))}
+                  </div>
+                </>
+              )}
+              <div className="sec"><h3>Membres &amp; soldes</h3></div>
               <div className="card">
                 {members.map((m: any) => {
                   const n = net[m.id] || 0;
@@ -239,9 +286,12 @@ export default async function GroupPage({ params, searchParams }: { params: { id
                   );
                 })}
               </div>
-              <div className="banner" style={{ marginTop: 14 }}>
-                🔗 Invite un ami avec ce code : <b style={{ color: 'var(--text)' }}>&nbsp;{group.invite_code}</b>
+              <div style={{ marginTop: 14 }}>
+                <ShareInvite code={group.invite_code} groupName={group.name} />
               </div>
+              <p className="muted center" style={{ fontSize: '.76rem', marginTop: 10 }}>
+                Code d&apos;invitation : <b style={{ color: 'var(--text)' }}>{group.invite_code}</b>
+              </p>
             </>
           )}
         </div>

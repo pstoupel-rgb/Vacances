@@ -14,7 +14,9 @@ Version **full-stack** de Vini : comptes utilisateurs, groupes partagés et **pa
 - 🐷 **Cagnottes** : objectif, anneau de progression, contributeurs, paiement Stripe
 - 🍷 **Commandes groupées de vin** : catalogue (lots de N bouteilles), quantités, seuil minimum, paiement du panier
 - 📷 **Photos** : galerie par groupe, ajout depuis la pellicule, téléchargement/enregistrement (Supabase Storage privé)
-- ⚖️ **Soldes** calculés automatiquement
+- ⚖️ **Soldes** calculés automatiquement + **« Régler les comptes »** (transferts minimaux, remboursement Stripe entre amis)
+- 🧭 **« Y aller »** (itinéraire Maps) & **ajout au calendrier** (.ics) sur les activités
+- 🔗 **Invitation native** (partage iOS / copie du lien)
 - 📲 **PWA** installable (manifest + service worker)
 
 ## 🧱 Stack

@@ -1,4 +1,4 @@
-import type { EventRow, Payment } from './types';
+import type { EventRow, Payment, Settlement } from './types';
 
 export const eur = (n: number) =>
   (Math.round(n * 100) / 100).toLocaleString('fr-FR', {
@@ -32,7 +32,8 @@ export function groupBalances(
   events: EventRow[],
   participantsByEvent: Record<string, string[]>,
   paymentsByEvent: Record<string, Payment[]>,
-  memberIds: string[]
+  memberIds: string[],
+  settlements: Settlement[] = []
 ) {
   const net: Record<string, number> = {};
   memberIds.forEach((id) => (net[id] = 0));
@@ -48,5 +49,35 @@ export function groupBalances(
       if (net[uid] !== undefined) net[uid] -= due;
     }
   }
+  // Remboursements déjà effectués : le débiteur réduit sa dette, le créancier ce qu'on lui doit.
+  for (const s of settlements) {
+    if (s.status !== 'paid') continue;
+    if (net[s.from_user] !== undefined) net[s.from_user] += Number(s.amount);
+    if (net[s.to_user] !== undefined) net[s.to_user] -= Number(s.amount);
+  }
   return net;
+}
+
+// Transferts minimaux pour équilibrer le groupe : qui paie qui, et combien.
+export function computeTransfers(net: Record<string, number>) {
+  const debtors: { id: string; amt: number }[] = [];
+  const creditors: { id: string; amt: number }[] = [];
+  Object.entries(net).forEach(([id, v]) => {
+    if (v < -0.01) debtors.push({ id, amt: -v });
+    else if (v > 0.01) creditors.push({ id, amt: v });
+  });
+  debtors.sort((a, b) => b.amt - a.amt);
+  creditors.sort((a, b) => b.amt - a.amt);
+  const transfers: { from: string; to: string; amount: number }[] = [];
+  let i = 0;
+  let j = 0;
+  while (i < debtors.length && j < creditors.length) {
+    const pay = Math.min(debtors[i].amt, creditors[j].amt);
+    if (pay > 0.01) transfers.push({ from: debtors[i].id, to: creditors[j].id, amount: Math.round(pay * 100) / 100 });
+    debtors[i].amt -= pay;
+    creditors[j].amt -= pay;
+    if (debtors[i].amt < 0.01) i++;
+    if (creditors[j].amt < 0.01) j++;
+  }
+  return transfers;
 }

@@ -6,6 +6,7 @@ import { eur, shareOf, paidBy, isSettled, collected } from '@/lib/money';
 import PayButton from '@/components/PayButton';
 import ContributeButton from '@/components/ContributeButton';
 import RsvpButtons from '@/components/RsvpButtons';
+import AddToCalendar from '@/components/AddToCalendar';
 import { deleteEvent } from '@/app/actions';
 
 export default async function EventPage({ params, searchParams }: { params: { id: string }; searchParams: { paid?: string } }) {
@@ -64,6 +65,15 @@ export default async function EventPage({ params, searchParams }: { params: { id
 
       <div className="wrap" style={{ paddingTop: 14 }}>
         {searchParams.paid === '1' && <div className="banner" style={{ color: 'var(--green)', marginBottom: 14 }}>✓ Paiement confirmé, merci !</div>}
+
+        <div className="row" style={{ marginBottom: 14, flexWrap: 'wrap' }}>
+          {event.place && (
+            <a className="btn ghost small" href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(event.place)}`} target="_blank" rel="noreferrer">
+              🧭 Y aller
+            </a>
+          )}
+          <AddToCalendar title={event.title} date={event.event_date} time={event.event_time} place={event.place} />
+        </div>
 
         <RsvpButtons eventId={event.id} current={myStatus} />
 

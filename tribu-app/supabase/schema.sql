@@ -445,3 +445,20 @@ create policy "photos_obj_delete" on storage.objects for delete to authenticated
 -- Catégorie d'une commande groupée (vin / nourriture / cadeaux / autre)
 alter table public.wine_orders
   add column if not exists category text not null default 'vin';
+
+-- ============================================================
+--  REMBOURSEMENTS ("Régler les comptes")
+-- ============================================================
+create table if not exists public.settlements (
+  id uuid primary key default gen_random_uuid(),
+  group_id uuid not null references public.groups(id) on delete cascade,
+  from_user uuid not null references auth.users(id) on delete cascade,
+  to_user uuid not null references auth.users(id) on delete cascade,
+  amount numeric(10,2) not null,
+  status text not null default 'paid',
+  stripe_session_id text unique,
+  created_at timestamptz not null default now()
+);
+alter table public.settlements enable row level security;
+drop policy if exists "settle_read" on public.settlements;
+create policy "settle_read" on public.settlements for select using (public.is_group_member(group_id));

@@ -12,9 +12,9 @@ export async function POST(request: NextRequest) {
   } = await supabase.auth.getUser();
   if (!user) return NextResponse.json({ error: 'Non connecté' }, { status: 401 });
 
-  const { eventId, orderId, cagnotteId, amount } = await request.json();
+  const { eventId, orderId, cagnotteId, settleToUser, groupId: settleGroupId, amount } = await request.json();
   const cents = Math.round(Number(amount) * 100);
-  if ((!eventId && !orderId && !cagnotteId) || !cents || cents < 50) {
+  if ((!eventId && !orderId && !cagnotteId && !settleToUser) || !cents || cents < 50) {
     return NextResponse.json({ error: 'Montant invalide (min. 0,50 €)' }, { status: 400 });
   }
 
@@ -24,7 +24,16 @@ export async function POST(request: NextRequest) {
   let successPath = '';
   const metadata: Record<string, string> = { userId: user.id };
 
-  if (cagnotteId) {
+  if (settleToUser) {
+    // Remboursement direct à un ami.
+    const { data: creditor } = await supabase.from('profiles').select('name').eq('id', settleToUser).single();
+    label = `Remboursement à ${creditor?.name || 'un ami'}`;
+    organizerId = settleToUser; // l'argent va au créancier
+    successPath = `/group/${settleGroupId}?tab=membres`;
+    metadata.kind = 'settle';
+    metadata.groupId = settleGroupId;
+    metadata.toUser = settleToUser;
+  } else if (cagnotteId) {
     const { data: cag } = await supabase
       .from('cagnottes')
       .select('id, title, organizer_id')

@@ -24,7 +24,13 @@ export async function POST(request: NextRequest) {
     const amount = (session.amount_total || 0) / 100;
     const admin = createAdminClient(); // service_role : contourne la RLS
 
-    if (session.metadata?.kind === 'cagnotte' && session.metadata.cagnotteId && userId) {
+    if (session.metadata?.kind === 'settle' && session.metadata.groupId && session.metadata.toUser && userId) {
+      // Remboursement entre amis.
+      await admin.from('settlements').upsert(
+        { group_id: session.metadata.groupId, from_user: userId, to_user: session.metadata.toUser, amount, status: 'paid', stripe_session_id: session.id },
+        { onConflict: 'stripe_session_id' }
+      );
+    } else if (session.metadata?.kind === 'cagnotte' && session.metadata.cagnotteId && userId) {
       // Contribution à une cagnotte.
       await admin.from('cagnotte_contributions').upsert(
         { cagnotte_id: session.metadata.cagnotteId, user_id: userId, amount, status: 'paid', stripe_session_id: session.id },

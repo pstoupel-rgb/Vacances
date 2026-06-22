@@ -5,11 +5,14 @@ import { TYPES, type EventRow, type Payment, type WineOrder } from '@/lib/types'
 import { eur, shareOf, isSettled, collected, groupBalances } from '@/lib/money';
 import EventForm from '@/components/EventForm';
 import WineOrderForm from '@/components/WineOrderForm';
+import PollForm from '@/components/PollForm';
+import CagnotteForm from '@/components/CagnotteForm';
+import Ring from '@/components/Ring';
 
 const GRADS = ['var(--gp)', 'var(--gpk)', 'var(--gtl)', 'var(--gor)', 'var(--gbl)'];
 const TABS = [
   { id: 'acts', label: 'Activités', icon: '📅' },
-  { id: 'balances', label: 'Soldes', icon: '⚖️' },
+  { id: 'cagnotte', label: 'Cagnotte', icon: '🐷' },
   { id: 'cmd', label: 'Commandes', icon: '🍷' },
   { id: 'membres', label: 'Membres', icon: '👥' },
 ];
@@ -46,6 +49,24 @@ export default async function GroupPage({ params, searchParams }: { params: { id
 
   const { data: orders } = await supabase.from('wine_orders').select('*').eq('group_id', params.id).order('created_at', { ascending: false });
   const wineOrders = (orders || []) as WineOrder[];
+
+  // Sondages (+ total de votes)
+  const { data: pollRows } = await supabase.from('polls').select('id, question').eq('group_id', params.id).order('created_at', { ascending: false });
+  const polls = pollRows || [];
+  const voteCount: Record<string, number> = {};
+  if (polls.length) {
+    const { data: pv } = await supabase.from('poll_votes').select('poll_id').in('poll_id', polls.map((p: any) => p.id));
+    (pv || []).forEach((v: any) => (voteCount[v.poll_id] = (voteCount[v.poll_id] || 0) + 1));
+  }
+
+  // Cagnottes (+ montant collecté)
+  const { data: cagRows } = await supabase.from('cagnottes').select('*').eq('group_id', params.id).order('created_at', { ascending: false });
+  const cagnottes = cagRows || [];
+  const collectedByCag: Record<string, number> = {};
+  if (cagnottes.length) {
+    const { data: cc } = await supabase.from('cagnotte_contributions').select('cagnotte_id, amount, status').in('cagnotte_id', cagnottes.map((c: any) => c.id));
+    (cc || []).forEach((c: any) => { if (c.status === 'paid') collectedByCag[c.cagnotte_id] = (collectedByCag[c.cagnotte_id] || 0) + Number(c.amount); });
+  }
 
   const avs = members.slice(0, 6).map((m: any) => <div key={m.id} className="a">{m.emoji}</div>);
 
@@ -106,10 +127,48 @@ export default async function GroupPage({ params, searchParams }: { params: { id
               )}
               <div className="sec"><h3>Nouvelle activité</h3></div>
               <EventForm groupId={group.id} members={members} />
+
+              <div className="sec"><h3>Sondages</h3></div>
+              {polls.map((p: any) => (
+                <Link key={p.id} href={`/poll/${p.id}`} className="act">
+                  <div className="thumb" style={{ background: 'var(--gp)' }}>🗳️</div>
+                  <div style={{ flex: 1 }}>
+                    <div className="a-title">{p.question}</div>
+                    <div className="a-meta"><span>{voteCount[p.id] || 0} vote(s)</span></div>
+                  </div>
+                  <div className="chev">›</div>
+                </Link>
+              ))}
+              <PollForm groupId={group.id} />
             </>
           )}
 
-          {tab === 'balances' && <Balances events={events} partsByEvent={partsByEvent} paysByEvent={paysByEvent} members={members} meId={user.id} />}
+          {tab === 'cagnotte' && (
+            <>
+              {cagnottes.length === 0 ? (
+                <div className="empty"><div className="big">🐷</div><h3>Aucune cagnotte</h3><p>Collecte pour un cadeau, un resto, une commande de vin…</p></div>
+              ) : (
+                cagnottes.map((c: any) => {
+                  const col = collectedByCag[c.id] || 0;
+                  const pct = Number(c.goal) ? Math.min(100, (col / Number(c.goal)) * 100) : 0;
+                  return (
+                    <Link key={c.id} href={`/cagnotte/${c.id}`} className="card" style={{ display: 'block', marginBottom: 12 }}>
+                      <div className="between"><div style={{ fontWeight: 700 }}>{c.title}</div></div>
+                      <div className="ring-wrap" style={{ marginTop: 12 }}>
+                        <Ring pct={pct} />
+                        <div>
+                          <div style={{ fontFamily: 'Poppins', fontWeight: 700, fontSize: '1.3rem' }}>{eur(col)}</div>
+                          <div className="muted" style={{ fontSize: '.8rem' }}>sur {eur(Number(c.goal))} objectif</div>
+                        </div>
+                      </div>
+                    </Link>
+                  );
+                })
+              )}
+              <div style={{ height: 4 }} />
+              <CagnotteForm groupId={group.id} />
+            </>
+          )}
 
           {tab === 'cmd' && (
             <>

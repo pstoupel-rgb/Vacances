@@ -49,3 +49,13 @@ export interface WinePayment {
   id: string; order_id: string; user_id: string; amount: number;
   status: string; stripe_session_id: string | null; created_at: string;
 }
+
+export interface Poll { id: string; group_id: string; question: string; author_id: string; created_at: string; }
+export interface PollOption { id: string; poll_id: string; label: string; }
+export interface PollVote { poll_id: string; option_id: string; user_id: string; }
+
+export interface Cagnotte { id: string; group_id: string; title: string; goal: number; organizer_id: string; created_at: string; }
+export interface CagnotteContribution {
+  id: string; cagnotte_id: string; user_id: string; amount: number;
+  status: string; stripe_session_id: string | null; created_at: string;
+}

@@ -12,9 +12,9 @@ export async function POST(request: NextRequest) {
   } = await supabase.auth.getUser();
   if (!user) return NextResponse.json({ error: 'Non connecté' }, { status: 401 });
 
-  const { eventId, orderId, amount } = await request.json();
+  const { eventId, orderId, cagnotteId, amount } = await request.json();
   const cents = Math.round(Number(amount) * 100);
-  if ((!eventId && !orderId) || !cents || cents < 50) {
+  if ((!eventId && !orderId && !cagnotteId) || !cents || cents < 50) {
     return NextResponse.json({ error: 'Montant invalide (min. 0,50 €)' }, { status: 400 });
   }
 
@@ -24,7 +24,19 @@ export async function POST(request: NextRequest) {
   let successPath = '';
   const metadata: Record<string, string> = { userId: user.id };
 
-  if (orderId) {
+  if (cagnotteId) {
+    const { data: cag } = await supabase
+      .from('cagnottes')
+      .select('id, title, organizer_id')
+      .eq('id', cagnotteId)
+      .single();
+    if (!cag) return NextResponse.json({ error: 'Cagnotte introuvable' }, { status: 404 });
+    label = `${cag.title} — cagnotte`;
+    organizerId = cag.organizer_id;
+    successPath = `/cagnotte/${cagnotteId}`;
+    metadata.kind = 'cagnotte';
+    metadata.cagnotteId = cagnotteId;
+  } else if (orderId) {
     const { data: order } = await supabase
       .from('wine_orders')
       .select('id, title, organizer_id')

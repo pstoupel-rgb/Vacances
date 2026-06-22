@@ -3,6 +3,7 @@
 import { redirect } from 'next/navigation';
 import { revalidatePath } from 'next/cache';
 import { createClient } from '@/lib/supabase/server';
+import { sendInviteEmails } from '@/lib/email';
 import type { EventType, PaymentMode } from '@/lib/types';
 
 async function requireUser() {
@@ -128,6 +129,8 @@ export async function createDinner(formData: FormData) {
   );
   if (emails.length) {
     await supabase.from('group_invites').insert(emails.map((email) => ({ group_id: group.id, email, invited_by: user.id })));
+    const { data: me } = await supabase.from('profiles').select('name').eq('id', user.id).single();
+    await sendInviteEmails(emails, { inviterName: me?.name || 'Un ami', groupName, eventTitle: title });
   }
 
   redirect(`/event/${ev.id}`);
@@ -260,5 +263,66 @@ export async function setWineStatus(orderId: string, status: 'open' | 'closed') 
 export async function deleteWineOrder(orderId: string, groupId: string) {
   const { supabase } = await requireUser();
   await supabase.from('wine_orders').delete().eq('id', orderId);
-  redirect(`/group/${groupId}?tab=wine`);
+  redirect(`/group/${groupId}?tab=cmd`);
+}
+
+/* ----------------------- Sondages ----------------------- */
+
+export async function createPoll(formData: FormData) {
+  const { supabase, user } = await requireUser();
+  const groupId = String(formData.get('group_id'));
+  const question = String(formData.get('question') || '').trim();
+  const options = formData.getAll('option').map((v) => String(v).trim()).filter(Boolean);
+  if (!question || options.length < 2) return;
+  const { data: poll, error } = await supabase
+    .from('polls')
+    .insert({ group_id: groupId, question, author_id: user.id })
+    .select('id')
+    .single();
+  if (error || !poll) throw new Error(error?.message || 'Création impossible');
+  await supabase.from('poll_options').insert(options.map((label) => ({ poll_id: poll.id, label })));
+  redirect(`/poll/${poll.id}`);
+}
+
+export async function votePoll(pollId: string, optionId: string) {
+  const { supabase, user } = await requireUser();
+  await supabase.from('poll_votes').upsert({ poll_id: pollId, option_id: optionId, user_id: user.id }, { onConflict: 'poll_id,user_id' });
+  revalidatePath(`/poll/${pollId}`);
+}
+
+export async function addPollOption(pollId: string, label: string) {
+  const { supabase } = await requireUser();
+  const v = label.trim();
+  if (!v) return;
+  await supabase.from('poll_options').insert({ poll_id: pollId, label: v });
+  revalidatePath(`/poll/${pollId}`);
+}
+
+export async function deletePoll(pollId: string, groupId: string) {
+  const { supabase } = await requireUser();
+  await supabase.from('polls').delete().eq('id', pollId);
+  redirect(`/group/${groupId}?tab=acts`);
+}
+
+/* ----------------------- Cagnottes ----------------------- */
+
+export async function createCagnotte(formData: FormData) {
+  const { supabase, user } = await requireUser();
+  const groupId = String(formData.get('group_id'));
+  const title = String(formData.get('title') || '').trim();
+  const goal = parseFloat(String(formData.get('goal') || '0')) || 0;
+  if (!title) return;
+  const { data, error } = await supabase
+    .from('cagnottes')
+    .insert({ group_id: groupId, title, goal, organizer_id: user.id })
+    .select('id')
+    .single();
+  if (error || !data) throw new Error(error?.message || 'Création impossible');
+  redirect(`/cagnotte/${data.id}`);
+}
+
+export async function deleteCagnotte(cagnotteId: string, groupId: string) {
+  const { supabase } = await requireUser();
+  await supabase.from('cagnottes').delete().eq('id', cagnotteId);
+  redirect(`/group/${groupId}?tab=cagnotte`);
 }

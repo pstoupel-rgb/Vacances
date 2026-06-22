@@ -1,15 +1,30 @@
-# 🤝 Tribu — application réelle (Next.js + Supabase + Stripe)
+# 🍷 Vini — application réelle (Next.js + Supabase + Stripe)
 
-Version **full-stack** de Tribu : comptes utilisateurs, groupes partagés en temps réel et **paiements Stripe réels** (parts d'addition + cagnottes), avec reversement aux organisateurs via **Stripe Connect**.
+Version **full-stack** de Vini : comptes utilisateurs, groupes partagés et **paiements Stripe réels**, avec reversement aux organisateurs via **Stripe Connect**. PWA installable.
 
-> Pour la version maquette 100 % locale (paiement simulé), voir le dossier `../tribu`.
+> Pour la maquette visuelle 100 % locale (paiement simulé), voir le dossier `../vini`.
+
+## ✨ Fonctionnalités
+
+- 🔐 **Connexion** Google, Facebook et email + mot de passe (création de compte)
+- 👥 **Groupes** privés (réutilisables ou **éphémères**) + invitation par code/lien
+- 🍝 **Dîners** : on invite les gens **par email**, le **groupe se crée automatiquement** au moment de valider ; les invités rejoignent en se connectant
+- 📅 **Activités** (dîner/sport/sortie) avec **RSVP** Je participe / Peut-être / Non + parts d'addition
+- 📊 **Sondages** : votez, ajoutez des options
+- 🐷 **Cagnottes** : objectif, anneau de progression, contributeurs, paiement Stripe
+- 🍷 **Commandes groupées de vin** : catalogue (lots de N bouteilles), quantités, seuil minimum, paiement du panier
+- ⚖️ **Soldes** calculés automatiquement
+- 📲 **PWA** installable (manifest + service worker)
 
 ## 🧱 Stack
 
 - **Next.js 14** (App Router, Server Actions, Route Handlers) — front + API serverless
-- **Supabase** — authentification (lien magique e‑mail) + Postgres avec **RLS**
-- **Stripe** — Checkout (encaissement) + **Connect Express** (reversement organisateur) + Webhooks
-- Déployable sur **Vercel** en un clic
+- **Supabase** — auth (Google/Facebook/email) + Postgres avec **RLS**
+- **Stripe** — Checkout + **Connect Express** (reversement organisateur) + Webhooks
+- **Resend** (optionnel) — emails d'invitation
+- Déployable sur **Vercel**
+
+> ℹ️ Le schéma [`supabase/schema.sql`](supabase/schema.sql) est **idempotent** : tu peux le relancer après une mise à jour pour ajouter les nouvelles tables (sondages, cagnottes, invitations, vin…) sans rien casser.
 
 ## ⚙️ Mise en route (≈ 15 min)
 

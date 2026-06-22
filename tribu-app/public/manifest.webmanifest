@@ -1,0 +1,14 @@
+{
+  "name": "Vini",
+  "short_name": "Vini",
+  "description": "Organisez, partagez et profitez entre amis : dîners, sorties, sondages, cagnottes, paiements et commandes de vin.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#7c3aed",
+  "theme_color": "#7c3aed",
+  "icons": [
+    { "src": "/icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }
+  ]
+}

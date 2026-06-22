@@ -150,6 +150,13 @@ textarea.input { resize:none; min-height:76px; }
 .chip { display:flex; align-items:center; gap:7px; background:var(--soft); border:1.5px solid transparent; border-radius:30px; padding:7px 13px; font-size:.85rem; font-weight:500; cursor:pointer; }
 .chip.on { border-color:var(--purple); background:rgba(124,58,237,.08); }
 
+/* poll */
+.poll-opt { position:relative; background:var(--soft); border-radius:13px; padding:13px 14px; margin-bottom:9px; overflow:hidden; cursor:pointer; display:flex; justify-content:space-between; align-items:center; font-size:.9rem; font-weight:500; z-index:0; border:1.5px solid transparent; }
+.poll-opt .bar { position:absolute; inset:0; background:rgba(124,58,237,.12); z-index:-1; border-radius:13px; transition:width .4s; }
+.poll-opt.win .bar { background:rgba(124,58,237,.2); }
+.poll-opt .v { font-size:.82rem; color:var(--muted); font-weight:600; }
+.poll-opt.mine { border-color:var(--purple); }
+
 .empty { text-align:center; padding:46px 22px; color:var(--muted); }
 .empty .big { font-size:2.8rem; margin-bottom:10px; }
 .empty h3 { color:var(--text); font-weight:700; margin-bottom:5px; }

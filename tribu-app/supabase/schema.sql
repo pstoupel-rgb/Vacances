@@ -318,3 +318,92 @@ begin
     set accepted = true
     where lower(email) = lower(auth.email()) and accepted = false;
 end; $$;
+
+-- ============================================================
+--  SONDAGES
+-- ============================================================
+create table if not exists public.polls (
+  id uuid primary key default gen_random_uuid(),
+  group_id uuid not null references public.groups(id) on delete cascade,
+  question text not null,
+  author_id uuid not null references auth.users(id) on delete cascade,
+  created_at timestamptz not null default now()
+);
+create table if not exists public.poll_options (
+  id uuid primary key default gen_random_uuid(),
+  poll_id uuid not null references public.polls(id) on delete cascade,
+  label text not null,
+  created_at timestamptz not null default now()
+);
+create table if not exists public.poll_votes (
+  poll_id uuid not null references public.polls(id) on delete cascade,
+  option_id uuid not null references public.poll_options(id) on delete cascade,
+  user_id uuid not null references auth.users(id) on delete cascade,
+  primary key (poll_id, user_id)
+);
+
+create or replace function public.poll_group(pid uuid)
+returns uuid language sql security definer stable set search_path = public as $$
+  select group_id from public.polls where id = pid;
+$$;
+
+alter table public.polls        enable row level security;
+alter table public.poll_options enable row level security;
+alter table public.poll_votes   enable row level security;
+
+drop policy if exists "poll_read" on public.polls;
+create policy "poll_read" on public.polls for select using (public.is_group_member(group_id));
+drop policy if exists "poll_insert" on public.polls;
+create policy "poll_insert" on public.polls for insert with check (public.is_group_member(group_id) and author_id = auth.uid());
+drop policy if exists "poll_delete" on public.polls;
+create policy "poll_delete" on public.polls for delete using (author_id = auth.uid());
+
+drop policy if exists "popt_read" on public.poll_options;
+create policy "popt_read" on public.poll_options for select using (public.is_group_member(public.poll_group(poll_id)));
+drop policy if exists "popt_write" on public.poll_options;
+create policy "popt_write" on public.poll_options for insert with check (public.is_group_member(public.poll_group(poll_id)));
+
+drop policy if exists "pvote_read" on public.poll_votes;
+create policy "pvote_read" on public.poll_votes for select using (public.is_group_member(public.poll_group(poll_id)));
+drop policy if exists "pvote_write" on public.poll_votes;
+create policy "pvote_write" on public.poll_votes for all
+  using (user_id = auth.uid()) with check (user_id = auth.uid() and public.is_group_member(public.poll_group(poll_id)));
+
+-- ============================================================
+--  CAGNOTTES (first-class)
+-- ============================================================
+create table if not exists public.cagnottes (
+  id uuid primary key default gen_random_uuid(),
+  group_id uuid not null references public.groups(id) on delete cascade,
+  title text not null,
+  goal numeric(10,2) not null default 0,
+  organizer_id uuid not null references auth.users(id) on delete cascade,
+  created_at timestamptz not null default now()
+);
+create table if not exists public.cagnotte_contributions (
+  id uuid primary key default gen_random_uuid(),
+  cagnotte_id uuid not null references public.cagnottes(id) on delete cascade,
+  user_id uuid not null references auth.users(id) on delete cascade,
+  amount numeric(10,2) not null,
+  status text not null default 'paid',
+  stripe_session_id text unique,
+  created_at timestamptz not null default now()
+);
+
+create or replace function public.cagnotte_group(cid uuid)
+returns uuid language sql security definer stable set search_path = public as $$
+  select group_id from public.cagnottes where id = cid;
+$$;
+
+alter table public.cagnottes              enable row level security;
+alter table public.cagnotte_contributions enable row level security;
+
+drop policy if exists "cag_read" on public.cagnottes;
+create policy "cag_read" on public.cagnottes for select using (public.is_group_member(group_id));
+drop policy if exists "cag_insert" on public.cagnottes;
+create policy "cag_insert" on public.cagnottes for insert with check (public.is_group_member(group_id) and organizer_id = auth.uid());
+drop policy if exists "cag_delete" on public.cagnottes;
+create policy "cag_delete" on public.cagnottes for delete using (organizer_id = auth.uid());
+
+drop policy if exists "cagc_read" on public.cagnotte_contributions;
+create policy "cagc_read" on public.cagnotte_contributions for select using (public.is_group_member(public.cagnotte_group(cagnotte_id)));

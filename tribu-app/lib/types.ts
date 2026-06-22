@@ -40,7 +40,7 @@ export interface WineOrder {
 }
 export interface WineItem {
   id: string; order_id: string; name: string; domaine: string | null;
-  color: WineColor; vintage: number | null; price: number; created_at: string;
+  color: WineColor; vintage: number | null; price: number; bottles: number; created_at: string;
 }
 export interface WinePick {
   order_id: string; item_id: string; user_id: string; quantity: number;

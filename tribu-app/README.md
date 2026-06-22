@@ -27,6 +27,11 @@ cp .env.example .env.local   # puis remplis les valeurs (voir ci-dessous)
    (`NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY`).
 4. **Authentication → URL Configuration** : ajoute `http://localhost:3000/auth/callback`
    (et l'URL Vercel en prod) dans *Redirect URLs*.
+5. **Authentication → Providers** : active les méthodes de connexion proposées sur l'écran d'accueil :
+   - **Email** (avec mot de passe) — activé par défaut.
+   - **Google** : crée un OAuth Client ID sur Google Cloud, colle Client ID/Secret dans Supabase.
+   - **Facebook** : crée une app sur Facebook Developers, colle App ID/Secret dans Supabase.
+   Le bouton correspondant n'apparaît comme fonctionnel qu'une fois le provider activé côté Supabase.
 
 ### 3. Stripe
 1. Crée un compte [stripe.com](https://stripe.com), reste en **mode test**.

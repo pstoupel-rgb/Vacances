@@ -268,3 +268,13 @@ create policy "wp_write" on public.wine_picks for all
 -- Paiements vin : lecture par les membres ; écriture via webhook (service_role).
 drop policy if exists "wpay_read" on public.wine_payments;
 create policy "wpay_read" on public.wine_payments for select using (public.is_group_member(public.order_group(order_id)));
+
+-- ============================================================
+--  RSVP : statut de participation (Je participe / Peut-être / Non)
+-- ============================================================
+alter table public.event_participants
+  add column if not exists status text not null default 'yes';   -- yes | maybe | no
+
+-- Nombre de bouteilles par lot (ex. "Pack Découverte" = 6 bouteilles)
+alter table public.wine_items
+  add column if not exists bottles int not null default 1;

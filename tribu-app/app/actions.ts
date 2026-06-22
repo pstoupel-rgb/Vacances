@@ -86,6 +86,15 @@ export async function joinEvent(eventId: string, groupId: string) {
   revalidatePath(`/event/${eventId}`);
 }
 
+// RSVP : Je participe (yes) / Peut-être (maybe) / Non (no).
+export async function setRsvp(eventId: string, status: 'yes' | 'maybe' | 'no') {
+  const { supabase, user } = await requireUser();
+  await supabase
+    .from('event_participants')
+    .upsert({ event_id: eventId, user_id: user.id, status }, { onConflict: 'event_id,user_id' });
+  revalidatePath(`/event/${eventId}`);
+}
+
 export async function leaveEvent(eventId: string) {
   const { supabase, user } = await requireUser();
   await supabase
@@ -151,7 +160,7 @@ export async function addWineItem(formData: FormData) {
     name,
     domaine: String(formData.get('domaine') || '').trim() || null,
     color: String(formData.get('color') || 'rouge'),
-    vintage: parseInt(String(formData.get('vintage') || '')) || null,
+    bottles: parseInt(String(formData.get('bottles') || '1')) || 1,
     price: parseFloat(String(formData.get('price') || '0')) || 0,
   });
   revalidatePath(`/wine/${orderId}`);

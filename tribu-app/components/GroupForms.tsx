@@ -3,23 +3,19 @@
 import { useState } from 'react';
 import { createGroup, joinGroup } from '@/app/actions';
 
-const EMOJIS = ['🎾', '🍽️', '🍷', '🏓', '⚽', '🎉', '🏖️', '🍻', '🎿', '🏀'];
+const EMOJIS = ['🍷', '🎾', '🏖️', '🍻', '🎉', '⚽', '🏔️', '🍝', '🎿', '🥂'];
 
 export default function GroupForms() {
   const [tab, setTab] = useState<'create' | 'join'>('create');
-  const [emoji, setEmoji] = useState('🎾');
+  const [emoji, setEmoji] = useState('🍷');
 
   return (
     <>
-      <div className="sec-title">Ajouter un groupe</div>
+      <div className="sec"><h3>Ajouter un groupe</h3></div>
       <div className="card">
-        <div className="tabs" style={{ marginTop: 0 }}>
-          <a className={tab === 'create' ? 'on' : ''} onClick={() => setTab('create')}>
-            Créer
-          </a>
-          <a className={tab === 'join' ? 'on' : ''} onClick={() => setTab('join')}>
-            Rejoindre
-          </a>
+        <div className="row" style={{ marginBottom: 14, gap: 8 }}>
+          <button className={tab === 'create' ? 'btn small' : 'btn small ghost'} onClick={() => setTab('create')}>Créer</button>
+          <button className={tab === 'join' ? 'btn small' : 'btn small ghost'} onClick={() => setTab('join')}>Rejoindre</button>
         </div>
 
         {tab === 'create' ? (
@@ -27,7 +23,7 @@ export default function GroupForms() {
             <input type="hidden" name="emoji" value={emoji} />
             <label className="fld">
               <span className="lab">Nom du groupe</span>
-              <input className="input" name="name" placeholder="Les potes du tennis 🎾" maxLength={30} required />
+              <input className="input" name="name" placeholder="Les amis du dimanche 🍷" maxLength={30} required />
             </label>
             <label className="fld">
               <span className="lab">Emoji</span>

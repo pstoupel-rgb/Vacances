@@ -1,18 +1,9 @@
 import Link from 'next/link';
 import { createClient } from '@/lib/supabase/server';
 import { redirect } from 'next/navigation';
-import GroupForms from '@/components/GroupForms';
-import ProfileEditor from '@/components/ProfileEditor';
-import ConnectButton from '@/components/ConnectButton';
-import { signOut } from './actions';
+import { TYPES, type EventRow } from '@/lib/types';
 
-const GRADIENTS = [
-  'linear-gradient(140deg,#7c5cff,#22d3ee)',
-  'linear-gradient(140deg,#f5576c,#f093fb)',
-  'linear-gradient(140deg,#11998e,#38ef7d)',
-  'linear-gradient(140deg,#fa709a,#fee140)',
-  'linear-gradient(140deg,#4facfe,#00f2fe)',
-];
+const GRADS = ['var(--gp)', 'var(--gpk)', 'var(--gtl)', 'var(--gor)', 'var(--gbl)'];
 
 export default async function HomePage() {
   const supabase = createClient();
@@ -21,92 +12,89 @@ export default async function HomePage() {
   } = await supabase.auth.getUser();
   if (!user) redirect('/login');
 
-  const { data: profile } = await supabase
-    .from('profiles')
-    .select('name, emoji')
-    .eq('id', user.id)
-    .single();
+  const { data: profile } = await supabase.from('profiles').select('name, emoji').eq('id', user.id).single();
 
-  // Groupes dont je suis membre.
   const { data: memberships } = await supabase
     .from('group_members')
-    .select('group_id, groups(id, name, emoji, invite_code)')
+    .select('group_id, groups(id, name, emoji)')
     .order('joined_at', { ascending: false });
+  const groups = (memberships || []).map((m: any) => m.groups).filter(Boolean);
+  const groupIds = groups.map((g: any) => g.id);
 
-  const groups = (memberships || [])
-    .map((m: any) => m.groups)
-    .filter(Boolean);
-
-  // Compte des membres par groupe.
-  const counts: Record<string, number> = {};
-  for (const g of groups) {
-    const { count } = await supabase
-      .from('group_members')
-      .select('*', { count: 'exact', head: true })
-      .eq('group_id', g.id);
-    counts[g.id] = count || 1;
+  let upcoming: { g: any; e: EventRow }[] = [];
+  if (groupIds.length) {
+    const { data: events } = await supabase
+      .from('events')
+      .select('*')
+      .in('group_id', groupIds)
+      .order('event_date', { ascending: true })
+      .limit(6);
+    const byId: Record<string, any> = {};
+    groups.forEach((g: any) => (byId[g.id] = g));
+    upcoming = (events || []).map((e: any) => ({ g: byId[e.group_id], e }));
   }
-
-  const { data: acct } = await supabase
-    .from('stripe_accounts')
-    .select('charges_enabled')
-    .eq('user_id', user.id)
-    .maybeSingle();
 
   const firstName = (profile?.name || 'Ami').split(' ')[0];
 
   return (
-    <div className="pt">
-      <div className="topbar">
-        <div style={{ flex: 1 }}>
-          <h1>Salut {firstName} 👋</h1>
-          <div className="sub">Tes groupes & sorties</div>
-        </div>
-        <form action={signOut}>
-          <button className="pill" style={{ background: 'var(--brand)' }} title="Profil / Déconnexion">
+    <div>
+      <div className="ghead">
+        <div className="htop">
+          <div style={{ flex: 1 }}>
+            <h1>Bonjour {firstName} 👋</h1>
+            <div className="hsub">Tes groupes & activités</div>
+          </div>
+          <Link href="/profile" className="ic-btn solid">
             {profile?.emoji || '😎'}
-          </button>
-        </form>
+          </Link>
+        </div>
       </div>
 
-      {groups.length === 0 ? (
-        <div className="empty">
-          <div className="big">👋</div>
-          <h3>Aucun groupe pour l&apos;instant</h3>
-          <p>Crée ton premier groupe ou rejoins celui d&apos;un ami avec un code d&apos;invitation.</p>
+      <div className="wrap">
+        <div className="sec">
+          <h3>Mes groupes</h3>
+          <Link href="/groups" className="link">Voir tout</Link>
         </div>
-      ) : (
-        groups.map((g: any, i: number) => (
-          <Link key={g.id} href={`/group/${g.id}`} className="group-card" style={{ background: GRADIENTS[i % GRADIENTS.length] }}>
-            <div className="gc-emoji">{g.emoji}</div>
-            <h3>{g.name}</h3>
-            <div className="gc-meta">
-              {counts[g.id]} membre{counts[g.id] > 1 ? 's' : ''} · code : {g.invite_code}
-            </div>
+        <div className="rail">
+          {groups.map((g: any, i: number) => (
+            <Link key={g.id} href={`/group/${g.id}`} className="gtile">
+              <div className="ph" style={{ background: GRADS[i % GRADS.length] }}>{g.emoji}</div>
+              <div className="nm">{g.name}</div>
+            </Link>
+          ))}
+          <Link href="/groups" className="gtile">
+            <div className="ph" style={{ background: 'var(--soft)', color: 'var(--purple)', fontSize: '2rem', border: '1.5px dashed #d7d2ea' }}>+</div>
+            <div className="nm">Créer<br />un groupe</div>
           </Link>
-        ))
-      )}
-
-      <GroupForms />
-
-      <div className="sec-title">Réglages</div>
-      <div className="card">
-        <div className="between">
-          <div className="row">
-            <div className="pill" style={{ background: 'var(--brand)' }}>{profile?.emoji || '😎'}</div>
-            <b>{profile?.name || 'Ami'}</b>
-          </div>
-          <ProfileEditor name={profile?.name || ''} emoji={profile?.emoji || '😎'} />
         </div>
-        <div className="hr" />
-        <p className="muted" style={{ fontSize: '.82rem', lineHeight: 1.5, marginBottom: 10 }}>
-          Active les encaissements pour recevoir l&apos;argent des sorties que tu organises (parts &amp; cagnottes), via Stripe.
-        </p>
-        <ConnectButton enabled={!!acct?.charges_enabled} />
-        <div className="hr" />
-        <form action={signOut}>
-          <button className="btn danger">Se déconnecter</button>
-        </form>
+
+        <div className="sec">
+          <h3>À venir</h3>
+          <Link href="/activities" className="link">Voir tout</Link>
+        </div>
+        {upcoming.length === 0 ? (
+          <div className="card center muted" style={{ padding: 22, fontSize: '.88rem' }}>
+            Aucune activité à venir.<br />Crée-en une dans un groupe 👇
+          </div>
+        ) : (
+          upcoming.map(({ g, e }) => {
+            const t = TYPES[e.type];
+            return (
+              <Link key={e.id} href={`/event/${e.id}`} className="act">
+                <div className="thumb" style={{ background: t.color }}>{t.emoji}</div>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div className="a-title">{e.title}</div>
+                  <div className="a-meta">
+                    {e.event_date && <span>{e.event_date}{e.event_time ? ' · ' + e.event_time : ''}</span>}
+                    {e.place && <span>📍 {e.place}</span>}
+                  </div>
+                  <div className="a-meta" style={{ marginTop: 4 }}>{g?.emoji} {g?.name}</div>
+                </div>
+                <div className="chev">›</div>
+              </Link>
+            );
+          })
+        )}
       </div>
     </div>
   );

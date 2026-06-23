@@ -457,6 +457,8 @@
   .photo-cell img{width:100%;height:100%;object-fit:cover;display:block;}
   .photo-cell:active img{opacity:.85;}
   .photo-empty{grid-column:1/-1;text-align:center;color:var(--muted);font-size:.82rem;padding:30px 10px;line-height:1.6;}
+  /* Réactiver le menu long-appui iOS ("Enregistrer l'image") pour les photos */
+  .lb-img img,#save-modal-img{-webkit-touch-callout:default!important;}
   .photo-quality{position:absolute;bottom:4px;right:5px;background:rgba(0,0,0,.55);color:#fff;font-size:.58rem;font-weight:700;border-radius:6px;padding:1px 5px;pointer-events:none;line-height:1.5;}
   .photo-cell.selected{outline:3px solid var(--brown);outline-offset:-3px;}
   .photo-cell.selected::after{content:'✓';position:absolute;inset:0;background:rgba(157,110,60,.4);display:grid;place-items:center;font-size:1.8rem;color:#fff;font-weight:900;}
@@ -1091,10 +1093,11 @@
 <div class="lightbox" id="lightbox">
   <div class="lb-bar">
     <button onclick="closeLightbox()">✕</button>
-    <span style="font-size:.72rem;color:rgba(255,255,255,.55)">Appuie longuement → 📷 Enregistrer</span>
+    <button id="lb-save-btn" onclick="saveCurrent()" style="font-size:.75rem;padding:0 14px;width:auto;font-weight:700;opacity:.5">📷 …</button>
     <button onclick="deleteCurrent()">🗑</button>
   </div>
   <div class="lb-img" id="lb-img"></div>
+  <div style="text-align:center;padding:6px 0 10px;font-size:.68rem;color:rgba(255,255,255,.35)">ou appuie longuement sur la photo</div>
 </div>
 
 <!-- SAVE MODAL (sélection multiple) -->
@@ -1107,9 +1110,9 @@
   <div style="flex:1;display:grid;place-items:center;padding:8px;overflow:hidden">
     <img id="save-modal-img" style="max-width:100%;max-height:100%;object-fit:contain;border-radius:10px" src="" alt="">
   </div>
-  <div style="text-align:center;padding:14px 16px calc(14px + env(safe-area-inset-bottom));color:rgba(255,255,255,.75);font-size:.88rem;line-height:1.5">
-    👇 Appuie <b>longuement</b> sur la photo → "Enregistrer l'image"<br>
-    <span style="font-size:.75rem;opacity:.6">puis passe à la suivante</span>
+  <div style="display:flex;flex-direction:column;align-items:center;gap:8px;padding:10px 16px calc(14px + env(safe-area-inset-bottom))">
+    <button id="save-modal-btn" onclick="saveModalPhoto()" style="background:#fff;color:#333;border:none;border-radius:24px;padding:11px 28px;font-size:.9rem;font-weight:700;cursor:pointer;width:100%;max-width:280px">📷 Enregistrer cette photo</button>
+    <span style="font-size:.68rem;color:rgba(255,255,255,.35)">ou appuie longuement sur la photo</span>
   </div>
 </div>
 
@@ -1755,9 +1758,17 @@ function openLightbox(id,url){
   _cur={id,url};_curBlob=null;
   document.getElementById('lb-img').innerHTML='<img src="'+url+'" alt="">';
   document.getElementById('lightbox').classList.add('open');
-  /* Pré-charge le blob dès l'ouverture : saveCurrent() n'a plus besoin d'await
-     → le geste iOS est préservé et la feuille de partage s'ouvre correctement. */
-  blobOf(id).then(b=>{_curBlob=b;}).catch(()=>{});
+  const btn=document.getElementById('lb-save-btn');
+  if(btn){btn.textContent='📷 …';btn.style.opacity='.5';btn.disabled=true;}
+  /* Pré-charge le blob en arrière-plan dès l'ouverture.
+     Quand c'est prêt, le bouton s'active → saveCurrent() lit _curBlob de façon
+     synchrone (aucun await avant navigator.share) → geste iOS préservé. */
+  blobOf(id).then(b=>{
+    _curBlob=b;
+    if(btn){btn.textContent='📷 Enregistrer';btn.style.opacity='1';btn.disabled=false;}
+  }).catch(()=>{
+    if(btn){btn.textContent='📷 Ouvrir';btn.style.opacity='.8';btn.disabled=false;}
+  });
 }
 function closeLightbox(){document.getElementById('lightbox').classList.remove('open');document.getElementById('lb-img').innerHTML='';_cur=null;_curBlob=null;}
 async function blobOf(id){
@@ -1767,7 +1778,8 @@ async function blobOf(id){
 }
 async function saveCurrent(){
   if(!_cur)return;
-  const blob=_curBlob; /* synchrone, pas d'await → geste iOS préservé */
+  /* _curBlob lu de façon SYNCHRONE → aucun await avant navigator.share → geste iOS OK */
+  const blob=_curBlob;
   if(blob){
     const file=new File([blob],'corse-'+_cur.id+'.jpg',{type:'image/jpeg'});
     if(navigator.canShare&&navigator.canShare({files:[file]})){
@@ -1777,8 +1789,21 @@ async function saveCurrent(){
     document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),1500);
     return;
   }
-  /* Blob pas encore prêt ou CORS indispo : window.open synchrone → pas bloqué par iOS */
+  /* Pas de blob : ouvre l'URL directement dans Safari (synchrone) */
   if(_cur.url)window.open(_cur.url,'_blank');
+}
+async function saveModalPhoto(){
+  const url=_saveQueue[_saveIdx];if(!url)return;
+  const ph=PHOTOS.find(x=>x.url===url);
+  let blob=null;
+  if(ph)try{const r=await fetch(ph.url);if(r.ok)blob=await r.blob();}catch(e){}
+  if(blob){
+    const file=new File([blob],'corse-photo.jpg',{type:'image/jpeg'});
+    if(navigator.canShare&&navigator.canShare({files:[file]})){
+      try{await navigator.share({files:[file]});return;}catch(e){if(e.name==='AbortError')return;}
+    }
+  }
+  window.open(url,'_blank');
 }
 async function deleteCurrent(){if(!_cur)return;if(!confirm('Supprimer cette photo ?'))return;
   try{await _fbDb.collection('photos').doc(_cur.id).delete();try{await _fbSt.ref('photos/'+_cur.id+'.jpg').delete();}catch(e){}}

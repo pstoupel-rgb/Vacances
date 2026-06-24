@@ -270,8 +270,8 @@
   .wc-ov-content .wc-card{padding:4px 13px 8px;}
   .wc-ov-msg{text-align:center;color:var(--muted);font-size:.86rem;padding:42px 0;}
   .wc-ov-hint{text-align:center;font-size:.72rem;color:var(--muted);margin-top:16px;}
-  @keyframes wcSlideNext{from{opacity:0;transform:translateX(34px)}to{opacity:1;transform:none}}
-  @keyframes wcSlidePrev{from{opacity:0;transform:translateX(-34px)}to{opacity:1;transform:none}}
+  @keyframes wcSlideNext{from{opacity:0;transform:translateX(-40px)}to{opacity:1;transform:none}}
+  @keyframes wcSlidePrev{from{opacity:0;transform:translateX(40px)}to{opacity:1;transform:none}}
 
   /* ===== MÉTÉO ===== */
   .weather-wrap{padding:16px 16px 0;}
@@ -1164,7 +1164,7 @@
       <button class="wc-ov-arrow" id="wc-ov-next" onclick="_wcOvShift(1)" aria-label="Jour suivant">›</button>
     </div>
     <div class="wc-ov-content" id="wc-ov-content"></div>
-    <div class="wc-ov-hint">👉 Glisse vers la droite pour voir le jour suivant</div>
+    <div class="wc-ov-hint">Glisse → droite : jour suivant · gauche : jour précédent</div>
   </div>
 </div>
 

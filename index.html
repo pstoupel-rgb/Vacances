@@ -14,8 +14,10 @@
 <meta name="theme-color" content="#f5f2ed">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="icon-ldf-180.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;700&family=Cormorant+Garamond:ital,wght@1,600;1,700&family=Inter:wght@400;500;600;700&display=swap">
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;700&family=Cormorant+Garamond:ital,wght@1,600;1,700&family=Inter:wght@300;400;500;600;700&display=swap');
   *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
   :root{
     --bg:#f5f2ed; --bg2:#ede7dc; --card:#fff; --border:#e0d8ce;
@@ -505,7 +507,7 @@
 <!-- ========== ACCUEIL ========== -->
 <div class="page active page-content" id="page-home">
   <div class="hero-wrap">
-    <img class="hero-img" src="https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=900&q=80" alt="Corse plage" loading="eager">
+    <img class="hero-img" src="https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=900&q=80&fm=webp" alt="Corse plage" loading="eager">
     <div class="hero-overlay"></div>
     <div class="hero-icons">
       <div class="hero-menu-wrap">
@@ -593,10 +595,10 @@
 
   <div class="reco-section" style="padding-bottom:16px;padding-top:8px">
     <div class="reco-grid">
-      <div class="reco-tile" onclick="showPage('maison',document.getElementById('nav-maison'))"><img src="https://images.unsplash.com/photo-1568605114967-8130f3a36994?w=240&q=70" loading="lazy" alt=""><span>Maison</span></div>
-      <div class="reco-tile" onclick="showPage('carte',document.getElementById('nav-carte'),'restaurants')"><img src="https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=240&q=70" loading="lazy" alt=""><span>Restaurants</span></div>
-      <div class="reco-tile" onclick="showPage('carte',document.getElementById('nav-commerces'),'commerces')"><img src="https://images.unsplash.com/photo-1604719312566-8912e9227c6a?w=240&q=70" loading="lazy" alt=""><span>Commerces</span></div>
-      <div class="reco-tile" onclick="openWorldCup()"><img src="https://images.unsplash.com/photo-1431324155629-1a6deb1dec8d?w=240&q=70" loading="lazy" alt=""><span>⚽ World Cup</span></div>
+      <div class="reco-tile" onclick="showPage('maison',document.getElementById('nav-maison'))"><img src="https://images.unsplash.com/photo-1568605114967-8130f3a36994?w=240&q=70&fm=webp" loading="lazy" alt=""><span>Maison</span></div>
+      <div class="reco-tile" onclick="showPage('carte',document.getElementById('nav-carte'),'restaurants')"><img src="https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=240&q=70&fm=webp" loading="lazy" alt=""><span>Restaurants</span></div>
+      <div class="reco-tile" onclick="showPage('carte',document.getElementById('nav-commerces'),'commerces')"><img src="https://images.unsplash.com/photo-1604719312566-8912e9227c6a?w=240&q=70&fm=webp" loading="lazy" alt=""><span>Commerces</span></div>
+      <div class="reco-tile" onclick="openWorldCup()"><img src="https://images.unsplash.com/photo-1431324155629-1a6deb1dec8d?w=240&q=70&fm=webp" loading="lazy" alt=""><span>⚽ World Cup</span></div>
     </div>
   </div>
 
@@ -1456,16 +1458,16 @@ window.addEventListener('load',()=>setTimeout(()=>{const s=document.getElementBy
 
 /* 📅 PROGRAMME DU JOUR */
 const IMG={
-  plane:'https://images.unsplash.com/photo-1436491865332-7a61a109cc05?w=160&h=130&fit=crop&q=70',
-  car:'https://images.unsplash.com/photo-1502877338535-766e1452684a?w=160&h=130&fit=crop&q=70',
-  food:'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=160&h=130&fit=crop&q=70',
-  beach:'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=160&h=130&fit=crop&q=70',
-  golf:'https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?w=160&h=130&fit=crop&q=70',
-  boat:'https://images.unsplash.com/photo-1505577058444-a3dab90d4253?w=160&h=130&fit=crop&q=70',
-  canyon:'https://images.unsplash.com/photo-1551632811-561732d1e306?w=160&h=130&fit=crop&q=70',
-  sunset:'https://images.unsplash.com/photo-1471922694854-ff1b63b20054?w=160&h=130&fit=crop&q=70',
-  home:'https://images.unsplash.com/photo-1564013799919-ab600027ffc6?w=160&h=130&fit=crop&q=70',
-  water:'https://images.unsplash.com/photo-1530870110042-98b2cb110834?w=160&h=130&fit=crop&q=70'
+  plane:'https://images.unsplash.com/photo-1436491865332-7a61a109cc05?w=160&h=130&fit=crop&q=70&fm=webp',
+  car:'https://images.unsplash.com/photo-1502877338535-766e1452684a?w=160&h=130&fit=crop&q=70&fm=webp',
+  food:'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=160&h=130&fit=crop&q=70&fm=webp',
+  beach:'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=160&h=130&fit=crop&q=70&fm=webp',
+  golf:'https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?w=160&h=130&fit=crop&q=70&fm=webp',
+  boat:'https://images.unsplash.com/photo-1505577058444-a3dab90d4253?w=160&h=130&fit=crop&q=70&fm=webp',
+  canyon:'https://images.unsplash.com/photo-1551632811-561732d1e306?w=160&h=130&fit=crop&q=70&fm=webp',
+  sunset:'https://images.unsplash.com/photo-1471922694854-ff1b63b20054?w=160&h=130&fit=crop&q=70&fm=webp',
+  home:'https://images.unsplash.com/photo-1564013799919-ab600027ffc6?w=160&h=130&fit=crop&q=70&fm=webp',
+  water:'https://images.unsplash.com/photo-1530870110042-98b2cb110834?w=160&h=130&fit=crop&q=70&fm=webp'
 };
 const DAYS=[
   {date:'2026-07-04',name:'Arrivée — 3 familles',short:'Sam 4/07',items:[{ic:'✈️',t:'Vol Lille → Figari',time:'11h20',img:IMG.plane},{ic:'🚗',t:'Sixt — Stoupel & Carniol',time:'13h30',img:IMG.car,resas:[{key:'sixt-stoupel',label:'Résa Stoupel'},{key:'sixt-carniol',label:'Résa Carniol'},{key:'sixt-delhauteur',label:'Résa Delhauteur'}]},{ic:'🥂',t:'Apéro de bienvenue',time:'18h30',img:IMG.sunset}]},

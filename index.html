@@ -141,7 +141,7 @@
   .prog-name{font-weight:600;font-size:.9rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
   .prog-time{font-size:.75rem;color:var(--muted);margin-top:1px;}
   .prog-thumb{width:64px;height:48px;border-radius:8px;object-fit:cover;flex-shrink:0;background:var(--bg2);}
-  .prog-carousel{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none;-webkit-overflow-scrolling:touch;margin-top:2px;}
+  .prog-carousel{display:flex;align-items:flex-start;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none;-webkit-overflow-scrolling:touch;margin-top:2px;transition:height .2s ease;}
   .prog-carousel::-webkit-scrollbar{display:none;}
   .prog-slide{flex:0 0 100%;scroll-snap-align:center;padding:0 16px;}
   .prog-slide-head{font-size:.74rem;color:var(--muted);font-weight:600;margin-bottom:4px;display:flex;align-items:center;flex-wrap:wrap;gap:5px;}
@@ -1500,7 +1500,20 @@ function renderProgram(){
     }).join('');
     return '<div class="prog-slide"><div class="prog-slide-head"><span>'+day.short+' · '+day.name+'</span>'+(today?'<span class="ps-today">Aujourd\'hui</span>':'')+'</div><div class="program">'+items+'</div></div>';
   }).join('');
-  if(!host.dataset.init){host.dataset.init='1';requestAnimationFrame(()=>{host.scrollLeft=startIdx*host.clientWidth;});}
+  if(!host.dataset.init){
+    host.dataset.init='1';
+    requestAnimationFrame(()=>{host.scrollLeft=startIdx*host.clientWidth;_progFit();});
+    let _pf;host.addEventListener('scroll',()=>{cancelAnimationFrame(_pf);_pf=requestAnimationFrame(_progFit);},{passive:true});
+    window.addEventListener('resize',_progFit);
+  }
+  requestAnimationFrame(_progFit);
+}
+/* Ajuste la hauteur du carrousel à la diapo active (évite l'écart sous les jours courts). */
+function _progFit(){
+  const host=document.getElementById('prog-carousel');if(!host||!host.children.length)return;
+  const i=Math.round(host.scrollLeft/host.clientWidth);
+  const s=host.children[Math.max(0,Math.min(i,host.children.length-1))];
+  if(s)host.style.height=s.offsetHeight+'px';
 }
 renderProgram();
 

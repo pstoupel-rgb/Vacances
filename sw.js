@@ -1,6 +1,8 @@
 /* Service Worker — network-first pour HTML (toujours la dernière version),
-   cache-first pour les assets statiques (offline OK). */
-const CACHE = 'corse-2026-v145';
+   cache-first pour les assets statiques (offline OK),
+   cache-first pour les photos Firebase (réseau faible OK, ex: Corse 📶). */
+const CACHE = 'corse-2026-v146';
+const MEDIA_CACHE = 'corse-media-v1';   /* photos Firebase — conservé entre versions */
 const ASSETS = [
   './',
   './index.html',
@@ -15,13 +17,34 @@ self.addEventListener('install', e => {
 
 self.addEventListener('activate', e => {
   e.waitUntil(
-    caches.keys().then(keys => Promise.all(keys.filter(k => k !== CACHE).map(k => caches.delete(k))))
-      .then(() => self.clients.claim())
+    caches.keys().then(keys => Promise.all(
+      keys.filter(k => k !== CACHE && k !== MEDIA_CACHE).map(k => caches.delete(k))
+    )).then(() => self.clients.claim())
   );
 });
 
 self.addEventListener('fetch', e => {
   if (e.request.method !== 'GET') return;
+
+  const url = new URL(e.request.url);
+
+  /* Photos / médias Firebase Storage → cache-first.
+     Les fichiers sont immuables (URL par id) : une fois vus, plus de re-téléchargement.
+     Idéal en réseau faible — les photos déjà ouvertes restent dispo hors-ligne. */
+  if (url.hostname === 'firebasestorage.googleapis.com') {
+    e.respondWith(
+      caches.open(MEDIA_CACHE).then(cache =>
+        cache.match(e.request).then(cached => {
+          if (cached) return cached;
+          return fetch(e.request).then(res => {
+            if (res && res.status === 200) cache.put(e.request, res.clone());
+            return res;
+          });
+        })
+      )
+    );
+    return;
+  }
 
   /* Navigation (HTML) → network-first : toujours la dernière version si connexion,
      sinon fallback cache pour l'offline. */

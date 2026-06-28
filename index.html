@@ -141,7 +141,7 @@
   .prog-name{font-weight:600;font-size:.9rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
   .prog-time{font-size:.75rem;color:var(--muted);margin-top:1px;}
   .prog-thumb{width:64px;height:48px;border-radius:8px;object-fit:cover;flex-shrink:0;background:var(--bg2);}
-  .prog-carousel{display:flex;align-items:flex-start;overflow-x:auto;overflow-y:hidden;scroll-snap-type:x mandatory;scrollbar-width:none;-webkit-overflow-scrolling:touch;margin-top:2px;transition:height .2s ease;}
+  .prog-carousel{display:flex;align-items:stretch;overflow-x:auto;overflow-y:hidden;scroll-snap-type:x mandatory;scrollbar-width:none;-webkit-overflow-scrolling:touch;margin-top:2px;}
   .prog-carousel::-webkit-scrollbar{display:none;}
   .prog-slide{flex:0 0 100%;scroll-snap-align:center;padding:0 16px;}
   .prog-slide-head{font-size:.74rem;color:var(--muted);font-weight:600;margin-bottom:4px;display:flex;align-items:center;flex-wrap:wrap;gap:5px;}
@@ -524,17 +524,7 @@
     <div class="hero-title"><h1>Corse 2026</h1></div>
   </div>
 
-  <div class="countdown-card" id="countdown-card">
-    <div class="cd-label">Départ dans</div>
-    <div class="cd-nums">
-      <div class="cd-block"><strong id="cd-d">—</strong><span>jours</span></div>
-      <div class="cd-block"><strong id="cd-h">—</strong><span>heures</span></div>
-      <div class="cd-block"><strong id="cd-m">—</strong><span>min</span></div>
-      <div class="cd-block"><strong id="cd-s">—</strong><span>sec</span></div>
-    </div>
-  </div>
-
-  <div class="reco-section" style="padding-top:4px;padding-bottom:0">
+  <div class="reco-section" style="padding-top:10px;padding-bottom:0">
     <div id="wc-widget"><div class="wc-card"><div class="wc-title">⚽ Coupe du Monde 2026</div><div class="wc-no-match">Chargement…</div></div></div>
     <div id="bottles-section" style="display:none">
       <div class="bottles-card">
@@ -1440,22 +1430,6 @@ function showWeek(n,btn){
 /* Splash */
 window.addEventListener('load',()=>setTimeout(()=>{const s=document.getElementById('splash');if(s)s.classList.add('hide');},700));
 
-/* ⏳ COMPTE À REBOURS */
-(function(){
-  const els={d:document.getElementById('cd-d'),h:document.getElementById('cd-h'),m:document.getElementById('cd-m'),s:document.getElementById('cd-s')};
-  const target=new Date('2026-07-04T11:20:00').getTime();
-  function tick(){
-    const diff=target-Date.now();
-    if(diff<=0){els.d.textContent='🎉';els.h.textContent='';els.m.textContent='';els.s.textContent='';return;}
-    els.d.textContent=Math.floor(diff/86400000);
-    els.h.textContent=String(Math.floor((diff%86400000)/3600000)).padStart(2,'0');
-    els.m.textContent=String(Math.floor((diff%3600000)/60000)).padStart(2,'0');
-    els.s.textContent=String(Math.floor((diff%60000)/1000)).padStart(2,'0');
-    els.s.style.animation='none';void els.s.offsetWidth;els.s.style.animation='cdpulse .45s ease';
-  }
-  tick();setInterval(tick,1000);
-})();
-
 /* 📅 PROGRAMME DU JOUR */
 const IMG={
   plane:'https://images.unsplash.com/photo-1436491865332-7a61a109cc05?w=160&h=130&fit=crop&q=70&fm=webp',
@@ -1500,20 +1474,7 @@ function renderProgram(){
     }).join('');
     return '<div class="prog-slide"><div class="prog-slide-head"><span>'+day.short+' · '+day.name+'</span>'+(today?'<span class="ps-today">Aujourd\'hui</span>':'')+'</div><div class="program">'+items+'</div></div>';
   }).join('');
-  if(!host.dataset.init){
-    host.dataset.init='1';
-    requestAnimationFrame(()=>{host.scrollLeft=startIdx*host.clientWidth;_progFit();});
-    let _pf;host.addEventListener('scroll',()=>{cancelAnimationFrame(_pf);_pf=requestAnimationFrame(_progFit);},{passive:true});
-    window.addEventListener('resize',_progFit);
-  }
-  requestAnimationFrame(_progFit);
-}
-/* Ajuste la hauteur du carrousel à la diapo active (évite l'écart sous les jours courts). */
-function _progFit(){
-  const host=document.getElementById('prog-carousel');if(!host||!host.children.length)return;
-  const i=Math.round(host.scrollLeft/host.clientWidth);
-  const s=host.children[Math.max(0,Math.min(i,host.children.length-1))];
-  if(s)host.style.height=s.offsetHeight+'px';
+  if(!host.dataset.init){host.dataset.init='1';requestAnimationFrame(()=>{host.scrollLeft=startIdx*host.clientWidth;});}
 }
 renderProgram();
 

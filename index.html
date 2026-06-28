@@ -148,7 +148,7 @@
   .ps-today{background:var(--brown);color:#fff;font-size:.58rem;font-weight:700;padding:2px 7px;border-radius:6px;}
 
   /* ===== RECO TILES ===== */
-  .reco-grid{display:flex;gap:8px;margin-top:5px;}
+  .reco-grid{display:flex;gap:8px;margin-top:2px;}
   .reco-tile{flex:1;position:relative;border-radius:12px;overflow:hidden;cursor:pointer;}
   .reco-tile img{width:100%;height:66px;object-fit:cover;display:block;background:var(--bg2);}
   .reco-tile::after{content:'';position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,.6),transparent 70%);}
@@ -593,7 +593,7 @@
   </div>
   <div class="prog-carousel" id="prog-carousel"></div>
 
-  <div class="reco-section" style="padding-bottom:16px;padding-top:8px">
+  <div class="reco-section" style="padding-bottom:16px;padding-top:0">
     <div class="reco-grid">
       <div class="reco-tile" onclick="showPage('maison',document.getElementById('nav-maison'))"><img src="https://images.unsplash.com/photo-1568605114967-8130f3a36994?w=240&q=70&fm=webp" loading="lazy" alt=""><span>Maison</span></div>
       <div class="reco-tile" onclick="showPage('carte',document.getElementById('nav-carte'),'restaurants')"><img src="https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=240&q=70&fm=webp" loading="lazy" alt=""><span>Restaurants</span></div>

@@ -1879,8 +1879,8 @@ loadWeather();
 /* ⚽ COUPE DU MONDE */
 const WC_PHASES=[
   {from:'2026-06-11',to:'2026-06-28',label:'Phase de groupes'},
-  {from:'2026-06-28',to:'2026-07-04',label:'8ème de finale'},
-  {from:'2026-07-04',to:'2026-07-09',label:'1/8 de finale'},
+  {from:'2026-06-28',to:'2026-07-04',label:'16ème de finale'},
+  {from:'2026-07-04',to:'2026-07-09',label:'8ème de finale'},
   {from:'2026-07-09',to:'2026-07-13',label:'Quarts de finale'},
   {from:'2026-07-13',to:'2026-07-17',label:'Demi-finales'},
   {from:'2026-07-17',to:'2026-07-19',label:'Match pour la 3e place'},
@@ -1895,7 +1895,7 @@ function _wcFallback(el){
   else if(now<vacStart){
     body=`<div class="wc-no-match">📡 ${ph.label} en cours</div>
     <div class="wc-fallback-grid">
-      <div class="wc-fb-row"><span>4–8 juil.</span><span>1/8 de finale</span></div>
+      <div class="wc-fb-row"><span>4–8 juil.</span><span>8ème de finale</span></div>
       <div class="wc-fb-row wc-fb-hi"><span>10–12 juil.</span><span>⚡ Quarts</span></div>
       <div class="wc-fb-row wc-fb-hi"><span>14–15 juil.</span><span>⭐ Demies</span></div>
       <div class="wc-fb-row wc-fb-hi"><span>18 juil.</span><span>🥉 3e place</span></div>

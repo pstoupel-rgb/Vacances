@@ -2189,7 +2189,8 @@ function _wcOvRowsSS(evs){
     const dx=t.clientX-x0,dy=t.clientY-y0;
     x0=null;y0=null;
     if(Math.abs(dx)>50&&Math.abs(dx)>Math.abs(dy)*1.4){
-      _wcOvShift(dx>0?1:-1);
+      /* Swipe vers la droite → jour suivant */
+      _wcOvShift(dx>0?-1:1);
     }
   },{passive:true});
 })();

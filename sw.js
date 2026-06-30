@@ -1,7 +1,7 @@
 /* Service Worker — network-first pour HTML (toujours la dernière version),
    cache-first pour les assets statiques (offline OK),
    cache-first pour les photos Firebase (réseau faible OK, ex: Corse 📶). */
-const CACHE = 'corse-2026-v162';
+const CACHE = 'corse-2026-v163';
 const MEDIA_CACHE = 'corse-media-v1';   /* photos Firebase — conservé entre versions */
 const ASSETS = [
   './',

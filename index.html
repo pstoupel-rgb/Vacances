@@ -1482,28 +1482,43 @@ function renderProgram(){
 }
 renderProgram();
 
-/* 🔢 CODES (réservation/enregistrement vol) — 6 chiffres, sauvegardés sur l'appareil */
+/* 🔢 CODES (réservation/enregistrement vol) — 6 chiffres, partagés en temps réel (Firebase) */
 const CODES_KEY='corse2026-codes';
-function _getCodes(){try{return JSON.parse(localStorage.getItem(CODES_KEY)||'{}');}catch(e){return{};}}
+let CODES={};let _codesFbUnsub=null;
+try{CODES=JSON.parse(localStorage.getItem(CODES_KEY)||'{}');}catch(e){CODES={};}
 function renderCodeBtns(){
-  const codes=_getCodes();
   document.querySelectorAll('[data-code]').forEach(btn=>{
     const key=btn.getAttribute('data-code');
     const label=btn.getAttribute('data-code-label')||key;
-    const v=codes[key];
+    const v=CODES[key];
     btn.textContent=v?('🔢 '+label+' : '+v):('🔢 Code '+label);
     btn.classList.toggle('code-set',!!v);
   });
 }
-function editCode(key,label){
-  const codes=_getCodes();
-  const v=prompt('Code '+label+' (6 chiffres)',codes[key]||'');
+async function editCode(key,label){
+  const v=prompt('Code '+label+' (6 chiffres) — visible par toute la team',CODES[key]||'');
   if(v===null)return;
   const d=(v||'').replace(/\D/g,'').slice(0,6);
   if(d.length!==6){alert('Le code doit comporter 6 chiffres.');return;}
-  codes[key]=d;
-  try{localStorage.setItem(CODES_KEY,JSON.stringify(codes));}catch(e){}
+  CODES[key]=d;
+  try{localStorage.setItem(CODES_KEY,JSON.stringify(CODES));}catch(e){}
   renderCodeBtns();
+  /* Partage temps réel : écrit le code pour toute la team */
+  try{
+    if(typeof _initFbAsync==='function'){await _initFbAsync();}
+    if(_fbDb){await _fbDb.collection('stats').doc('codes').set({[key]:d},{merge:true});}
+  }catch(e){console.warn('code sync',e);}
+}
+/* Abonnement temps réel : reçoit les codes saisis par les autres */
+async function initCodes(){
+  renderCodeBtns();
+  if(typeof _initFbAsync!=='function')return;
+  await _initFbAsync();
+  if(_fbDb&&!_codesFbUnsub){
+    _codesFbUnsub=_fbDb.collection('stats').doc('codes').onSnapshot(snap=>{
+      if(snap.exists){CODES=snap.data()||{};try{localStorage.setItem(CODES_KEY,JSON.stringify(CODES));}catch(e){}renderCodeBtns();}
+    },()=>{});
+  }
 }
 renderCodeBtns();
 
@@ -2269,7 +2284,7 @@ async function initBottles(){
   }
 }
 /* Différé après le 1er affichage : Firebase (~100 Ko) ne bloque plus le rendu de l'accueil. */
-(window.requestIdleCallback||(cb=>setTimeout(cb,200)))(()=>initBottles());
+(window.requestIdleCallback||(cb=>setTimeout(cb,200)))(()=>{initBottles();initCodes();});
 
 /* 😂 PHRASES CULTES */
 const PHRASE_DEV_KEY='corse2026-devid';

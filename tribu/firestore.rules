@@ -1,0 +1,57 @@
+rules_version = '2';
+
+// ============================================================
+//  Tribu — règles de sécurité Firestore
+//  ⚠️  À déployer UNIQUEMENT sur un projet Firebase DÉDIÉ à Tribu.
+//      NE PAS appliquer au projet "corse-2026" : ça casserait l'app Corse
+//      (qui partage le même projet en mode MVP).
+//
+//  Modèle actuel : partage par lien ("anyone with the link"), comme un
+//  Google Doc. On ne peut PAS énumérer les voyages : il faut connaître
+//  l'identifiant exact (généré aléatoirement) reçu via le lien d'invitation.
+//
+//  Étape suivante "vraie vente" : passer en Firebase Auth et restreindre
+//  l'accès aux membres listés dans le voyage (voir bloc commenté plus bas).
+// ============================================================
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    match /tribu_trips/{tripId} {
+      // Lecture d'UN voyage si on connaît son ID (reçu par lien). Pas d'énumération.
+      allow get: if true;
+      allow list: if false;
+
+      // Création / mise à jour : on valide la forme et la taille du document.
+      allow create, update: if isValidTrip();
+
+      // Pas de suppression à distance.
+      allow delete: if false;
+    }
+
+    function isValidTrip() {
+      let d = request.resource.data;
+      return d.id is string
+        && d.name is string && d.name.size() > 0 && d.name.size() < 120
+        && d.size() < 60;            // nombre de champs raisonnable (anti-spam)
+    }
+
+    // Tout le reste est interdit.
+    match /{document=**} { allow read, write: if false; }
+  }
+}
+
+// ------------------------------------------------------------
+//  VERSION "COMPTES" (Firebase Auth) — à activer pour la prod payante.
+//  Chaque voyage stocke un tableau `memberUids`. Seuls ses membres lisent/écrivent ;
+//  le créateur (1er uid) peut supprimer. L'ajout de membre se fait via le lien
+//  d'invitation (cloud function qui ajoute request.auth.uid à memberUids).
+// ------------------------------------------------------------
+//  match /tribu_trips/{tripId} {
+//    allow read, update: if request.auth != null
+//      && request.auth.uid in resource.data.memberUids;
+//    allow create: if request.auth != null
+//      && request.auth.uid in request.resource.data.memberUids;
+//    allow delete: if request.auth != null
+//      && request.auth.uid == resource.data.memberUids[0];
+//  }

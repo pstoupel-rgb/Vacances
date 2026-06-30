@@ -263,7 +263,8 @@
   <section class="view" id="v-money">
     <div class="pad" style="padding-top:calc(18px + env(safe-area-inset-top))">
       <h1 class="serif" style="font-size:1.5rem;margin-bottom:4px">Dépenses partagées</h1>
-      <p class="muted" style="font-size:.85rem;margin-bottom:16px" id="m-total">—</p>
+      <p class="muted" style="font-size:.85rem;margin-bottom:12px" id="m-total">—</p>
+      <div id="m-me"></div>
 
       <div class="sec-h"><h2 style="font-size:1.05rem">Équilibre</h2></div>
       <div class="card" id="m-balances"></div>
@@ -352,6 +353,20 @@ function save(){try{localStorage.setItem(DB_KEY,JSON.stringify(STATE));}catch(e)
 function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2,7);}
 function curTrip(){return STATE.trips.find(t=>t.id===STATE.activeTripId)||null;}
 
+/* ---- Identité légère « qui es-tu » (par appareil, NON synchronisée) ---- */
+const ME_KEY='tribu-me';
+let ME={};try{ME=JSON.parse(localStorage.getItem(ME_KEY)||'{}');}catch(e){ME={};}
+function meId(){return CUR?ME[CUR.id]:null;}
+function meName(){const id=meId();const p=CUR&&CUR.participants.find(x=>x.id===id);return p?p.name:null;}
+function setMe(pid){if(!CUR)return;ME[CUR.id]=pid;try{localStorage.setItem(ME_KEY,JSON.stringify(ME));}catch(e){}}
+function askWhoAmI(force){
+  if(!CUR||!CUR.participants.length)return;
+  if(!force&&meId()&&CUR.participants.find(p=>p.id===meId()))return;
+  sheet('<h2 class="serif">Qui es-tu ?</h2><p class="muted" style="margin-bottom:14px">Choisis ton prénom dans la tribu — pour personnaliser tes dépenses et tes remboursements.</p>'
+    +'<div class="chips-pick">'+CUR.participants.map(p=>'<button type="button" onclick="chooseMe(\''+p.id+'\')"><span class="dot" style="background:'+p.color+';display:inline-block;margin-right:6px"></span>'+esc(p.name)+'</button>').join('')+'</div>');
+}
+function chooseMe(pid){setMe(pid);closeSheet();const n=CUR.participants.find(p=>p.id===pid);rerenderActive();toast('Salut '+(n?n.name:'')+' 👋');}
+
 /* ===================== DATE HELPERS ===================== */
 const MS=86400000;
 function ymd(d){return d.toISOString().slice(0,10);}
@@ -405,7 +420,7 @@ function renderTrips(){
       +'<div class="m">'+esc(t.destination||'')+(t.start?' · '+frDate(t.start,{day:'numeric',month:'short'})+(n?' → '+frDate(t.end,{day:'numeric',month:'short'}):''):'')+'</div></div></button>';
   }).join('');
 }
-function openTrip(id){STATE.activeTripId=id;CUR=curTrip();CUR_DAY=null;save();maybeWeather();if(CUR&&CUR.shared)_loadFb().then(()=>subscribeTrip(CUR.id)).catch(()=>{});show('home');}
+function openTrip(id){STATE.activeTripId=id;CUR=curTrip();CUR_DAY=null;save();maybeWeather();if(CUR&&CUR.shared)_loadFb().then(()=>subscribeTrip(CUR.id)).catch(()=>{});show('home');setTimeout(()=>askWhoAmI(),400);}
 
 /* ===================== TRIP FORM ===================== */
 function openTripForm(id){
@@ -598,10 +613,22 @@ function renderMoney(){
   document.getElementById('m-total').textContent=fmt(total)+' dépensés · '+ppl.length+' participants · '+(total/ppl.length?fmt(total/ppl.length):fmt(0))+' / pers.';
   /* balances */
   const bal=balances();
+  /* personal banner */
+  const me=meId(),meBox=document.getElementById('m-me');
+  if(me&&bal[me]!=null){
+    const b=bal[me];const col=b>0.005?'var(--ok)':(b<-0.005?'var(--neg)':'var(--muted)');
+    const msg=b>0.005?('On te doit <b>'+fmt(b)+'</b>'):(b<-0.005?('Tu dois <b>'+fmt(-b)+'</b>'):'Tu es à jour ✓');
+    meBox.innerHTML='<div class="card" style="margin-bottom:16px;border-color:'+col+'"><div style="padding:12px 14px;display:flex;align-items:center;gap:10px">'
+      +'<span class="dot" style="background:'+(meColor()||'#999')+'"></span><div style="flex:1"><div style="font-size:.74rem;color:var(--muted);font-weight:700">TOI · '+esc(meName())+'</div><div style="color:'+col+';font-weight:700;margin-top:2px">'+msg+'</div></div>'
+      +'<button class="link-btn" onclick="askWhoAmI(true)">changer</button></div></div>';
+  }else{
+    meBox.innerHTML='<div class="card" style="margin-bottom:16px"><button style="width:100%;padding:12px 14px;text-align:left;font-weight:600" onclick="askWhoAmI(true)">👤 Qui es-tu ? <span class="muted" style="font-weight:500">— personnalise tes remboursements</span></button></div>';
+  }
   document.getElementById('m-balances').innerHTML=ppl.map(p=>{
     const b=bal[p.id]||0;const cls=b>0.005?'pos':(b<-0.005?'negv':'muted');
     const txt=b>0.005?'+'+fmt(b):(b<-0.005?fmt(b):'à jour');
-    return '<div class="bal"><div class="who"><span class="dot" style="background:'+p.color+'"></span>'+esc(p.name)+'</div><div class="'+cls+'">'+txt+'</div></div>';
+    const isMe=p.id===me?' <span class="mini teal" style="padding:1px 7px">toi</span>':'';
+    return '<div class="bal"><div class="who"><span class="dot" style="background:'+p.color+'"></span>'+esc(p.name)+isMe+'</div><div class="'+cls+'">'+txt+'</div></div>';
   }).join('');
   /* settlement */
   const tx=settle(bal);
@@ -641,10 +668,11 @@ function settle(bal){
   return tx;
 }
 function nameColor(name){const p=CUR.participants.find(x=>x.name===name);return p?p.color:'#999';}
+function meColor(){const p=CUR&&CUR.participants.find(x=>x.id===meId());return p?p.color:null;}
 function openExpenseForm(id){
   const ppl=CUR.participants;if(!ppl.length){toast('Ajoute des participants d\'abord');return;}
   const e=id?CUR.expenses.find(x=>x.id===id):null;
-  const payer=e?e.payer:ppl[0].id;
+  const payer=e?e.payer:(meId()||ppl[0].id);
   const split=e?e.split.slice():ppl.map(p=>p.id);
   sheet(
     '<h2 class="serif">'+(e?'Modifier la dépense':'Nouvelle dépense')+'</h2>'
@@ -887,6 +915,7 @@ async function joinTrip(id){
       STATE.trips.unshift(t);STATE.activeTripId=id;save();CUR=curTrip();
       subscribeTrip(id);cleanUrl();maybeWeather();show('home');
       toast('Tu as rejoint « '+t.name+' » 🎉');
+      setTimeout(()=>askWhoAmI(true),500);
     }else{toast('Voyage introuvable');cleanUrl();bootNormal();}
   }catch(e){toast('Connexion impossible (hors-ligne ?)');cleanUrl();bootNormal();}
 }

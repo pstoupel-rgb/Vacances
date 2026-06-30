@@ -129,6 +129,7 @@
   @keyframes cdpulse{0%{transform:scale(1)}45%{transform:scale(1.18)}100%{transform:scale(1)}}
 
   .resa-btn{display:inline-flex;align-items:center;gap:3px;background:#fff8ee;border:1px solid #d4a85a;color:#9a6e10;border-radius:20px;padding:2px 8px;font-size:.72rem;font-weight:700;cursor:pointer;font-family:inherit;margin-top:4px;}
+  .resa-btn.code-set{background:#e9f7ee;border-color:#3FA66A;color:#1f7a45;}
   /* ===== PROGRAMME DU JOUR ===== */
   .reco-section{padding:8px 16px 0;}
   .reco-label{font-size:.82rem;font-weight:600;color:var(--text);}
@@ -706,7 +707,7 @@
         <div class="day-vibe">🔵🔴</div>
       </div>
       <div class="timeline">
-        <div class="tl-item"><div class="tl-time">11h20</div><div class="tl-dot dot-plane">✈️</div><div class="tl-content"><div class="tl-title">V72526 Volotea — départ Lille</div><div class="tl-row"><span class="tag yellow">V72526</span><span class="tag">Volotea</span><span class="tag green">2h05</span></div></div></div>
+        <div class="tl-item"><div class="tl-time">11h20</div><div class="tl-dot dot-plane">✈️</div><div class="tl-content"><div class="tl-title">V72526 Volotea — départ Lille</div><div class="tl-row"><span class="tag yellow">V72526</span><span class="tag">Volotea</span><span class="tag green">2h05</span></div><div style="display:flex;gap:6px;margin-top:4px;flex-wrap:wrap"><button class="resa-btn" data-code="vol-stoupel" data-code-label="Stoupel" onclick="editCode('vol-stoupel','Stoupel')">🔢 Code Stoupel</button><button class="resa-btn" data-code="vol-carniol" data-code-label="Carniol" onclick="editCode('vol-carniol','Carniol')">🔢 Code Carniol</button></div></div></div>
         <div class="tl-item"><div class="tl-time">13h25</div><div class="tl-dot dot-plane">🛬</div><div class="tl-content"><div class="tl-title">Atterrissage Figari</div></div></div>
         <div class="tl-item"><div class="tl-time">13h30</div><div class="tl-dot dot-activity">🚗</div><div class="tl-content"><div class="tl-title">Sixt — Stoupel &amp; Carniol</div><div class="tl-sub">⚠️ Longues files en juillet — prévoir ~40 min</div><div class="tl-row"><span class="tag orange">~40 min</span></div><div style="display:flex;gap:6px;margin-top:4px;flex-wrap:wrap"><button class="resa-btn" onclick="openResa('sixt-stoupel','Sixt Stoupel')">📄 Résa Stoupel</button><button class="resa-btn" onclick="openResa('sixt-carniol','Sixt Carniol')">📄 Résa Carniol</button><button class="resa-btn" onclick="openResa('sixt-delhauteur','Sixt Delhauteur')">📄 Résa Delhauteur</button></div></div></div>
         <div class="tl-item"><div class="tl-time">Docs</div><div class="tl-dot dot-activity">🛡️</div><div class="tl-content"><div class="tl-title">Assurances voiture</div><div style="display:flex;gap:6px;margin-top:4px"><button class="resa-btn" onclick="openResa('assurance-stoupel','Assurance Stoupel')">📄 Stoupel</button><button class="resa-btn" onclick="openResa('assurance-carniol','Assurance Carniol')">📄 Carniol</button></div></div></div>
@@ -1480,6 +1481,31 @@ function renderProgram(){
   if(!host.dataset.init){host.dataset.init='1';requestAnimationFrame(()=>{host.scrollLeft=startIdx*host.clientWidth;});}
 }
 renderProgram();
+
+/* 🔢 CODES (réservation/enregistrement vol) — 6 chiffres, sauvegardés sur l'appareil */
+const CODES_KEY='corse2026-codes';
+function _getCodes(){try{return JSON.parse(localStorage.getItem(CODES_KEY)||'{}');}catch(e){return{};}}
+function renderCodeBtns(){
+  const codes=_getCodes();
+  document.querySelectorAll('[data-code]').forEach(btn=>{
+    const key=btn.getAttribute('data-code');
+    const label=btn.getAttribute('data-code-label')||key;
+    const v=codes[key];
+    btn.textContent=v?('🔢 '+label+' : '+v):('🔢 Code '+label);
+    btn.classList.toggle('code-set',!!v);
+  });
+}
+function editCode(key,label){
+  const codes=_getCodes();
+  const v=prompt('Code '+label+' (6 chiffres)',codes[key]||'');
+  if(v===null)return;
+  const d=(v||'').replace(/\D/g,'').slice(0,6);
+  if(d.length!==6){alert('Le code doit comporter 6 chiffres.');return;}
+  codes[key]=d;
+  try{localStorage.setItem(CODES_KEY,JSON.stringify(codes));}catch(e){}
+  renderCodeBtns();
+}
+renderCodeBtns();
 
 /* 📍 CARTE Leaflet (chargée à la 1re ouverture) */
 const PLACES=[

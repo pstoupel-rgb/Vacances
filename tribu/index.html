@@ -199,7 +199,10 @@
       <p class="muted" style="margin-bottom:20px">Vos vacances en groupe, enfin simples.</p>
       <div id="trip-list"></div>
       <button class="btn" onclick="openTripForm()" style="margin-top:6px">＋ Nouveau voyage</button>
-      <div class="center" style="margin-top:18px"><button class="link-btn" onclick="importData()">Importer une sauvegarde</button></div>
+      <div class="center" style="margin-top:18px;display:flex;gap:18px;justify-content:center">
+        <button class="link-btn" onclick="importData()">Importer une sauvegarde</button>
+        <button class="link-btn" onclick="openSyncSettings()">⚙︎ Synchro</button>
+      </div>
     </div>
   </section>
 
@@ -850,14 +853,53 @@ function importData(){
    Les photos restent locales (IndexedDB), non synchronisées. */
 const FB_CONFIG={apiKey:"AIzaSyAL886rXzaeCatalbH39I1tnEisUvVi_bY",authDomain:"corse-2026.firebaseapp.com",projectId:"corse-2026",storageBucket:"corse-2026.firebasestorage.app",messagingSenderId:"512857354719",appId:"1:512857354719:web:c9a26c7f843bcd5c2f146a"};
 const FB_COL='tribu_trips';
+const FB_CFG_KEY='tribu-fbconfig';
+function _getFbConfig(){try{const c=JSON.parse(localStorage.getItem(FB_CFG_KEY));if(c&&c.apiKey&&c.projectId)return c;}catch(e){}return FB_CONFIG;}
+function _isCustomFb(){const c=_getFbConfig();return c.projectId!==FB_CONFIG.projectId;}
 let _db=null,_fbLoading=null;const _subs={},_lastPush={};let _pushT=null;
 function _loadFb(){
   if(_db)return Promise.resolve();
   if(_fbLoading)return _fbLoading;
   const S=['app','firestore'].map(m=>'https://www.gstatic.com/firebasejs/10.14.1/firebase-'+m+'-compat.js');
   _fbLoading=Promise.all(S.map(src=>new Promise((ok,ko)=>{const s=document.createElement('script');s.src=src;s.onload=ok;s.onerror=ko;document.head.appendChild(s);})))
-    .then(()=>{try{firebase.app();}catch(e){firebase.initializeApp(FB_CONFIG);}_db=firebase.firestore();});
+    .then(()=>{try{firebase.app();}catch(e){firebase.initializeApp(_getFbConfig());}_db=firebase.firestore();});
   return _fbLoading;
+}
+/* ---- Réglages de synchro : ta propre config Firebase (mode privé/sécurisé) ---- */
+function parseFbConfig(text){
+  if(!text||!text.trim())return null;
+  let t=text.trim();const i=t.indexOf('{'),j=t.lastIndexOf('}');
+  if(i>=0&&j>i)t=t.slice(i,j+1);
+  let obj=null;
+  try{obj=JSON.parse(t);}catch(e){try{obj=Function('return ('+t+')')();}catch(e2){return null;}}
+  return (obj&&obj.apiKey&&obj.projectId)?obj:null;
+}
+function openSyncSettings(){
+  const cfg=_getFbConfig(),custom=_isCustomFb();
+  sheet('<h2 class="serif">Synchronisation</h2>'
+   +'<div class="card" style="margin-bottom:14px"><div style="padding:12px 14px"><div style="font-size:.74rem;color:var(--muted);font-weight:700">PROJET FIREBASE ACTUEL</div><div style="font-weight:700;margin-top:3px">'+esc(cfg.projectId)+(custom?' <span class="mini teal">le tien 🔒</span>':' <span class="mini">démo partagé</span>')+'</div></div></div>'
+   +'<p class="muted" style="font-size:.85rem;margin-bottom:12px">Pour ta version privée et sécurisée, crée ton propre projet Firebase (gratuit) et colle ici l\'objet <code>firebaseConfig</code> qu\'il te donne.</p>'
+   +'<div class="field"><label>Config Firebase</label><textarea id="fb-cfg" rows="7" placeholder=\'{ "apiKey": "...", "authDomain": "...", "projectId": "...", "appId": "..." }\'></textarea></div>'
+   +'<button class="btn" onclick="saveFbConfig()">Enregistrer ma config</button>'
+   +(custom?'<button class="btn ghost" style="margin-top:10px" onclick="resetFbConfig()">Revenir au projet de démo</button>':'')
+   +'<div class="center" style="margin-top:14px"><button class="link-btn" onclick="showFbGuide()">📖 Comment créer mon projet ? (2 min)</button></div>');
+}
+function saveFbConfig(){
+  const obj=parseFbConfig(val('fb-cfg'));
+  if(!obj){toast('Config non reconnue (apiKey/projectId manquants)');return;}
+  try{localStorage.setItem(FB_CFG_KEY,JSON.stringify(obj));}catch(e){}
+  closeSheet();
+  if(confirm('Config « '+obj.projectId+' » enregistrée ✓\nRecharger pour l\'activer ?'))location.reload();else toast('Active au prochain rechargement');
+}
+function resetFbConfig(){localStorage.removeItem(FB_CFG_KEY);closeSheet();if(confirm('Projet de démo rétabli. Recharger ?'))location.reload();}
+function showFbGuide(){
+  sheet('<h2 class="serif">Créer ton projet Firebase</h2><div style="font-size:.92rem;line-height:1.65">'
+   +'<p><b>1.</b> Ouvre <b>console.firebase.google.com</b> → « Ajouter un projet », nomme-le (ex. <i>tribu-voyages</i>).</p>'
+   +'<p><b>2.</b> Menu <b>Build → Firestore Database</b> → « Créer une base » (mode production, région Europe).</p>'
+   +'<p><b>3.</b> Onglet <b>Règles</b> → colle le contenu du fichier <code>firestore.rules</code> (fourni) → <b>Publier</b>.</p>'
+   +'<p><b>4.</b> Roue ⚙︎ <b>Paramètres du projet</b> → « Tes applications » → icône <b>&lt;/&gt;</b> (Web) → enregistre l\'app.</p>'
+   +'<p><b>5.</b> Copie l\'objet <code>firebaseConfig</code> affiché, reviens ici et colle-le.</p>'
+   +'</div><button class="btn" style="margin-top:14px" onclick="openSyncSettings()">← Retour aux réglages</button>');
 }
 function _clean(t){return JSON.parse(JSON.stringify(t));}
 async function pushTrip(t){

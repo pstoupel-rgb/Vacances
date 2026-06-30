@@ -1,6 +1,6 @@
 /* Tribu — service worker
    network-first pour le HTML (toujours à jour), cache-first pour le reste (offline). */
-const CACHE = 'tribu-v3';
+const CACHE = 'tribu-v4';
 const ASSETS = ['./', './index.html', './manifest.webmanifest'];
 
 self.addEventListener('install', e => {

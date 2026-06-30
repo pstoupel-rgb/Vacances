@@ -210,7 +210,10 @@
       <div class="hero-grad"></div>
       <div class="hero-top">
         <button class="chip" onclick="show('trips')">↩︎ Voyages</button>
-        <button class="chip" onclick="openTripForm(CUR&&CUR.id)">✏️ Éditer</button>
+        <div style="display:flex;gap:8px">
+          <button class="chip" id="share-chip" onclick="shareTrip()">🔗 Inviter</button>
+          <button class="chip" onclick="openTripForm(CUR&&CUR.id)">✏️</button>
+        </div>
       </div>
       <div class="hero-bot">
         <h1 id="h-name">—</h1>
@@ -345,7 +348,7 @@ let CUR=null;       /* current trip object */
 let CUR_DAY=null;   /* selected day index */
 
 function load(){try{const s=JSON.parse(localStorage.getItem(DB_KEY));if(s&&s.trips)STATE=s;}catch(e){}}
-function save(){try{localStorage.setItem(DB_KEY,JSON.stringify(STATE));}catch(e){}}
+function save(){try{localStorage.setItem(DB_KEY,JSON.stringify(STATE));}catch(e){}if(typeof schedulePush==='function')schedulePush();}
 function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2,7);}
 function curTrip(){return STATE.trips.find(t=>t.id===STATE.activeTripId)||null;}
 
@@ -402,7 +405,7 @@ function renderTrips(){
       +'<div class="m">'+esc(t.destination||'')+(t.start?' · '+frDate(t.start,{day:'numeric',month:'short'})+(n?' → '+frDate(t.end,{day:'numeric',month:'short'}):''):'')+'</div></div></button>';
   }).join('');
 }
-function openTrip(id){STATE.activeTripId=id;CUR=curTrip();CUR_DAY=null;save();maybeWeather();show('home');}
+function openTrip(id){STATE.activeTripId=id;CUR=curTrip();CUR_DAY=null;save();maybeWeather();if(CUR&&CUR.shared)_loadFb().then(()=>subscribeTrip(CUR.id)).catch(()=>{});show('home');}
 
 /* ===================== TRIP FORM ===================== */
 function openTripForm(id){
@@ -458,6 +461,7 @@ function deleteTrip(id){
 /* ===================== HOME ===================== */
 function renderHome(){
   if(!CUR){show('trips');return;}
+  renderShareChip();
   document.getElementById('h-cover').src=CUR.cover||COVERS[0];
   document.getElementById('h-name').textContent=CUR.name;
   const n=nights(CUR);
@@ -810,11 +814,95 @@ function importData(){
   i.click();
 }
 
+/* ===================== SYNC TEMPS RÉEL (Firebase) =====================
+   MVP : réutilise un projet Firebase existant, collection isolée "tribu_trips".
+   ⚠️ Pour la production : créez VOTRE propre projet Firebase, remplacez FB_CONFIG,
+   et ajoutez des règles de sécurité Firestore. Le partage actuel = "toute personne
+   avec le lien peut voir/éditer" (modèle type Google Docs).
+   Les photos restent locales (IndexedDB), non synchronisées. */
+const FB_CONFIG={apiKey:"AIzaSyAL886rXzaeCatalbH39I1tnEisUvVi_bY",authDomain:"corse-2026.firebaseapp.com",projectId:"corse-2026",storageBucket:"corse-2026.firebasestorage.app",messagingSenderId:"512857354719",appId:"1:512857354719:web:c9a26c7f843bcd5c2f146a"};
+const FB_COL='tribu_trips';
+let _db=null,_fbLoading=null;const _subs={},_lastPush={};let _pushT=null;
+function _loadFb(){
+  if(_db)return Promise.resolve();
+  if(_fbLoading)return _fbLoading;
+  const S=['app','firestore'].map(m=>'https://www.gstatic.com/firebasejs/10.14.1/firebase-'+m+'-compat.js');
+  _fbLoading=Promise.all(S.map(src=>new Promise((ok,ko)=>{const s=document.createElement('script');s.src=src;s.onload=ok;s.onerror=ko;document.head.appendChild(s);})))
+    .then(()=>{try{firebase.app();}catch(e){firebase.initializeApp(FB_CONFIG);}_db=firebase.firestore();});
+  return _fbLoading;
+}
+function _clean(t){return JSON.parse(JSON.stringify(t));}
+async function pushTrip(t){
+  if(!_db||!t||!t.shared)return;
+  t.updatedAt=Date.now();_lastPush[t.id]=t.updatedAt;
+  try{await _db.collection(FB_COL).doc(t.id).set(_clean(t));}catch(e){console.warn('push',e);}
+}
+function subscribeTrip(id){
+  if(!_db||_subs[id])return;
+  _subs[id]=_db.collection(FB_COL).doc(id).onSnapshot(snap=>{
+    if(!snap.exists)return;
+    const remote=snap.data();
+    if(_lastPush[id]&&remote.updatedAt===_lastPush[id])return;          /* notre propre écriture */
+    const i=STATE.trips.findIndex(x=>x.id===id);
+    const localUpd=i>=0?(STATE.trips[i].updatedAt||0):0;
+    if(remote.updatedAt&&remote.updatedAt<=localUpd)return;             /* pas plus récent */
+    remote.shared=true;
+    if(i>=0)STATE.trips[i]=remote;else STATE.trips.unshift(remote);
+    if(STATE.activeTripId===id)CUR=curTrip();
+    try{localStorage.setItem(DB_KEY,JSON.stringify(STATE));}catch(e){}
+    rerenderActive();
+    toast('Mise à jour de la tribu ↻');
+  },e=>console.warn('sub',e));
+}
+function schedulePush(){
+  if(!CUR||!CUR.shared)return;
+  clearTimeout(_pushT);_pushT=setTimeout(()=>{_loadFb().then(()=>pushTrip(CUR)).catch(()=>{});},600);
+}
+function subscribeAll(){STATE.trips.filter(t=>t.shared).forEach(t=>{_loadFb().then(()=>subscribeTrip(t.id)).catch(()=>{});});}
+function rerenderActive(){
+  const v=document.querySelector('.view.active');if(!v)return;
+  const id=v.id.replace('v-','');
+  if(id==='home')renderHome();else if(id==='plan')renderPlan();else if(id==='money')renderMoney();
+  else if(id==='pack')renderPack();else if(id==='trips')renderTrips();
+}
+function renderShareChip(){const c=document.getElementById('share-chip');if(c)c.textContent=(CUR&&CUR.shared)?'☁︎ Partagé':'🔗 Inviter';}
+async function shareTrip(){
+  if(!CUR)return;
+  CUR.shared=true;save();renderShareChip();
+  await _loadFb().then(()=>pushTrip(CUR)).then(()=>subscribeTrip(CUR.id)).catch(()=>toast('Hors-ligne : réessaie connecté'));
+  const link=location.origin+location.pathname+'?trip='+CUR.id;
+  if(navigator.share){try{await navigator.share({title:CUR.name,text:'Rejoins notre voyage « '+CUR.name+' » sur Tribu',url:link});return;}catch(e){if(e.name==='AbortError')return;}}
+  try{await navigator.clipboard.writeText(link);toast('Lien d\'invitation copié ✓');}catch(e){prompt("Lien d'invitation :",link);}
+}
+function cleanUrl(){try{history.replaceState({},'',location.pathname);}catch(e){}}
+async function joinTrip(id){
+  const existing=STATE.trips.find(t=>t.id===id);
+  if(existing){cleanUrl();subscribeAll();openTrip(id);return;}
+  toast('Connexion au voyage…');
+  try{
+    await _loadFb();
+    const snap=await _db.collection(FB_COL).doc(id).get();
+    if(snap.exists){
+      const t=snap.data();t.shared=true;
+      STATE.trips.unshift(t);STATE.activeTripId=id;save();CUR=curTrip();
+      subscribeTrip(id);cleanUrl();maybeWeather();show('home');
+      toast('Tu as rejoint « '+t.name+' » 🎉');
+    }else{toast('Voyage introuvable');cleanUrl();bootNormal();}
+  }catch(e){toast('Connexion impossible (hors-ligne ?)');cleanUrl();bootNormal();}
+}
+
 /* ===================== BOOT ===================== */
+function bootNormal(){
+  CUR=curTrip();
+  if(CUR){maybeWeather();show('home');}else{show('trips');}
+  subscribeAll();
+}
 load();
-CUR=curTrip();
-if(CUR){maybeWeather();show('home');}else{show('trips');}
-window.addEventListener('online',()=>maybeWeather());
+(function(){
+  const join=new URLSearchParams(location.search).get('trip');
+  if(join){joinTrip(join);}else{bootNormal();}
+})();
+window.addEventListener('online',()=>{maybeWeather();subscribeAll();});
 document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeSheet();closeLB();}});
 
 /* Service worker */

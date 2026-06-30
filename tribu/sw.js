@@ -1,6 +1,6 @@
 /* Tribu — service worker
    network-first pour le HTML (toujours à jour), cache-first pour le reste (offline). */
-const CACHE = 'tribu-v1';
+const CACHE = 'tribu-v2';
 const ASSETS = ['./', './index.html', './manifest.webmanifest'];
 
 self.addEventListener('install', e => {
@@ -18,8 +18,11 @@ self.addEventListener('fetch', e => {
   if (e.request.method !== 'GET') return;
   const url = new URL(e.request.url);
 
-  /* Météo : toujours réseau, jamais en cache (données fraîches). */
+  /* Météo + Firestore (sync temps réel) : toujours réseau, jamais en cache. */
   if (url.hostname.endsWith('open-meteo.com')) return;
+  if (url.hostname.endsWith('firestore.googleapis.com')) return;
+  if (url.hostname.endsWith('firebaseinstallations.googleapis.com')) return;
+  if (url.hostname.endsWith('firebasedatabase.app')) return;
 
   /* Navigation HTML → network-first. */
   if (e.request.mode === 'navigate') {

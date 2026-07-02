@@ -1312,18 +1312,40 @@ function playIsaVideo(){
   const modal=document.getElementById('isa-video-modal');
   modal.style.display='flex';
 }
+/* API lecteur YouTube (chargée à la 1re lecture) — pour forcer le démarrage auto */
+let _ytReady=false,_ytCbs=[];
+function _ytApi(cb){
+  if(_ytReady){cb();return;}
+  _ytCbs.push(cb);
+  if(window._ytLoading)return;
+  window._ytLoading=true;
+  const prev=window.onYouTubeIframeAPIReady;
+  window.onYouTubeIframeAPIReady=function(){_ytReady=true;_ytCbs.forEach(f=>f());_ytCbs=[];if(prev)prev();};
+  const s=document.createElement('script');s.src='https://www.youtube.com/iframe_api';document.head.appendChild(s);
+}
 /* Lecture vidéo générique (Facebook / YouTube) — lancement auto au clic */
 function playVideo(type,id){
   const wrap=document.getElementById('isa-video-wrap');
+  document.getElementById('isa-video-modal').style.display='flex';
   if(type==='fb'){
     const href=encodeURIComponent('https://www.facebook.com/watch/?v='+id);
     wrap.style.aspectRatio='16/9';
     wrap.innerHTML='<iframe src="https://www.facebook.com/plugins/video.php?href='+href+'&show_text=false&autoplay=1&mute=0" width="100%" height="100%" style="border:none;display:block" frameborder="0" allowfullscreen allow="autoplay; fullscreen; clipboard-write; encrypted-media; picture-in-picture; web-share"></iframe>';
-  }else{
-    wrap.style.aspectRatio=(type==='yts')?'9/16':'16/9';
-    wrap.innerHTML='<iframe src="https://www.youtube.com/embed/'+id+'?autoplay=1&playsinline=1&rel=0" width="100%" height="100%" style="border:none;display:block" frameborder="0" allowfullscreen allow="autoplay; fullscreen; encrypted-media; picture-in-picture"></iframe>';
+    return;
   }
-  document.getElementById('isa-video-modal').style.display='flex';
+  wrap.style.aspectRatio=(type==='yts')?'9/16':'16/9';
+  wrap.innerHTML='<div id="yt-host" style="width:100%;height:100%"></div>';
+  let done=false;
+  const fallback=()=>{if(done)return;done=true;wrap.innerHTML='<iframe src="https://www.youtube.com/embed/'+id+'?autoplay=1&playsinline=1&rel=0" width="100%" height="100%" style="border:none;display:block" frameborder="0" allowfullscreen allow="autoplay; fullscreen; encrypted-media; picture-in-picture"></iframe>';};
+  _ytApi(function(){
+    if(done)return;done=true;
+    try{
+      new YT.Player('yt-host',{width:'100%',height:'100%',videoId:id,
+        playerVars:{autoplay:1,playsinline:1,rel:0},
+        events:{onReady:function(e){try{e.target.playVideo();}catch(_){}}}});
+    }catch(_){fallback();}
+  });
+  setTimeout(fallback,2500);   /* repli si l'API YouTube ne charge pas */
 }
 function closeIsaVideo(){
   document.getElementById('isa-video-modal').style.display='none';

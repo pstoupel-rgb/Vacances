@@ -1076,7 +1076,8 @@
     <div class="frais-label">💰 Solde du compte Wise</div>
     <div class="fam-card">
       <div id="depenses-list"></div>
-      <div class="compte-final"><span>Solde actuel</span><span class="ok" id="solde">—</span></div>
+      <div class="compte-final"><span>Solde réel du compte <button onclick="editSolde()" style="background:none;border:none;color:var(--brown);cursor:pointer;font-size:.85rem;padding:0 2px">✏️</button></span><span class="ok" id="solde">—</span></div>
+      <div id="solde-apayer" style="font-size:.72rem;color:var(--muted);text-align:right;margin-top:4px"></div>
     </div>
 
     <div class="fam-card">
@@ -1085,6 +1086,7 @@
         <input type="text" id="dep-label" placeholder="Description (ex: courses)">
         <input type="number" id="dep-montant" placeholder="Montant (€)" min="0" inputmode="decimal">
         <input type="date" id="dep-date" min="2026-07-04" max="2026-07-18" title="Date de la dépense (la semaine est déduite ; laisse vide si partagé)">
+        <label style="display:flex;align-items:center;gap:7px;font-weight:500;color:var(--text);font-size:.88rem"><input type="checkbox" id="dep-apayer" style="width:auto;margin:0"> Pas encore payée (débit à venir)</label>
         <button class="add-btn" onclick="ajouterDep()">Ajouter</button>
       </div>
     </div>
@@ -2356,7 +2358,7 @@ async function initBottles(){
   }
 }
 /* Différé après le 1er affichage : Firebase (~100 Ko) ne bloque plus le rendu de l'accueil. */
-(window.requestIdleCallback||(cb=>setTimeout(cb,200)))(()=>{initBottles();initCodes();initDelh();});
+(window.requestIdleCallback||(cb=>setTimeout(cb,200)))(()=>{initBottles();initCodes();initDelh();initSolde();});
 
 /* 😂 PHRASES CULTES */
 const PHRASE_DEV_KEY='corse2026-devid';
@@ -2520,6 +2522,8 @@ async function likePhrase(id){
 
 /* 💳 PARTAGE DES FRAIS */
 const RECUS=23986;
+/* Solde réel du compte Wise (éditable, synchronisé) — ancre de vérité, indépendant du calcul RECUS−dépenses */
+let SOLDE_OVR=12723.05;try{const _sv=localStorage.getItem('corse2026-solde');if(_sv!=null&&_sv!=='')SOLDE_OVR=parseFloat(_sv);}catch(e){}
 const DKEY='corse2026-depenses';
 const DEFAULT_DEPENSES=[
   {label:'Maison payée',montant:11000},
@@ -2639,28 +2643,55 @@ function renderFrais(){
   renderDelhRestos();
   renderBudgetHebdo();
   const list=document.getElementById('depenses-list');if(!list)return;
-  let html='<div class="compte-row"><span class="compte-label">Total reçu</span><span class="ok compte-montant">+ '+eur(RECUS)+'</span><span></span></div>';
+  let html='';
   DEPENSES.forEach((d,i)=>{
     const wk=depWeek(d);
     const badge=wk==='s1'?' <span class="ftag ftag-s1">S1</span>':wk==='s2'?' <span class="ftag ftag-s2">S2</span>':'';
     const dt=d.date?' <span style="color:var(--muted);font-size:.72rem">'+_delhFmtDate(d.date)+'</span>':'';
-    html+='<div class="compte-row"><span class="compte-label">'+escHtml(d.label)+badge+dt+'</span><span class="neg compte-montant">− '+eur(d.montant)+'</span><button class="del-btn" onclick="supprimerDep('+i+')" title="Supprimer">×</button></div>';
+    const ap=d.apayer
+      ? ' <span onclick="toggleApayer('+i+')" style="cursor:pointer;background:#fdeeee;border:1px solid #e0a0a0;color:#b5432f;border-radius:20px;padding:1px 7px;font-size:.64rem;font-weight:700">⏳ à payer</span>'
+      : ' <span onclick="toggleApayer('+i+')" style="cursor:pointer;color:var(--muted);font-size:.64rem">✓ payée</span>';
+    html+='<div class="compte-row"><span class="compte-label">'+escHtml(d.label)+badge+dt+ap+'</span><span class="neg compte-montant">− '+eur(d.montant)+'</span><button class="del-btn" onclick="supprimerDep('+i+')" title="Supprimer">×</button></div>';
   });
   list.innerHTML=html;
-  const total=DEPENSES.reduce((s,d)=>s+(+d.montant||0),0);
-  const solde=RECUS-total;
+  const aPayer=DEPENSES.filter(d=>d.apayer).reduce((s,d)=>s+(+d.montant||0),0);
+  const solde=(SOLDE_OVR!=null&&!isNaN(SOLDE_OVR))?SOLDE_OVR:(RECUS-DEPENSES.reduce((s,d)=>s+(+d.montant||0),0));
   const el=document.getElementById('solde');
   if(el){el.textContent=eur(solde);el.className=solde>=0?'ok':'neg';}
+  const apEl=document.getElementById('solde-apayer');
+  if(apEl)apEl.innerHTML=aPayer>0?('dont pas encore débité : <b>'+eur(aPayer)+'</b> · solde après paiement : <b>'+eur(Math.round((solde-aPayer)*100)/100)+'</b>'):'';
 }
 function supprimerDep(i){if(!confirm('Supprimer cette dépense ?'))return;DEPENSES.splice(i,1);saveDepenses();renderFrais();}
 /* Semaine d'une dépense : déduite de sa date ; sans date = partagé sur les 2 semaines */
 function depWeek(d){if(d&&d.date)return delhWeek(d.date);if(d&&(d.semaine==='s1'||d.semaine==='s2'))return d.semaine;return 'both';}
 function ajouterDep(){
-  const li=document.getElementById('dep-label'),mi=document.getElementById('dep-montant'),di=document.getElementById('dep-date');
+  const li=document.getElementById('dep-label'),mi=document.getElementById('dep-montant'),di=document.getElementById('dep-date'),ap=document.getElementById('dep-apayer');
   const label=li.value.trim();const montant=parseFloat(String(mi.value).replace(',','.'));
   if(!label||isNaN(montant)||montant<=0)return;
-  DEPENSES.push({label,montant:Math.round(montant*100)/100,date:di?di.value:''});saveDepenses();
-  li.value='';mi.value='';if(di)di.value='';renderFrais();li.focus();
+  DEPENSES.push({label,montant:Math.round(montant*100)/100,date:di?di.value:'',apayer:ap?ap.checked:false});saveDepenses();
+  li.value='';mi.value='';if(di)di.value='';if(ap)ap.checked=false;renderFrais();li.focus();
+}
+function toggleApayer(i){if(DEPENSES[i]){DEPENSES[i].apayer=!DEPENSES[i].apayer;saveDepenses();renderFrais();}}
+function editSolde(){
+  const cur=(SOLDE_OVR!=null&&!isNaN(SOLDE_OVR))?SOLDE_OVR:(RECUS-DEPENSES.reduce((s,d)=>s+(+d.montant||0),0));
+  const v=prompt('Solde réel du compte Wise (€) — visible par la team',cur);
+  if(v===null)return;
+  const m=parseFloat(String(v).replace(',','.'));
+  if(isNaN(m)){alert('Montant invalide');return;}
+  SOLDE_OVR=m;
+  try{localStorage.setItem('corse2026-solde',String(m));}catch(e){}
+  if(typeof _initFbAsync==='function'){_initFbAsync().then(function(){if(_fbDb)_fbDb.collection('stats').doc('wise').set({solde:m});}).catch(function(){});}
+  renderFrais();
+}
+let _soldeUnsub=null;
+async function initSolde(){
+  if(typeof _initFbAsync!=='function')return;
+  await _initFbAsync();
+  if(_fbDb&&!_soldeUnsub){
+    _soldeUnsub=_fbDb.collection('stats').doc('wise').onSnapshot(function(s){
+      if(s.exists&&typeof s.data().solde==='number'){SOLDE_OVR=s.data().solde;try{localStorage.setItem('corse2026-solde',String(SOLDE_OVR));}catch(e){}renderFrais();}
+    },function(){});
+  }
 }
 function copyIban(btn){
   const iban='BE85967750153506';

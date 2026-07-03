@@ -202,6 +202,10 @@
   .foot-actions{display:flex;gap:8px;margin-top:14px;}
   textarea.treasure-set{width:100%;font-family:var(--ff);font-weight:600;font-size:.95rem;padding:11px;
     border:2px solid var(--border);border-radius:12px;background:#fff;color:var(--ink);min-height:80px;resize:vertical;}
+  .guide-txt{font-size:.9rem;font-weight:600;color:var(--ink2);line-height:1.45;}
+  .guide-txt b{color:var(--sea2);}
+  .guide-txt ul,.guide-txt ol{margin:8px 0 2px;padding-left:22px;}
+  .guide-txt li{margin:5px 0;}
 </style>
 </head>
 <body>
@@ -318,6 +322,7 @@ function render(){
   if(scr==='station')   return renderStation();
   if(scr==='treasure')  return renderTreasure();
   if(scr==='parents')   return renderParents();
+  if(scr==='guide')     return renderGuide();
   renderHome();
 }
 
@@ -660,6 +665,7 @@ function renderParents(){
   app.innerHTML = `
     <div class="topbar"><button class="back" onclick="go('home')">‹</button><h2 style="font-size:1.4rem">Coin des parents</h2></div>
     <div class="lead">Réglez ici la vraie cachette du trésor et gérez la partie.</div>
+    <div style="margin-bottom:14px"><button class="btn sea small" onclick="go('guide')">📖 Mode d'emploi (à lire avant de partir)</button></div>
     <div class="parch" style="padding-top:22px">
       <div class="section-label" style="color:var(--wood)">🎁 Message de fin (la vraie cachette)</div>
       <textarea class="treasure-set" id="tmsg" oninput="S.treasureMsg=this.value;save()">${esc(S.treasureMsg)}</textarea>
@@ -680,6 +686,78 @@ function renderParents(){
       <button class="btn ghost small" onclick="resetGame()">🔄 Réinitialiser</button>
     </div>
     <div class="footnote">Idées de vraie cachette : sous un transat, dans le tas de bois, derrière un pot de fleurs, dans le four éteint 🔥</div>
+  `;
+}
+
+/* ---------------- MODE D'EMPLOI PARENTS ---------------- */
+function renderGuide(){
+  app.innerHTML = `
+    <div class="topbar"><button class="back" onclick="go('parents')">‹</button><h2 style="font-size:1.4rem">Mode d'emploi</h2></div>
+    <div class="lead">Tout ce qu'il faut savoir pour lancer la chasse au trésor. Rien à imprimer 🙌</div>
+
+    <div class="parch" style="padding-top:22px;margin-bottom:14px">
+      <div class="section-label" style="color:var(--wood)">📶 1. À faire TANT QUE vous avez du réseau</div>
+      <div class="guide-txt">
+        Si la maison a peu de wifi/4G, préparez l'app <b>avant d'arriver</b> (ou sur la route) :
+        <ol>
+          <li>Ouvrez le lien de l'app sur <b>chaque téléphone</b> qui jouera.</li>
+          <li>Laissez-le charger jusqu'à l'écran pirate 🏴‍☠️.</li>
+          <li>C'est bon : l'app est enregistrée et marche ensuite <b>100 % hors-ligne</b>.</li>
+        </ol>
+      </div>
+    </div>
+
+    <div class="parch" style="padding-top:22px;margin-bottom:14px">
+      <div class="section-label" style="color:var(--wood)">📲 2. Mettre l'app sur les téléphones</div>
+      <div class="guide-txt">
+        Envoyez le lien par <b>WhatsApp / Messages / AirDrop</b>, puis sur chaque appareil :
+        <ul>
+          <li><b>iPhone</b> : bouton Partager ⬆️ → « Sur l'écran d'accueil ».</li>
+          <li><b>Android</b> : menu ⋮ → « Installer l'application ».</li>
+        </ul>
+        Un seul téléphone suffit : les enfants jouent <b>en équipe</b> et se le passent.
+      </div>
+    </div>
+
+    <div class="parch" style="padding-top:22px;margin-bottom:14px">
+      <div class="section-label" style="color:var(--wood)">🎁 3. Cacher le vrai trésor</div>
+      <div class="guide-txt">
+        Cachez un vrai petit trésor (bonbons, pièces chocolat, petits jouets), puis dans
+        <b>Coin des parents</b> écrivez où il se trouve dans le « message de fin ».
+        Il s'affiche quand les enfants ouvrent le coffre 🗝️.
+      </div>
+    </div>
+
+    <div class="parch" style="padding-top:22px;margin-bottom:14px">
+      <div class="section-label" style="color:var(--wood)">🧭 4. Comment on joue</div>
+      <div class="guide-txt">
+        L'équipage fait <b>5 étapes</b> autour de la maison. À chaque étape :
+        <ul>
+          <li>une <b>énigme</b> indique le lieu 🗺️,</li>
+          <li>chaque enfant a une <b>mission selon son âge</b> (les petits observent, les grands décodent),</li>
+          <li>un <b>mini-jeu</b> sur l'écran donne <b>un chiffre du coffre</b>.</li>
+        </ul>
+        Une fois les 5 chiffres réunis, ils composent le code et le trésor est révélé 🎉.
+      </div>
+    </div>
+
+    <div class="parch" style="padding-top:22px;margin-bottom:14px">
+      <div class="section-label" style="color:var(--wood)">💡 5. Solutions (au cas où)</div>
+      <div class="guide-txt">
+        Si un enfant bloque, glissez-lui un indice :
+        <ul>
+          <li>🏊 <b>Piscine</b> : Méditerranée · un marcassin · la châtaigne.</li>
+          <li>🪨 <b>Graviers</b> : toucher le caillou d'or 🪙 caché parmi les cailloux.</li>
+          <li>🛋️ <b>Terrasse de devant</b> : tourner la molette jusqu'à lire le message, mot = <b>SOLEIL</b>.</li>
+          <li>🪑 <b>Terrasse de derrière</b> : cadenas <b>4&nbsp;5&nbsp;7&nbsp;1</b> (pattes du chat, doigts d'une main, 3+4, 2×4−7).</li>
+          <li>🍽️ <b>Cuisine</b> : retrouver les paires du Memory.</li>
+        </ul>
+        Chaque jeu se retente à volonté : aucun échec possible, on ne peut pas se bloquer.
+      </div>
+    </div>
+
+    <button class="btn" onclick="go('map')">🚩 C'est parti, lancer la chasse !</button>
+    <div class="footnote">Bon jeu à toute la tribu, moussaillons ! 🏝️</div>
   `;
 }
 

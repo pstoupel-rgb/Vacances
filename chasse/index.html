@@ -250,36 +250,36 @@ const STATIONS = [
     ]
   },
   {
+    id:'terrasse-avant', emoji:'🛋️', name:'La Terrasse de Devant',
+    clue:"File vers la grande terrasse à l'avant de la maison : un pirate a glissé un message secret près du canapé.",
+    digit:6, game:'caesar',
+    missions:[
+      "Soulève les coussins du canapé de devant : un trésor s'y cache peut-être ! 🛋️",
+      "Fais le tour de la terrasse et compte les coussins du canapé.",
+      "Aide à tourner la molette du décodeur secret.",
+      "Décode le message et lis-le à voix haute à l'équipage 📜."
+    ]
+  },
+  {
+    id:'terrasse-arriere', emoji:'🪑', name:'La Terrasse de Derrière',
+    clue:"Fais le tour jusqu'à la terrasse à l'arrière de la maison, près de l'autre canapé : un cadenas y garde le dernier chiffre.",
+    digit:1, game:'lock',
+    missions:[
+      "Réponds : combien de doigts sur <b>une main</b> ? ✋",
+      "Compte les coussins du canapé de derrière.",
+      "Résous les énigmes de chiffres.",
+      "Compose le code du cadenas sans te tromper 🔐."
+    ]
+  },
+  {
     id:'cuisine', emoji:'🍽️', name:'La Cuisine',
-    clue:"Direction le repaire des bonnes odeurs, là où l'on prépare le festin des pirates.",
+    clue:"Dernière étape : le repaire des bonnes odeurs, là où l'on prépare le festin des pirates.",
     digit:2, game:'memory',
     missions:[
       "Sens un aliment les yeux fermés 👀 et devine ce que c'est.",
       "Trouve quelque chose de <b>rouge</b> et quelque chose de <b>sucré</b>.",
       "Gagne au Memory des saveurs corses.",
       "Invente le nom d'un cocktail de pirate (sans alcool 🍹 !)."
-    ]
-  },
-  {
-    id:'olivier', emoji:'🫒', name:"L'Olivier",
-    clue:"Sous l'arbre gris-vert aux petites olives se cache un message secret gravé par un pirate.",
-    digit:6, game:'caesar',
-    missions:[
-      "Fais 5 tours autour de l'arbre en criant « Trésor ! » 🌀",
-      "Trouve la plus belle feuille et garde-la comme indice.",
-      "Aide à tourner la molette du décodeur secret.",
-      "Décode le message et lis-le à voix haute à l'équipage 📜."
-    ]
-  },
-  {
-    id:'terrasse', emoji:'☀️', name:'La Terrasse',
-    clue:"Montez là où l'on prend l'apéro au coucher du soleil : un cadenas y garde le dernier chiffre.",
-    digit:1, game:'lock',
-    missions:[
-      "Réponds : combien de doigts sur <b>une main</b> ? ✋",
-      "Compte les chaises de la terrasse.",
-      "Résous les énigmes de chiffres.",
-      "Compose le code du cadenas sans te tromper 🔐."
     ]
   }
 ];
@@ -515,17 +515,17 @@ function gameMemory(z){
   });
 }
 
-/* ---- CAESAR (olivier) ---- */
+/* ---- CAESAR (terrasse de devant) ---- */
 function caesarShift(txt,s){
   return txt.replace(/[A-Z]/g,c=>String.fromCharCode((c.charCodeAt(0)-65+s+26)%26+65));
 }
 function gameCaesar(z){
-  const plain="LE TRESOR AIME LE SOLEIL MOT OLIVIER";
+  const plain="LE PIRATE ADORE LA MER ET LE SOLEIL";
   const enc=caesarShift(plain,3);            // décalage +3
   let shift=0;
   const draw=()=>{
     z.innerHTML=`<div class="game">
-      <div class="q">📜 Message secret gravé dans l'écorce. Tourne la molette pour le lire, puis écris le <b>MOT</b> caché.</div>
+      <div class="q">📜 Message secret caché sous le coussin. Tourne la molette pour le lire, puis écris le <b>dernier mot</b> du message.</div>
       <div class="cipher">${caesarShift(enc,shift)}</div>
       <div class="wheel">🔄 <input type="range" min="0" max="25" value="${shift}"><div class="shiftval">${shift}</div></div>
       <div class="ansrow">
@@ -537,12 +537,12 @@ function gameCaesar(z){
     </div>`;
     const r=z.querySelector('input[type=range]');
     r.oninput=()=>{ shift=+r.value; z.querySelector('.cipher').textContent=caesarShift(enc,shift); z.querySelector('.shiftval').textContent=shift; };
-    window.caeHint=()=>{ shift=22; r.value=22; r.oninput(); document.getElementById('caesmsg').innerHTML='<div class="msg win">Presque ! Le mot est un arbre… 🌳</div>'; };
+    window.caeHint=()=>{ shift=22; r.value=22; r.oninput(); document.getElementById('caesmsg').innerHTML='<div class="msg win">Presque ! Le mot, c\'est ce qui brille dans le ciel… ☀️</div>'; };
   };
   window.checkCaesar=()=>{
     const v=(document.getElementById('caesans').value||'').trim().toUpperCase().replace(/[^A-Z]/g,'');
     const m=document.getElementById('caesmsg');
-    if(v==='OLIVIER'){ completeStation(); }
+    if(v==='SOLEIL'){ completeStation(); }
     else{ m.innerHTML='<div class="msg err">Pas encore… tourne bien la molette pour tout lire !</div>'; }
   };
   draw();

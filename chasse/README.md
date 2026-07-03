@@ -1,7 +1,8 @@
 # 🏴‍☠️ La Chasse au Trésor de Corse
 
 Une petite **app web** de chasse au trésor pour les enfants, à jouer autour de la
-maison en Corse (piscine, jardin de gravier, cuisine, olivier, terrasse).
+maison en Corse : **piscine**, **jardin de graviers**, **terrasse de devant**,
+**terrasse de derrière** et **cuisine**.
 100 % hors-ligne, aucun compte, un seul fichier.
 
 ## 🎮 Le principe

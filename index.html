@@ -1070,6 +1070,7 @@
       <div class="add-form">
         <input type="text" id="dep-label" placeholder="Description (ex: courses)">
         <input type="number" id="dep-montant" placeholder="Montant (€)" min="0" inputmode="decimal">
+        <input type="date" id="dep-date" min="2026-07-04" max="2026-07-18" title="Date de la dépense (la semaine est déduite ; laisse vide si partagé)">
         <button class="add-btn" onclick="ajouterDep()">Ajouter</button>
       </div>
     </div>
@@ -2600,19 +2601,25 @@ async function initDelh(){
 }
 function renderBudgetHebdo(){
   const box=document.getElementById('budget-hebdo');if(!box)return;
-  const TOTAL_DU=32500;                                   /* total des contributions des familles */
-  const totalDep=DEPENSES.reduce((s,d)=>s+(+d.montant||0),0);  /* dépenses payées via Wise */
-  const delhSpent=_delhTotal();                           /* restos déjà payés par Delhauteur */
-  const dispo=TOTAL_DU-totalDep-delhSpent;                /* ce qui reste du budget total à dépenser */
-  const parSem=Math.round(dispo/2);
-  const cell=(lbl,val)=>'<div style="flex:1;background:var(--bg2);border-radius:12px;padding:11px 8px;text-align:center"><div style="font-size:.68rem;color:var(--muted);font-weight:800;letter-spacing:.04em">'+lbl+'</div><div style="font-weight:800;font-size:1.25rem;color:var(--brown);margin-top:3px">'+eur(parSem)+'</div></div>';
+  const TOTAL_DU=32500;                       /* total des contributions des familles */
+  const sumBy=w=>DEPENSES.filter(d=>depWeek(d)===w).reduce((s,d)=>s+(+d.montant||0),0);
+  const shared=sumBy('both'),dep1=sumBy('s1'),dep2=sumBy('s2');
+  const half=TOTAL_DU/2;                       /* 16 250 € par semaine au départ */
+  /* Chaque semaine : sa moitié du budget − sa moitié des dépenses partagées − ses dépenses propres − ses restos Delhauteur */
+  const week1=half-shared/2-dep1-_delhSum('s1');
+  const week2=half-shared/2-dep2-_delhSum('s2');
+  const dispo=week1+week2;
+  const cell=(lbl,val,spent)=>'<div style="flex:1;background:var(--bg2);border-radius:12px;padding:11px 8px;text-align:center">'
+    +'<div style="font-size:.68rem;color:var(--muted);font-weight:800;letter-spacing:.04em">'+lbl+'</div>'
+    +'<div style="font-weight:800;font-size:1.3rem;color:'+(val<0?'var(--neg)':'var(--brown)')+';margin-top:3px">'+eur(Math.round(val))+'</div>'
+    +(spent>0?'<div style="font-size:.63rem;color:var(--muted);margin-top:2px">déjà dépensé '+eur(Math.round(spent))+'</div>':'')
+    +'</div>';
   box.innerHTML=
     '<div class="compte-row"><span class="compte-label">Budget total du séjour</span><span class="compte-montant">'+eur(TOTAL_DU)+'</span><span></span></div>'
-   +'<div class="compte-row"><span class="compte-label">− Dépenses déjà faites (Wise)</span><span class="compte-montant neg">− '+eur(totalDep)+'</span><span></span></div>'
-   +'<div class="compte-row"><span class="compte-label">− Restos Delhauteur déjà payés</span><span class="compte-montant neg">− '+eur(delhSpent)+'</span><span></span></div>'
-   +'<div class="compte-final" style="border-top:1px solid var(--border)"><span>Encore dépensable</span><span class="'+(dispo>=0?'ok':'neg')+'">'+eur(dispo)+'</span></div>'
-   +'<div style="display:flex;gap:10px;margin-top:11px">'+cell('SEMAINE 1',parSem)+cell('SEMAINE 2',parSem)+'</div>'
-   +'<div style="font-size:.72rem;color:var(--muted);margin-top:8px;line-height:1.45">Basé sur le budget total (32 500 €) — donc l\'argent que Carniol et Etienne doivent encore verser est bien compté. Budget/semaine = moitié du reste ; il baisse à chaque dépense ou resto Delhauteur.</div>';
+   +'<div class="compte-row"><span class="compte-label">− Dépenses partagées (½ / semaine)</span><span class="compte-montant neg">− '+eur(shared)+'</span><span></span></div>'
+   +'<div class="compte-final" style="border-top:1px solid var(--border)"><span>Encore dépensable</span><span class="'+(dispo>=0?'ok':'neg')+'">'+eur(Math.round(dispo))+'</span></div>'
+   +'<div style="display:flex;gap:10px;margin-top:11px">'+cell('SEMAINE 1',week1,dep1+_delhSum('s1'))+cell('SEMAINE 2',week2,dep2+_delhSum('s2'))+'</div>'
+   +'<div style="font-size:.72rem;color:var(--muted);margin-top:8px;line-height:1.45">Chaque semaine a son budget (½ du total). Une dépense <b>datée</b> ne baisse <b>que</b> la semaine de sa date. Une dépense <b>sans date</b> (ex. maison) est répartie moitié-moitié.</div>';
 }
 function renderFrais(){
   renderDelhRestos();
@@ -2620,7 +2627,10 @@ function renderFrais(){
   const list=document.getElementById('depenses-list');if(!list)return;
   let html='<div class="compte-row"><span class="compte-label">Total reçu</span><span class="ok compte-montant">+ '+eur(RECUS)+'</span><span></span></div>';
   DEPENSES.forEach((d,i)=>{
-    html+='<div class="compte-row"><span class="compte-label">'+escHtml(d.label)+'</span><span class="neg compte-montant">− '+eur(d.montant)+'</span><button class="del-btn" onclick="supprimerDep('+i+')" title="Supprimer">×</button></div>';
+    const wk=depWeek(d);
+    const badge=wk==='s1'?' <span class="ftag ftag-s1">S1</span>':wk==='s2'?' <span class="ftag ftag-s2">S2</span>':'';
+    const dt=d.date?' <span style="color:var(--muted);font-size:.72rem">'+_delhFmtDate(d.date)+'</span>':'';
+    html+='<div class="compte-row"><span class="compte-label">'+escHtml(d.label)+badge+dt+'</span><span class="neg compte-montant">− '+eur(d.montant)+'</span><button class="del-btn" onclick="supprimerDep('+i+')" title="Supprimer">×</button></div>';
   });
   list.innerHTML=html;
   const total=DEPENSES.reduce((s,d)=>s+(+d.montant||0),0);
@@ -2629,12 +2639,14 @@ function renderFrais(){
   if(el){el.textContent=eur(solde);el.className=solde>=0?'ok':'neg';}
 }
 function supprimerDep(i){if(!confirm('Supprimer cette dépense ?'))return;DEPENSES.splice(i,1);saveDepenses();renderFrais();}
+/* Semaine d'une dépense : déduite de sa date ; sans date = partagé sur les 2 semaines */
+function depWeek(d){if(d&&d.date)return delhWeek(d.date);if(d&&(d.semaine==='s1'||d.semaine==='s2'))return d.semaine;return 'both';}
 function ajouterDep(){
-  const li=document.getElementById('dep-label'),mi=document.getElementById('dep-montant');
+  const li=document.getElementById('dep-label'),mi=document.getElementById('dep-montant'),di=document.getElementById('dep-date');
   const label=li.value.trim();const montant=parseFloat(String(mi.value).replace(',','.'));
   if(!label||isNaN(montant)||montant<=0)return;
-  DEPENSES.push({label,montant:Math.round(montant*100)/100});saveDepenses();
-  li.value='';mi.value='';renderFrais();li.focus();
+  DEPENSES.push({label,montant:Math.round(montant*100)/100,date:di?di.value:''});saveDepenses();
+  li.value='';mi.value='';if(di)di.value='';renderFrais();li.focus();
 }
 function copyIban(btn){
   const iban='BE85967750153506';

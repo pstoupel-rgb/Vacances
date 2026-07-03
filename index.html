@@ -1042,6 +1042,11 @@
       </table>
     </div>
 
+    <div class="frais-label">💶 Ce qu'on peut encore dépenser</div>
+    <div class="fam-card">
+      <div id="budget-hebdo"></div>
+    </div>
+
     <div class="frais-label">🍽️ Restos payés par Delhauteur <span style="font-weight:400;color:var(--muted)">(à la place des 4 180 €)</span></div>
     <div class="fam-card">
       <div id="delh-restos"></div>
@@ -2541,6 +2546,7 @@ function renderDelhRestos(){
   if(pr){const rest=4180-x;pr.textContent=rest<=0?'✓':eur(rest);pr.className=rest<=0?'ok':'neg';}
   if(tp)tp.textContent=eur(23986+x);
   if(tr){const rest=8514-x;tr.textContent=eur(rest);tr.className=rest<=0?'ok':'neg';}
+  if(typeof renderBudgetHebdo==='function')renderBudgetHebdo();
 }
 function saveDelh(){
   try{localStorage.setItem('corse2026-delh',JSON.stringify(DELH));}catch(e){}
@@ -2568,8 +2574,24 @@ async function initDelh(){
     },function(){});
   }
 }
+function renderBudgetHebdo(){
+  const box=document.getElementById('budget-hebdo');if(!box)return;
+  const totalDep=DEPENSES.reduce((s,d)=>s+(+d.montant||0),0);
+  const soldeWise=RECUS-totalDep;
+  const delhRestant=Math.max(0,4180-_delhTotal());
+  const dispo=soldeWise+delhRestant;
+  const parSem=Math.round(dispo/2);
+  const cell=(lbl,val)=>'<div style="flex:1;background:var(--bg2);border-radius:12px;padding:11px 8px;text-align:center"><div style="font-size:.68rem;color:var(--muted);font-weight:800;letter-spacing:.04em">'+lbl+'</div><div style="font-weight:800;font-size:1.25rem;color:var(--brown);margin-top:3px">'+eur(parSem)+'</div></div>';
+  box.innerHTML=
+    '<div class="compte-row"><span class="compte-label">Solde compte Wise</span><span class="compte-montant '+(soldeWise>=0?'ok':'neg')+'">'+eur(soldeWise)+'</span><span></span></div>'
+   +'<div class="compte-row"><span class="compte-label">+ Restos Delhauteur restants</span><span class="compte-montant">'+eur(delhRestant)+'</span><span></span></div>'
+   +'<div class="compte-final" style="border-top:1px solid var(--border)"><span>Total encore dépensable</span><span class="'+(dispo>=0?'ok':'neg')+'">'+eur(dispo)+'</span></div>'
+   +'<div style="display:flex;gap:10px;margin-top:11px">'+cell('SEMAINE 1',parSem)+cell('SEMAINE 2',parSem)+'</div>'
+   +'<div style="font-size:.72rem;color:var(--muted);margin-top:8px;line-height:1.45">Toutes les dépenses étant partagées sur les 2 semaines, le budget par semaine = moitié du total encore dépensable. Il baisse automatiquement à chaque dépense ou resto Delhauteur ajouté.</div>';
+}
 function renderFrais(){
   renderDelhRestos();
+  renderBudgetHebdo();
   const list=document.getElementById('depenses-list');if(!list)return;
   let html='<div class="compte-row"><span class="compte-label">Total reçu</span><span class="ok compte-montant">+ '+eur(RECUS)+'</span><span></span></div>';
   DEPENSES.forEach((d,i)=>{

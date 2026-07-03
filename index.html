@@ -526,8 +526,8 @@
     </div>
     <div class="hero-title"><h1>Corse 2026</h1>
       <div style="display:flex;justify-content:center;gap:16px;margin-top:7px">
-        <button onclick="wiseCard('wise-verte','Carte Wise verte')" title="Carte Wise verte" aria-label="Carte Wise verte" style="width:30px;height:30px;border-radius:50%;background:#1f9d55;border:2px solid rgba(255,255,255,.92);box-shadow:0 2px 9px rgba(0,0,0,.35);font-size:.82rem;display:grid;place-items:center;cursor:pointer">💳</button>
-        <button onclick="wiseCard('wise-blanche','Carte Wise blanche')" title="Carte Wise blanche" aria-label="Carte Wise blanche" style="width:30px;height:30px;border-radius:50%;background:#fff;border:2px solid rgba(0,0,0,.14);box-shadow:0 2px 9px rgba(0,0,0,.35);font-size:.82rem;display:grid;place-items:center;cursor:pointer">💳</button>
+        <button onclick="wiseCard('wise-verte','Carte Wise verte','#1f9d55')" title="Carte Wise verte" aria-label="Carte Wise verte" style="width:30px;height:30px;border-radius:50%;background:#1f9d55;border:2px solid rgba(255,255,255,.92);box-shadow:0 2px 9px rgba(0,0,0,.35);font-size:.82rem;display:grid;place-items:center;cursor:pointer">💳</button>
+        <button onclick="wiseCard('wise-blanche','Carte Wise blanche','#cfcfcf')" title="Carte Wise blanche" aria-label="Carte Wise blanche" style="width:30px;height:30px;border-radius:50%;background:#fff;border:2px solid rgba(0,0,0,.14);box-shadow:0 2px 9px rgba(0,0,0,.35);font-size:.82rem;display:grid;place-items:center;cursor:pointer">💳</button>
       </div>
     </div>
   </div>
@@ -638,6 +638,15 @@
   <div id="team-modal-name" class="team-modal-name"></div>
   <button class="team-modal-change" onclick="changeTeamPhotoFromModal()">📷 Changer la photo</button>
   <button class="team-modal-close" onclick="closeTeamModal()">Fermer</button>
+</div>
+
+<!-- Modal code carte Wise (affichage plein écran, lecture seule) -->
+<div id="wise-modal" onclick="this.style.display='none'" style="display:none;position:fixed;inset:0;z-index:1500;background:rgba(0,0,0,.74);align-items:center;justify-content:center;flex-direction:column;gap:18px;padding:24px;-webkit-transform:translateZ(0);transform:translateZ(0)">
+  <div id="wise-modal-card" style="background:#fff;border-radius:22px;padding:30px 40px;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.45);max-width:92vw;border-top:8px solid #1f9d55">
+    <div id="wise-modal-label" style="font-size:1rem;font-weight:700;color:#888;margin-bottom:16px"></div>
+    <div id="wise-modal-code" style="font-family:ui-monospace,Menlo,monospace;font-size:3.4rem;font-weight:800;letter-spacing:.14em;color:#111;line-height:1.1"></div>
+  </div>
+  <div style="color:rgba(255,255,255,.75);font-size:.85rem">Touche l'écran pour fermer</div>
 </div>
 
 <!-- Modal phrase -->
@@ -1588,18 +1597,16 @@ async function editCode(key,label){
     if(_fbDb){await _fbDb.collection('stats').doc('codes').set({[key]:d},{merge:true});}
   }catch(e){console.warn('code sync',e);}
 }
-/* 💳 Cartes Wise (verte / blanche) — affiche le code au clic, éditable, synchronisé */
-async function wiseCard(key,label){
-  const cur=CODES[key]||'';
-  const v=prompt('💳 '+label+(cur?'\n\nCode : '+cur:'\n\nAucun code enregistré.')+'\n\nSaisis / modifie le code (visible par la team) :',cur);
-  if(v===null)return;
-  const d=(v||'').replace(/\D/g,'');
-  CODES[key]=d;
-  try{localStorage.setItem(CODES_KEY,JSON.stringify(CODES));}catch(e){}
-  try{
-    if(typeof _initFbAsync==='function'){await _initFbAsync();}
-    if(_fbDb){await _fbDb.collection('stats').doc('codes').set({[key]:d},{merge:true});}
-  }catch(e){console.warn('wise code sync',e);}
+/* 💳 Cartes Wise (verte / blanche) — codes FIXES, non modifiables. Au clic : affichage plein écran. */
+const WISE_CODES={'wise-verte':'','wise-blanche':''};
+function wiseCard(key,label,color){
+  const code=WISE_CODES[key]||CODES[key]||'';
+  document.getElementById('wise-modal-label').textContent='💳 '+label;
+  const c=document.getElementById('wise-modal-code');
+  c.textContent=code||'— code non défini —';
+  c.style.color=code?'#111':'#b5432f';
+  document.getElementById('wise-modal-card').style.borderTop='8px solid '+(color||'#1f9d55');
+  document.getElementById('wise-modal').style.display='flex';
 }
 /* Abonnement temps réel : reçoit les codes saisis par les autres */
 async function initCodes(){

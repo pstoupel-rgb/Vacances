@@ -1050,7 +1050,13 @@
     <div class="frais-label">🍽️ Restos payés par Delhauteur <span style="font-weight:400;color:var(--muted)">(à la place des 4 180 €)</span></div>
     <div class="fam-card">
       <div id="delh-restos"></div>
-      <div style="font-size:.72rem;color:var(--muted);margin-top:6px;line-height:1.45">Delhauteur règle sa part en <b>payant des restos directement</b> → ces montants <b>ne passent pas</b> par le compte Wise. Objectif : <b>moitié en semaine 1, moitié en semaine 2</b> (pour éviter d'avancer trop d'argent).</div>
+      <div class="add-form" style="margin-top:12px">
+        <input type="text" id="delh-nom" placeholder="Nom du resto (ex : Le Tiki)">
+        <input type="date" id="delh-date" min="2026-07-04" max="2026-07-18">
+        <input type="number" id="delh-montant" min="0" inputmode="decimal" placeholder="Montant (€)">
+        <button class="add-btn" onclick="addDelhResto()">＋ Ajouter le resto</button>
+      </div>
+      <div style="font-size:.72rem;color:var(--muted);margin-top:8px;line-height:1.45">La semaine (S1/S2) est déduite de la date. Ces montants <b>ne passent pas</b> par le compte Wise. Objectif : <b>2 090 € en semaine 1, 2 090 € en semaine 2</b>.</div>
     </div>
 
     <div class="frais-label">💰 Solde du compte Wise</div>
@@ -2513,30 +2519,45 @@ if(!Array.isArray(DEPENSES))DEPENSES=DEFAULT_DEPENSES.slice();
 function saveDepenses(){try{localStorage.setItem(DKEY,JSON.stringify(DEPENSES));}catch(e){}}
 const eur=n=>n.toLocaleString('fr-FR')+' €';
 function escHtml(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
-/* 🍽️ Enveloppe restos Delhauteur — 2 090 € en S1, 2 090 € en S2 (partagé Firebase) */
-const DELH_S1=2090,DELH_S2=2090;
-let DELH={s1:0,s2:0},_delhUnsub=null;
-try{const c=JSON.parse(localStorage.getItem('corse2026-delh'));if(c&&typeof c==='object')DELH={s1:+c.s1||0,s2:+c.s2||0};}catch(e){}
-function _delhTotal(){return (+DELH.s1||0)+(+DELH.s2||0);}
+/* 🍽️ Restos Delhauteur — liste (nom, date, montant) ; semaine déduite de la date ; 2 090 € S1 + 2 090 € S2 (partagé Firebase) */
+const DELH_S1=2090,DELH_S2=2090,DELH_SPLIT='2026-07-11';
+let DELH={entries:[]},_delhUnsub=null;
+(function(){try{const c=JSON.parse(localStorage.getItem('corse2026-delh'));
+  if(c&&Array.isArray(c.entries))DELH={entries:c.entries};
+  else if(c&&(+c.s1||+c.s2)){DELH={entries:[]};if(+c.s1)DELH.entries.push({id:uid(),nom:'Restos semaine 1',date:'2026-07-06',montant:+c.s1});if(+c.s2)DELH.entries.push({id:uid(),nom:'Restos semaine 2',date:'2026-07-13',montant:+c.s2});}
+}catch(e){}})();
+function delhWeek(d){return (d&&d>=DELH_SPLIT)?'s2':'s1';}
+function _delhSum(w){return DELH.entries.filter(e=>delhWeek(e.date)===w).reduce((s,e)=>s+(+e.montant||0),0);}
+function _delhTotal(){return DELH.entries.reduce((s,e)=>s+(+e.montant||0),0);}
+function _delhFmtDate(d){try{return new Date(d+'T12:00:00').toLocaleDateString('fr-FR',{day:'numeric',month:'short'});}catch(e){return d||'';}}
 function renderDelhRestos(){
   const box=document.getElementById('delh-restos');
-  const rows=[['s1','Semaine 1 · 4–11 juil.',DELH_S1,+DELH.s1||0],['s2','Semaine 2 · 11–18 juil.',DELH_S2,+DELH.s2||0]];
   if(box){
+    const rows=[['s1','Semaine 1 · 4–10 juil.',DELH_S1,_delhSum('s1')],['s2','Semaine 2 · 11–18 juil.',DELH_S2,_delhSum('s2')]];
     let html='';
     rows.forEach(function(r){
-      const k=r[0],label=r[1],target=r[2],paid=r[3];
+      const label=r[1],target=r[2],paid=r[3];
       const reste=Math.max(0,target-paid),pct=Math.min(100,Math.round(paid/target*100)),done=reste<=0;
-      html+='<div style="margin-bottom:13px">'
-        +'<div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:4px"><span style="font-weight:700;font-size:.88rem">'+label+'</span>'
+      html+='<div style="margin-bottom:11px">'
+        +'<div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:4px"><span style="font-weight:700;font-size:.86rem">'+label+'</span>'
         +'<span style="font-size:.8rem">'+(done?'<span class="ok">✓ complété</span>':'<span class="neg">reste '+eur(reste)+'</span>')+'</span></div>'
         +'<div style="height:8px;border-radius:100px;background:var(--bg2);overflow:hidden"><i style="display:block;height:100%;width:'+pct+'%;background:'+(done?'#198754':'var(--brown)')+';transition:width .3s"></i></div>'
-        +'<div style="display:flex;justify-content:space-between;align-items:center;margin-top:6px">'
-        +'<span style="font-size:.74rem;color:var(--muted)">payé '+eur(paid)+' / '+eur(target)+'</span>'
-        +'<span style="display:flex;gap:6px"><button class="resa-btn" onclick="addDelhResto(\''+k+'\')">＋ resto</button>'
-        +(paid>0?'<button class="resa-btn" onclick="resetDelhWeek(\''+k+'\')" style="background:#fdeeee;border-color:#e0a0a0;color:#b5432f">↺</button>':'')+'</span></div></div>';
+        +'<div style="font-size:.72rem;color:var(--muted);margin-top:4px">payé '+eur(paid)+' / '+eur(target)+'</div></div>';
     });
+    const list=DELH.entries.slice().sort(function(a,b){return (a.date||'').localeCompare(b.date||'');});
+    if(list.length){
+      html+='<div style="margin:12px 0 2px;font-weight:800;font-size:.72rem;color:var(--muted)">DÉTAIL DES RESTOS</div>';
+      list.forEach(function(e){
+        const w=delhWeek(e.date);
+        html+='<div style="display:flex;align-items:center;gap:8px;padding:7px 0;border-bottom:1px solid var(--border)">'
+          +'<span class="ftag '+(w==='s1'?'ftag-s1':'ftag-s2')+'">'+(w==='s1'?'S1':'S2')+'</span>'
+          +'<span style="flex:1;min-width:0"><span style="font-weight:600">'+escHtml(e.nom||'Resto')+'</span> <span style="color:var(--muted);font-size:.78rem">· '+_delhFmtDate(e.date)+'</span></span>'
+          +'<span style="font-weight:700;white-space:nowrap">'+eur(+e.montant||0)+'</span>'
+          +'<button class="del-btn" onclick="deleteDelhResto(\''+e.id+'\')" title="Supprimer">×</button></div>';
+      });
+    }
     const tot=_delhTotal();
-    html+='<div style="border-top:1px solid var(--border);padding-top:9px;display:flex;justify-content:space-between;font-weight:800"><span>Total réglé en restos</span><span class="'+(tot>=4180?'ok':'')+'">'+eur(tot)+' / 4 180 €</span></div>';
+    html+='<div style="border-top:2px solid var(--border);padding-top:9px;margin-top:6px;display:flex;justify-content:space-between;font-weight:800"><span>Total réglé en restos</span><span class="'+(tot>=4180?'ok':'')+'">'+eur(tot)+' / 4 180 €</span></div>';
     box.innerHTML=html;
   }
   /* Répercute sur le tableau Familles (Paulet = Delhauteur) + Total */
@@ -2552,17 +2573,20 @@ function saveDelh(){
   try{localStorage.setItem('corse2026-delh',JSON.stringify(DELH));}catch(e){}
   if(typeof _initFbAsync==='function'){_initFbAsync().then(function(){if(_fbDb)_fbDb.collection('stats').doc('delhauteur-restos').set(DELH);}).catch(function(){});}
 }
-function addDelhResto(week){
-  const v=prompt('Montant du resto payé par Delhauteur — '+(week==='s1'?'Semaine 1':'Semaine 2')+' (€)','');
-  if(v===null)return;
-  const m=parseFloat(String(v).replace(',','.'));
+function addDelhResto(){
+  const ni=document.getElementById('delh-nom'),di=document.getElementById('delh-date'),mi=document.getElementById('delh-montant');
+  const nom=(ni.value||'').trim(),date=di.value,m=parseFloat(String(mi.value).replace(',','.'));
+  if(!nom){alert('Indique le nom du resto');return;}
+  if(!date){alert('Indique la date');return;}
   if(isNaN(m)||m<=0){alert('Montant invalide');return;}
-  DELH[week]=Math.round(((+DELH[week]||0)+m)*100)/100;
+  DELH.entries.push({id:uid(),nom:nom,date:date,montant:Math.round(m*100)/100});
   saveDelh();renderDelhRestos();
+  ni.value='';mi.value='';ni.focus();
 }
-function resetDelhWeek(week){
-  if(!confirm('Remettre cette semaine à zéro ?'))return;
-  DELH[week]=0;saveDelh();renderDelhRestos();
+function deleteDelhResto(id){
+  if(!confirm('Supprimer ce resto ?'))return;
+  DELH.entries=DELH.entries.filter(function(e){return e.id!==id;});
+  saveDelh();renderDelhRestos();
 }
 async function initDelh(){
   renderDelhRestos();
@@ -2570,24 +2594,25 @@ async function initDelh(){
   await _initFbAsync();
   if(_fbDb&&!_delhUnsub){
     _delhUnsub=_fbDb.collection('stats').doc('delhauteur-restos').onSnapshot(function(snap){
-      if(snap.exists){const d=snap.data()||{};DELH={s1:+d.s1||0,s2:+d.s2||0};try{localStorage.setItem('corse2026-delh',JSON.stringify(DELH));}catch(e){}renderDelhRestos();}
+      if(snap.exists){const d=snap.data()||{};DELH={entries:Array.isArray(d.entries)?d.entries:[]};try{localStorage.setItem('corse2026-delh',JSON.stringify(DELH));}catch(e){}renderDelhRestos();}
     },function(){});
   }
 }
 function renderBudgetHebdo(){
   const box=document.getElementById('budget-hebdo');if(!box)return;
-  const totalDep=DEPENSES.reduce((s,d)=>s+(+d.montant||0),0);
-  const soldeWise=RECUS-totalDep;
-  const delhRestant=Math.max(0,4180-_delhTotal());
-  const dispo=soldeWise+delhRestant;
+  const TOTAL_DU=32500;                                   /* total des contributions des familles */
+  const totalDep=DEPENSES.reduce((s,d)=>s+(+d.montant||0),0);  /* dépenses payées via Wise */
+  const delhSpent=_delhTotal();                           /* restos déjà payés par Delhauteur */
+  const dispo=TOTAL_DU-totalDep-delhSpent;                /* ce qui reste du budget total à dépenser */
   const parSem=Math.round(dispo/2);
   const cell=(lbl,val)=>'<div style="flex:1;background:var(--bg2);border-radius:12px;padding:11px 8px;text-align:center"><div style="font-size:.68rem;color:var(--muted);font-weight:800;letter-spacing:.04em">'+lbl+'</div><div style="font-weight:800;font-size:1.25rem;color:var(--brown);margin-top:3px">'+eur(parSem)+'</div></div>';
   box.innerHTML=
-    '<div class="compte-row"><span class="compte-label">Solde compte Wise</span><span class="compte-montant '+(soldeWise>=0?'ok':'neg')+'">'+eur(soldeWise)+'</span><span></span></div>'
-   +'<div class="compte-row"><span class="compte-label">+ Restos Delhauteur restants</span><span class="compte-montant">'+eur(delhRestant)+'</span><span></span></div>'
-   +'<div class="compte-final" style="border-top:1px solid var(--border)"><span>Total encore dépensable</span><span class="'+(dispo>=0?'ok':'neg')+'">'+eur(dispo)+'</span></div>'
+    '<div class="compte-row"><span class="compte-label">Budget total du séjour</span><span class="compte-montant">'+eur(TOTAL_DU)+'</span><span></span></div>'
+   +'<div class="compte-row"><span class="compte-label">− Dépenses déjà faites (Wise)</span><span class="compte-montant neg">− '+eur(totalDep)+'</span><span></span></div>'
+   +'<div class="compte-row"><span class="compte-label">− Restos Delhauteur déjà payés</span><span class="compte-montant neg">− '+eur(delhSpent)+'</span><span></span></div>'
+   +'<div class="compte-final" style="border-top:1px solid var(--border)"><span>Encore dépensable</span><span class="'+(dispo>=0?'ok':'neg')+'">'+eur(dispo)+'</span></div>'
    +'<div style="display:flex;gap:10px;margin-top:11px">'+cell('SEMAINE 1',parSem)+cell('SEMAINE 2',parSem)+'</div>'
-   +'<div style="font-size:.72rem;color:var(--muted);margin-top:8px;line-height:1.45">Toutes les dépenses étant partagées sur les 2 semaines, le budget par semaine = moitié du total encore dépensable. Il baisse automatiquement à chaque dépense ou resto Delhauteur ajouté.</div>';
+   +'<div style="font-size:.72rem;color:var(--muted);margin-top:8px;line-height:1.45">Basé sur le budget total (32 500 €) — donc l\'argent que Carniol et Etienne doivent encore verser est bien compté. Budget/semaine = moitié du reste ; il baisse à chaque dépense ou resto Delhauteur.</div>';
 }
 function renderFrais(){
   renderDelhRestos();

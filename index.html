@@ -2623,21 +2623,24 @@ function renderBudgetHebdo(){
   /* On ne retire QUE les dépenses pas encore payées (les payées sont déjà sorties du compte) */
   const apBy=w=>DEPENSES.filter(d=>d.apayer&&depWeek(d)===w).reduce((s,d)=>s+(+d.montant||0),0);
   const ap1=apBy('s1'),ap2=apBy('s2'),apBoth=apBy('both'),apTot=ap1+ap2+apBoth;
+  /* + enveloppe restos Delhauteur restante, par semaine (2 090 € − déjà payé cette semaine) */
+  const delhRem1=Math.max(0,DELH_S1-_delhSum('s1')),delhRem2=Math.max(0,DELH_S2-_delhSum('s2')),delhRemTot=delhRem1+delhRem2;
   const half=base/2;
-  const week1=half-ap1-apBoth/2;
-  const week2=half-ap2-apBoth/2;
+  const week1=half-ap1-apBoth/2+delhRem1;
+  const week2=half-ap2-apBoth/2+delhRem2;
   const dispo=week1+week2;
-  const cell=(lbl,val,spent)=>'<div style="flex:1;background:var(--bg2);border-radius:12px;padding:11px 8px;text-align:center">'
+  const cell=(lbl,val,delh)=>'<div style="flex:1;background:var(--bg2);border-radius:12px;padding:11px 8px;text-align:center">'
     +'<div style="font-size:.68rem;color:var(--muted);font-weight:800;letter-spacing:.04em">'+lbl+'</div>'
     +'<div style="font-weight:800;font-size:1.3rem;color:'+(val<0?'var(--neg)':'var(--brown)')+';margin-top:3px">'+eur(Math.round(val))+'</div>'
-    +(spent>0?'<div style="font-size:.63rem;color:var(--muted);margin-top:2px">à payer '+eur(Math.round(spent))+'</div>':'')
+    +(delh>0?'<div style="font-size:.63rem;color:var(--muted);margin-top:2px">dont Delhauteur '+eur(Math.round(delh))+'</div>':'')
     +'</div>';
   box.innerHTML=
     '<div class="compte-row"><span class="compte-label">Solde attendu (Carniol &amp; Etienne réglés)</span><span class="compte-montant">'+eur(base)+'</span><span></span></div>'
    +(apTot>0?'<div class="compte-row"><span class="compte-label">− Dépenses pas encore payées</span><span class="compte-montant neg">− '+eur(apTot)+'</span><span></span></div>':'')
+   +(delhRemTot>0?'<div class="compte-row"><span class="compte-label">+ Restos Delhauteur restants</span><span class="compte-montant ok">+ '+eur(delhRemTot)+'</span><span></span></div>':'')
    +'<div class="compte-final" style="border-top:1px solid var(--border)"><span>Encore dépensable</span><span class="'+(dispo>=0?'ok':'neg')+'">'+eur(Math.round(dispo*100)/100)+'</span></div>'
-   +'<div style="display:flex;gap:10px;margin-top:11px">'+cell('SEMAINE 1',week1,ap1+apBoth/2)+cell('SEMAINE 2',week2,ap2+apBoth/2)+'</div>'
-   +'<div style="font-size:.72rem;color:var(--muted);margin-top:8px;line-height:1.45">Basé sur le solde du compte (une fois Carniol &amp; Etienne réglés) − les dépenses pas encore débitées. Une dépense <b>datée</b> ne baisse que sa semaine. Les <b>restos Delhauteur</b> sont suivis dans leur propre enveloppe, à part.</div>';
+   +'<div style="display:flex;gap:10px;margin-top:11px">'+cell('SEMAINE 1',week1,delhRem1)+cell('SEMAINE 2',week2,delhRem2)+'</div>'
+   +'<div style="font-size:.72rem;color:var(--muted);margin-top:8px;line-height:1.45">Solde attendu (Carniol &amp; Etienne réglés) − dépenses pas encore débitées + les <b>2 090 €/semaine</b> de restos payés par Delhauteur. Une dépense <b>datée</b> ne baisse que sa semaine.</div>';
 }
 function renderFrais(){
   renderDelhRestos();

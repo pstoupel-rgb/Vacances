@@ -1076,7 +1076,7 @@
     <div class="frais-label">💰 Solde du compte Wise</div>
     <div class="fam-card">
       <div id="depenses-list"></div>
-      <div class="compte-final"><span>Solde réel du compte <button onclick="editSolde()" style="background:none;border:none;color:var(--brown);cursor:pointer;font-size:.85rem;padding:0 2px">✏️</button></span><span class="ok" id="solde">—</span></div>
+      <div class="compte-final"><span>Solde attendu (C&amp;E réglés) <button onclick="editSolde()" style="background:none;border:none;color:var(--brown);cursor:pointer;font-size:.85rem;padding:0 2px">✏️</button></span><span class="ok" id="solde">—</span></div>
       <div id="solde-apayer" style="font-size:.72rem;color:var(--muted);text-align:right;margin-top:4px"></div>
     </div>
 
@@ -2619,25 +2619,25 @@ async function initDelh(){
 }
 function renderBudgetHebdo(){
   const box=document.getElementById('budget-hebdo');if(!box)return;
-  const TOTAL_DU=32500;                       /* total des contributions des familles */
-  const sumBy=w=>DEPENSES.filter(d=>depWeek(d)===w).reduce((s,d)=>s+(+d.montant||0),0);
-  const shared=sumBy('both'),dep1=sumBy('s1'),dep2=sumBy('s2');
-  const half=TOTAL_DU/2;                       /* 16 250 € par semaine au départ */
-  /* Chaque semaine : sa moitié du budget − sa moitié des dépenses partagées − ses dépenses propres − ses restos Delhauteur */
-  const week1=half-shared/2-dep1-_delhSum('s1');
-  const week2=half-shared/2-dep2-_delhSum('s2');
+  const base=(SOLDE_OVR!=null&&!isNaN(SOLDE_OVR))?SOLDE_OVR:0;   /* solde attendu une fois Carniol & Etienne réglés */
+  /* On ne retire QUE les dépenses pas encore payées (les payées sont déjà sorties du compte) */
+  const apBy=w=>DEPENSES.filter(d=>d.apayer&&depWeek(d)===w).reduce((s,d)=>s+(+d.montant||0),0);
+  const ap1=apBy('s1'),ap2=apBy('s2'),apBoth=apBy('both'),apTot=ap1+ap2+apBoth;
+  const half=base/2;
+  const week1=half-ap1-apBoth/2;
+  const week2=half-ap2-apBoth/2;
   const dispo=week1+week2;
   const cell=(lbl,val,spent)=>'<div style="flex:1;background:var(--bg2);border-radius:12px;padding:11px 8px;text-align:center">'
     +'<div style="font-size:.68rem;color:var(--muted);font-weight:800;letter-spacing:.04em">'+lbl+'</div>'
     +'<div style="font-weight:800;font-size:1.3rem;color:'+(val<0?'var(--neg)':'var(--brown)')+';margin-top:3px">'+eur(Math.round(val))+'</div>'
-    +(spent>0?'<div style="font-size:.63rem;color:var(--muted);margin-top:2px">déjà dépensé '+eur(Math.round(spent))+'</div>':'')
+    +(spent>0?'<div style="font-size:.63rem;color:var(--muted);margin-top:2px">à payer '+eur(Math.round(spent))+'</div>':'')
     +'</div>';
   box.innerHTML=
-    '<div class="compte-row"><span class="compte-label">Budget total du séjour</span><span class="compte-montant">'+eur(TOTAL_DU)+'</span><span></span></div>'
-   +'<div class="compte-row"><span class="compte-label">− Dépenses partagées (½ / semaine)</span><span class="compte-montant neg">− '+eur(shared)+'</span><span></span></div>'
-   +'<div class="compte-final" style="border-top:1px solid var(--border)"><span>Encore dépensable</span><span class="'+(dispo>=0?'ok':'neg')+'">'+eur(Math.round(dispo))+'</span></div>'
-   +'<div style="display:flex;gap:10px;margin-top:11px">'+cell('SEMAINE 1',week1,dep1+_delhSum('s1'))+cell('SEMAINE 2',week2,dep2+_delhSum('s2'))+'</div>'
-   +'<div style="font-size:.72rem;color:var(--muted);margin-top:8px;line-height:1.45">Chaque semaine a son budget (½ du total). Une dépense <b>datée</b> ne baisse <b>que</b> la semaine de sa date. Une dépense <b>sans date</b> (ex. maison) est répartie moitié-moitié.</div>';
+    '<div class="compte-row"><span class="compte-label">Solde attendu (Carniol &amp; Etienne réglés)</span><span class="compte-montant">'+eur(base)+'</span><span></span></div>'
+   +(apTot>0?'<div class="compte-row"><span class="compte-label">− Dépenses pas encore payées</span><span class="compte-montant neg">− '+eur(apTot)+'</span><span></span></div>':'')
+   +'<div class="compte-final" style="border-top:1px solid var(--border)"><span>Encore dépensable</span><span class="'+(dispo>=0?'ok':'neg')+'">'+eur(Math.round(dispo*100)/100)+'</span></div>'
+   +'<div style="display:flex;gap:10px;margin-top:11px">'+cell('SEMAINE 1',week1,ap1+apBoth/2)+cell('SEMAINE 2',week2,ap2+apBoth/2)+'</div>'
+   +'<div style="font-size:.72rem;color:var(--muted);margin-top:8px;line-height:1.45">Basé sur le solde du compte (une fois Carniol &amp; Etienne réglés) − les dépenses pas encore débitées. Une dépense <b>datée</b> ne baisse que sa semaine. Les <b>restos Delhauteur</b> sont suivis dans leur propre enveloppe, à part.</div>';
 }
 function renderFrais(){
   renderDelhRestos();
@@ -2674,7 +2674,7 @@ function ajouterDep(){
 function toggleApayer(i){if(DEPENSES[i]){DEPENSES[i].apayer=!DEPENSES[i].apayer;saveDepenses();renderFrais();}}
 function editSolde(){
   const cur=(SOLDE_OVR!=null&&!isNaN(SOLDE_OVR))?SOLDE_OVR:(RECUS-DEPENSES.reduce((s,d)=>s+(+d.montant||0),0));
-  const v=prompt('Solde réel du compte Wise (€) — visible par la team',cur);
+  const v=prompt('Solde attendu du compte (une fois Carniol & Etienne réglés), en € — visible par la team',cur);
   if(v===null)return;
   const m=parseFloat(String(v).replace(',','.'));
   if(isNaN(m)){alert('Montant invalide');return;}

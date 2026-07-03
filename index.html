@@ -524,7 +524,12 @@
       </div>
       <button class="ci-cam-btn" onclick="showPage('photos',null)" aria-label="Photos">📷</button>
     </div>
-    <div class="hero-title"><h1>Corse 2026</h1></div>
+    <div class="hero-title"><h1>Corse 2026</h1>
+      <div style="display:flex;justify-content:center;gap:16px;margin-top:7px">
+        <button onclick="wiseCard('wise-verte','Carte Wise verte')" title="Carte Wise verte" aria-label="Carte Wise verte" style="width:30px;height:30px;border-radius:50%;background:#1f9d55;border:2px solid rgba(255,255,255,.92);box-shadow:0 2px 9px rgba(0,0,0,.35);font-size:.82rem;display:grid;place-items:center;cursor:pointer">💳</button>
+        <button onclick="wiseCard('wise-blanche','Carte Wise blanche')" title="Carte Wise blanche" aria-label="Carte Wise blanche" style="width:30px;height:30px;border-radius:50%;background:#fff;border:2px solid rgba(0,0,0,.14);box-shadow:0 2px 9px rgba(0,0,0,.35);font-size:.82rem;display:grid;place-items:center;cursor:pointer">💳</button>
+      </div>
+    </div>
   </div>
 
   <div class="reco-section" style="padding-top:0;padding-bottom:0;margin-top:-28px;position:relative;z-index:10">
@@ -1582,6 +1587,19 @@ async function editCode(key,label){
     if(typeof _initFbAsync==='function'){await _initFbAsync();}
     if(_fbDb){await _fbDb.collection('stats').doc('codes').set({[key]:d},{merge:true});}
   }catch(e){console.warn('code sync',e);}
+}
+/* 💳 Cartes Wise (verte / blanche) — affiche le code au clic, éditable, synchronisé */
+async function wiseCard(key,label){
+  const cur=CODES[key]||'';
+  const v=prompt('💳 '+label+(cur?'\n\nCode : '+cur:'\n\nAucun code enregistré.')+'\n\nSaisis / modifie le code (visible par la team) :',cur);
+  if(v===null)return;
+  const d=(v||'').replace(/\D/g,'');
+  CODES[key]=d;
+  try{localStorage.setItem(CODES_KEY,JSON.stringify(CODES));}catch(e){}
+  try{
+    if(typeof _initFbAsync==='function'){await _initFbAsync();}
+    if(_fbDb){await _fbDb.collection('stats').doc('codes').set({[key]:d},{merge:true});}
+  }catch(e){console.warn('wise code sync',e);}
 }
 /* Abonnement temps réel : reçoit les codes saisis par les autres */
 async function initCodes(){

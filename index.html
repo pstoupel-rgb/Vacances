@@ -690,7 +690,7 @@
   <div class="weather-wrap">
     <div class="weather-card">
       <div class="weather-head">
-        <span class="weather-title">☀️ Météo · 15 jours</span>
+        <span class="weather-title">☀️ Météo · Météo-France</span>
         <span class="weather-loc">Porto-Vecchio →</span>
       </div>
       <div class="weather-strip" id="weather-strip"></div>
@@ -1973,7 +1973,7 @@ async function loadWeather(){
   const strip=document.getElementById('weather-strip');
   strip.innerHTML=Array.from({length:8}).map(()=>'<div class="w-day"><div class="skel" style="height:10px;width:30px;margin:0 auto 6px"></div><div class="skel" style="height:22px;width:22px;border-radius:50%;margin:0 auto 6px"></div><div class="skel" style="height:10px;width:26px;margin:0 auto"></div></div>').join('');
   try{
-    const url='https://api.open-meteo.com/v1/forecast?latitude='+HOUSE.lat+'&longitude='+HOUSE.lng+'&daily=weathercode,temperature_2m_max,temperature_2m_min,precipitation_probability_max&timezone=auto&forecast_days=16';
+    const url='https://api.open-meteo.com/v1/forecast?latitude='+HOUSE.lat+'&longitude='+HOUSE.lng+'&daily=weathercode,temperature_2m_max,temperature_2m_min,precipitation_probability_max&timezone=auto&forecast_days=16&models=meteofrance_seamless';
     const ctrl=new AbortController();const to=setTimeout(()=>ctrl.abort(),6000);
     const r=await fetch(url,{signal:ctrl.signal});clearTimeout(to);
     if(!r.ok)throw new Error('api');
@@ -1981,6 +1981,7 @@ async function loadWeather(){
     const DN=['Dim','Lun','Mar','Mer','Jeu','Ven','Sam'];
     const today=new Date().toISOString().slice(0,10);
     strip.innerHTML=d.time.map((t,i)=>{
+      if(d.temperature_2m_max[i]==null)return '';   /* jour non prévu par Météo-France */
       const dt=new Date(t+'T00:00:00');
       return '<div class="w-day'+(t===today?' today':'')+'"><div class="wn">'+(t===today?'Auj.':DN[dt.getDay()]+' '+dt.getDate())+'</div><div class="wi">'+wmoE(d.weathercode[i])+'</div><div class="wh">'+Math.round(d.temperature_2m_max[i])+'°</div><div class="wl">'+Math.round(d.temperature_2m_min[i])+'°</div><div class="wr">💧'+(d.precipitation_probability_max[i]||0)+'%</div></div>';
     }).join('');
@@ -1990,7 +1991,7 @@ async function loadWeather(){
       const i=ti>=0?ti:0;
       const rain=d.precipitation_probability_max[i]||0;
       const desc=rain>50?'Risque de pluie':''+Math.round(d.temperature_2m_min[i])+'° min · 💧'+rain+'%';
-      const next=d.time.slice(i+1,i+4).map((t,j)=>{const dt=new Date(t+'T00:00:00');return '<div class="hw-mini"><div class="wn">'+DN[dt.getDay()]+'</div><div class="wi">'+wmoE(d.weathercode[i+1+j])+'</div><div class="wh">'+Math.round(d.temperature_2m_max[i+1+j])+'°</div></div>';}).join('');
+      const next=d.time.slice(i+1,i+4).map((t,j)=>{if(d.temperature_2m_max[i+1+j]==null)return '';const dt=new Date(t+'T00:00:00');return '<div class="hw-mini"><div class="wn">'+DN[dt.getDay()]+'</div><div class="wi">'+wmoE(d.weathercode[i+1+j])+'</div><div class="wh">'+Math.round(d.temperature_2m_max[i+1+j])+'°</div></div>';}).join('');
       hw.innerHTML='<div class="hw-card"><div class="hw-today"><div class="hw-icon">'+wmoE(d.weathercode[i])+'</div><div class="hw-info"><div class="hw-loc">Porto-Vecchio · Aujourd\'hui</div><div class="hw-temp">'+Math.round(d.temperature_2m_max[i])+'°</div><div class="hw-desc">'+desc+'</div></div></div><div class="hw-next">'+next+'</div></div>';
     }
   }catch(e){strip.innerHTML='<div class="weather-msg">🌐 Météo indisponible — vérifiez la connexion.</div>';}

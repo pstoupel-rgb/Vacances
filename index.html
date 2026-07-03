@@ -2629,6 +2629,10 @@ function renderBudgetHebdo(){
   const week1=half-ap1-apBoth/2+delhRem1;
   const week2=half-ap2-apBoth/2+delhRem2;
   const dispo=week1+week2;
+  /* À garder sur la Wise (hors Delhauteur) : part du compte restos/activités + dépenses à payer débitées cette semaine */
+  const accW=(base-apTot)/2;                 /* restos/activités par semaine, depuis le compte */
+  const gardeW1=accW+apBoth+ap1;             /* + courses non datées (payées tôt) + à-payer datées S1 */
+  const gardeW2=accW+ap2;
   const cell=(lbl,val,delh)=>'<div style="flex:1;background:var(--bg2);border-radius:12px;padding:11px 8px;text-align:center">'
     +'<div style="font-size:.68rem;color:var(--muted);font-weight:800;letter-spacing:.04em">'+lbl+'</div>'
     +'<div style="font-weight:800;font-size:1.3rem;color:'+(val<0?'var(--neg)':'var(--brown)')+';margin-top:3px">'+eur(Math.round(val))+'</div>'
@@ -2640,7 +2644,8 @@ function renderBudgetHebdo(){
    +(delhRemTot>0?'<div class="compte-row"><span class="compte-label">+ Restos Delhauteur restants</span><span class="compte-montant ok">+ '+eur(delhRemTot)+'</span><span></span></div>':'')
    +'<div class="compte-final" style="border-top:1px solid var(--border)"><span>Encore dépensable</span><span class="'+(dispo>=0?'ok':'neg')+'">'+eur(Math.round(dispo*100)/100)+'</span></div>'
    +'<div style="display:flex;gap:10px;margin-top:11px">'+cell('SEMAINE 1',week1,delhRem1)+cell('SEMAINE 2',week2,delhRem2)+'</div>'
-   +'<div style="font-size:.72rem;color:var(--muted);margin-top:8px;line-height:1.45">Solde attendu (Carniol &amp; Etienne réglés) − dépenses pas encore débitées + les <b>2 090 €/semaine</b> de restos payés par Delhauteur. Une dépense <b>datée</b> ne baisse que sa semaine.</div>';
+   +'<div style="font-size:.78rem;margin-top:10px;background:#eef6f0;border:1px solid #cfe6d6;border-radius:10px;padding:9px 11px;color:var(--text)">💳 <b>À garder sur la Wise</b> (hors Delhauteur) — Semaine 1 : <b>'+eur(Math.round(gardeW1*100)/100)+'</b> · Semaine 2 : <b>'+eur(Math.round(gardeW2*100)/100)+'</b></div>'
+   +'<div style="font-size:.72rem;color:var(--muted);margin-top:8px;line-height:1.45">Solde attendu (Carniol &amp; Etienne réglés) − dépenses pas encore débitées + les <b>2 090 €/semaine</b> de restos payés par Delhauteur. « À garder sur la Wise » = la part payée depuis le compte (les 2 090 € Delhauteur, eux, ne passent pas par la Wise).</div>';
 }
 function renderFrais(){
   renderDelhRestos();

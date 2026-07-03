@@ -1051,12 +1051,26 @@
     <div class="fam-card">
       <div id="delh-restos"></div>
       <div class="add-form" style="margin-top:12px">
-        <input type="text" id="delh-nom" placeholder="Nom du resto (ex : Le Tiki)">
-        <input type="date" id="delh-date" min="2026-07-04" max="2026-07-18">
+        <select id="delh-resto">
+          <option value="">— Choisir le resto —</option>
+          <option>Bar Plage</option>
+          <option>Tamaricciu</option>
+          <option>Le Cabanon Bleu</option>
+          <option>Paillotte Capu Biancu</option>
+          <option>Le Tiki</option>
+          <option>La Voile Rouge</option>
+          <option>Ranch'O Plage</option>
+          <option>Playarellu</option>
+          <option>RENA — Cala Rossa</option>
+        </select>
+        <select id="delh-semaine">
+          <option value="s1">Semaine 1</option>
+          <option value="s2">Semaine 2</option>
+        </select>
         <input type="number" id="delh-montant" min="0" inputmode="decimal" placeholder="Montant (€)">
         <button class="add-btn" onclick="addDelhResto()">＋ Ajouter le resto</button>
       </div>
-      <div style="font-size:.72rem;color:var(--muted);margin-top:8px;line-height:1.45">La semaine (S1/S2) est déduite de la date. Ces montants <b>ne passent pas</b> par le compte Wise. Objectif : <b>2 090 € en semaine 1, 2 090 € en semaine 2</b>.</div>
+      <div style="font-size:.72rem;color:var(--muted);margin-top:8px;line-height:1.45">Choisis le resto et la semaine. Ces montants <b>ne passent pas</b> par le compte Wise. Objectif : <b>2 090 € en semaine 1, 2 090 € en semaine 2</b>.</div>
     </div>
 
     <div class="frais-label">💰 Solde du compte Wise</div>
@@ -2528,7 +2542,8 @@ let DELH={entries:[]},_delhUnsub=null;
   else if(c&&(+c.s1||+c.s2)){DELH={entries:[]};if(+c.s1)DELH.entries.push({id:uid(),nom:'Restos semaine 1',date:'2026-07-06',montant:+c.s1});if(+c.s2)DELH.entries.push({id:uid(),nom:'Restos semaine 2',date:'2026-07-13',montant:+c.s2});}
 }catch(e){}})();
 function delhWeek(d){return (d&&d>=DELH_SPLIT)?'s2':'s1';}
-function _delhSum(w){return DELH.entries.filter(e=>delhWeek(e.date)===w).reduce((s,e)=>s+(+e.montant||0),0);}
+function entryWeek(e){return e.semaine==='s2'?'s2':(e.semaine==='s1'?'s1':(e.date?delhWeek(e.date):'s1'));}
+function _delhSum(w){return DELH.entries.filter(e=>entryWeek(e)===w).reduce((s,e)=>s+(+e.montant||0),0);}
 function _delhTotal(){return DELH.entries.reduce((s,e)=>s+(+e.montant||0),0);}
 function _delhFmtDate(d){try{return new Date(d+'T12:00:00').toLocaleDateString('fr-FR',{day:'numeric',month:'short'});}catch(e){return d||'';}}
 function renderDelhRestos(){
@@ -2545,14 +2560,14 @@ function renderDelhRestos(){
         +'<div style="height:8px;border-radius:100px;background:var(--bg2);overflow:hidden"><i style="display:block;height:100%;width:'+pct+'%;background:'+(done?'#198754':'var(--brown)')+';transition:width .3s"></i></div>'
         +'<div style="font-size:.72rem;color:var(--muted);margin-top:4px">payé '+eur(paid)+' / '+eur(target)+'</div></div>';
     });
-    const list=DELH.entries.slice().sort(function(a,b){return (a.date||'').localeCompare(b.date||'');});
+    const list=DELH.entries.slice().sort(function(a,b){return entryWeek(a).localeCompare(entryWeek(b));});
     if(list.length){
       html+='<div style="margin:12px 0 2px;font-weight:800;font-size:.72rem;color:var(--muted)">DÉTAIL DES RESTOS</div>';
       list.forEach(function(e){
-        const w=delhWeek(e.date);
+        const w=entryWeek(e);
         html+='<div style="display:flex;align-items:center;gap:8px;padding:7px 0;border-bottom:1px solid var(--border)">'
           +'<span class="ftag '+(w==='s1'?'ftag-s1':'ftag-s2')+'">'+(w==='s1'?'S1':'S2')+'</span>'
-          +'<span style="flex:1;min-width:0"><span style="font-weight:600">'+escHtml(e.nom||'Resto')+'</span> <span style="color:var(--muted);font-size:.78rem">· '+_delhFmtDate(e.date)+'</span></span>'
+          +'<span style="flex:1;min-width:0;font-weight:600">'+escHtml(e.nom||'Resto')+'</span>'
           +'<span style="font-weight:700;white-space:nowrap">'+eur(+e.montant||0)+'</span>'
           +'<button class="del-btn" onclick="deleteDelhResto(\''+e.id+'\')" title="Supprimer">×</button></div>';
       });
@@ -2575,14 +2590,13 @@ function saveDelh(){
   if(typeof _initFbAsync==='function'){_initFbAsync().then(function(){if(_fbDb)_fbDb.collection('stats').doc('delhauteur-restos').set(DELH);}).catch(function(){});}
 }
 function addDelhResto(){
-  const ni=document.getElementById('delh-nom'),di=document.getElementById('delh-date'),mi=document.getElementById('delh-montant');
-  const nom=(ni.value||'').trim(),date=di.value,m=parseFloat(String(mi.value).replace(',','.'));
-  if(!nom){alert('Indique le nom du resto');return;}
-  if(!date){alert('Indique la date');return;}
+  const ri=document.getElementById('delh-resto'),wi=document.getElementById('delh-semaine'),mi=document.getElementById('delh-montant');
+  const nom=(ri.value||'').trim(),sem=wi.value==='s2'?'s2':'s1',m=parseFloat(String(mi.value).replace(',','.'));
+  if(!nom){alert('Choisis le resto');return;}
   if(isNaN(m)||m<=0){alert('Montant invalide');return;}
-  DELH.entries.push({id:uid(),nom:nom,date:date,montant:Math.round(m*100)/100});
+  DELH.entries.push({id:uid(),nom:nom,semaine:sem,montant:Math.round(m*100)/100});
   saveDelh();renderDelhRestos();
-  ni.value='';mi.value='';ni.focus();
+  ri.value='';mi.value='';
 }
 function deleteDelhResto(id){
   if(!confirm('Supprimer ce resto ?'))return;

@@ -1,0 +1,717 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="robots" content="noindex, nofollow">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>La Chasse au Trésor de Corse 🏴‍☠️</title>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Chasse au Trésor">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#1f4e4a">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="../icon-ldf-180.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Pirata+One&family=Baloo+2:wght@500;600;700;800&display=swap">
+<style>
+  *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+  :root{
+    --sea:#1f4e4a; --sea2:#2a6b63; --sand:#f3e6c8; --sand2:#e8d6a8;
+    --ink:#3a2a17; --ink2:#6b533a; --gold:#e0a915; --gold2:#c78a06;
+    --wood:#8a5a2b; --wood2:#6d4420; --red:#c0392b; --green:#2f8f4e;
+    --card:#fbf3dd; --border:#d9c48f;
+    --radius:18px; --shadow:0 8px 24px rgba(0,0,0,.25);
+    --ff-title:'Pirata One',cursive; --ff:'Baloo 2','Trebuchet MS',sans-serif;
+  }
+  html{-webkit-text-size-adjust:100%;height:100%;}
+  body{
+    font-family:var(--ff); color:var(--ink);
+    min-height:100%;
+    background:
+      radial-gradient(circle at 20% 10%, rgba(255,255,255,.10), transparent 40%),
+      repeating-linear-gradient(45deg, rgba(0,0,0,.02) 0 12px, transparent 12px 24px),
+      linear-gradient(160deg,#1f4e4a,#123330);
+    -webkit-user-select:none; user-select:none;
+    overflow-x:hidden;
+  }
+  #app{max-width:520px;margin:0 auto;min-height:100vh;min-height:100dvh;
+    padding:calc(env(safe-area-inset-top) + 8px) 14px calc(env(safe-area-inset-bottom) + 24px);
+    display:flex;flex-direction:column;}
+
+  /* ---- Boutons ---- */
+  .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;
+    font-family:var(--ff);font-weight:800;font-size:1.1rem;color:#fff;
+    background:linear-gradient(180deg,var(--gold),var(--gold2));
+    border:none;border-radius:14px;padding:15px 22px;cursor:pointer;
+    box-shadow:0 5px 0 #9a6a04, var(--shadow);width:100%;
+    transition:transform .06s, box-shadow .06s;}
+  .btn:active{transform:translateY(4px);box-shadow:0 1px 0 #9a6a04;}
+  .btn.sea{background:linear-gradient(180deg,#2a7d73,#1c5850);box-shadow:0 5px 0 #123b36,var(--shadow);}
+  .btn.ghost{background:rgba(255,255,255,.12);box-shadow:none;border:2px solid rgba(255,255,255,.35);color:#fff;}
+  .btn.ghost.small,.btn.ghost{box-shadow:none;}
+  .btn.small{font-size:.95rem;padding:11px 16px;box-shadow:0 4px 0 #9a6a04;}
+  .btn.sea.small{box-shadow:0 4px 0 #123b36;}
+  .btn:disabled{opacity:.5;filter:grayscale(.4);}
+
+  /* ---- Cartes parchemin ---- */
+  .parch{background:linear-gradient(180deg,var(--card),#f3e7c6);
+    border:2px solid var(--border);border-radius:var(--radius);
+    box-shadow:var(--shadow);padding:18px;position:relative;}
+  .parch::after{content:"";position:absolute;inset:5px;border:1.5px dashed rgba(120,90,40,.35);
+    border-radius:12px;pointer-events:none;}
+
+  h1,h2,h3{font-family:var(--ff-title);letter-spacing:.5px;font-weight:400;line-height:1.05;}
+  .center{text-align:center;}
+
+  /* ---- HOME ---- */
+  .hero{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:14px;padding:20px 0;}
+  .hero .flag{font-size:5rem;filter:drop-shadow(0 6px 10px rgba(0,0,0,.4));animation:sway 3s ease-in-out infinite;}
+  @keyframes sway{0%,100%{transform:rotate(-4deg)}50%{transform:rotate(4deg)}}
+  .hero h1{color:var(--gold);font-size:2.9rem;text-shadow:0 3px 0 #7a4d00,0 6px 14px rgba(0,0,0,.4);}
+  .hero .sub{color:#f3e6c8;font-size:1.05rem;font-weight:600;max-width:300px;}
+  .hero .isle{color:#bfe3d5;font-size:.9rem;font-weight:600;}
+  .home-btns{width:100%;display:flex;flex-direction:column;gap:12px;max-width:340px;margin-top:6px;}
+
+  /* ---- SETUP ---- */
+  .topbar{display:flex;align-items:center;gap:10px;margin-bottom:14px;}
+  .topbar .back{background:rgba(255,255,255,.14);border:none;color:#fff;font-size:1.3rem;
+    width:42px;height:42px;border-radius:12px;flex:0 0 auto;cursor:pointer;font-weight:800;}
+  .topbar h2{color:#fff;font-size:1.5rem;flex:1;}
+  .lead{color:#f3e6c8;font-weight:600;font-size:.95rem;margin-bottom:12px;line-height:1.35;}
+
+  .player{display:flex;gap:8px;align-items:center;margin-bottom:10px;}
+  .player .emoji{font-size:1.6rem;flex:0 0 auto;width:34px;text-align:center;}
+  .player input.name{flex:1;min-width:0;font-family:var(--ff);font-weight:700;font-size:1rem;
+    padding:11px 12px;border:2px solid var(--border);border-radius:12px;background:#fff;color:var(--ink);}
+  .agebox{display:flex;align-items:center;gap:4px;background:#fff;border:2px solid var(--border);border-radius:12px;padding:4px 6px;flex:0 0 auto;}
+  .agebox button{width:30px;height:30px;border:none;border-radius:8px;background:var(--sand2);
+    font-weight:800;font-size:1.2rem;color:var(--ink);cursor:pointer;line-height:1;}
+  .agebox .val{width:40px;text-align:center;font-weight:800;font-size:.95rem;}
+  .agebox .val small{display:block;font-size:.6rem;color:var(--ink2);font-weight:700;margin-top:-2px;}
+  .player .del{background:none;border:none;color:var(--red);font-size:1.3rem;cursor:pointer;flex:0 0 auto;width:30px;}
+  .addp{background:rgba(255,255,255,.12);border:2px dashed rgba(255,255,255,.4);color:#fff;
+    border-radius:12px;padding:11px;width:100%;font-family:var(--ff);font-weight:700;cursor:pointer;margin-top:4px;font-size:.95rem;}
+
+  /* ---- MAP ---- */
+  .maphead{text-align:center;margin-bottom:8px;}
+  .maphead h2{color:var(--gold);font-size:2rem;text-shadow:0 2px 0 #7a4d00;}
+  .maphead p{color:#e8d6a8;font-weight:600;font-size:.9rem;}
+  .chestbar{display:flex;gap:6px;justify-content:center;margin:10px 0 18px;flex-wrap:wrap;}
+  .digit{width:44px;height:54px;border-radius:10px;background:#123330;border:2px solid var(--gold);
+    display:flex;align-items:center;justify-content:center;font-family:var(--ff-title);
+    font-size:1.9rem;color:var(--gold);box-shadow:inset 0 2px 6px rgba(0,0,0,.5);}
+  .digit.empty{color:#3a5c57;border-color:#2f5b55;}
+
+  .trail{position:relative;padding-left:6px;}
+  .st{display:flex;gap:12px;align-items:stretch;margin-bottom:12px;position:relative;}
+  .st .node{flex:0 0 auto;width:54px;display:flex;flex-direction:column;align-items:center;}
+  .st .dot{width:52px;height:52px;border-radius:50%;display:flex;align-items:center;justify-content:center;
+    font-size:1.7rem;background:var(--sand);border:3px solid var(--wood);box-shadow:var(--shadow);z-index:2;}
+  .st .line{flex:1;width:4px;background:repeating-linear-gradient(var(--gold) 0 6px,transparent 6px 12px);margin:2px 0;}
+  .st:last-child .line{display:none;}
+  .st.done .dot{background:linear-gradient(180deg,#3fbf6a,#2f8f4e);border-color:#1f6a3a;color:#fff;}
+  .st.locked .dot{filter:grayscale(1);opacity:.7;}
+  .st .body{flex:1;background:linear-gradient(180deg,var(--card),#f3e7c6);border:2px solid var(--border);
+    border-radius:14px;padding:12px 14px;box-shadow:var(--shadow);cursor:pointer;min-width:0;}
+  .st.locked .body{cursor:default;opacity:.75;}
+  .st .body h3{font-family:var(--ff);font-weight:800;font-size:1.05rem;color:var(--ink);}
+  .st .body .clue{font-size:.82rem;color:var(--ink2);font-weight:600;margin-top:2px;line-height:1.25;}
+  .st .body .tag{display:inline-block;margin-top:6px;font-size:.72rem;font-weight:800;padding:3px 9px;border-radius:20px;}
+  .tag.play{background:var(--sea);color:#fff;} .tag.ok{background:var(--green);color:#fff;} .tag.lock{background:#b9a677;color:#fff;}
+
+  /* ---- STATION ---- */
+  .stationwrap{display:flex;flex-direction:column;gap:14px;}
+  .bigemoji{font-size:3rem;text-align:center;}
+  .st-title{color:var(--gold);font-size:2rem;text-align:center;text-shadow:0 2px 0 #7a4d00;}
+  .section-label{font-family:var(--ff-title);font-size:1.15rem;color:var(--wood);margin-bottom:6px;display:flex;align-items:center;gap:6px;}
+  .clue-box{background:#fff7e2;border-left:5px solid var(--gold);border-radius:10px;padding:12px 14px;font-weight:600;font-style:italic;color:var(--ink2);}
+  .missions{display:flex;flex-direction:column;gap:8px;}
+  .mission{display:flex;gap:10px;align-items:center;background:#fff;border:2px solid var(--border);border-radius:12px;padding:9px 11px;}
+  .mission .mrank{flex:0 0 auto;text-align:center;line-height:1.05;}
+  .mission .mrank .em{font-size:1.5rem;} .mission .mrank .rk{font-size:.6rem;font-weight:800;color:var(--wood);text-transform:uppercase;}
+  .mission .mtxt{font-size:.9rem;font-weight:600;} .mission .mtxt b{color:var(--sea2);}
+
+  .game{background:#fff;border:2px solid var(--border);border-radius:14px;padding:14px;}
+  .q{font-weight:800;font-size:1.02rem;margin-bottom:10px;}
+  .opts{display:flex;flex-direction:column;gap:9px;}
+  .opt{padding:13px 14px;border:2px solid var(--border);border-radius:12px;background:var(--sand);
+    font-family:var(--ff);font-weight:700;font-size:1rem;cursor:pointer;text-align:left;color:var(--ink);}
+  .opt.good{background:var(--green);color:#fff;border-color:#1f6a3a;}
+  .opt.bad{background:var(--red);color:#fff;border-color:#8f2318;animation:shake .3s;}
+  @keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+  .qprog{text-align:center;font-weight:700;color:var(--ink2);font-size:.85rem;margin-top:8px;}
+
+  /* stones */
+  .stonegrid{display:grid;grid-template-columns:repeat(6,1fr);gap:4px;justify-items:center;}
+  .stone{font-size:1.7rem;cursor:pointer;transition:transform .1s;padding:2px;}
+  .stone:active{transform:scale(.8);}
+
+  /* memory */
+  .memgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;}
+  .mcard{aspect-ratio:1;border-radius:12px;font-size:1.9rem;display:flex;align-items:center;justify-content:center;cursor:pointer;
+    background:linear-gradient(180deg,var(--sea2),var(--sea));color:transparent;border:2px solid #123330;transition:transform .15s;}
+  .mcard.up{background:var(--sand);color:var(--ink);border-color:var(--wood);}
+  .mcard.matched{background:linear-gradient(180deg,#3fbf6a,#2f8f4e);color:#fff;border-color:#1f6a3a;}
+
+  /* caesar */
+  .cipher{font-family:var(--ff-title);font-size:1.35rem;letter-spacing:2px;text-align:center;color:var(--sea);
+    background:#fff7e2;padding:12px;border-radius:10px;word-break:break-word;line-height:1.4;}
+  .wheel{display:flex;align-items:center;gap:10px;margin:12px 0;}
+  .wheel input[type=range]{flex:1;accent-color:var(--gold);height:30px;}
+  .wheel .shiftval{font-family:var(--ff-title);font-size:1.5rem;color:var(--wood);width:42px;text-align:center;}
+
+  /* text input answer */
+  .ansrow{display:flex;gap:8px;margin-top:12px;}
+  .ansrow input{flex:1;min-width:0;font-family:var(--ff);font-weight:700;font-size:1.1rem;text-transform:uppercase;
+    padding:12px;border:2px solid var(--border);border-radius:12px;text-align:center;background:#fff;color:var(--ink);}
+
+  /* lock dials */
+  .lock{display:flex;gap:8px;justify-content:center;margin:14px 0;}
+  .dial{display:flex;flex-direction:column;align-items:center;gap:4px;}
+  .dial button{width:40px;height:34px;border:none;border-radius:9px;background:var(--wood);color:#fff;font-size:1.2rem;font-weight:800;cursor:pointer;}
+  .dial .num{width:46px;height:56px;background:#123330;border:2px solid var(--gold);border-radius:10px;
+    display:flex;align-items:center;justify-content:center;font-family:var(--ff-title);font-size:2rem;color:var(--gold);}
+  .riddles{list-style:none;display:flex;flex-direction:column;gap:6px;margin:6px 0 4px;}
+  .riddles li{font-size:.85rem;font-weight:600;background:#fff7e2;border-radius:8px;padding:7px 10px;color:var(--ink2);}
+  .riddles li b{color:var(--sea2);}
+
+  .msg{text-align:center;font-weight:800;padding:10px;border-radius:10px;margin-top:10px;}
+  .msg.win{background:#dff5e4;color:var(--green);} .msg.err{background:#fbe3df;color:var(--red);}
+
+  .reward{background:linear-gradient(180deg,#fff3cf,#ffe6a0);border:2px solid var(--gold);border-radius:14px;
+    text-align:center;padding:16px;}
+  .reward .rd{font-family:var(--ff-title);font-size:3rem;color:var(--gold2);text-shadow:0 2px 0 #fff;}
+
+  /* ---- TREASURE ---- */
+  .treasure{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:16px;}
+  .treasure .chest{font-size:6rem;animation:pop .6s cubic-bezier(.2,.9,.3,1.4);}
+  @keyframes pop{0%{transform:scale(.3) rotate(-10deg);opacity:0}100%{transform:scale(1)}}
+  .treasure h1{color:var(--gold);font-size:3rem;text-shadow:0 3px 0 #7a4d00;}
+  .treasure .final{background:linear-gradient(180deg,var(--card),#f3e7c6);border:2px solid var(--gold);
+    border-radius:16px;padding:18px;font-weight:700;font-size:1.1rem;color:var(--ink);max-width:360px;box-shadow:var(--shadow);}
+
+  /* confetti */
+  #confetti{position:fixed;inset:0;pointer-events:none;z-index:9999;overflow:hidden;}
+  .conf{position:absolute;top:-20px;width:10px;height:16px;border-radius:2px;animation:fall linear forwards;}
+  @keyframes fall{to{transform:translateY(110vh) rotate(720deg);opacity:.9}}
+
+  .hint-btn{background:none;border:none;color:var(--sea2);font-weight:800;text-decoration:underline;cursor:pointer;font-size:.85rem;margin-top:8px;}
+  .footnote{color:#bfe3d5;font-size:.78rem;text-align:center;margin-top:14px;font-weight:600;}
+  .foot-actions{display:flex;gap:8px;margin-top:14px;}
+  textarea.treasure-set{width:100%;font-family:var(--ff);font-weight:600;font-size:.95rem;padding:11px;
+    border:2px solid var(--border);border-radius:12px;background:#fff;color:var(--ink);min-height:80px;resize:vertical;}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<div id="confetti"></div>
+
+<script>
+"use strict";
+/* ============================================================
+   LA CHASSE AU TRÉSOR DE CORSE — mini-app 100% hors-ligne
+   ============================================================ */
+
+const STORE_KEY = 'chasse-corse-v1';
+
+/* ---- Grades par âge ---- */
+function grade(age){
+  if(age<=7)  return {rank:'Mousse',    em:'🐣'};
+  if(age<=10) return {rank:'Matelot',   em:'⚓'};
+  if(age<=13) return {rank:'Corsaire',  em:'🗡️'};
+  return           {rank:'Capitaine', em:'🧭'};
+}
+function tier(age){ if(age<=7)return 0; if(age<=10)return 1; if(age<=13)return 2; return 3; }
+
+/* ---- Les stations ---- */
+const STATIONS = [
+  {
+    id:'piscine', emoji:'🏊', name:'La Piscine',
+    clue:"Rendez-vous là où l'eau est bleue, où l'on fait des bombes et des étoiles de mer !",
+    digit:4, game:'quiz',
+    missions:[
+      "Fais 3 bisous à la surface de l'eau en les comptant à voix haute 💦",
+      "Trouve un objet qui <b>flotte</b> et un objet qui <b>coule</b>.",
+      "Réponds au quiz et explique les réponses aux plus petits.",
+      "Tu es le maître-nageur 🛟 : vérifie que tout l'équipage est prêt avant de valider."
+    ]
+  },
+  {
+    id:'gravier', emoji:'🪨', name:'Le Jardin de Gravier',
+    clue:"Cherchez le coin qui crisse sous les pieds… là où mille cailloux dorment au soleil.",
+    digit:8, game:'stones',
+    missions:[
+      "Ramasse <b>8 cailloux</b> et fais-en un petit tas trésor.",
+      "Trouve le caillou le plus <b>rond</b> et le plus rigolo du jardin.",
+      "Cache 3 cailloux pour plus tard et retiens bien où !",
+      "Repère le <b>caillou d'or</b> sur l'écran avant tout le monde 🪙."
+    ]
+  },
+  {
+    id:'cuisine', emoji:'🍽️', name:'La Cuisine',
+    clue:"Direction le repaire des bonnes odeurs, là où l'on prépare le festin des pirates.",
+    digit:2, game:'memory',
+    missions:[
+      "Sens un aliment les yeux fermés 👀 et devine ce que c'est.",
+      "Trouve quelque chose de <b>rouge</b> et quelque chose de <b>sucré</b>.",
+      "Gagne au Memory des saveurs corses.",
+      "Invente le nom d'un cocktail de pirate (sans alcool 🍹 !)."
+    ]
+  },
+  {
+    id:'olivier', emoji:'🫒', name:"L'Olivier",
+    clue:"Sous l'arbre gris-vert aux petites olives se cache un message secret gravé par un pirate.",
+    digit:6, game:'caesar',
+    missions:[
+      "Fais 5 tours autour de l'arbre en criant « Trésor ! » 🌀",
+      "Trouve la plus belle feuille et garde-la comme indice.",
+      "Aide à tourner la molette du décodeur secret.",
+      "Décode le message et lis-le à voix haute à l'équipage 📜."
+    ]
+  },
+  {
+    id:'terrasse', emoji:'☀️', name:'La Terrasse',
+    clue:"Montez là où l'on prend l'apéro au coucher du soleil : un cadenas y garde le dernier chiffre.",
+    digit:1, game:'lock',
+    missions:[
+      "Réponds : combien de doigts sur <b>une main</b> ? ✋",
+      "Compte les chaises de la terrasse.",
+      "Résous les énigmes de chiffres.",
+      "Compose le code du cadenas sans te tromper 🔐."
+    ]
+  }
+];
+
+/* ---- État ---- */
+let S = load();
+
+function defaultState(){
+  return {
+    screen:'home',
+    started:false,
+    players:[
+      {name:'', age:6}, {name:'', age:8}, {name:'', age:11}, {name:'', age:12}, {name:'', age:14}
+    ],
+    done:{},           // {stationId:true}
+    stationIdx:0,
+    treasureMsg:"Le vrai trésor est caché près de la piscine 🏊\nCherchez sous le transat bleu !"
+  };
+}
+function load(){
+  try{ const s=JSON.parse(localStorage.getItem(STORE_KEY)); if(s&&s.players) return s; }catch(e){}
+  return defaultState();
+}
+function save(){ try{ localStorage.setItem(STORE_KEY, JSON.stringify(S)); }catch(e){} }
+
+const app = document.getElementById('app');
+function go(screen, idx){ S.screen=screen; if(idx!=null)S.stationIdx=idx; save(); render(); window.scrollTo(0,0); }
+const esc = s => (s||'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+
+/* ============================================================ RENDER */
+function render(){
+  const scr = S.screen;
+  if(scr==='home')      return renderHome();
+  if(scr==='setup')     return renderSetup();
+  if(scr==='map')       return renderMap();
+  if(scr==='station')   return renderStation();
+  if(scr==='treasure')  return renderTreasure();
+  if(scr==='parents')   return renderParents();
+  renderHome();
+}
+
+/* ---------------- HOME ---------------- */
+function renderHome(){
+  const anyProgress = Object.keys(S.done).length>0;
+  app.innerHTML = `
+    <div class="hero">
+      <div class="flag">🏴‍☠️</div>
+      <h1>La Chasse<br>au Trésor</h1>
+      <div class="sub">Un trésor de pirate est caché dans la maison de Corse… À vous de le retrouver, moussaillons !</div>
+      <div class="isle">🏝️ 5 épreuves &nbsp;•&nbsp; toute la tribu &nbsp;•&nbsp; dès 6 ans</div>
+      <div class="home-btns">
+        ${anyProgress
+          ? `<button class="btn" onclick="go('map')">▶️ Continuer l'aventure</button>
+             <button class="btn sea" onclick="go('setup')">👥 Voir l'équipage</button>`
+          : `<button class="btn" onclick="go('setup')">🚩 Commencer l'aventure</button>`}
+        <button class="btn ghost small" onclick="go('parents')">⚙️ Coin des parents</button>
+      </div>
+    </div>
+    <div class="footnote">Installe-la : bouton Partager → « Sur l'écran d'accueil »</div>
+  `;
+}
+
+/* ---------------- SETUP (équipage) ---------------- */
+function renderSetup(){
+  const rows = S.players.map((p,i)=>{
+    const g=grade(p.age);
+    return `<div class="player">
+      <div class="emoji">${g.em}</div>
+      <input class="name" placeholder="Prénom du pirate n°${i+1}" value="${esc(p.name)}"
+        oninput="setName(${i},this.value)">
+      <div class="agebox">
+        <button onclick="setAge(${i},-1)">−</button>
+        <div class="val">${p.age}<small>${g.rank}</small></div>
+        <button onclick="setAge(${i},1)">＋</button>
+      </div>
+      ${S.players.length>1?`<button class="del" onclick="delPlayer(${i})">✕</button>`:''}
+    </div>`;
+  }).join('');
+  app.innerHTML = `
+    <div class="topbar"><button class="back" onclick="go('home')">‹</button><h2>L'équipage</h2></div>
+    <div class="lead">Ajoute chaque enfant avec son âge. Les épreuves s'adaptent : les petits ont des missions simples, les grands des défis plus corsés 💪</div>
+    <div class="parch" style="padding-top:22px">
+      ${rows}
+      <button class="addp" onclick="addPlayer()">＋ Ajouter un pirate</button>
+    </div>
+    <div style="margin-top:16px">
+      <button class="btn" onclick="startAdventure()">⚓ En route vers le trésor !</button>
+    </div>
+  `;
+}
+function setName(i,v){ S.players[i].name=v; save(); }
+function setAge(i,d){ S.players[i].age=Math.max(3,Math.min(17,S.players[i].age+d)); save(); render(); }
+function addPlayer(){ S.players.push({name:'',age:8}); save(); render(); }
+function delPlayer(i){ S.players.splice(i,1); save(); render(); }
+function startAdventure(){ S.started=true; go('map'); }
+
+/* ---------------- MAP (parcours) ---------------- */
+function renderMap(){
+  const dilat = STATIONS.map(st=> S.done[st.id]
+      ? `<div class="digit">${st.digit}</div>`
+      : `<div class="digit empty">?</div>`).join('');
+  const firstUndone = STATIONS.findIndex(st=>!S.done[st.id]);
+  const allDone = firstUndone===-1;
+
+  const trail = STATIONS.map((st,i)=>{
+    const done = !!S.done[st.id];
+    const unlocked = done || i<=firstUndoneIndex();
+    const cls = done?'done':(unlocked?'':'locked');
+    const tag = done?`<span class="tag ok">✓ Chiffre ${st.digit} obtenu</span>`
+              : unlocked?`<span class="tag play">▶ À jouer</span>`
+              : `<span class="tag lock">🔒 Verrouillé</span>`;
+    return `<div class="st ${cls}">
+      <div class="node"><div class="dot">${done?'✓':st.emoji}</div><div class="line"></div></div>
+      <div class="body" ${unlocked?`onclick="go('station',${i})"`:''}>
+        <h3>${i+1}. ${st.name}</h3>
+        <div class="clue">${st.clue}</div>
+        ${tag}
+      </div>
+    </div>`;
+  }).join('');
+
+  app.innerHTML = `
+    <div class="topbar"><button class="back" onclick="go('home')">‹</button><h2 style="font-size:1.3rem">Carte au trésor</h2></div>
+    <div class="maphead">
+      <h2>Le code du coffre</h2>
+      <p>Gagne les 5 chiffres pour ouvrir le trésor !</p>
+      <div class="chestbar">${dilat}</div>
+    </div>
+    <div class="trail">${trail}</div>
+    ${allDone
+      ? `<div style="margin-top:6px"><button class="btn" onclick="go('station',${STATIONS.length})">🏴‍☠️ Ouvrir le coffre au trésor !</button></div>`
+      : ``}
+    <div class="footnote">Astuce parents : cachez de vrais petits cailloux peints & un vrai trésor 🎁</div>
+  `;
+}
+function firstUndoneIndex(){ const i=STATIONS.findIndex(st=>!S.done[st.id]); return i===-1?STATIONS.length:i; }
+
+/* Épreuve réussie */
+function completeStation(){
+  const st=STATIONS[S.stationIdx];
+  S.done[st.id]=true; save();
+  const z=document.getElementById('gamezone');
+  z.innerHTML = `
+    <div class="reward">
+      <div style="font-weight:800;color:var(--wood)">Épreuve réussie ! Tu gagnes le chiffre :</div>
+      <div class="rd">${st.digit}</div>
+      <div style="font-weight:700;color:var(--ink2);margin-bottom:12px">Note-le… il ouvrira le coffre 🗝️</div>
+      <button class="btn" onclick="go('map')">Continuer la chasse ➜</button>
+    </div>`;
+  burst(20);
+}
+
+/* ============================================================ MINI-JEUX */
+function mountGame(st){
+  const z=document.getElementById('gamezone');
+  if(st.game==='quiz')   return gameQuiz(z);
+  if(st.game==='stones') return gameStones(z);
+  if(st.game==='memory') return gameMemory(z);
+  if(st.game==='caesar') return gameCaesar(z);
+  if(st.game==='lock')   return gameLock(z);
+}
+
+/* ---- QUIZ (piscine) ---- */
+const QUIZ=[
+  {q:"Dans quelle mer se baigne-t-on en Corse ?", a:["L'océan Atlantique","La mer Méditerranée","La mer du Nord"], ok:1},
+  {q:"Comment s'appelle un bébé sanglier ? (la Corse en est pleine 🐗)", a:["Un poussin","Un veau","Un marcassin"], ok:2},
+  {q:"Quel fruit sec est un symbole de la Corse ?", a:["La noix de coco","La châtaigne","La banane"], ok:1}
+];
+function gameQuiz(z){
+  let qi=0;
+  const draw=()=>{
+    const item=QUIZ[qi];
+    z.innerHTML=`<div class="game">
+      <div class="q">❓ ${item.q}</div>
+      <div class="opts">${item.a.map((o,i)=>`<button class="opt" data-i="${i}">${o}</button>`).join('')}</div>
+      <div class="qprog">Question ${qi+1} / ${QUIZ.length}</div>
+    </div>`;
+    z.querySelectorAll('.opt').forEach(b=>b.onclick=()=>{
+      const i=+b.dataset.i;
+      if(i===item.ok){
+        b.classList.add('good');
+        setTimeout(()=>{ qi++; qi<QUIZ.length?draw():completeStation(); },500);
+      }else{
+        b.classList.add('bad');
+        setTimeout(()=>b.classList.remove('bad'),400);
+      }
+    });
+  };
+  draw();
+}
+
+/* ---- STONES (gravier) : trouve le caillou d'or ---- */
+function gameStones(z){
+  const total=30, goldPos=Math.floor(Math.random()*total);
+  let cells='';
+  for(let i=0;i<total;i++) cells+=`<div class="stone" data-i="${i}">${i===goldPos?'🪙':'🪨'}</div>`;
+  z.innerHTML=`<div class="game">
+    <div class="q">🔎 Un caillou d'or 🪙 se cache dans le gravier. Touche-le vite !</div>
+    <div class="stonegrid">${cells}</div>
+    <div id="stonemsg"></div>
+  </div>`;
+  z.querySelectorAll('.stone').forEach(s=>s.onclick=()=>{
+    if(+s.dataset.i===goldPos){ s.textContent='✨'; completeStation(); }
+    else{ s.textContent='💨'; setTimeout(()=>s.textContent='🪨',400);
+      document.getElementById('stonemsg').innerHTML='<div class="msg err">Ce n\'est qu\'un caillou ! Continue…</div>';
+      setTimeout(()=>{const m=document.getElementById('stonemsg');if(m)m.innerHTML='';},900);
+    }
+  });
+}
+
+/* ---- MEMORY (cuisine) ---- */
+const FOODS=['🌰','🧀','🍯','🍊','🫒','🐟']; // châtaigne, brocciu, miel, clémentine, olive, poisson
+function gameMemory(z){
+  let deck=[...FOODS,...FOODS].map((e,i)=>({e,i})).sort(()=>Math.random()-.5);
+  let up=[], matched=0, lock=false;
+  z.innerHTML=`<div class="game">
+    <div class="q">🍽️ Retrouve les paires de saveurs corses !</div>
+    <div class="memgrid">${deck.map((c,i)=>`<div class="mcard" data-i="${i}">${c.e}</div>`).join('')}</div>
+  </div>`;
+  const cards=[...z.querySelectorAll('.mcard')];
+  cards.forEach((el,i)=>el.onclick=()=>{
+    if(lock||el.classList.contains('up')||el.classList.contains('matched'))return;
+    el.classList.add('up'); up.push({el,e:deck[i].e});
+    if(up.length===2){
+      lock=true;
+      if(up[0].e===up[1].e){
+        up.forEach(u=>u.el.classList.add('matched')); matched++; up=[]; lock=false;
+        if(matched===FOODS.length) setTimeout(completeStation,400);
+      }else{
+        setTimeout(()=>{ up.forEach(u=>u.el.classList.remove('up')); up=[]; lock=false; },700);
+      }
+    }
+  });
+}
+
+/* ---- CAESAR (olivier) ---- */
+function caesarShift(txt,s){
+  return txt.replace(/[A-Z]/g,c=>String.fromCharCode((c.charCodeAt(0)-65+s+26)%26+65));
+}
+function gameCaesar(z){
+  const plain="LE TRESOR AIME LE SOLEIL MOT OLIVIER";
+  const enc=caesarShift(plain,3);            // décalage +3
+  let shift=0;
+  const draw=()=>{
+    z.innerHTML=`<div class="game">
+      <div class="q">📜 Message secret gravé dans l'écorce. Tourne la molette pour le lire, puis écris le <b>MOT</b> caché.</div>
+      <div class="cipher">${caesarShift(enc,shift)}</div>
+      <div class="wheel">🔄 <input type="range" min="0" max="25" value="${shift}"><div class="shiftval">${shift}</div></div>
+      <div class="ansrow">
+        <input id="caesans" placeholder="LE MOT SECRET" autocomplete="off">
+        <button class="btn sea small" style="width:auto;padding:0 18px" onclick="checkCaesar()">OK</button>
+      </div>
+      <div id="caesmsg"></div>
+      <button class="hint-btn" onclick="caeHint()">Besoin d'un indice ?</button>
+    </div>`;
+    const r=z.querySelector('input[type=range]');
+    r.oninput=()=>{ shift=+r.value; z.querySelector('.cipher').textContent=caesarShift(enc,shift); z.querySelector('.shiftval').textContent=shift; };
+    window.caeHint=()=>{ shift=22; r.value=22; r.oninput(); document.getElementById('caesmsg').innerHTML='<div class="msg win">Presque ! Le mot est un arbre… 🌳</div>'; };
+  };
+  window.checkCaesar=()=>{
+    const v=(document.getElementById('caesans').value||'').trim().toUpperCase().replace(/[^A-Z]/g,'');
+    const m=document.getElementById('caesmsg');
+    if(v==='OLIVIER'){ completeStation(); }
+    else{ m.innerHTML='<div class="msg err">Pas encore… tourne bien la molette pour tout lire !</div>'; }
+  };
+  draw();
+}
+
+/* ---- LOCK (terrasse) : cadenas 4 chiffres ---- */
+function gameLock(z){
+  const code=[4,5,7,1]; // pattes du chat, doigts d'une main, 3+4, double de 4 moins 7
+  let cur=[0,0,0,0];
+  const draw=()=>{
+    z.innerHTML=`<div class="game">
+      <div class="q">🔐 Résous les énigmes, puis compose le code du cadenas !</div>
+      <ul class="riddles">
+        <li><b>1er chiffre :</b> combien de pattes a un chat ? 🐱</li>
+        <li><b>2e chiffre :</b> combien de doigts sur une main ? ✋</li>
+        <li><b>3e chiffre :</b> 3 + 4 = ? </li>
+        <li><b>4e chiffre :</b> le double de 4, moins 7 = ?</li>
+      </ul>
+      <div class="lock">${cur.map((n,i)=>`
+        <div class="dial">
+          <button onclick="dial(${i},1)">▲</button>
+          <div class="num" id="d${i}">${n}</div>
+          <button onclick="dial(${i},-1)">▼</button>
+        </div>`).join('')}</div>
+      <button class="btn sea small" onclick="checkLock()">Ouvrir le cadenas</button>
+      <div id="lockmsg"></div>
+    </div>`;
+  };
+  window.dial=(i,d)=>{ cur[i]=(cur[i]+d+10)%10; document.getElementById('d'+i).textContent=cur[i]; };
+  window.checkLock=()=>{
+    const m=document.getElementById('lockmsg');
+    if(cur.join('')===code.join('')) completeStation();
+    else m.innerHTML='<div class="msg err">Clic-clac… le cadenas résiste ! Revérifie tes calculs.</div>';
+  };
+  draw();
+}
+
+</script>
+<script>
+/* second script block: final lock + treasure + parents + confetti,
+   and re-bind renderStation properly */
+
+function renderStationFinal(){
+  const code = STATIONS.map(s=>s.digit); // [4,8,2,6,1]
+  let cur = code.map(()=>0);
+  app.innerHTML = `
+    <div class="topbar"><button class="back" onclick="go('map')">‹</button><h2 style="font-size:1.3rem">Le Coffre</h2></div>
+    <div class="stationwrap">
+      <div class="bigemoji">🧰</div>
+      <h1 class="st-title">Le Coffre au Trésor</h1>
+      <div class="clue-box">Composez le code magique avec les 5 chiffres gagnés à chaque épreuve. Tout l'équipage réuni, tournez les molettes ensemble !</div>
+      <div class="game">
+        <div class="lock">${cur.map((n,i)=>`
+          <div class="dial">
+            <button onclick="fdial(${i},1)">▲</button>
+            <div class="num" id="fd${i}">${n}</div>
+            <button onclick="fdial(${i},-1)">▼</button>
+          </div>`).join('')}</div>
+        <button class="btn" onclick="checkFinal()">🗝️ Ouvrir le coffre !</button>
+        <div id="finalmsg"></div>
+      </div>
+    </div>
+  `;
+  window.fdial=(i,d)=>{ cur[i]=(cur[i]+d+10)%10; document.getElementById('fd'+i).textContent=cur[i]; };
+  window.checkFinal=()=>{
+    const m=document.getElementById('finalmsg');
+    if(cur.join('')===code.join('')){ go('treasure'); }
+    else m.innerHTML='<div class="msg err">Le coffre reste fermé… vérifie chaque chiffre gagné 🔢</div>';
+  };
+}
+
+/* proper renderStation (station screen + game) — redefined here to win */
+function renderStation(){
+  const idx=S.stationIdx;
+  if(idx>=STATIONS.length) return renderStationFinal();
+  const st=STATIONS[idx];
+  const missions = S.players.map(p=>{
+    const g=grade(p.age), t=tier(p.age);
+    const who = p.name.trim()? esc(p.name) : g.rank;
+    return `<div class="mission">
+      <div class="mrank"><div class="em">${g.em}</div><div class="rk">${g.rank}</div></div>
+      <div class="mtxt"><b>${who}</b> — ${st.missions[t]}</div>
+    </div>`;
+  }).join('');
+  app.innerHTML = `
+    <div class="topbar"><button class="back" onclick="go('map')">‹</button><h2 style="font-size:1.3rem">Épreuve ${idx+1}/5</h2></div>
+    <div class="stationwrap">
+      <div class="bigemoji">${st.emoji}</div>
+      <h1 class="st-title">${st.name}</h1>
+      <div><div class="section-label">🧭 Où aller ?</div><div class="clue-box">${st.clue}</div></div>
+      <div><div class="section-label">🎯 La mission de chaque pirate</div><div class="missions">${missions}</div></div>
+      <div><div class="section-label">🎮 L'épreuve de l'app</div><div id="gamezone"></div></div>
+    </div>`;
+  mountGame(st);
+}
+
+/* ---------------- TREASURE ---------------- */
+function renderTreasure(){
+  app.innerHTML = `
+    <div class="treasure">
+      <div class="chest">🏴‍☠️</div>
+      <h1>TRÉSOR !</h1>
+      <div style="color:#f3e6c8;font-weight:700;font-size:1.05rem">Bravo l'équipage ! Le coffre est ouvert ! 🎉</div>
+      <div class="final">${esc(S.treasureMsg).replace(/\n/g,'<br>')}</div>
+      <div style="width:100%;max-width:340px;display:flex;flex-direction:column;gap:10px;margin-top:6px">
+        <button class="btn sea" onclick="go('map')">↩︎ Revoir la carte</button>
+        <button class="btn ghost small" onclick="resetGame()">🔄 Rejouer depuis le début</button>
+      </div>
+    </div>`;
+  burst(120);
+}
+
+/* ---------------- PARENTS ---------------- */
+function renderParents(){
+  app.innerHTML = `
+    <div class="topbar"><button class="back" onclick="go('home')">‹</button><h2 style="font-size:1.4rem">Coin des parents</h2></div>
+    <div class="lead">Réglez ici la vraie cachette du trésor et gérez la partie.</div>
+    <div class="parch" style="padding-top:22px">
+      <div class="section-label" style="color:var(--wood)">🎁 Message de fin (la vraie cachette)</div>
+      <textarea class="treasure-set" id="tmsg" oninput="S.treasureMsg=this.value;save()">${esc(S.treasureMsg)}</textarea>
+      <div style="font-size:.8rem;color:var(--ink2);font-weight:600;margin-top:6px">
+        Ce texte s'affiche quand les enfants ouvrent le coffre. Cachez un vrai petit trésor (bonbons, jouets, pièces chocolat) à cet endroit !
+      </div>
+      <hr style="border:none;border-top:1.5px dashed var(--border);margin:16px 0">
+      <div class="section-label" style="color:var(--wood)">📋 Le code du coffre (pour vous)</div>
+      <div style="font-family:var(--ff-title);font-size:2rem;color:var(--sea2);letter-spacing:6px;text-align:center">
+        ${STATIONS.map(s=>s.digit).join(' ')}
+      </div>
+      <div style="font-size:.8rem;color:var(--ink2);font-weight:600;text-align:center">
+        Les enfants le reconstituent en gagnant chaque épreuve.
+      </div>
+    </div>
+    <div class="foot-actions">
+      <button class="btn sea small" onclick="go('setup')">👥 Équipage</button>
+      <button class="btn ghost small" onclick="resetGame()">🔄 Réinitialiser</button>
+    </div>
+    <div class="footnote">Idées de vraie cachette : sous un transat, dans le tas de bois, derrière un pot de fleurs, dans le four éteint 🔥</div>
+  `;
+}
+
+function resetGame(){
+  if(!confirm('Recommencer la chasse à zéro ? (l\'équipage et la cachette sont conservés)'))return;
+  S.done={}; S.stationIdx=0; save(); go('home');
+}
+
+/* ---------------- CONFETTI ---------------- */
+function burst(n){
+  const c=document.getElementById('confetti');
+  const cols=['#e0a915','#c0392b','#2f8f4e','#2a7d73','#fff','#e8d6a8'];
+  for(let i=0;i<n;i++){
+    const d=document.createElement('div');
+    d.className='conf';
+    d.style.left=Math.random()*100+'vw';
+    d.style.background=cols[i%cols.length];
+    d.style.animationDuration=(2+Math.random()*2)+'s';
+    d.style.animationDelay=(Math.random()*.5)+'s';
+    d.style.transform='rotate('+Math.random()*360+'deg)';
+    c.appendChild(d);
+    setTimeout(()=>d.remove(),4500);
+  }
+}
+
+/* ---------------- GO! ---------------- */
+render();
+
+/* Service worker (offline) */
+if('serviceWorker' in navigator){
+  window.addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}));
+}
+</script>
+</body>
+</html>

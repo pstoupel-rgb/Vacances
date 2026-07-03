@@ -2674,7 +2674,19 @@ function ajouterDep(){
   DEPENSES.push({label,montant:Math.round(montant*100)/100,date:di?di.value:'',apayer:ap?ap.checked:false});saveDepenses();
   li.value='';mi.value='';if(di)di.value='';if(ap)ap.checked=false;renderFrais();li.focus();
 }
-function toggleApayer(i){if(DEPENSES[i]){DEPENSES[i].apayer=!DEPENSES[i].apayer;saveDepenses();renderFrais();}}
+function toggleApayer(i){
+  const d=DEPENSES[i];if(!d)return;
+  const wasApayer=!!d.apayer;
+  d.apayer=!wasApayer;
+  /* Passer "à payer" → "payée" débite le solde attendu (l'argent sort du compte) ; l'inverse le recrédite.
+     Ainsi l'« encore dépensable » ne change pas : payer une dépense déjà engagée ne libère pas de budget. */
+  if(SOLDE_OVR!=null&&!isNaN(SOLDE_OVR)){
+    SOLDE_OVR=Math.round((SOLDE_OVR+(wasApayer?-1:1)*(+d.montant||0))*100)/100;
+    try{localStorage.setItem('corse2026-solde',String(SOLDE_OVR));}catch(e){}
+    if(typeof _initFbAsync==='function'){_initFbAsync().then(function(){if(_fbDb)_fbDb.collection('stats').doc('wise').set({solde:SOLDE_OVR});}).catch(function(){});}
+  }
+  saveDepenses();renderFrais();
+}
 function editSolde(){
   const cur=(SOLDE_OVR!=null&&!isNaN(SOLDE_OVR))?SOLDE_OVR:(RECUS-DEPENSES.reduce((s,d)=>s+(+d.montant||0),0));
   const v=prompt('Solde attendu du compte (une fois Carniol & Etienne réglés), en € — visible par la team',cur);

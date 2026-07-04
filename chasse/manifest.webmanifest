@@ -1,0 +1,16 @@
+{
+  "name": "La Chasse au Trésor de Corse",
+  "short_name": "Chasse au Trésor",
+  "description": "Chasse au trésor de pirate pour les enfants — épreuves adaptées à chaque âge, à jouer autour de la maison en Corse.",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#1f4e4a",
+  "theme_color": "#1f4e4a",
+  "lang": "fr",
+  "icons": [
+    { "src": "../icon-ldf-180.png", "sizes": "180x180", "type": "image/png" },
+    { "src": "../icon-ldf.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+  ]
+}

@@ -518,6 +518,7 @@
       <div class="hero-menu-wrap">
         <button class="hero-menu-btn" onclick="toggleMenu(event)" aria-label="Menu">☰</button>
         <div class="menu-drop" id="menu-drop">
+          <button class="menu-item" onclick="openKids()"><span class="mi-ico">👶</span>Kids</button>
           <button class="menu-item" onclick="openTeam()"><span class="mi-ico">👥</span>LA TEAM</button>
           <button class="menu-item" onclick="openWorldCup()"><span class="mi-ico">⚽</span>World Cup</button>
           <button class="menu-item" onclick="closeMenu();showPage('profil',document.getElementById('nav-profil'))"><span class="mi-ico">💳</span>Partage des frais</button>
@@ -1186,6 +1187,17 @@
 </div>
 
 <!-- TEAM MODAL -->
+<div class="team-overlay" id="kids-overlay" onclick="if(event.target===this)closeKids()">
+  <div class="team-sheet">
+    <div class="team-grip"></div>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin:2px 0 8px">
+      <h2 style="font-family:'Playfair Display',serif;font-size:1.5rem;font-weight:700">👶 Kids</h2>
+      <button onclick="closeKids()" style="background:var(--bg2);border:none;border-radius:100px;padding:7px 15px;font-weight:700;cursor:pointer;font-family:inherit;color:var(--text)">Fermer</button>
+    </div>
+    <div id="kids-body"></div>
+  </div>
+</div>
+
 <div class="team-overlay" id="team-overlay" onclick="if(event.target===this)closeTeam()">
   <div class="team-sheet">
     <div class="team-grip"></div>
@@ -2386,7 +2398,61 @@ async function initBottles(){
   }
 }
 /* Différé après le 1er affichage : Firebase (~100 Ko) ne bloque plus le rendu de l'accueil. */
-(window.requestIdleCallback||(cb=>setTimeout(cb,200)))(()=>{initBottles();initCodes();initDelh();initSolde();});
+/* ===== 👶 KIDS — chaque parent note /10 par SEMAINE ; classement hebdomadaire ===== */
+const KIDS_KEY='corse2026-kids',KIDS_ME_KEY='corse2026-kids-me';
+const KIDS_WK={s1:{label:'Semaine 1',sub:'4 → 10 juil.'},s2:{label:'Semaine 2',sub:'11 → 18 juil.'}};
+let KIDS={kids:[],parents:[],votes:{s1:{},s2:{}}},KIDS_WEEK=null,KIDS_ME=null,_kidsUnsub=null;
+function _kidsNorm(c){return {kids:(c&&c.kids)||[],parents:(c&&c.parents)||[],votes:{s1:(c&&c.votes&&c.votes.s1)||{},s2:(c&&c.votes&&c.votes.s2)||{}}};}
+try{const c=JSON.parse(localStorage.getItem(KIDS_KEY));if(c&&c.kids)KIDS=_kidsNorm(c);}catch(e){}
+try{KIDS_ME=localStorage.getItem(KIDS_ME_KEY)||null;}catch(e){}
+function saveKids(){try{localStorage.setItem(KIDS_KEY,JSON.stringify(KIDS));}catch(e){}if(typeof _initFbAsync==='function'){_initFbAsync().then(function(){if(_fbDb)_fbDb.collection('stats').doc('kids').set(JSON.parse(JSON.stringify(KIDS)));}).catch(function(){});}}
+function saveKidMe(){try{localStorage.setItem(KIDS_ME_KEY,KIDS_ME||'');}catch(e){}}
+async function initKids(){if(typeof _initFbAsync!=='function')return;await _initFbAsync();if(_fbDb&&!_kidsUnsub){_kidsUnsub=_fbDb.collection('stats').doc('kids').onSnapshot(function(s){if(s.exists){KIDS=_kidsNorm(s.data());try{localStorage.setItem(KIDS_KEY,JSON.stringify(KIDS));}catch(e){}if(document.getElementById('kids-overlay').classList.contains('open'))renderKids();}},function(){});}}
+function openKids(){closeMenu();document.getElementById('kids-overlay').classList.add('open');if(KIDS_WEEK==null)KIDS_WEEK=(new Date().toISOString().slice(0,10)>='2026-07-11')?'s2':'s1';renderKids();}
+function closeKids(){document.getElementById('kids-overlay').classList.remove('open');}
+function kidAvg(week,kidId){const dv=(KIDS.votes[week]||{})[kidId]||{};const vals=Object.values(dv).map(Number).filter(function(v){return !isNaN(v);});if(!vals.length)return{avg:null,count:0};return{avg:vals.reduce(function(a,b){return a+b;},0)/vals.length,count:vals.length};}
+function kidRanking(week){return KIDS.kids.map(function(k){return{kid:k,a:kidAvg(week,k.id)};}).sort(function(x,y){return (y.a.avg==null?-1:y.a.avg)-(x.a.avg==null?-1:x.a.avg);});}
+function setKidMe(pid){KIDS_ME=pid;saveKidMe();renderKids();}
+function addKid(){const n=prompt("Prénom de l'enfant :");if(!n||!n.trim())return;KIDS.kids.push({id:uid(),name:n.trim()});saveKids();renderKids();}
+function delKid(id){if(!confirm('Retirer cet enfant ?'))return;KIDS.kids=KIDS.kids.filter(function(k){return k.id!==id;});['s1','s2'].forEach(function(w){if(KIDS.votes[w])delete KIDS.votes[w][id];});saveKids();renderKids();}
+function addParent(){const n=prompt('Prénom du parent (votant) :');if(!n||!n.trim())return;const p={id:uid(),name:n.trim()};KIDS.parents.push(p);if(!KIDS_ME){KIDS_ME=p.id;saveKidMe();}saveKids();renderKids();}
+function delParent(id){if(!confirm('Retirer ce parent ?'))return;KIDS.parents=KIDS.parents.filter(function(p){return p.id!==id;});if(KIDS_ME===id){KIDS_ME=null;saveKidMe();}saveKids();renderKids();}
+function voteKid(kidId,val){if(!KIDS_ME){alert("Choisis d'abord qui tu es (parent).");return;}if(!KIDS.votes[KIDS_WEEK])KIDS.votes[KIDS_WEEK]={};if(!KIDS.votes[KIDS_WEEK][kidId])KIDS.votes[KIDS_WEEK][kidId]={};if(val===''){delete KIDS.votes[KIDS_WEEK][kidId][KIDS_ME];}else{KIDS.votes[KIDS_WEEK][kidId][KIDS_ME]=Number(val);}saveKids();renderKids();}
+function kidSelWeek(w){KIDS_WEEK=w;renderKids();}
+function renderKids(){
+  const box=document.getElementById('kids-body');if(!box)return;
+  const wk=KIDS_WEEK||'s1';
+  let h='<p style="font-size:.84rem;color:var(--muted);margin-bottom:12px;line-height:1.45">Chaque parent note les enfants <b>sur 10 pour la semaine</b>. Le 🏆 de la semaine est <b>dispensé de corvées</b> !</p>';
+  h+='<div style="display:flex;gap:8px;margin-bottom:12px">'+['s1','s2'].map(function(w){const on=w===wk;return '<button onclick="kidSelWeek(\''+w+'\')" style="flex:1;padding:9px 6px;border-radius:10px;cursor:pointer;font-family:inherit;border:1px solid '+(on?'var(--brown)':'var(--border)')+';background:'+(on?'var(--brown)':'var(--card)')+';color:'+(on?'#fff':'var(--text)')+'"><div style="font-weight:800">'+KIDS_WK[w].label+'</div><div style="font-size:.62rem;opacity:.8">'+KIDS_WK[w].sub+'</div></button>';}).join('')+'</div>';
+  if(!KIDS.parents.length){
+    h+='<div style="background:var(--bg2);border-radius:12px;padding:12px;margin-bottom:12px;text-align:center;font-size:.86rem">Ajoute d\'abord les <b>parents</b> (votants) et les <b>enfants</b> en bas 👇</div>';
+  }else if(!KIDS_ME||!KIDS.parents.find(function(p){return p.id===KIDS_ME;})){
+    h+='<div style="background:var(--bg2);border-radius:12px;padding:12px;margin-bottom:12px"><div style="font-weight:700;margin-bottom:8px">Qui es-tu ?</div><div style="display:flex;gap:6px;flex-wrap:wrap">'+KIDS.parents.map(function(p){return '<button onclick="setKidMe(\''+p.id+'\')" style="border:1px solid var(--border);background:var(--card);border-radius:100px;padding:7px 13px;font-weight:600;cursor:pointer;font-family:inherit">'+escHtml(p.name)+'</button>';}).join('')+'</div></div>';
+  }else{
+    const me=KIDS.parents.find(function(p){return p.id===KIDS_ME;});
+    h+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;font-size:.85rem"><span>Tu notes en tant que <b>'+escHtml(me.name)+'</b></span><button onclick="setKidMe(null)" style="background:none;border:none;color:var(--brown);font-weight:700;cursor:pointer;font-family:inherit">changer</button></div>';
+  }
+  const canVote=KIDS_ME&&KIDS.parents.find(function(p){return p.id===KIDS_ME;});
+  if(!KIDS.kids.length){
+    h+='<div style="text-align:center;color:var(--muted);padding:16px 0">Aucun enfant. Ajoute-les en bas.</div>';
+  }else{
+    h+='<div style="font-weight:800;font-size:.72rem;color:var(--muted);text-transform:uppercase;margin:6px 2px">🏅 Classement — '+KIDS_WK[wk].label+'</div>';
+    const rank=kidRanking(wk),medals=['🥇','🥈','🥉'];let pos=0;
+    h+=rank.map(function(r){
+      const k=r.kid,a=r.a,myVote=((KIDS.votes[wk]||{})[k.id]||{})[KIDS_ME],ranked=a.avg!=null;
+      const medal=ranked?(medals[pos]||((pos+1)+'.')):'';if(ranked)pos++;const isWin=ranked&&pos===1;
+      let opts='<option value="">–</option>';for(let s=0;s<=10;s++){opts+='<option value="'+s+'"'+(myVote!=null&&Number(myVote)===s?' selected':'')+'>'+s+'</option>';}
+      return '<div style="background:var(--card);border:1px solid '+(isWin?'var(--brown)':'var(--border)')+';border-radius:14px;padding:11px 13px;margin-bottom:9px"><div style="display:flex;align-items:center;gap:9px"><div style="font-size:1.1rem;width:26px;text-align:center">'+medal+'</div><div style="flex:1;font-weight:700">'+escHtml(k.name)+'</div><div style="text-align:right"><div style="font-weight:800;font-size:1.05rem">'+(ranked?(Math.round(a.avg*10)/10)+' <span style="font-size:.68rem;color:var(--muted)">/10</span>':'<span style="color:var(--muted);font-size:.78rem">pas noté</span>')+'</div><div style="font-size:.62rem;color:var(--muted)">'+a.count+' vote'+(a.count>1?'s':'')+'</div></div><button onclick="delKid(\''+k.id+'\')" style="background:none;border:none;color:var(--muted);font-size:1.1rem;cursor:pointer">×</button></div>'+(canVote?'<div style="display:flex;align-items:center;gap:8px;margin-top:9px"><span style="font-size:.78rem;color:var(--muted)">Ta note :</span><select onchange="voteKid(\''+k.id+'\',this.value)" style="flex:1;padding:8px;border-radius:8px;font-family:inherit">'+opts+'</select></div>':'')+'</div>';
+    }).join('');
+    const win=rank[0]&&rank[0].a.avg!=null?rank[0]:null;
+    if(win){h+='<div style="background:#fff4e2;border:1px solid #e6c68a;border-radius:14px;padding:12px 14px;margin-top:4px;text-align:center;font-weight:700;color:#8a5a12">🏆 '+escHtml(win.kid.name)+' remporte la '+KIDS_WK[wk].label+' → dispensé de corvées !</div>';}
+  }
+  h+='<div style="margin-top:16px;border-top:1px solid var(--border);padding-top:12px"><div style="display:flex;gap:8px"><button onclick="addKid()" style="flex:1;padding:10px;border-radius:10px;border:1px dashed var(--brown);background:var(--card);color:var(--brown);font-weight:700;cursor:pointer;font-family:inherit">＋ Enfant</button><button onclick="addParent()" style="flex:1;padding:10px;border-radius:10px;border:1px dashed var(--brown);background:var(--card);color:var(--brown);font-weight:700;cursor:pointer;font-family:inherit">＋ Parent</button></div>';
+  if(KIDS.parents.length){h+='<div style="font-size:.72rem;color:var(--muted);margin-top:10px">Parents : '+KIDS.parents.map(function(p){return escHtml(p.name)+' <span onclick="delParent(\''+p.id+'\')" style="cursor:pointer;color:#b5432f">×</span>';}).join(' · ')+'</div>';}
+  h+='</div>';
+  box.innerHTML=h;
+}
+(window.requestIdleCallback||(cb=>setTimeout(cb,200)))(()=>{initBottles();initCodes();initDelh();initSolde();initKids();});
 
 /* 😂 PHRASES CULTES */
 const PHRASE_DEV_KEY='corse2026-devid';

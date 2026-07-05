@@ -2380,11 +2380,10 @@ async function initBottles(){
     if(wc)wc.style.display='none';
     if(section)section.style.display='block';
   }else{
-    /* À partir du 4 juillet : décompte caché, foot visible, bouteilles cachées */
+    /* À partir du 4 juillet : décompte caché, foot visible ET bouteilles visibles */
     if(countdown)countdown.style.display='none';
-    if(section)section.style.display='none';
     if(wc)wc.style.display='';
-    return;
+    if(section)section.style.display='block';
   }
   try{const s=localStorage.getItem('corse2026-bottles');if(s)Object.assign(BOTTLES,JSON.parse(s));}catch(e){}
   renderBottles();

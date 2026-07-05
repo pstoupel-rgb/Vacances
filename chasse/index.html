@@ -206,6 +206,28 @@
   .guide-txt b{color:var(--sea2);}
   .guide-txt ul,.guide-txt ol{margin:8px 0 2px;padding-left:22px;}
   .guide-txt li{margin:5px 0;}
+
+  /* piscine par enfant */
+  .poolgrid{display:flex;flex-direction:column;gap:8px;}
+  .poolcard{display:flex;align-items:center;gap:11px;width:100%;background:var(--sand);border:2px solid var(--border);
+    border-radius:12px;padding:10px 12px;cursor:pointer;font-family:var(--ff);text-align:left;}
+  .poolcard:active{transform:scale(.99);}
+  .poolcard.done{background:#dff5e4;border-color:#2f8f4e;}
+  .poolcard .pc-em{font-size:1.6rem;flex:0 0 auto;}
+  .poolcard .pc-info{flex:1;display:flex;flex-direction:column;line-height:1.15;min-width:0;}
+  .poolcard .pc-info b{font-size:1rem;color:var(--ink);}
+  .poolcard .pc-info span{font-size:.75rem;color:var(--ink2);font-weight:600;}
+  .poolcard .pc-stat{font-size:1.3rem;flex:0 0 auto;}
+  .pool-q{font-weight:700;font-size:1.05rem;text-align:center;background:#fff7e2;border-radius:10px;padding:14px;margin:10px 0;line-height:1.45;}
+  .bigduck{font-size:1.9rem;letter-spacing:4px;display:inline-block;margin:4px 0;}
+
+  /* mode test (parents) */
+  .test-list{display:flex;flex-direction:column;gap:6px;margin-top:6px;}
+  .test-row{display:flex;align-items:center;justify-content:space-between;gap:8px;background:#fff;
+    border:2px solid var(--border);border-radius:10px;padding:7px 10px;font-weight:700;font-size:.9rem;color:var(--ink);}
+  .test-row .tbtn{border:none;border-radius:8px;padding:8px 15px;font-family:var(--ff);font-weight:800;
+    font-size:.85rem;cursor:pointer;color:#fff;flex:0 0 auto;}
+  .tbtn.cancel{background:var(--red);} .tbtn.valid{background:var(--sea2);}
 </style>
 </head>
 <body>
@@ -234,12 +256,12 @@ const STATIONS = [
   {
     id:'piscine', emoji:'🏊', name:'La Piscine',
     clue:"Rendez-vous là où l'eau est bleue, où l'on fait des bombes et des étoiles de mer !",
-    digit:4, game:'quiz',
+    digit:4, game:'poolIndiv',
     missions:[
       "Fais 3 bisous à la surface de l'eau en les comptant à voix haute 💦",
       "Trouve un objet qui <b>flotte</b> et un objet qui <b>coule</b>.",
-      "Réponds au quiz et explique les réponses aux plus petits.",
-      "Tu es le maître-nageur 🛟 : vérifie que tout l'équipage est prêt avant de valider."
+      "Réussis <b>ton</b> défi piscine, puis aide un plus jeune à réussir le sien 💪",
+      "Tu es le maître-nageur 🛟 : réussis ton défi et vérifie que tout l'équipage a réussi le sien."
     ]
   },
   {
@@ -299,12 +321,13 @@ function defaultState(){
       {name:'Victor', age:7}, {name:'Clea', age:8}, {name:'Sam', age:11}, {name:'Vic', age:12}, {name:'Rose', age:13}
     ],
     done:{},           // {stationId:true}
+    poolDone:{},       // {playerIndex:true} pour l'épreuve piscine individuelle
     stationIdx:0,
     treasureMsg:"Le vrai trésor est caché près de la piscine 🏊\nCherchez sous le transat bleu !"
   };
 }
 function load(){
-  try{ const s=JSON.parse(localStorage.getItem(STORE_KEY)); if(s&&s.players) return s; }catch(e){}
+  try{ const s=JSON.parse(localStorage.getItem(STORE_KEY)); if(s&&s.players){ if(!s.poolDone)s.poolDone={}; return s; } }catch(e){}
   return defaultState();
 }
 function save(){ try{ localStorage.setItem(STORE_KEY, JSON.stringify(S)); }catch(e){} }
@@ -440,6 +463,7 @@ function completeStation(){
 /* ============================================================ MINI-JEUX */
 function mountGame(st){
   const z=document.getElementById('gamezone');
+  if(st.game==='poolIndiv') return gamePoolIndividual(z);
   if(st.game==='quiz')   return gameQuiz(z);
   if(st.game==='stones') return gameStones(z);
   if(st.game==='memory') return gameMemory(z);
@@ -447,7 +471,71 @@ function mountGame(st){
   if(st.game==='lock')   return gameLock(z);
 }
 
-/* ---- QUIZ (piscine) ---- */
+/* ---- PISCINE : une épreuve par enfant, difficulté selon l'âge ---- */
+function poolChallenge(age){
+  const R=n=>Math.floor(Math.random()*n);
+  const distract=(ans)=>{
+    const set=new Set([ans]);
+    let guard=0;
+    while(set.size<3 && guard++<50){ let d=ans+(R(2)?1:-1)*(1+R(3)); if(d>=0) set.add(d); }
+    let n=ans+4; while(set.size<3){ set.add(n++); }
+    return [...set].sort(()=>Math.random()-.5);
+  };
+  let q, ans;
+  if(age<=7){ const k=2+R(3); q=`Compte les canards dans la piscine :<br><span class="bigduck">${'🦆'.repeat(k)}</span><br>Combien y en a-t-il ?`; ans=k; }
+  else if(age<=9){ const a=2+R(4), b=2+R(4); q=`Il y a <b>${a}</b> bouées 🛟 et <b>${b}</b> ballons 🏐 dans l'eau.<br>Combien d'objets flottent en tout ?`; ans=a+b; }
+  else if(age<=11){ const a=8+R(8), b=2+R(6); q=`<b>${a}</b> enfants font la bombe 💦, puis <b>${b}</b> sortent se sécher.<br>Combien en reste-t-il dans l'eau ?`; ans=a-b; }
+  else if(age<=13){ const a=2+R(8), b=2+R(8); q=`<b>${a}</b> matelas gonflables, avec <b>${b}</b> coussins chacun.<br>Combien de coussins en tout ?`; ans=a*b; }
+  else { const a=3+R(6), b=2+R(6), c=2+R(7); q=`Plongeons du jour : <b>${a}</b> le matin, <b>${b}</b> le midi, <b>${c}</b> le soir.<br>Fais le total… puis <b>multiplie par 2</b> !`; ans=(a+b+c)*2; }
+  return {q, ans, options:distract(ans)};
+}
+
+function gamePoolIndividual(z){
+  const render=()=>{
+    const total=S.players.length;
+    const doneN=S.players.reduce((n,_,i)=>n+(S.poolDone[i]?1:0),0);
+    if(total>0 && doneN===total){ completeStation(); return; }
+    const cards=S.players.map((p,i)=>{
+      const g=grade(p.age), done=!!S.poolDone[i];
+      return `<button class="poolcard ${done?'done':''}" onclick="openPool(${i})">
+        <div class="pc-em">${g.em}</div>
+        <div class="pc-info"><b>${esc(p.name)||g.rank}</b><span>${p.age} ans · ${g.rank}</span></div>
+        <div class="pc-stat">${done?'✅':'▶️'}</div>
+      </button>`;
+    }).join('');
+    z.innerHTML=`<div class="game">
+      <div class="q">🏊 Chaque pirate a SON défi piscine (plus ou moins costaud selon l'âge). Touchez chaque prénom pour jouer !</div>
+      <div class="poolgrid">${cards}</div>
+      <div class="qprog">${doneN} / ${total} pirate(s) ont réussi</div>
+    </div>`;
+  };
+  window.__poolRender=render;
+  render();
+}
+
+function openPool(i){
+  const p=S.players[i], g=grade(p.age), ch=poolChallenge(p.age);
+  const z=document.getElementById('gamezone');
+  z.innerHTML=`<div class="game">
+    <button class="hint-btn" style="margin:0 0 4px" onclick="window.__poolRender()">‹ Retour aux pirates</button>
+    <div class="q">${g.em} Défi de <b>${esc(p.name)||g.rank}</b> — ${p.age} ans</div>
+    <div class="pool-q">${ch.q}</div>
+    <div class="opts">${ch.options.map(o=>`<button class="opt" data-v="${o}">${o}</button>`).join('')}</div>
+    <div id="poolmsg"></div>
+  </div>`;
+  z.querySelectorAll('.opt').forEach(b=>b.onclick=()=>{
+    if(+b.dataset.v===ch.ans){
+      b.classList.add('good'); S.poolDone[i]=true; save();
+      setTimeout(()=>window.__poolRender(),650);
+    }else{
+      b.classList.add('bad'); setTimeout(()=>b.classList.remove('bad'),400);
+      const m=document.getElementById('poolmsg');
+      if(m){ m.innerHTML='<div class="msg err">Presque ! Réessaie 💪</div>'; setTimeout(()=>{if(m)m.innerHTML='';},1100); }
+    }
+  });
+}
+
+/* ---- QUIZ (non utilisé — gardé au cas où) ---- */
 const QUIZ=[
   {q:"Dans quelle mer se baigne-t-on en Corse ?", a:["L'océan Atlantique","La mer Méditerranée","La mer du Nord"], ok:1},
   {q:"Comment s'appelle un bébé sanglier ? (la Corse en est pleine 🐗)", a:["Un poussin","Un veau","Un marcassin"], ok:2},
@@ -680,6 +768,20 @@ function renderParents(){
       <div style="font-size:.8rem;color:var(--ink2);font-weight:600;text-align:center">
         Les enfants le reconstituent en gagnant chaque épreuve.
       </div>
+      <hr style="border:none;border-top:1.5px dashed var(--border);margin:16px 0">
+      <div class="section-label" style="color:var(--wood)">🧪 Mode test — annuler / valider les épreuves</div>
+      <div class="test-list">
+        ${STATIONS.map(st=>{
+          const done=!!S.done[st.id];
+          return `<div class="test-row">
+            <span>${st.emoji} ${st.name} ${done?'<b style="color:var(--green)">✓</b>':''}</span>
+            <button class="tbtn ${done?'cancel':'valid'}" onclick="toggleStation('${st.id}')">${done?'Annuler':'Valider'}</button>
+          </div>`;
+        }).join('')}
+      </div>
+      <div style="font-size:.8rem;color:var(--ink2);font-weight:600;margin-top:8px">
+        « Annuler » remet l'épreuve à zéro pour la retester. « Valider » la marque réussie (pour sauter directement au coffre). Le bouton 🔄 Réinitialiser efface tout d'un coup.
+      </div>
     </div>
     <div class="foot-actions">
       <button class="btn sea small" onclick="go('setup')">👥 Équipage</button>
@@ -763,7 +865,14 @@ function renderGuide(){
 
 function resetGame(){
   if(!confirm('Recommencer la chasse à zéro ? (l\'équipage et la cachette sont conservés)'))return;
-  S.done={}; S.stationIdx=0; save(); go('home');
+  S.done={}; S.poolDone={}; S.stationIdx=0; save(); go('home');
+}
+
+/* Mode test : annuler / valider une épreuve */
+function toggleStation(id){
+  if(S.done[id]){ delete S.done[id]; if(id==='piscine') S.poolDone={}; }
+  else { S.done[id]=true; if(id==='piscine') S.players.forEach((_,i)=>S.poolDone[i]=true); }
+  save(); renderParents();
 }
 
 /* ---------------- CONFETTI ---------------- */

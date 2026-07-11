@@ -1051,10 +1051,10 @@
         <thead><tr><th>Famille</th><th>Dû</th><th>Payé</th><th>Reste</th></tr></thead>
         <tbody>
           <tr><td>Philou <span class="ftag ftag-both">S1+S2</span></td><td>11 000 €</td><td>11 000 €</td><td class="ok">✓</td></tr>
-          <tr><td>Oliver <span class="ftag ftag-s1">S1</span></td><td>5 500 €</td><td>3 333 €</td><td class="neg">2 167 €</td></tr>
+          <tr><td>Oliver <span class="ftag ftag-s1">S1</span></td><td>5 500 €</td><td>5 500 €</td><td class="ok">✓</td></tr>
           <tr><td>Paulet <span class="ftag ftag-both">S1+S2</span></td><td>10 500 €</td><td id="paulet-paye">6 320 €</td><td class="neg" id="paulet-reste">4 180 €</td></tr>
           <tr><td>Greg <span class="ftag ftag-s2">S2</span></td><td>5 500 €</td><td>3 333 €</td><td class="neg">2 167 €</td></tr>
-          <tr class="total-row"><td>Total</td><td>32 500 €</td><td id="total-paye">23 986 €</td><td class="neg" id="total-reste">8 514 €</td></tr>
+          <tr class="total-row"><td>Total</td><td>32 500 €</td><td id="total-paye">26 153 €</td><td class="neg" id="total-reste">6 347 €</td></tr>
         </tbody>
       </table>
     </div>
@@ -2696,8 +2696,8 @@ function renderDelhRestos(){
   const pp=document.getElementById('paulet-paye'),pr=document.getElementById('paulet-reste'),tp=document.getElementById('total-paye'),tr=document.getElementById('total-reste');
   if(pp)pp.textContent=eur(6320+x);
   if(pr){const rest=4180-x;pr.textContent=rest<=0?'✓':eur(rest);pr.className=rest<=0?'ok':'neg';}
-  if(tp)tp.textContent=eur(23986+x);
-  if(tr){const rest=8514-x;tr.textContent=eur(rest);tr.className=rest<=0?'ok':'neg';}
+  if(tp)tp.textContent=eur(26153+x);
+  if(tr){const rest=6347-x;tr.textContent=eur(rest);tr.className=rest<=0?'ok':'neg';}
   if(typeof renderBudgetHebdo==='function')renderBudgetHebdo();
 }
 function saveDelh(){

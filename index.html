@@ -1282,6 +1282,9 @@ function paintTeam(){
       if(m.id==='isa'){
         return '<div class="team-cell" onclick="playIsaVideo()"><div class="team-ava" id="ava-isa" style="background:'+teamColor('isa')+'">'+m.name.charAt(0)+'<span class="ava-cam">▶️</span></div><div class="tm-name">Isa</div></div>';
       }
+      if(m.id==='victor'){
+        return '<div class="team-cell" onclick="openVictorVideo()" title="ca va perrin ca va"><div class="team-ava" id="ava-victor" style="background:'+teamColor('victor')+'">'+m.name.charAt(0)+'<span class="ava-cam">▶️</span></div><div class="tm-name">Victor</div></div>';
+      }
       return '<div class="team-cell" onclick="viewTeamPhoto(\''+m.id+'\')"><div class="team-ava" id="ava-'+m.id+'" style="background:'+teamColor(m.id)+'">'+m.name.charAt(0)+'<span class="ava-cam">📷</span></div><div class="tm-name">'+m.name+'</div></div>';
     }).join('');
   });
@@ -1291,7 +1294,7 @@ function paintTeam(){
     let src=null;
     if(typeof p==='string'){src=p;}
     else{const f=await FileDB.get('team-'+m.id);if(f){src=URL.createObjectURL(f.blob);_teamUrls.push(src);}}
-    if(src)ava.innerHTML='<img src="'+src+'" alt=""><span class="ava-cam">'+(m.id==='isa'?'▶️':'📷')+'</span>';
+    if(src)ava.innerHTML='<img src="'+src+'" alt=""><span class="ava-cam">'+(m.id==='isa'||m.id==='victor'?'▶️':'📷')+'</span>';
   });
   paintPhraseAuthors();
 }
@@ -1375,6 +1378,9 @@ function playIsaVideo(){
   const modal=document.getElementById('isa-video-modal');
   modal.style.display='flex';
 }
+/* Vidéo de Victor — "ca va perrin ca va" (ouvre le lien, la redirection Google se fait dans le navigateur) */
+const VICTOR_VIDEO='https://share.google/Mju6rEAVzkNLpC6Eq';
+function openVictorVideo(){window.open(VICTOR_VIDEO,'_blank','noopener');}
 /* API lecteur YouTube (chargée à la 1re lecture) — pour forcer le démarrage auto */
 let _ytReady=false,_ytCbs=[];
 function _ytApi(cb){

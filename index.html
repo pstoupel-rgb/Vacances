@@ -1378,9 +1378,9 @@ function playIsaVideo(){
   const modal=document.getElementById('isa-video-modal');
   modal.style.display='flex';
 }
-/* Vidéo de Victor — "ca va perrin ca va" (ouvre le lien, la redirection Google se fait dans le navigateur) */
-const VICTOR_VIDEO='https://share.google/Mju6rEAVzkNLpC6Eq';
-function openVictorVideo(){window.open(VICTOR_VIDEO,'_blank','noopener');}
+/* Vidéo de Victor — "ca va perrin ca va" (YouTube, lecteur intégré comme Isa) */
+const VICTOR_VIDEO_ID='HpIPmgt5kII';
+function openVictorVideo(){playVideo('yt',VICTOR_VIDEO_ID);}
 /* API lecteur YouTube (chargée à la 1re lecture) — pour forcer le démarrage auto */
 let _ytReady=false,_ytCbs=[];
 function _ytApi(cb){

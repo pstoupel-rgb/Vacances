@@ -228,6 +228,27 @@
   .test-row .tbtn{border:none;border-radius:8px;padding:8px 15px;font-family:var(--ff);font-weight:800;
     font-size:.85rem;cursor:pointer;color:#fff;flex:0 0 auto;}
   .tbtn.cancel{background:var(--red);} .tbtn.valid{background:var(--sea2);}
+
+  /* équipes & scores */
+  :root{--t1a:#2a90b0;--t1b:#1f6f8b;--t2a:#c85aa6;--t2b:#a83d86;}
+  .scoreboard{display:flex;gap:8px;margin:6px 0;}
+  .sb{flex:1;display:flex;align-items:center;justify-content:space-between;gap:6px;padding:9px 12px;
+    border-radius:12px;color:#fff;font-weight:800;font-size:.85rem;box-shadow:var(--shadow);min-width:0;}
+  .sb span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .sb b{font-family:var(--ff-title);font-size:1.5rem;flex:0 0 auto;}
+  .sb.team1{background:linear-gradient(180deg,var(--t1a),var(--t1b));}
+  .sb.team2{background:linear-gradient(180deg,var(--t2a),var(--t2b));}
+  .teams2{display:flex;flex-direction:column;gap:14px;}
+  .teamcol{display:flex;flex-direction:column;gap:8px;}
+  .teamhd{font-family:var(--ff-title);font-size:1.05rem;text-align:center;padding:6px;border-radius:10px;color:#fff;}
+  .teamcol.team1 .teamhd{background:var(--t1b);} .teamcol.team2 .teamhd{background:var(--t2b);}
+  .ptsbadge{background:var(--gold);color:#fff;font-size:.7rem;font-weight:800;padding:2px 9px;border-radius:20px;white-space:nowrap;}
+  .teamchip{flex:0 0 auto;width:40px;height:40px;border:none;border-radius:11px;font-size:1.4rem;cursor:pointer;
+    box-shadow:inset 0 -3px 0 rgba(0,0,0,.15);}
+  .teamchip.team1{background:var(--t1a);} .teamchip.team2{background:var(--t2a);}
+  .teamlegend{display:flex;gap:8px;margin-bottom:12px;}
+  .teamlegend .tl{flex:1;text-align:center;padding:8px;border-radius:11px;color:#fff;font-weight:800;font-size:.85rem;}
+  .teamlegend .tl.team1{background:var(--t1b);} .teamlegend .tl.team2{background:var(--t2b);}
 </style>
 </head>
 <body>
@@ -240,7 +261,9 @@
    LA CHASSE AU TRÉSOR DE CORSE — mini-app 100% hors-ligne
    ============================================================ */
 
-const STORE_KEY = 'chasse-corse-v2';
+const STORE_KEY = 'chasse-corse-v3';
+const THEME = {piscine:'piscine', gravier:'gravier', 'terrasse-avant':'terrasse', 'terrasse-arriere':'terrasse', cuisine:'cuisine'};
+function kidPoints(age){ if(age<=7)return 5; if(age<=9)return 6; if(age<=11)return 8; if(age<=13)return 10; if(age<=15)return 12; return 14; }
 
 /* ---- Grades par âge ---- */
 function grade(age){
@@ -318,17 +341,41 @@ function defaultState(){
     screen:'home',
     started:false,
     players:[
-      {name:'Victor', age:7}, {name:'Clea', age:8}, {name:'Sam', age:11}, {name:'Vic', age:12}, {name:'Rose', age:13}
+      {name:'Victor', age:7,  team:1},
+      {name:'Clea',   age:8,  team:2},
+      {name:'Vic',    age:12, team:1},
+      {name:'Lélé',   age:13, team:2},
+      {name:'Gatien', age:15, team:2},
+      {name:'Louise', age:16, team:1}
     ],
+    teams:{ 1:{name:'Les Requins', em:'🦈'}, 2:{name:'Les Dauphins', em:'🐬'} },
     done:{},           // {stationId:true}
-    poolDone:{},       // {playerIndex:true} pour l'épreuve piscine individuelle
+    kidDone:{},        // {stationId:{playerIndex:true}} défis individuels réussis
     stationIdx:0,
     treasureMsg:"Le vrai trésor est caché près de la piscine 🏊\nCherchez sous le transat bleu !"
   };
 }
 function load(){
-  try{ const s=JSON.parse(localStorage.getItem(STORE_KEY)); if(s&&s.players){ if(!s.poolDone)s.poolDone={}; return s; } }catch(e){}
+  try{ const s=JSON.parse(localStorage.getItem(STORE_KEY)); if(s&&s.players){
+    if(!s.kidDone)s.kidDone={};
+    if(!s.teams)s.teams={1:{name:'Les Requins',em:'🦈'},2:{name:'Les Dauphins',em:'🐬'}};
+    s.players.forEach(p=>{ if(!p.team)p.team=1; });
+    return s;
+  } }catch(e){}
   return defaultState();
+}
+function computeScores(){
+  const sc={1:0,2:0};
+  for(const stId in S.kidDone){ const m=S.kidDone[stId]||{};
+    for(const idx in m){ if(m[idx]){ const p=S.players[idx]; if(p) sc[p.team]=(sc[p.team]||0)+kidPoints(p.age); } } }
+  return sc;
+}
+function scoreboardHTML(){
+  const sc=computeScores(), t=S.teams;
+  return `<div class="scoreboard">
+    <div class="sb team1"><span>${t[1].em} ${esc(t[1].name)}</span><b>${sc[1]}</b></div>
+    <div class="sb team2"><span>${t[2].em} ${esc(t[2].name)}</span><b>${sc[2]}</b></div>
+  </div>`;
 }
 function save(){ try{ localStorage.setItem(STORE_KEY, JSON.stringify(S)); }catch(e){} }
 
@@ -357,7 +404,7 @@ function renderHome(){
       <div class="flag">🏴‍☠️</div>
       <h1>La Chasse<br>au Trésor</h1>
       <div class="sub">Un trésor de pirate est caché dans la maison de Corse… À vous de le retrouver, moussaillons !</div>
-      <div class="isle">🏝️ 5 épreuves &nbsp;•&nbsp; toute la tribu &nbsp;•&nbsp; dès 6 ans</div>
+      <div class="isle">🏝️ 5 épreuves &nbsp;•&nbsp; 2 équipes &nbsp;•&nbsp; de 6 à 16 ans</div>
       <div class="home-btns">
         ${anyProgress
           ? `<button class="btn" onclick="go('map')">▶️ Continuer l'aventure</button>
@@ -372,11 +419,12 @@ function renderHome(){
 
 /* ---------------- SETUP (équipage) ---------------- */
 function renderSetup(){
+  const cnt={1:0,2:0}; S.players.forEach(p=>cnt[p.team]++);
   const rows = S.players.map((p,i)=>{
-    const g=grade(p.age);
+    const g=grade(p.age), tm=S.teams[p.team];
     return `<div class="player">
-      <div class="emoji">${g.em}</div>
-      <input class="name" placeholder="Prénom du pirate n°${i+1}" value="${esc(p.name)}"
+      <button class="teamchip team${p.team}" onclick="setTeam(${i})" title="Changer d'équipe">${tm.em}</button>
+      <input class="name" placeholder="Prénom n°${i+1}" value="${esc(p.name)}"
         oninput="setName(${i},this.value)">
       <div class="agebox">
         <button onclick="setAge(${i},-1)">−</button>
@@ -388,7 +436,11 @@ function renderSetup(){
   }).join('');
   app.innerHTML = `
     <div class="topbar"><button class="back" onclick="go('home')">‹</button><h2>L'équipage</h2></div>
-    <div class="lead">Ajoute chaque enfant avec son âge. Les épreuves s'adaptent : les petits ont des missions simples, les grands des défis plus corsés 💪</div>
+    <div class="lead">2 équipes de pirates s'affrontent aux points ! Touche le pion coloré pour changer un enfant d'équipe. Les défis s'adaptent à l'âge 💪</div>
+    <div class="teamlegend">
+      <span class="tl team1">${S.teams[1].em} ${esc(S.teams[1].name)} · ${cnt[1]}</span>
+      <span class="tl team2">${S.teams[2].em} ${esc(S.teams[2].name)} · ${cnt[2]}</span>
+    </div>
     <div class="parch" style="padding-top:22px">
       ${rows}
       <button class="addp" onclick="addPlayer()">＋ Ajouter un pirate</button>
@@ -400,7 +452,8 @@ function renderSetup(){
 }
 function setName(i,v){ S.players[i].name=v; save(); }
 function setAge(i,d){ S.players[i].age=Math.max(3,Math.min(17,S.players[i].age+d)); save(); render(); }
-function addPlayer(){ S.players.push({name:'',age:8}); save(); render(); }
+function setTeam(i){ S.players[i].team = S.players[i].team===1?2:1; save(); render(); }
+function addPlayer(){ const cnt={1:0,2:0}; S.players.forEach(p=>cnt[p.team]++); S.players.push({name:'',age:8,team:cnt[1]<=cnt[2]?1:2}); save(); render(); }
 function delPlayer(i){ S.players.splice(i,1); save(); render(); }
 function startAdventure(){ S.started=true; go('map'); }
 
@@ -433,9 +486,10 @@ function renderMap(){
     <div class="topbar"><button class="back" onclick="go('home')">‹</button><h2 style="font-size:1.3rem">Carte au trésor</h2></div>
     <div class="maphead">
       <h2>Le code du coffre</h2>
-      <p>Gagne les 5 chiffres pour ouvrir le trésor !</p>
+      <p>Gagnez les 5 chiffres… et un max de points par équipe !</p>
       <div class="chestbar">${dilat}</div>
     </div>
+    ${scoreboardHTML()}
     <div class="trail">${trail}</div>
     ${allDone
       ? `<div style="margin-top:6px"><button class="btn" onclick="go('station',${STATIONS.length})">🏴‍☠️ Ouvrir le coffre au trésor !</button></div>`
@@ -452,10 +506,11 @@ function completeStation(){
   const z=document.getElementById('gamezone');
   z.innerHTML = `
     <div class="reward">
-      <div style="font-weight:800;color:var(--wood)">Épreuve réussie ! Tu gagnes le chiffre :</div>
+      <div style="font-weight:800;color:var(--wood)">Épreuve réussie par tout l'équipage ! Chiffre du coffre :</div>
       <div class="rd">${st.digit}</div>
-      <div style="font-weight:700;color:var(--ink2);margin-bottom:12px">Note-le… il ouvrira le coffre 🗝️</div>
-      <button class="btn" onclick="go('map')">Continuer la chasse ➜</button>
+      <div style="font-weight:700;color:var(--ink2);margin-bottom:10px">Note-le… il ouvrira le coffre 🗝️</div>
+      ${scoreboardHTML()}
+      <button class="btn" style="margin-top:12px" onclick="go('map')">Continuer la chasse ➜</button>
     </div>`;
   burst(20);
 }
@@ -471,62 +526,77 @@ function mountGame(st){
   if(st.game==='lock')   return gameLock(z);
 }
 
-/* ---- PISCINE : une épreuve par enfant, difficulté selon l'âge ---- */
-function poolChallenge(age){
+/* ---- DÉFI INDIVIDUEL PAR ENFANT (par station, difficulté selon l'âge) ---- */
+function kidChallenge(age, theme){
   const R=n=>Math.floor(Math.random()*n);
+  const T={
+    piscine :{em:'🦆', o1:'bouées 🛟', o2:'ballons 🏐', place:'la piscine', unit:'objets flottants'},
+    gravier :{em:'🪨', o1:'galets',    o2:'coquillages 🐚', place:'le jardin', unit:'cailloux'},
+    cuisine :{em:'🍅', o1:'olives 🫒', o2:'gâteaux 🧁', place:'la cuisine', unit:'aliments'},
+    terrasse:{em:'🛋️', o1:'coussins',  o2:'chaises 🪑', place:'la terrasse', unit:'objets'}
+  }[theme] || {em:'⭐', o1:'trucs', o2:'machins', place:'la maison', unit:'objets'};
   const distract=(ans)=>{
-    const set=new Set([ans]);
-    let guard=0;
-    while(set.size<3 && guard++<50){ let d=ans+(R(2)?1:-1)*(1+R(3)); if(d>=0) set.add(d); }
+    const set=new Set([ans]); let guard=0;
+    while(set.size<3 && guard++<60){ const d=ans+(R(2)?1:-1)*(1+R(3)); if(d>=0) set.add(d); }
     let n=ans+4; while(set.size<3){ set.add(n++); }
     return [...set].sort(()=>Math.random()-.5);
   };
   let q, ans;
-  if(age<=7){ const k=2+R(3); q=`Compte les canards dans la piscine :<br><span class="bigduck">${'🦆'.repeat(k)}</span><br>Combien y en a-t-il ?`; ans=k; }
-  else if(age<=9){ const a=2+R(4), b=2+R(4); q=`Il y a <b>${a}</b> bouées 🛟 et <b>${b}</b> ballons 🏐 dans l'eau.<br>Combien d'objets flottent en tout ?`; ans=a+b; }
-  else if(age<=11){ const a=8+R(8), b=2+R(6); q=`<b>${a}</b> enfants font la bombe 💦, puis <b>${b}</b> sortent se sécher.<br>Combien en reste-t-il dans l'eau ?`; ans=a-b; }
-  else if(age<=13){ const a=2+R(8), b=2+R(8); q=`<b>${a}</b> matelas gonflables, avec <b>${b}</b> coussins chacun.<br>Combien de coussins en tout ?`; ans=a*b; }
-  else { const a=3+R(6), b=2+R(6), c=2+R(7); q=`Plongeons du jour : <b>${a}</b> le matin, <b>${b}</b> le midi, <b>${c}</b> le soir.<br>Fais le total… puis <b>multiplie par 2</b> !`; ans=(a+b+c)*2; }
+  if(age<=7){ const k=2+R(3); q=`Compte les ${T.em} près de ${T.place} :<br><span class="bigduck">${T.em.repeat(k)}</span><br>Combien y en a-t-il ?`; ans=k; }
+  else if(age<=9){ const a=2+R(4), b=2+R(4); q=`Il y a <b>${a}</b> ${T.o1} et <b>${b}</b> ${T.o2}.<br>Combien de ${T.unit} en tout ?`; ans=a+b; }
+  else if(age<=11){ const a=9+R(8), b=2+R(6); q=`Il y a <b>${a}</b> ${T.unit}, puis <b>${b}</b> disparaissent.<br>Combien en reste-t-il ?`; ans=a-b; }
+  else if(age<=13){ const a=2+R(8), b=3+R(7); q=`<b>${a}</b> paniers avec <b>${b}</b> ${T.unit} chacun.<br>Combien de ${T.unit} en tout ?`; ans=a*b; }
+  else if(age<=15){ const a=3+R(6), b=2+R(6), c=2+R(7); q=`On compte <b>${a}</b>, puis <b>${b}</b>, puis <b>${c}</b> ${T.unit}.<br>Fais le total… puis <b>×2</b> !`; ans=(a+b+c)*2; }
+  else { const a=3+R(6), b=3+R(6), c=2+R(6), d=2+R(5); q=`<b>${a}</b> caisses de <b>${b}</b> ${T.unit}, et <b>${c}</b> caisses de <b>${d}</b>.<br>Combien de ${T.unit} en tout ?`; ans=a*b+c*d; }
   return {q, ans, options:distract(ans)};
 }
 
-function gamePoolIndividual(z){
+function gameKidDefis(st){
+  const stId=st.id;
+  if(!S.kidDone[stId]) S.kidDone[stId]={};
+  const z=document.getElementById('gamezone');
   const render=()=>{
+    const done=S.kidDone[stId];
     const total=S.players.length;
-    const doneN=S.players.reduce((n,_,i)=>n+(S.poolDone[i]?1:0),0);
+    const doneN=S.players.reduce((n,_,i)=>n+(done[i]?1:0),0);
     if(total>0 && doneN===total){ completeStation(); return; }
-    const cards=S.players.map((p,i)=>{
-      const g=grade(p.age), done=!!S.poolDone[i];
-      return `<button class="poolcard ${done?'done':''}" onclick="openPool(${i})">
-        <div class="pc-em">${g.em}</div>
-        <div class="pc-info"><b>${esc(p.name)||g.rank}</b><span>${p.age} ans · ${g.rank}</span></div>
-        <div class="pc-stat">${done?'✅':'▶️'}</div>
-      </button>`;
-    }).join('');
+    const teamBlock=(tno)=>{
+      const members=S.players.map((p,i)=>({p,i})).filter(x=>x.p.team===tno);
+      if(!members.length) return '';
+      const cards=members.map(({p,i})=>{ const g=grade(p.age), d=!!done[i];
+        return `<button class="poolcard ${d?'done':''}" onclick="openKid('${stId}',${i})">
+          <div class="pc-em">${g.em}</div>
+          <div class="pc-info"><b>${esc(p.name)||g.rank}</b><span>${p.age} ans · +${kidPoints(p.age)} pts</span></div>
+          <div class="pc-stat">${d?'✅':'▶️'}</div>
+        </button>`; }).join('');
+      const t=S.teams[tno];
+      return `<div class="teamcol team${tno}"><div class="teamhd">${t.em} ${esc(t.name)}</div>${cards}</div>`;
+    };
     z.innerHTML=`<div class="game">
-      <div class="q">🏊 Chaque pirate a SON défi piscine (plus ou moins costaud selon l'âge). Touchez chaque prénom pour jouer !</div>
-      <div class="poolgrid">${cards}</div>
-      <div class="qprog">${doneN} / ${total} pirate(s) ont réussi</div>
+      <div class="q">🎯 Chaque pirate touche son prénom et relève SON défi (plus ou moins costaud selon l'âge). Chaque réussite rapporte des points à son équipe !</div>
+      <div class="teams2">${teamBlock(1)}${teamBlock(2)}</div>
+      <div class="qprog">${doneN} / ${total} défis réussis</div>
     </div>`;
   };
-  window.__poolRender=render;
+  window.__kidRender=render;
   render();
 }
 
-function openPool(i){
-  const p=S.players[i], g=grade(p.age), ch=poolChallenge(p.age);
+function openKid(stId,i){
+  const st=STATIONS.find(s=>s.id===stId);
+  const p=S.players[i], g=grade(p.age), ch=kidChallenge(p.age, THEME[stId]);
   const z=document.getElementById('gamezone');
   z.innerHTML=`<div class="game">
-    <button class="hint-btn" style="margin:0 0 4px" onclick="window.__poolRender()">‹ Retour aux pirates</button>
-    <div class="q">${g.em} Défi de <b>${esc(p.name)||g.rank}</b> — ${p.age} ans</div>
+    <button class="hint-btn" style="margin:0 0 4px" onclick="window.__kidRender()">‹ Retour aux équipes</button>
+    <div class="q">${g.em} Défi de <b>${esc(p.name)||g.rank}</b> — ${p.age} ans <span class="ptsbadge">+${kidPoints(p.age)} pts</span></div>
     <div class="pool-q">${ch.q}</div>
     <div class="opts">${ch.options.map(o=>`<button class="opt" data-v="${o}">${o}</button>`).join('')}</div>
     <div id="poolmsg"></div>
   </div>`;
   z.querySelectorAll('.opt').forEach(b=>b.onclick=()=>{
     if(+b.dataset.v===ch.ans){
-      b.classList.add('good'); S.poolDone[i]=true; save();
-      setTimeout(()=>window.__poolRender(),650);
+      b.classList.add('good'); S.kidDone[stId][i]=true; save();
+      setTimeout(()=>window.__kidRender(),650);
     }else{
       b.classList.add('bad'); setTimeout(()=>b.classList.remove('bad'),400);
       const m=document.getElementById('poolmsg');
@@ -707,38 +777,37 @@ function renderStationFinal(){
   };
 }
 
-/* proper renderStation (station screen + game) — redefined here to win */
+/* proper renderStation (station screen + défis d'équipe) */
 function renderStation(){
   const idx=S.stationIdx;
   if(idx>=STATIONS.length) return renderStationFinal();
   const st=STATIONS[idx];
-  const missions = S.players.map(p=>{
-    const g=grade(p.age), t=tier(p.age);
-    const who = p.name.trim()? esc(p.name) : g.rank;
-    return `<div class="mission">
-      <div class="mrank"><div class="em">${g.em}</div><div class="rk">${g.rank}</div></div>
-      <div class="mtxt"><b>${who}</b> — ${st.missions[t]}</div>
-    </div>`;
-  }).join('');
   app.innerHTML = `
     <div class="topbar"><button class="back" onclick="go('map')">‹</button><h2 style="font-size:1.3rem">Épreuve ${idx+1}/5</h2></div>
     <div class="stationwrap">
       <div class="bigemoji">${st.emoji}</div>
       <h1 class="st-title">${st.name}</h1>
       <div><div class="section-label">🧭 Où aller ?</div><div class="clue-box">${st.clue}</div></div>
-      <div><div class="section-label">🎯 La mission de chaque pirate</div><div class="missions">${missions}</div></div>
-      <div><div class="section-label">🎮 L'épreuve de l'app</div><div id="gamezone"></div></div>
+      ${scoreboardHTML()}
+      <div><div class="section-label">🎮 Les défis de l'équipage</div><div id="gamezone"></div></div>
     </div>`;
-  mountGame(st);
+  gameKidDefis(st);
 }
 
 /* ---------------- TREASURE ---------------- */
 function renderTreasure(){
+  const sc=computeScores(), t=S.teams;
+  let verdict;
+  if(sc[1]>sc[2]) verdict=`🏆 ${t[1].em} <b>${esc(t[1].name)}</b> gagnent la coupe des points !`;
+  else if(sc[2]>sc[1]) verdict=`🏆 ${t[2].em} <b>${esc(t[2].name)}</b> gagnent la coupe des points !`;
+  else verdict=`🤝 Égalité parfaite entre les deux équipages !`;
   app.innerHTML = `
     <div class="treasure">
       <div class="chest">🏴‍☠️</div>
       <h1>TRÉSOR !</h1>
-      <div style="color:#f3e6c8;font-weight:700;font-size:1.05rem">Bravo l'équipage ! Le coffre est ouvert ! 🎉</div>
+      <div style="color:#f3e6c8;font-weight:700;font-size:1.05rem">Bravo à tout l'équipage ! Le coffre est ouvert ! 🎉</div>
+      <div style="width:100%;max-width:360px">${scoreboardHTML()}</div>
+      <div style="color:#fff3cf;font-weight:700;font-size:1rem;max-width:340px">${verdict}</div>
       <div class="final">${esc(S.treasureMsg).replace(/\n/g,'<br>')}</div>
       <div style="width:100%;max-width:340px;display:flex;flex-direction:column;gap:10px;margin-top:6px">
         <button class="btn sea" onclick="go('map')">↩︎ Revoir la carte</button>
@@ -831,30 +900,28 @@ function renderGuide(){
     </div>
 
     <div class="parch" style="padding-top:22px;margin-bottom:14px">
-      <div class="section-label" style="color:var(--wood)">🧭 4. Comment on joue</div>
+      <div class="section-label" style="color:var(--wood)">🧭 4. Comment on joue (2 équipes)</div>
       <div class="guide-txt">
-        L'équipage fait <b>5 étapes</b> autour de la maison. À chaque étape :
+        Les enfants forment <b>2 équipes</b> (🦈 vs 🐬) et jouent <b>ensemble</b>. On fait <b>5 étapes</b> autour de la maison. À chaque étape :
         <ul>
           <li>une <b>énigme</b> indique le lieu 🗺️,</li>
-          <li>chaque enfant a une <b>mission selon son âge</b> (les petits observent, les grands décodent),</li>
-          <li>un <b>mini-jeu</b> sur l'écran donne <b>un chiffre du coffre</b>.</li>
+          <li><b>chaque enfant</b> touche son prénom et relève <b>son défi</b> (plus ou moins costaud selon son âge) ;</li>
+          <li>chaque défi réussi rapporte des <b>points à son équipe</b> 🏆 ;</li>
+          <li>quand tout le monde a réussi, l'étape donne <b>un chiffre du coffre</b>.</li>
         </ul>
-        Une fois les 5 chiffres réunis, ils composent le code et le trésor est révélé 🎉.
+        À la fin : les 5 chiffres ouvrent le coffre, on annonce <b>l'équipe qui a le plus de points</b>, et <b>tout le monde</b> trouve le trésor 🎉.
       </div>
     </div>
 
     <div class="parch" style="padding-top:22px;margin-bottom:14px">
-      <div class="section-label" style="color:var(--wood)">💡 5. Solutions (au cas où)</div>
+      <div class="section-label" style="color:var(--wood)">💡 5. Bon à savoir</div>
       <div class="guide-txt">
-        Si un enfant bloque, glissez-lui un indice :
         <ul>
-          <li>🏊 <b>Piscine</b> : Méditerranée · un marcassin · la châtaigne.</li>
-          <li>🪨 <b>Graviers</b> : toucher le caillou d'or 🪙 caché parmi les cailloux.</li>
-          <li>🛋️ <b>Terrasse de devant</b> : tourner la molette jusqu'à lire le message, mot = <b>SOLEIL</b>.</li>
-          <li>🪑 <b>Terrasse de derrière</b> : cadenas <b>4&nbsp;5&nbsp;7&nbsp;1</b> (pattes du chat, doigts d'une main, 3+4, 2×4−7).</li>
-          <li>🍽️ <b>Cuisine</b> : retrouver les paires du Memory.</li>
+          <li>Les défis sont des <b>calculs adaptés à l'âge</b> : les petits comptent des objets, les grands font des additions, multiplications puis calculs en plusieurs étapes.</li>
+          <li>Un défi se <b>retente à volonté</b> : aucun échec possible, on ne peut pas rester bloqué.</li>
+          <li>Les équipes sont <b>équilibrées par âge</b> pour que les points restent serrés. Vous pouvez changer les équipes dans « L'équipage ».</li>
+          <li>Le <b>code du coffre</b> est visible dans le Coin des parents.</li>
         </ul>
-        Chaque jeu se retente à volonté : aucun échec possible, on ne peut pas se bloquer.
       </div>
     </div>
 
@@ -865,13 +932,13 @@ function renderGuide(){
 
 function resetGame(){
   if(!confirm('Recommencer la chasse à zéro ? (l\'équipage et la cachette sont conservés)'))return;
-  S.done={}; S.poolDone={}; S.stationIdx=0; save(); go('home');
+  S.done={}; S.kidDone={}; S.stationIdx=0; save(); go('home');
 }
 
-/* Mode test : annuler / valider une épreuve */
+/* Mode test : annuler / valider une épreuve (et ses points) */
 function toggleStation(id){
-  if(S.done[id]){ delete S.done[id]; if(id==='piscine') S.poolDone={}; }
-  else { S.done[id]=true; if(id==='piscine') S.players.forEach((_,i)=>S.poolDone[i]=true); }
+  if(S.done[id]){ delete S.done[id]; S.kidDone[id]={}; }
+  else { S.done[id]=true; S.kidDone[id]={}; S.players.forEach((_,i)=>S.kidDone[id][i]=true); }
   save(); renderParents();
 }
 

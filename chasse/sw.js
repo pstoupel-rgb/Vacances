@@ -1,6 +1,6 @@
 /* Service Worker — Chasse au Trésor.
    Cache-first pour un fonctionnement 100% hors-ligne une fois chargée. */
-const CACHE = 'chasse-corse-v2';
+const CACHE = 'chasse-corse-v3';
 const ASSETS = [
   './',
   './index.html',

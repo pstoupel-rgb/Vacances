@@ -294,6 +294,11 @@
   .wtile.placed{background:linear-gradient(180deg,var(--gold),var(--gold2));box-shadow:none;cursor:default;}
   .wtile .wnum{position:absolute;top:-8px;left:-8px;width:22px;height:22px;border-radius:50%;background:var(--sea2);
     color:#fff;font-size:.75rem;display:flex;align-items:center;justify-content:center;box-shadow:0 1px 3px rgba(0,0,0,.3);}
+
+  /* eau glacée (chrono) */
+  .icetimer{font-family:var(--ff-title);font-size:3.4rem;color:#1f6f8b;margin:10px 0 6px;letter-spacing:2px;}
+  .icebar{height:16px;background:#d8e8ee;border-radius:20px;overflow:hidden;border:2px solid #9cc4d2;}
+  .icebar-fill{height:100%;background:linear-gradient(90deg,#5ec6e8,#2a90b0);width:0;transition:width .4s linear;}
 </style>
 </head>
 <body>
@@ -389,7 +394,9 @@ const BONUS = [
   { id:'danse',       emoji:'💃', name:'Le Grand Défi Danse',
     desc:"Chaque équipe prépare une danse rigolote, puis la présente : +2 points à la meilleure 🏆" },
   { id:'degustation', emoji:'🫣', name:'La Dégustation à l\'Aveugle',
-    desc:"Les yeux bandés, goûtez le produit mystère choisi par le parent 😋" }
+    desc:"Les yeux bandés, goûtez le produit mystère choisi par le parent 😋" },
+  { id:'eauglacee',   emoji:'🧊', name:'L\'Épreuve de l\'Eau Glacée',
+    desc:"Chaque joueur doit tenir au moins 1 min 30 dans l'eau glacée ⏱️ (chrono dans l'app)." }
 ];
 
 /* ---- État ---- */
@@ -469,6 +476,7 @@ const esc = s => (s||'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;
 
 /* ============================================================ RENDER */
 function render(){
+  if(window.__iceTimer){ clearInterval(window.__iceTimer); window.__iceTimer=null; }
   const scr = S.screen;
   if(scr==='home')      return renderHome();
   if(scr==='setup')     return renderSetup();
@@ -598,6 +606,7 @@ function bonusDone(id){
   if(id==='deguisement') return S.costumeWinner!==0;
   if(id==='danse') return S.danceWinner!==0;
   if(id==='degustation') return S.players.length>0 && S.players.every((_,i)=>(S.kidDone.degustation||{})[i]);
+  if(id==='eauglacee') return S.players.length>0 && S.players.every((_,i)=>(S.kidDone.eauglacee||{})[i]);
   return false;
 }
 function firstUndoneIndex(){ const i=STATIONS.findIndex(st=>!S.done[st.id]); return i===-1?STATIONS.length:i; }
@@ -727,6 +736,67 @@ function renderBonus(){
   else if(bo.id==='deguisement') gameCostume();
   else if(bo.id==='danse') gameDance();
   else if(bo.id==='degustation') gameTaste();
+  else if(bo.id==='eauglacee') gameIce();
+}
+
+/* ---- EAU GLACÉE (chrono d'endurance, 1'30 par joueur) ---- */
+const ICE_GOAL=90;
+function gameIce(){
+  const z=document.getElementById('gamezone');
+  if(!S.kidDone.eauglacee) S.kidDone.eauglacee={};
+  if(window.__iceTimer){clearInterval(window.__iceTimer);window.__iceTimer=null;}
+  const render=()=>{
+    const done=S.kidDone.eauglacee;
+    const teamBlock=(tno)=>{
+      const members=S.players.map((p,i)=>({p,i})).filter(x=>x.p.team===tno);
+      if(!members.length) return '';
+      const cards=members.map(({p,i})=>{ const g=grade(p.age), d=!!done[i];
+        return `<button class="poolcard ${d?'done':''}" onclick="iceKid(${i})">
+          <div class="pc-em">${g.em}</div>
+          <div class="pc-info"><b>${esc(p.name)||g.rank}</b><span>${d?('🧊 a tenu 1 min 30 · +'+kidPoints(p.age)+' pts'):(p.age+' ans · à faire')}</span></div>
+          <div class="pc-stat">${d?'✅':'🧊'}</div>
+        </button>`; }).join('');
+      return `<div class="teamcol team${tno}"><div class="teamhd">${S.teams[tno].em} ${esc(S.teams[tno].name)}</div>${cards}</div>`;
+    };
+    z.innerHTML=`<div class="game">
+      <div class="q">🧊 Épreuve de l'eau glacée ! Chaque joueur doit tenir <b>au moins 1 min 30</b> (main ou pieds dans l'eau glacée). Touche ton prénom et lance le chrono ⏱️</div>
+      <div class="teams2">${teamBlock(1)}${teamBlock(2)}</div>
+    </div>`;
+  };
+  window.__iceRender=render; render();
+}
+function iceKid(i){
+  const p=S.players[i], z=document.getElementById('gamezone');
+  if(window.__iceTimer){clearInterval(window.__iceTimer);window.__iceTimer=null;}
+  let t=0, running=false;
+  const fmt=v=>Math.floor(v/60)+':'+String(v%60).padStart(2,'0');
+  const paint=()=>{
+    z.innerHTML=`<div class="game" style="text-align:center">
+      <button class="hint-btn" style="float:left" onclick="window.__iceLeave()">‹ Retour</button>
+      <div class="q" style="clear:both">${grade(p.age).em} <b>${esc(p.name)||''}</b> — tiens <b>1:30</b> dans l'eau glacée 🧊</div>
+      <div class="icetimer" id="icetime">${fmt(t)}</div>
+      <div class="icebar"><div class="icebar-fill" id="icefill" style="width:${Math.round(t/ICE_GOAL*100)}%"></div></div>
+      <div id="icemsg" style="font-weight:700;color:var(--ink2);margin:10px 0">Objectif : 1:30 ⏱️ — courage !</div>
+      <button class="btn" id="iceStart" onclick="window.__iceStart()">▶️ Démarrer le chrono</button>
+    </div>`;
+  };
+  window.__iceStart=()=>{
+    if(running) return; running=true;
+    const btn=document.getElementById('iceStart'); if(btn){btn.disabled=true;btn.textContent='⏳ En cours…';}
+    window.__iceTimer=setInterval(()=>{
+      t++;
+      const el=document.getElementById('icetime'); if(el) el.textContent=fmt(t);
+      const bar=document.getElementById('icefill'); if(bar) bar.style.width=Math.min(100,Math.round(t/ICE_GOAL*100))+'%';
+      if(t>=ICE_GOAL){
+        clearInterval(window.__iceTimer); window.__iceTimer=null;
+        S.kidDone.eauglacee[i]=true; save(); burst(50);
+        const m=document.getElementById('icemsg'); if(m) m.innerHTML='<span style="color:var(--green);font-weight:800;font-size:1.1rem">🎉 Bravo ! 1:30 tenu, +'+kidPoints(p.age)+' pts pour l\'équipe !</span>';
+        const b2=document.getElementById('iceStart'); if(b2){b2.disabled=false;b2.textContent='Suivant ➜';b2.onclick=()=>renderBonus();}
+      }
+    },1000);
+  };
+  window.__iceLeave=()=>{ if(window.__iceTimer){clearInterval(window.__iceTimer);window.__iceTimer=null;} renderBonus(); };
+  paint();
 }
 
 /* ---- CAILLOUX MYSTÈRES (indice sous les cailloux) ---- */

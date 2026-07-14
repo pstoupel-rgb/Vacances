@@ -103,6 +103,10 @@
     display:flex;align-items:center;justify-content:center;font-family:var(--ff-title);
     font-size:1.9rem;color:var(--gold);box-shadow:inset 0 2px 6px rgba(0,0,0,.5);}
   .digit.empty{color:#3a5c57;border-color:#2f5b55;}
+  .wordchip{min-width:40px;padding:6px 10px;border-radius:10px;background:#123330;border:2px solid var(--gold);
+    display:flex;align-items:center;justify-content:center;font-family:var(--ff-title);
+    font-size:1.05rem;color:var(--gold);box-shadow:inset 0 2px 6px rgba(0,0,0,.5);}
+  .wordchip.empty{color:#3a5c57;border-color:#2f5b55;}
 
   .trail{position:relative;padding-left:6px;}
   .st{display:flex;gap:12px;align-items:stretch;margin-bottom:12px;position:relative;}
@@ -278,6 +282,18 @@
   .cstone:active{transform:scale(.9);}
   .cstone.up{background:#efe7d0;box-shadow:inset 0 0 0 2px var(--border);}
   .cstone.up.letter{background:linear-gradient(180deg,#3fbf6a,#2f8f4e);color:#fff;font-family:var(--ff-title);}
+
+  /* énigme finale (mots) */
+  .phrasebox{min-height:44px;display:flex;flex-wrap:wrap;gap:6px;justify-content:center;align-items:center;
+    background:#fff7e2;border-radius:10px;padding:12px;margin-bottom:12px;}
+  .wtiles{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;}
+  .wtile{position:relative;font-family:var(--ff-title);font-size:1.15rem;color:#fff;
+    background:linear-gradient(180deg,var(--wood),var(--wood2));border:none;border-radius:11px;
+    padding:11px 15px;cursor:pointer;box-shadow:0 4px 0 rgba(0,0,0,.25);}
+  .wtile:active{transform:translateY(3px);box-shadow:0 1px 0 rgba(0,0,0,.25);}
+  .wtile.placed{background:linear-gradient(180deg,var(--gold),var(--gold2));box-shadow:none;cursor:default;}
+  .wtile .wnum{position:absolute;top:-8px;left:-8px;width:22px;height:22px;border-radius:50%;background:var(--sea2);
+    color:#fff;font-size:.75rem;display:flex;align-items:center;justify-content:center;box-shadow:0 1px 3px rgba(0,0,0,.3);}
 </style>
 </head>
 <body>
@@ -340,7 +356,7 @@ const STATIONS = [
   },
   {
     id:'terrasse-arriere', emoji:'🪑', name:'La Terrasse de Derrière',
-    clue:"Fais le tour jusqu'à la terrasse à l'arrière de la maison, près de l'autre canapé : un cadenas y garde le dernier chiffre.",
+    clue:"Fais le tour jusqu'à la terrasse à l'arrière de la maison, près de l'autre canapé : le dernier mot de l'énigme s'y cache.",
     digit:1, game:'lock',
     missions:[
       "Réponds : combien de doigts sur <b>une main</b> ? ✋",
@@ -404,6 +420,7 @@ function defaultState(){
     tasteProduct:'',   // le produit mystère (choisi par le parent)
     indiceWord:'TRESOR', // mot caché sous les cailloux
     cluesFound:false,
+    enigmaWords:['CHERCHE','OÙ','IL','FAIT','FRAIS'], // 1 mot par épreuve -> énigme finale
     treasureMsg:"Le vrai trésor est caché près de la piscine 🏊\nCherchez sous le transat bleu !"
   };
 }
@@ -418,6 +435,7 @@ function load(){
     if(s.tasteProduct==null)s.tasteProduct='';
     if(!s.indiceWord)s.indiceWord='TRESOR';
     if(s.cluesFound==null)s.cluesFound=false;
+    if(!s.enigmaWords||!s.enigmaWords.length)s.enigmaWords=defaultState().enigmaWords;
     if(s.bonusIdx==null)s.bonusIdx=0;
     s.players.forEach(p=>{ if(!p.team)p.team=1; });
     return s;
@@ -526,9 +544,9 @@ function startAdventure(){ S.started=true; go('map'); }
 
 /* ---------------- MAP (parcours) ---------------- */
 function renderMap(){
-  const dilat = STATIONS.map(st=> S.done[st.id]
-      ? `<div class="digit">${st.digit}</div>`
-      : `<div class="digit empty">?</div>`).join('');
+  const dilat = STATIONS.map((st,i)=> S.done[st.id]
+      ? `<div class="wordchip">${esc(stationWord(st))}</div>`
+      : `<div class="wordchip empty">?</div>`).join('');
   const firstUndone = STATIONS.findIndex(st=>!S.done[st.id]);
   const allDone = firstUndone===-1;
 
@@ -536,7 +554,7 @@ function renderMap(){
     const done = !!S.done[st.id];
     const unlocked = done || i<=firstUndoneIndex();
     const cls = done?'done':(unlocked?'':'locked');
-    const tag = done?`<span class="tag ok">✓ Chiffre ${st.digit} obtenu</span>`
+    const tag = done?`<span class="tag ok">✓ Mot « ${esc(stationWord(st))} » gagné</span>`
               : unlocked?`<span class="tag play">▶ À jouer</span>`
               : `<span class="tag lock">🔒 Verrouillé</span>`;
     return `<div class="st ${cls}">
@@ -552,8 +570,8 @@ function renderMap(){
   app.innerHTML = `
     <div class="topbar"><button class="back" onclick="go('home')">‹</button><h2 style="font-size:1.3rem">Carte au trésor</h2></div>
     <div class="maphead">
-      <h2>Le code du coffre</h2>
-      <p>Gagnez les 5 chiffres… et un max de points par équipe !</p>
+      <h2>L'énigme du coffre</h2>
+      <p>Gagnez les 5 mots pour reconstituer l'énigme… et un max de points par équipe !</p>
       <div class="chestbar">${dilat}</div>
     </div>
     ${scoreboardHTML()}
@@ -583,6 +601,7 @@ function bonusDone(id){
   return false;
 }
 function firstUndoneIndex(){ const i=STATIONS.findIndex(st=>!S.done[st.id]); return i===-1?STATIONS.length:i; }
+function stationWord(st){ const i=STATIONS.indexOf(st); return (S.enigmaWords[i]||('MOT'+(i+1))); }
 
 /* Épreuve réussie */
 function completeStation(){
@@ -591,9 +610,9 @@ function completeStation(){
   const z=document.getElementById('gamezone');
   z.innerHTML = `
     <div class="reward">
-      <div style="font-weight:800;color:var(--wood)">Épreuve réussie par tout l'équipage ! Chiffre du coffre :</div>
-      <div class="rd">${st.digit}</div>
-      <div style="font-weight:700;color:var(--ink2);margin-bottom:10px">Note-le… il ouvrira le coffre 🗝️</div>
+      <div style="font-weight:800;color:var(--wood)">Épreuve réussie par tout l'équipage ! Mot de l'énigme :</div>
+      <div class="rd" style="font-size:2.1rem">${esc(stationWord(st))}</div>
+      <div style="font-weight:700;color:var(--ink2);margin-bottom:10px">Retenez-le… il fait partie de l'énigme du trésor 🗝️</div>
       ${scoreboardHTML()}
       <button class="btn" style="margin-top:12px" onclick="go('map')">Continuer la chasse ➜</button>
     </div>`;
@@ -1027,32 +1046,42 @@ function gameLock(z){
    and re-bind renderStation properly */
 
 function renderStationFinal(){
-  const code = STATIONS.map(s=>s.digit); // [4,8,2,6,1]
-  let cur = code.map(()=>0);
-  app.innerHTML = `
-    <div class="topbar"><button class="back" onclick="go('map')">‹</button><h2 style="font-size:1.3rem">Le Coffre</h2></div>
-    <div class="stationwrap">
-      <div class="bigemoji">🧰</div>
-      <h1 class="st-title">Le Coffre au Trésor</h1>
-      <div class="clue-box">Composez le code magique avec les 5 chiffres gagnés à chaque épreuve. Tout l'équipage réuni, tournez les molettes ensemble !</div>
-      <div class="game">
-        <div class="lock">${cur.map((n,i)=>`
-          <div class="dial">
-            <button onclick="fdial(${i},1)">▲</button>
-            <div class="num" id="fd${i}">${n}</div>
-            <button onclick="fdial(${i},-1)">▼</button>
-          </div>`).join('')}</div>
-        <button class="btn" onclick="checkFinal()">🗝️ Ouvrir le coffre !</button>
-        <div id="finalmsg"></div>
-      </div>
-    </div>
-  `;
-  window.fdial=(i,d)=>{ cur[i]=(cur[i]+d+10)%10; document.getElementById('fd'+i).textContent=cur[i]; };
-  window.checkFinal=()=>{
-    const m=document.getElementById('finalmsg');
-    if(cur.join('')===code.join('')){ go('treasure'); }
-    else m.innerHTML='<div class="msg err">Le coffre reste fermé… vérifie chaque chiffre gagné 🔢</div>';
+  const words = S.enigmaWords.slice(0, STATIONS.length); // les mots dans le bon ordre
+  // tuiles mélangées : {w, ord}
+  const tiles = words.map((w,i)=>({w, ord:i})).sort(()=>Math.random()-.5);
+  let placed = []; // indices d'ordre déjà placés (dans l'ordre de pose)
+  const draw=()=>{
+    const phrase = placed.map(o=>words[o]).join(' ');
+    const remaining = tiles.filter(t=>!placed.includes(t.ord));
+    app.innerHTML = `
+      <div class="topbar"><button class="back" onclick="go('map')">‹</button><h2 style="font-size:1.3rem">Le Coffre</h2></div>
+      <div class="stationwrap">
+        <div class="bigemoji">🧰</div>
+        <h1 class="st-title">L'Énigme du Coffre</h1>
+        <div class="clue-box">Tout l'équipage réuni : remettez les 5 mots gagnés <b>dans l'ordre des épreuves</b> (le petit numéro sur chaque mot vous aide 1→5) pour lire l'énigme qui mène au trésor !</div>
+        <div class="game">
+          <div class="phrasebox">${placed.length? placed.map(o=>`<span class="wtile placed">${esc(words[o])}</span>`).join(' ') : '<span style="color:var(--muted);font-weight:600">Touchez les mots dans l\'ordre 1 → 5…</span>'}</div>
+          <div class="wtiles">${remaining.map(t=>`<button class="wtile" onclick="placeWord(${t.ord})"><span class="wnum">${t.ord+1}</span>${esc(t.w)}</button>`).join('')}</div>
+          ${placed.length?`<button class="btn sea small" onclick="resetPhrase()">↺ Recommencer l'énigme</button>`:''}
+          <div id="finalmsg"></div>
+        </div>
+      </div>`;
+    if(placed.length===words.length){
+      const m=document.getElementById('finalmsg');
+      m.innerHTML=`<div class="reward" style="margin-top:12px"><div style="font-weight:800;color:var(--wood)">🎉 Énigme reconstituée !</div><div style="font-family:var(--ff-title);font-size:1.4rem;color:var(--gold2);margin:6px 0">« ${esc(phrase)} »</div><button class="btn" onclick="go('treasure')">🗝️ Ouvrir le trésor !</button></div>`;
+      burst(40);
+    }
   };
+  window.placeWord=(ord)=>{
+    // il faut poser les mots dans l'ordre : le prochain attendu est placed.length
+    if(ord===placed.length){ placed.push(ord); draw(); }
+    else {
+      const m=document.getElementById('finalmsg');
+      if(m){ m.innerHTML='<div class="msg err">Pas ce mot-là… quel mot vient en premier ? Réfléchissez à la phrase !</div>'; setTimeout(()=>{const x=document.getElementById('finalmsg'); if(x&&placed.length<words.length)x.innerHTML='';},1500); }
+    }
+  };
+  window.resetPhrase=()=>{ placed=[]; draw(); };
+  draw();
 }
 
 /* proper renderStation (station screen + défis d'équipe) */
@@ -1109,12 +1138,11 @@ function renderParents(){
         Ce texte s'affiche quand les enfants ouvrent le coffre. Cachez un vrai petit trésor (bonbons, jouets, pièces chocolat) à cet endroit !
       </div>
       <hr style="border:none;border-top:1.5px dashed var(--border);margin:16px 0">
-      <div class="section-label" style="color:var(--wood)">📋 Le code du coffre (pour vous)</div>
-      <div style="font-family:var(--ff-title);font-size:2rem;color:var(--sea2);letter-spacing:6px;text-align:center">
-        ${STATIONS.map(s=>s.digit).join(' ')}
-      </div>
-      <div style="font-size:.8rem;color:var(--ink2);font-weight:600;text-align:center">
-        Les enfants le reconstituent en gagnant chaque épreuve.
+      <div class="section-label" style="color:var(--wood)">🧩 L'énigme du coffre (5 mots, un par épreuve)</div>
+      <textarea class="treasure-set" oninput="S.enigmaWords=this.value.split('\\n').map(x=>x.trim()).filter(Boolean).slice(0,${STATIONS.length});save()">${esc(S.enigmaWords.join('\n'))}</textarea>
+      <div style="font-family:var(--ff-title);font-size:1.3rem;color:var(--sea2);text-align:center;margin-top:6px">« ${esc(S.enigmaWords.join(' '))} »</div>
+      <div style="font-size:.8rem;color:var(--ink2);font-weight:600;margin-top:6px">
+        Un mot par ligne (épreuve 1 en haut). Les enfants gagnent un mot par épreuve, puis les remettent dans l'ordre pour lire l'énigme. Écrivez une phrase qui mène à la cachette (ex : « CHERCHE OÙ IL FAIT FRAIS » → la cave, le frigo, l'ombre…).
       </div>
       <hr style="border:none;border-top:1.5px dashed var(--border);margin:16px 0">
       <div class="section-label" style="color:var(--wood)">🫣 Produit mystère (dégustation à l'aveugle)</div>
@@ -1200,9 +1228,9 @@ function renderGuide(){
           <li>une <b>énigme</b> indique le lieu 🗺️,</li>
           <li><b>chaque enfant</b> touche son prénom et relève <b>son défi</b> (plus ou moins costaud selon son âge) ;</li>
           <li>chaque défi réussi rapporte des <b>points à son équipe</b> 🏆 ;</li>
-          <li>quand tout le monde a réussi, l'étape donne <b>un chiffre du coffre</b>.</li>
+          <li>quand tout le monde a réussi, l'étape donne <b>un mot de l'énigme</b>.</li>
         </ul>
-        À la fin : les 5 chiffres ouvrent le coffre, on annonce <b>l'équipe qui a le plus de points</b>, et <b>tout le monde</b> trouve le trésor 🎉.
+        À la fin : on remet les 5 mots <b>dans l'ordre</b> pour lire l'énigme qui mène au trésor, on annonce <b>l'équipe qui a le plus de points</b>, et <b>tout le monde</b> trouve le trésor 🎉.
       </div>
     </div>
 
@@ -1213,7 +1241,7 @@ function renderGuide(){
           <li>Les défis sont des <b>calculs adaptés à l'âge</b> : les petits comptent des objets, les grands font des additions, multiplications puis calculs en plusieurs étapes.</li>
           <li>Un défi se <b>retente à volonté</b> : aucun échec possible, on ne peut pas rester bloqué.</li>
           <li>Les équipes sont <b>équilibrées par âge</b> pour que les points restent serrés. Vous pouvez changer les équipes dans « L'équipage ».</li>
-          <li>Le <b>code du coffre</b> est visible dans le Coin des parents.</li>
+          <li>L'<b>énigme du coffre</b> (les 5 mots) est réglable dans le Coin des parents — écrivez une phrase qui mène à votre cachette.</li>
         </ul>
       </div>
     </div>

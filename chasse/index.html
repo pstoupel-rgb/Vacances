@@ -249,6 +249,24 @@
   .teamlegend{display:flex;gap:8px;margin-bottom:12px;}
   .teamlegend .tl{flex:1;text-align:center;padding:8px;border-radius:11px;color:#fff;font-weight:800;font-size:.85rem;}
   .teamlegend .tl.team1{background:var(--t1b);} .teamlegend .tl.team2{background:var(--t2b);}
+
+  /* épreuves bonus */
+  .bonusgrid{display:flex;flex-direction:column;gap:10px;}
+  .bonuscard{display:flex;align-items:center;gap:12px;width:100%;text-align:left;font-family:var(--ff);
+    background:linear-gradient(180deg,var(--card),#f3e7c6);border:2px solid var(--gold);border-radius:14px;padding:12px;cursor:pointer;box-shadow:var(--shadow);}
+  .bonuscard.done{border-color:var(--green);}
+  .bonuscard .bo-em{font-size:2rem;flex:0 0 auto;}
+  .bonuscard .bo-info{min-width:0;}
+  .bonuscard .bo-info b{display:block;font-size:1.05rem;color:var(--ink);}
+  .bonuscard .bo-info span{font-size:.8rem;color:var(--ink2);font-weight:600;line-height:1.25;}
+
+  /* roue */
+  .wheelwrap{position:relative;width:200px;height:200px;margin:14px auto 6px;}
+  .wpointer{position:absolute;top:-6px;left:50%;transform:translateX(-50%);font-size:1.8rem;color:var(--red);z-index:3;text-shadow:0 1px 2px rgba(0,0,0,.4);}
+  .wheel{width:200px;height:200px;border-radius:50%;border:6px solid var(--wood);box-shadow:var(--shadow),inset 0 0 0 2px #fff;position:relative;transform:rotate(0deg);}
+  .wheel .wlabel{position:absolute;top:50%;left:50%;width:0;height:0;display:flex;align-items:center;justify-content:center;}
+  .wheel .wlabel span{display:inline-block;font-family:var(--ff-title);font-size:1.2rem;color:#fff;text-shadow:0 1px 2px rgba(0,0,0,.5);}
+  .costumebtns{display:flex;flex-direction:column;gap:10px;}
 </style>
 </head>
 <body>
@@ -333,6 +351,16 @@ const STATIONS = [
   }
 ];
 
+/* ---- Épreuves BONUS (points d'équipe + trésors perso, sans chiffre du coffre) ---- */
+const BONUS = [
+  { id:'roue',        emoji:'🎡', name:'La Roue de la Fortune',
+    desc:"Chaque pirate tourne la roue et gagne SON trésor rien qu'à lui 🎁" },
+  { id:'deguisement', emoji:'🎭', name:'Le Concours de Déguisement',
+    desc:"Défilé des pirates ! +1 point à l'équipe la mieux déguisée (c'est le juge qui décide)." },
+  { id:'degustation', emoji:'🫣', name:'La Dégustation à l\'Aveugle',
+    desc:"Les yeux bandés, goûtez le produit mystère choisi par le parent 😋" }
+];
+
 /* ---- État ---- */
 let S = load();
 
@@ -352,6 +380,11 @@ function defaultState(){
     done:{},           // {stationId:true}
     kidDone:{},        // {stationId:{playerIndex:true}} défis individuels réussis
     stationIdx:0,
+    bonusIdx:0,
+    wheelPrizes:['un paquet de bonbons 🍬','une pièce en chocolat 🪙','un petit jouet 🧸','une glace 🍦','un porte-bonheur 🐚','une petite BD 📖','un bracelet brésilien 🧵','un badge de pirate 🏴‍☠️'],
+    wheelResult:{},    // {playerIndex: prixText}
+    costumeWinner:0,   // 0=pas encore, 1, 2, 3=égalité
+    tasteProduct:'',   // le produit mystère (choisi par le parent)
     treasureMsg:"Le vrai trésor est caché près de la piscine 🏊\nCherchez sous le transat bleu !"
   };
 }
@@ -359,6 +392,11 @@ function load(){
   try{ const s=JSON.parse(localStorage.getItem(STORE_KEY)); if(s&&s.players){
     if(!s.kidDone)s.kidDone={};
     if(!s.teams)s.teams={1:{name:'Les Requins',em:'🦈'},2:{name:'Les Dauphins',em:'🐬'}};
+    if(!s.wheelPrizes)s.wheelPrizes=defaultState().wheelPrizes;
+    if(!s.wheelResult)s.wheelResult={};
+    if(s.costumeWinner==null)s.costumeWinner=0;
+    if(s.tasteProduct==null)s.tasteProduct='';
+    if(s.bonusIdx==null)s.bonusIdx=0;
     s.players.forEach(p=>{ if(!p.team)p.team=1; });
     return s;
   } }catch(e){}
@@ -368,6 +406,9 @@ function computeScores(){
   const sc={1:0,2:0};
   for(const stId in S.kidDone){ const m=S.kidDone[stId]||{};
     for(const idx in m){ if(m[idx]){ const p=S.players[idx]; if(p) sc[p.team]=(sc[p.team]||0)+kidPoints(p.age); } } }
+  if(S.costumeWinner===1) sc[1]+=1;
+  else if(S.costumeWinner===2) sc[2]+=1;
+  else if(S.costumeWinner===3){ sc[1]+=1; sc[2]+=1; }
   return sc;
 }
 function scoreboardHTML(){
@@ -380,7 +421,7 @@ function scoreboardHTML(){
 function save(){ try{ localStorage.setItem(STORE_KEY, JSON.stringify(S)); }catch(e){} }
 
 const app = document.getElementById('app');
-function go(screen, idx){ S.screen=screen; if(idx!=null)S.stationIdx=idx; save(); render(); window.scrollTo(0,0); }
+function go(screen, idx){ S.screen=screen; if(idx!=null){ if(screen==='bonus')S.bonusIdx=idx; else S.stationIdx=idx; } save(); render(); window.scrollTo(0,0); }
 const esc = s => (s||'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 
 /* ============================================================ RENDER */
@@ -390,6 +431,7 @@ function render(){
   if(scr==='setup')     return renderSetup();
   if(scr==='map')       return renderMap();
   if(scr==='station')   return renderStation();
+  if(scr==='bonus')     return renderBonus();
   if(scr==='treasure')  return renderTreasure();
   if(scr==='parents')   return renderParents();
   if(scr==='guide')     return renderGuide();
@@ -494,8 +536,24 @@ function renderMap(){
     ${allDone
       ? `<div style="margin-top:6px"><button class="btn" onclick="go('station',${STATIONS.length})">🏴‍☠️ Ouvrir le coffre au trésor !</button></div>`
       : ``}
-    <div class="footnote">Astuce parents : cachez de vrais petits cailloux peints & un vrai trésor 🎁</div>
+    <div class="section-label" style="color:var(--gold);margin:22px 0 8px;justify-content:center">⭐ Épreuves bonus</div>
+    <div class="bonusgrid">
+      ${BONUS.map((bo,i)=>{
+        const done=bonusDone(bo.id);
+        return `<button class="bonuscard ${done?'done':''}" onclick="go('bonus',${i})">
+          <div class="bo-em">${done?'✅':bo.emoji}</div>
+          <div class="bo-info"><b>${bo.name}</b><span>${bo.desc}</span></div>
+        </button>`;
+      }).join('')}
+    </div>
+    <div class="footnote">Astuce parents : cachez un vrai petit trésor par enfant 🎁 (la roue dit qui gagne quoi)</div>
   `;
+}
+function bonusDone(id){
+  if(id==='roue') return S.players.length>0 && S.players.every((_,i)=>S.wheelResult[i]);
+  if(id==='deguisement') return S.costumeWinner!==0;
+  if(id==='degustation') return S.players.length>0 && S.players.every((_,i)=>(S.kidDone.degustation||{})[i]);
+  return false;
 }
 function firstUndoneIndex(){ const i=STATIONS.findIndex(st=>!S.done[st.id]); return i===-1?STATIONS.length:i; }
 
@@ -604,6 +662,126 @@ function openKid(stId,i){
     }
   });
 }
+
+/* ============================================================ ÉPREUVES BONUS */
+function renderBonus(){
+  const bo=BONUS[S.bonusIdx];
+  app.innerHTML=`
+    <div class="topbar"><button class="back" onclick="go('map')">‹</button><h2 style="font-size:1.3rem">Épreuve bonus</h2></div>
+    <div class="stationwrap">
+      <div class="bigemoji">${bo.emoji}</div>
+      <h1 class="st-title">${bo.name}</h1>
+      <div class="clue-box">${bo.desc}</div>
+      ${scoreboardHTML()}
+      <div><div class="section-label">🎮 À vous de jouer</div><div id="gamezone"></div></div>
+      <button class="btn sea" style="margin-top:6px" onclick="go('map')">↩︎ Retour à la carte</button>
+    </div>`;
+  if(bo.id==='roue') gameWheel();
+  else if(bo.id==='deguisement') gameCostume();
+  else if(bo.id==='degustation') gameTaste();
+}
+
+/* ---- ROUE DE LA FORTUNE (un trésor perso par enfant) ---- */
+function gameWheel(){
+  const z=document.getElementById('gamezone');
+  const render=()=>{
+    const cards=S.players.map((p,i)=>{ const g=grade(p.age), won=S.wheelResult[i];
+      return `<button class="poolcard ${won?'done':''}" onclick="openWheel(${i})">
+        <div class="pc-em">${g.em}</div>
+        <div class="pc-info"><b>${esc(p.name)||g.rank}</b><span>${won?('🎁 '+esc(won)):(p.age+' ans · à faire tourner !')}</span></div>
+        <div class="pc-stat">${won?'✅':'🎡'}</div>
+      </button>`; }).join('');
+    const allDone=S.players.length>0 && S.players.every((_,i)=>S.wheelResult[i]);
+    z.innerHTML=`<div class="game">
+      <div class="q">🎡 Chacun son tour : touche ton prénom et fais tourner la roue. Tout le monde repart avec SON trésor !</div>
+      <div class="poolgrid">${cards}</div>
+      ${allDone?'<div class="msg win">🎉 Tout le monde a gagné son trésor ! (Le récap est dans le Coin des parents.)</div>':''}
+    </div>`;
+  };
+  window.__wheelRender=render; render();
+}
+function openWheel(i){
+  const p=S.players[i], prizes=S.wheelPrizes, n=prizes.length, seg=360/n;
+  const cols=['#e0a915','#2a7d73','#c0392b','#2f8f4e','#8B5E3C','#a83d86','#1f6f8b','#c78a06'];
+  const stops=[]; for(let k=0;k<n;k++) stops.push(`${cols[k%cols.length]} ${k*seg}deg ${(k+1)*seg}deg`);
+  let labels=''; for(let k=0;k<n;k++){ const a=k*seg+seg/2; labels+=`<div class="wlabel" style="transform:rotate(${a}deg) translateY(-88px)"><span style="transform:rotate(${-a}deg)">${k+1}</span></div>`; }
+  const z=document.getElementById('gamezone');
+  z.innerHTML=`<div class="game" style="text-align:center">
+    <button class="hint-btn" style="float:left" onclick="window.__wheelRender()">‹ Retour</button>
+    <div class="q" style="clear:both">${grade(p.age).em} Roue de <b>${esc(p.name)||''}</b> 🎡</div>
+    <div class="wheelwrap">
+      <div class="wpointer">▼</div>
+      <div class="wheel" id="wheelEl" style="background:conic-gradient(${stops.join(',')})">${labels}</div>
+    </div>
+    <button class="btn" id="spinBtn" onclick="spinWheel(${i})">🎯 Tourner la roue !</button>
+    <div id="wheelmsg"></div>
+  </div>`;
+}
+function spinWheel(i){
+  const prizes=S.wheelPrizes, n=prizes.length, seg=360/n;
+  const el=document.getElementById('wheelEl'), btn=document.getElementById('spinBtn');
+  if(!el||el.dataset.spun) return; el.dataset.spun='1'; btn.disabled=true;
+  const winner=Math.floor(Math.random()*n);
+  const target=5*360 + (360-(winner*seg+seg/2));
+  el.style.transition='transform 4s cubic-bezier(.17,.67,.28,1)';
+  requestAnimationFrame(()=>{ el.style.transform=`rotate(${target}deg)`; });
+  setTimeout(()=>{
+    S.wheelResult[i]=prizes[winner]; save();
+    const m=document.getElementById('wheelmsg');
+    if(m) m.innerHTML=`<div class="reward" style="margin-top:12px"><div style="font-weight:800;color:var(--wood)">🎁 Ton trésor :</div><div style="font-family:var(--ff-title);font-size:1.5rem;color:var(--gold2);margin:6px 0">${esc(prizes[winner])}</div><button class="btn" onclick="window.__wheelRender()">Suivant ➜</button></div>`;
+    burst(60);
+  },4200);
+}
+
+/* ---- CONCOURS DE DÉGUISEMENT (+1 point équipe) ---- */
+function gameCostume(){
+  const z=document.getElementById('gamezone'), t=S.teams;
+  const render=()=>{
+    const w=S.costumeWinner;
+    z.innerHTML=`<div class="game">
+      <div class="q">🎭 Défilé des pirates ! Le juge (un parent) désigne l'équipe la mieux déguisée : <b>+1 point</b>.</div>
+      <div class="costumebtns">
+        <button class="btn small" style="background:linear-gradient(180deg,var(--t1a),var(--t1b));box-shadow:0 4px 0 #14424f" onclick="setCostume(1)">${t[1].em} ${esc(t[1].name)}${w===1?' ✓':''}</button>
+        <button class="btn small" style="background:linear-gradient(180deg,var(--t2a),var(--t2b));box-shadow:0 4px 0 #6d2757" onclick="setCostume(2)">${t[2].em} ${esc(t[2].name)}${w===2?' ✓':''}</button>
+        <button class="btn sea small" onclick="setCostume(3)">🤝 Égalité (les deux +1)${w===3?' ✓':''}</button>
+      </div>
+      ${w!==0?`<div class="msg win">Point(s) attribué(s) ! 🏆</div>${scoreboardHTML()}`:''}
+    </div>`;
+  };
+  window.__costumeRender=render; render();
+}
+function setCostume(w){ S.costumeWinner=w; save(); renderBonus(); burst(30); }
+
+/* ---- DÉGUSTATION À L'AVEUGLE ---- */
+function gameTaste(){
+  const z=document.getElementById('gamezone');
+  if(!S.kidDone.degustation) S.kidDone.degustation={};
+  const render=()=>{
+    const done=S.kidDone.degustation;
+    const cards=S.players.map((p,i)=>{ const g=grade(p.age), d=!!done[i];
+      return `<button class="poolcard ${d?'done':''}" onclick="tasteKid(${i})">
+        <div class="pc-em">${g.em}</div>
+        <div class="pc-info"><b>${esc(p.name)||g.rank}</b><span>${d?('😋 a goûté · +'+kidPoints(p.age)+' pts'):(p.age+' ans · à faire')}</span></div>
+        <div class="pc-stat">${d?'✅':'🫣'}</div>
+      </button>`; }).join('');
+    z.innerHTML=`<div class="game">
+      <div class="q">🫣 Un parent prépare le <b>produit mystère</b> (à régler dans le Coin des parents) et bande les yeux de chaque pirate à tour de rôle. On goûte sans regarder — courage rapporte des points !</div>
+      <div class="poolgrid">${cards}</div>
+    </div>`;
+  };
+  window.__tasteRender=render; render();
+}
+function tasteKid(i){
+  const p=S.players[i];
+  const z=document.getElementById('gamezone');
+  z.innerHTML=`<div class="game" style="text-align:center">
+    <button class="hint-btn" style="float:left" onclick="window.__tasteRender()">‹ Retour</button>
+    <div class="q" style="clear:both">${grade(p.age).em} <b>${esc(p.name)||''}</b>, bande-toi les yeux 🙈</div>
+    <div class="pool-q">Goûte le produit mystère choisi par le parent…<br>Alors, courage ? 😋</div>
+    <button class="btn" onclick="tasteDone(${i})">😋 J'ai goûté ! (+${kidPoints(p.age)} pts pour mon équipe)</button>
+  </div>`;
+}
+function tasteDone(i){ if(!S.kidDone.degustation)S.kidDone.degustation={}; S.kidDone.degustation[i]=true; save(); burst(20); renderBonus(); }
 
 /* ---- QUIZ (non utilisé — gardé au cas où) ---- */
 const QUIZ=[
@@ -808,6 +986,7 @@ function renderTreasure(){
       <div style="color:#f3e6c8;font-weight:700;font-size:1.05rem">Bravo à tout l'équipage ! Le coffre est ouvert ! 🎉</div>
       <div style="width:100%;max-width:360px">${scoreboardHTML()}</div>
       <div style="color:#fff3cf;font-weight:700;font-size:1rem;max-width:340px">${verdict}</div>
+      <div style="color:#bfe3d5;font-weight:700;font-size:.92rem;max-width:340px">🎁 Et surtout : <b>chaque pirate repart avec SON propre trésor</b> — personne n'est oublié !</div>
       <div class="final">${esc(S.treasureMsg).replace(/\n/g,'<br>')}</div>
       <div style="width:100%;max-width:340px;display:flex;flex-direction:column;gap:10px;margin-top:6px">
         <button class="btn sea" onclick="go('map')">↩︎ Revoir la carte</button>
@@ -837,6 +1016,16 @@ function renderParents(){
       <div style="font-size:.8rem;color:var(--ink2);font-weight:600;text-align:center">
         Les enfants le reconstituent en gagnant chaque épreuve.
       </div>
+      <hr style="border:none;border-top:1.5px dashed var(--border);margin:16px 0">
+      <div class="section-label" style="color:var(--wood)">🫣 Produit mystère (dégustation à l'aveugle)</div>
+      <input class="name" style="width:100%" placeholder="Ex : olive, citron, miel, cornichon…" value="${esc(S.tasteProduct)}" oninput="S.tasteProduct=this.value;save()">
+      <div style="font-size:.8rem;color:var(--ink2);font-weight:600;margin-top:6px">Visible seulement ici. Préparez ce produit et bandez les yeux des enfants pour l'épreuve bonus 🫣.</div>
+      <hr style="border:none;border-top:1.5px dashed var(--border);margin:16px 0">
+      <div class="section-label" style="color:var(--wood)">🎡 Trésors de la roue (un par ligne)</div>
+      <textarea class="treasure-set" oninput="S.wheelPrizes=this.value.split('\\n').map(x=>x.trim()).filter(Boolean);save()">${esc(S.wheelPrizes.join('\n'))}</textarea>
+      <div style="font-size:.8rem;color:var(--ink2);font-weight:600;margin-top:6px">Les cases de la roue de la fortune. Chaque enfant en gagne un « d'office ». Cachez ces petits trésors dans la maison.</div>
+      ${Object.keys(S.wheelResult).length?`<div class="section-label" style="color:var(--wood);margin-top:14px">🏅 Trésors déjà gagnés</div>
+        <div class="test-list">${S.players.map((p,i)=>S.wheelResult[i]?`<div class="test-row"><span>${grade(p.age).em} ${esc(p.name)||('n°'+(i+1))}</span><b style="color:var(--sea2);font-size:.85rem">${esc(S.wheelResult[i])}</b></div>`:'').join('')}</div>`:''}
       <hr style="border:none;border-top:1.5px dashed var(--border);margin:16px 0">
       <div class="section-label" style="color:var(--wood)">🧪 Mode test — annuler / valider les épreuves</div>
       <div class="test-list">
@@ -932,7 +1121,7 @@ function renderGuide(){
 
 function resetGame(){
   if(!confirm('Recommencer la chasse à zéro ? (l\'équipage et la cachette sont conservés)'))return;
-  S.done={}; S.kidDone={}; S.stationIdx=0; save(); go('home');
+  S.done={}; S.kidDone={}; S.stationIdx=0; S.wheelResult={}; S.costumeWinner=0; save(); go('home');
 }
 
 /* Mode test : annuler / valider une épreuve (et ses points) */

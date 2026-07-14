@@ -312,7 +312,7 @@
    LA CHASSE AU TRÉSOR DE CORSE — mini-app 100% hors-ligne
    ============================================================ */
 
-const STORE_KEY = 'chasse-corse-v3';
+const STORE_KEY = 'chasse-corse-v4';
 const THEME = {piscine:'piscine', gravier:'gravier', 'terrasse-avant':'terrasse', 'terrasse-arriere':'terrasse', cuisine:'cuisine'};
 function kidPoints(age){ if(age<=7)return 5; if(age<=9)return 6; if(age<=11)return 8; if(age<=13)return 10; if(age<=15)return 12; return 14; }
 
@@ -325,62 +325,32 @@ function grade(age){
 }
 function tier(age){ if(age<=7)return 0; if(age<=10)return 1; if(age<=13)return 2; return 3; }
 
-/* ---- Les stations ---- */
+/* ---- Les épreuves (dans l'ordre) ---- */
 const STATIONS = [
   {
+    id:'deguisement', emoji:'🎭', name:'Le Déguisement',
+    clue:"Chaque équipe se déguise en pirates et défile fièrement ! Le juge désigne l'équipe la mieux costumée.",
+    game:'costume'
+  },
+  {
+    id:'danse', emoji:'💃', name:'La Danse',
+    clue:"Chaque équipe prépare une petite danse rigolote, puis la présente devant le juge !",
+    game:'dance'
+  },
+  {
     id:'piscine', emoji:'🏊', name:'La Piscine',
-    clue:"Rendez-vous là où l'eau est bleue, où l'on fait des bombes et des étoiles de mer !",
-    digit:4, game:'poolIndiv',
-    missions:[
-      "Fais 3 bisous à la surface de l'eau en les comptant à voix haute 💦",
-      "Trouve un objet qui <b>flotte</b> et un objet qui <b>coule</b>.",
-      "Réussis <b>ton</b> défi piscine, puis aide un plus jeune à réussir le sien 💪",
-      "Tu es le maître-nageur 🛟 : réussis ton défi et vérifie que tout l'équipage a réussi le sien."
-    ]
+    clue:"Direction la piscine ! Chaque pirate relève son défi dans l'eau bleue.",
+    game:'pool'
   },
   {
-    id:'gravier', emoji:'🪨', name:'Le Jardin de Gravier',
-    clue:"Cherchez le coin qui crisse sous les pieds… là où mille cailloux dorment au soleil.",
-    digit:8, game:'stones',
-    missions:[
-      "Ramasse <b>8 cailloux</b> et fais-en un petit tas trésor.",
-      "Trouve le caillou le plus <b>rond</b> et le plus rigolo du jardin.",
-      "Cache 3 cailloux pour plus tard et retiens bien où !",
-      "Repère le <b>caillou d'or</b> sur l'écran avant tout le monde 🪙."
-    ]
+    id:'nourriture', emoji:'🫣', name:'La Dégustation',
+    clue:"Les yeux bandés, chaque pirate goûte le produit mystère préparé par le parent.",
+    game:'taste'
   },
   {
-    id:'terrasse-avant', emoji:'🛋️', name:'La Terrasse de Devant',
-    clue:"File vers la grande terrasse à l'avant de la maison : un pirate a glissé un message secret près du canapé.",
-    digit:6, game:'caesar',
-    missions:[
-      "Soulève les coussins du canapé de devant : un trésor s'y cache peut-être ! 🛋️",
-      "Fais le tour de la terrasse et compte les coussins du canapé.",
-      "Aide à tourner la molette du décodeur secret.",
-      "Décode le message et lis-le à voix haute à l'équipage 📜."
-    ]
-  },
-  {
-    id:'terrasse-arriere', emoji:'🪑', name:'La Terrasse de Derrière',
-    clue:"Fais le tour jusqu'à la terrasse à l'arrière de la maison, près de l'autre canapé : le dernier mot de l'énigme s'y cache.",
-    digit:1, game:'lock',
-    missions:[
-      "Réponds : combien de doigts sur <b>une main</b> ? ✋",
-      "Compte les coussins du canapé de derrière.",
-      "Résous les énigmes de chiffres.",
-      "Compose le code du cadenas sans te tromper 🔐."
-    ]
-  },
-  {
-    id:'cuisine', emoji:'🍽️', name:'La Cuisine',
-    clue:"Dernière étape : le repaire des bonnes odeurs, là où l'on prépare le festin des pirates.",
-    digit:2, game:'memory',
-    missions:[
-      "Sens un aliment les yeux fermés 👀 et devine ce que c'est.",
-      "Trouve quelque chose de <b>rouge</b> et quelque chose de <b>sucré</b>.",
-      "Gagne au Memory des saveurs corses.",
-      "Invente le nom d'un cocktail de pirate (sans alcool 🍹 !)."
-    ]
+    id:'panini', emoji:'⚽', name:'Le Défi Panini',
+    clue:"Comme dans l'album ! Drapeaux pour les petits, questions Coupe du Monde pour les grands.",
+    game:'foot'
   }
 ];
 
@@ -479,7 +449,6 @@ function render(){
   if(scr==='setup')     return renderSetup();
   if(scr==='map')       return renderMap();
   if(scr==='station')   return renderStation();
-  if(scr==='bonus')     return renderBonus();
   if(scr==='treasure')  return renderTreasure();
   if(scr==='parents')   return renderParents();
   if(scr==='guide')     return renderGuide();
@@ -575,26 +544,16 @@ function renderMap(){
   app.innerHTML = `
     <div class="topbar"><button class="back" onclick="go('home')">‹</button><h2 style="font-size:1.3rem">Carte au trésor</h2></div>
     <div class="maphead">
-      <h2>L'énigme du coffre</h2>
-      <p>Gagnez les 5 mots pour reconstituer l'énigme… et un max de points par équipe !</p>
+      <h2>L'énigme du trésor</h2>
+      <p>Réussissez les 5 épreuves (dans l'ordre) pour gagner les mots… puis le jeu de piste vous mène au trésor !</p>
       <div class="chestbar">${dilat}</div>
     </div>
     ${scoreboardHTML()}
     <div class="trail">${trail}</div>
     ${allDone
-      ? `<div style="margin-top:6px"><button class="btn" onclick="go('station',${STATIONS.length})">🏴‍☠️ Ouvrir le coffre au trésor !</button></div>`
-      : ``}
-    <div class="section-label" style="color:var(--gold);margin:22px 0 8px;justify-content:center">⭐ Épreuves bonus</div>
-    <div class="bonusgrid">
-      ${BONUS.map((bo,i)=>{
-        const done=bonusDone(bo.id);
-        return `<button class="bonuscard ${done?'done':''}" onclick="go('bonus',${i})">
-          <div class="bo-em">${done?'✅':bo.emoji}</div>
-          <div class="bo-info"><b>${bo.name}</b><span>${bo.desc}</span></div>
-        </button>`;
-      }).join('')}
-    </div>
-    <div class="footnote">Astuce parents : cachez un vrai petit trésor par enfant 🎁 (la roue dit qui gagne quoi)</div>
+      ? `<div style="margin-top:10px"><button class="btn" onclick="go('station',${STATIONS.length})">🧭 Le Jeu de Piste — reconstituer l'énigme !</button></div>`
+      : `<div class="footnote">🔒 Le jeu de piste final se débloque une fois les 5 épreuves réussies.</div>`}
+    <div class="footnote">Astuce parents : réglez le déguisement, la danse et le produit mystère dans le Coin des parents 🎁</div>
   `;
 }
 function bonusDone(id){
@@ -775,16 +734,18 @@ function kidFoot(age){
   opts.sort(()=>Math.random()-.5);
   return {text, correct, opts};
 }
-function gameFoot(){
-  const z=document.getElementById('gamezone');
-  if(!S.kidDone.panini) S.kidDone.panini={};
+function gameFoot(st){
+  const z=document.getElementById('gamezone'); const key=st.id;
+  if(!S.kidDone[key]) S.kidDone[key]={};
   const render=()=>{
-    const done=S.kidDone.panini;
+    const done=S.kidDone[key];
+    const total=S.players.length, doneN=S.players.reduce((n,_,i)=>n+(done[i]?1:0),0);
+    if(total>0 && doneN===total){ completeStation(); return; }
     const teamBlock=(tno)=>{
       const members=S.players.map((p,i)=>({p,i})).filter(x=>x.p.team===tno);
       if(!members.length) return '';
       const cards=members.map(({p,i})=>{ const g=grade(p.age), d=!!done[i];
-        return `<button class="poolcard ${d?'done':''}" onclick="openFoot(${i})">
+        return `<button class="poolcard ${d?'done':''}" onclick="openFoot('${key}',${i})">
           <div class="pc-em">${g.em}</div>
           <div class="pc-info"><b>${esc(p.name)||g.rank}</b><span>${d?('⚽ réussi · +'+kidPoints(p.age)+' pts'):(p.age+' ans · '+(p.age<=11?'drapeaux':'quiz CDM'))}</span></div>
           <div class="pc-stat">${d?'✅':'⚽'}</div>
@@ -798,7 +759,7 @@ function gameFoot(){
   };
   window.__footRender=render; render();
 }
-function openFoot(i){
+function openFoot(key,i){
   const p=S.players[i], g=grade(p.age), q=kidFoot(p.age);
   const z=document.getElementById('gamezone');
   z.innerHTML=`<div class="game">
@@ -810,8 +771,8 @@ function openFoot(i){
   </div>`;
   z.querySelectorAll('.opt').forEach(b=>b.onclick=()=>{
     if(b.dataset.ok==='1'){
-      b.classList.add('good'); S.kidDone.panini[i]=true; save();
-      setTimeout(()=>renderBonus(),650);
+      b.classList.add('good'); S.kidDone[key][i]=true; save();
+      setTimeout(()=>window.__footRender(),650);
     }else{
       b.classList.add('bad'); setTimeout(()=>b.classList.remove('bad'),400);
       const m=document.getElementById('footmsg');
@@ -930,9 +891,9 @@ function rollDance(re){
   const st=DANCE_STYLES[Math.floor(Math.random()*DANCE_STYLES.length)];
   const mv=DANCE_MOVES[Math.floor(Math.random()*DANCE_MOVES.length)];
   S.danceChallenge={style:st,move:mv}; save();
-  if(re) renderBonus();
+  if(re) renderStation();
 }
-function gameDance(){
+function gameDance(st){
   const z=document.getElementById('gamezone'), t=S.teams;
   if(!S.danceChallenge) rollDance(false);
   const c=S.danceChallenge, w=S.danceWinner;
@@ -946,10 +907,10 @@ function gameDance(){
       <button class="btn small" style="background:linear-gradient(180deg,var(--t2a),var(--t2b));box-shadow:0 4px 0 #6d2757" onclick="setDance(2)">${t[2].em} ${esc(t[2].name)}${w===2?' ✓':''}</button>
       <button class="btn sea small" onclick="setDance(3)">🤝 Égalité (les deux +2)${w===3?' ✓':''}</button>
     </div>
-    ${w!==0?`<div class="msg win">+2 points attribués ! 🏆</div>${scoreboardHTML()}`:''}
+    ${w!==0?`<div class="msg win">+2 points attribués ! Touche à nouveau une équipe pour corriger, ou continue.</div>${scoreboardHTML()}<button class="btn" style="margin-top:10px" onclick="completeStation()">Valider et gagner le mot ➜</button>`:''}
   </div>`;
 }
-function setDance(w){ S.danceWinner=w; save(); renderBonus(); burst(30); }
+function setDance(w){ S.danceWinner=w; save(); renderStation(); burst(30); }
 
 /* ---- ROUE DE LA FORTUNE (un trésor perso par enfant) ---- */
 function gameWheel(){
@@ -1004,54 +965,57 @@ function spinWheel(i){
 }
 
 /* ---- CONCOURS DE DÉGUISEMENT (+1 point équipe) ---- */
-function gameCostume(){
-  const z=document.getElementById('gamezone'), t=S.teams;
-  const render=()=>{
-    const w=S.costumeWinner;
-    z.innerHTML=`<div class="game">
-      <div class="q">🎭 Défilé des pirates ! Le juge (un parent) désigne l'équipe la mieux déguisée : <b>+1 point</b>.</div>
-      <div class="costumebtns">
-        <button class="btn small" style="background:linear-gradient(180deg,var(--t1a),var(--t1b));box-shadow:0 4px 0 #14424f" onclick="setCostume(1)">${t[1].em} ${esc(t[1].name)}${w===1?' ✓':''}</button>
-        <button class="btn small" style="background:linear-gradient(180deg,var(--t2a),var(--t2b));box-shadow:0 4px 0 #6d2757" onclick="setCostume(2)">${t[2].em} ${esc(t[2].name)}${w===2?' ✓':''}</button>
-        <button class="btn sea small" onclick="setCostume(3)">🤝 Égalité (les deux +1)${w===3?' ✓':''}</button>
-      </div>
-      ${w!==0?`<div class="msg win">Point(s) attribué(s) ! 🏆</div>${scoreboardHTML()}`:''}
-    </div>`;
-  };
-  window.__costumeRender=render; render();
+function gameCostume(st){
+  const z=document.getElementById('gamezone'), t=S.teams, w=S.costumeWinner;
+  z.innerHTML=`<div class="game">
+    <div class="q">🎭 Défilé des pirates ! Le juge (un parent) désigne l'équipe la mieux déguisée : <b>+1 point</b>.</div>
+    <div class="costumebtns">
+      <button class="btn small" style="background:linear-gradient(180deg,var(--t1a),var(--t1b));box-shadow:0 4px 0 #14424f" onclick="setCostume(1)">${t[1].em} ${esc(t[1].name)}${w===1?' ✓':''}</button>
+      <button class="btn small" style="background:linear-gradient(180deg,var(--t2a),var(--t2b));box-shadow:0 4px 0 #6d2757" onclick="setCostume(2)">${t[2].em} ${esc(t[2].name)}${w===2?' ✓':''}</button>
+      <button class="btn sea small" onclick="setCostume(3)">🤝 Égalité (les deux +1)${w===3?' ✓':''}</button>
+    </div>
+    ${w!==0?`<div class="msg win">Point(s) attribué(s) ! 🏆</div>${scoreboardHTML()}<button class="btn" style="margin-top:10px" onclick="completeStation()">Valider et gagner le mot ➜</button>`:''}
+  </div>`;
 }
-function setCostume(w){ S.costumeWinner=w; save(); renderBonus(); burst(30); }
+function setCostume(w){ S.costumeWinner=w; save(); renderStation(); burst(30); }
 
 /* ---- DÉGUSTATION À L'AVEUGLE ---- */
-function gameTaste(){
-  const z=document.getElementById('gamezone');
-  if(!S.kidDone.degustation) S.kidDone.degustation={};
+function gameTaste(st){
+  const z=document.getElementById('gamezone'); const key=st.id;
+  if(!S.kidDone[key]) S.kidDone[key]={};
   const render=()=>{
-    const done=S.kidDone.degustation;
-    const cards=S.players.map((p,i)=>{ const g=grade(p.age), d=!!done[i];
-      return `<button class="poolcard ${d?'done':''}" onclick="tasteKid(${i})">
-        <div class="pc-em">${g.em}</div>
-        <div class="pc-info"><b>${esc(p.name)||g.rank}</b><span>${d?('😋 a goûté · +'+kidPoints(p.age)+' pts'):(p.age+' ans · à faire')}</span></div>
-        <div class="pc-stat">${d?'✅':'🫣'}</div>
-      </button>`; }).join('');
+    const done=S.kidDone[key];
+    const total=S.players.length, doneN=S.players.reduce((n,_,i)=>n+(done[i]?1:0),0);
+    if(total>0 && doneN===total){ completeStation(); return; }
+    const teamBlock=(tno)=>{
+      const members=S.players.map((p,i)=>({p,i})).filter(x=>x.p.team===tno);
+      if(!members.length) return '';
+      const cards=members.map(({p,i})=>{ const g=grade(p.age), d=!!done[i];
+        return `<button class="poolcard ${d?'done':''}" onclick="tasteKid('${key}',${i})">
+          <div class="pc-em">${g.em}</div>
+          <div class="pc-info"><b>${esc(p.name)||g.rank}</b><span>${d?('😋 a goûté · +'+kidPoints(p.age)+' pts'):(p.age+' ans · à faire')}</span></div>
+          <div class="pc-stat">${d?'✅':'🫣'}</div>
+        </button>`; }).join('');
+      return `<div class="teamcol team${tno}"><div class="teamhd">${S.teams[tno].em} ${esc(S.teams[tno].name)}</div>${cards}</div>`;
+    };
     z.innerHTML=`<div class="game">
-      <div class="q">🫣 Un parent prépare le <b>produit mystère</b> (à régler dans le Coin des parents) et bande les yeux de chaque pirate à tour de rôle. On goûte sans regarder — courage rapporte des points !</div>
-      <div class="poolgrid">${cards}</div>
+      <div class="q">🫣 Un parent prépare le <b>produit mystère</b> (à régler dans le Coin des parents) et bande les yeux de chaque pirate. On goûte sans regarder — le courage rapporte des points !</div>
+      <div class="teams2">${teamBlock(1)}${teamBlock(2)}</div>
     </div>`;
   };
   window.__tasteRender=render; render();
 }
-function tasteKid(i){
+function tasteKid(key,i){
   const p=S.players[i];
   const z=document.getElementById('gamezone');
   z.innerHTML=`<div class="game" style="text-align:center">
     <button class="hint-btn" style="float:left" onclick="window.__tasteRender()">‹ Retour</button>
     <div class="q" style="clear:both">${grade(p.age).em} <b>${esc(p.name)||''}</b>, bande-toi les yeux 🙈</div>
     <div class="pool-q">Goûte le produit mystère choisi par le parent…<br>Alors, courage ? 😋</div>
-    <button class="btn" onclick="tasteDone(${i})">😋 J'ai goûté ! (+${kidPoints(p.age)} pts pour mon équipe)</button>
+    <button class="btn" onclick="tasteDone('${key}',${i})">😋 J'ai goûté ! (+${kidPoints(p.age)} pts pour mon équipe)</button>
   </div>`;
 }
-function tasteDone(i){ if(!S.kidDone.degustation)S.kidDone.degustation={}; S.kidDone.degustation[i]=true; save(); burst(20); renderBonus(); }
+function tasteDone(key,i){ if(!S.kidDone[key])S.kidDone[key]={}; S.kidDone[key][i]=true; save(); burst(20); window.__tasteRender(); }
 
 /* ---- QUIZ (non utilisé — gardé au cas où) ---- */
 const QUIZ=[
@@ -1205,10 +1169,10 @@ function renderStationFinal(){
     const phrase = placed.map(o=>words[o]).join(' ');
     const remaining = tiles.filter(t=>!placed.includes(t.ord));
     app.innerHTML = `
-      <div class="topbar"><button class="back" onclick="go('map')">‹</button><h2 style="font-size:1.3rem">Le Coffre</h2></div>
+      <div class="topbar"><button class="back" onclick="go('map')">‹</button><h2 style="font-size:1.3rem">Le Jeu de Piste</h2></div>
       <div class="stationwrap">
-        <div class="bigemoji">🧰</div>
-        <h1 class="st-title">L'Énigme du Coffre</h1>
+        <div class="bigemoji">🧭</div>
+        <h1 class="st-title">Le Jeu de Piste</h1>
         <div class="clue-box">Tout l'équipage réuni : remettez les 5 mots gagnés <b>dans l'ordre des épreuves</b> (le petit numéro sur chaque mot vous aide 1→5) pour lire l'énigme qui mène au trésor !</div>
         <div class="game">
           <div class="phrasebox">${placed.length? placed.map(o=>`<span class="wtile placed">${esc(words[o])}</span>`).join(' ') : '<span style="color:var(--muted);font-weight:600">Touchez les mots dans l\'ordre 1 → 5…</span>'}</div>
@@ -1241,15 +1205,20 @@ function renderStation(){
   if(idx>=STATIONS.length) return renderStationFinal();
   const st=STATIONS[idx];
   app.innerHTML = `
-    <div class="topbar"><button class="back" onclick="go('map')">‹</button><h2 style="font-size:1.3rem">Épreuve ${idx+1}/5</h2></div>
+    <div class="topbar"><button class="back" onclick="go('map')">‹</button><h2 style="font-size:1.3rem">Épreuve ${idx+1}/${STATIONS.length}</h2></div>
     <div class="stationwrap">
       <div class="bigemoji">${st.emoji}</div>
       <h1 class="st-title">${st.name}</h1>
-      <div><div class="section-label">🧭 Où aller ?</div><div class="clue-box">${st.clue}</div></div>
+      <div><div class="section-label">📣 L'épreuve</div><div class="clue-box">${st.clue}</div></div>
       ${scoreboardHTML()}
-      <div><div class="section-label">🎮 Les défis de l'équipage</div><div id="gamezone"></div></div>
+      <div><div class="section-label">🎮 À vous de jouer</div><div id="gamezone"></div></div>
     </div>`;
-  gameKidDefis(st);
+  const g=st.game;
+  if(g==='pool') gameKidDefis(st);
+  else if(g==='taste') gameTaste(st);
+  else if(g==='foot') gameFoot(st);
+  else if(g==='costume') gameCostume(st);
+  else if(g==='dance') gameDance(st);
 }
 
 /* ---------------- TREASURE ---------------- */
@@ -1266,7 +1235,6 @@ function renderTreasure(){
       <div style="color:#f3e6c8;font-weight:700;font-size:1.05rem">Bravo à tout l'équipage ! Le coffre est ouvert ! 🎉</div>
       <div style="width:100%;max-width:360px">${scoreboardHTML()}</div>
       <div style="color:#fff3cf;font-weight:700;font-size:1rem;max-width:340px">${verdict}</div>
-      <div style="color:#bfe3d5;font-weight:700;font-size:.92rem;max-width:340px">🎁 Et surtout : <b>chaque pirate repart avec SON propre trésor</b> — personne n'est oublié !</div>
       <div class="final">${esc(S.treasureMsg).replace(/\n/g,'<br>')}</div>
       <div style="width:100%;max-width:340px;display:flex;flex-direction:column;gap:10px;margin-top:6px">
         <button class="btn sea" onclick="go('map')">↩︎ Revoir la carte</button>

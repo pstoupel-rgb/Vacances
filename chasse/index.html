@@ -299,6 +299,7 @@
   .icetimer{font-family:var(--ff-title);font-size:3.4rem;color:#1f6f8b;margin:10px 0 6px;letter-spacing:2px;}
   .icebar{height:16px;background:#d8e8ee;border-radius:20px;overflow:hidden;border:2px solid #9cc4d2;}
   .icebar-fill{height:100%;background:linear-gradient(90deg,#5ec6e8,#2a90b0);width:0;transition:width .4s linear;}
+  .bigflag{display:block;font-size:3.5rem;margin:8px 0;line-height:1;}
 </style>
 </head>
 <body>
@@ -396,7 +397,9 @@ const BONUS = [
   { id:'degustation', emoji:'🫣', name:'La Dégustation à l\'Aveugle',
     desc:"Les yeux bandés, goûtez le produit mystère choisi par le parent 😋" },
   { id:'eauglacee',   emoji:'🧊', name:'L\'Épreuve de l\'Eau Glacée',
-    desc:"Chaque joueur doit tenir au moins 1 min 30 dans l'eau glacée ⏱️ (chrono dans l'app)." }
+    desc:"Chaque joueur doit tenir au moins 1 min 30 dans l'eau glacée ⏱️ (chrono dans l'app)." },
+  { id:'panini',      emoji:'⚽', name:'Le Défi Panini (Coupe du Monde)',
+    desc:"Drapeaux et questions Coupe du Monde ! Chaque joueur répond et marque pour son équipe 🏆" }
 ];
 
 /* ---- État ---- */
@@ -607,6 +610,7 @@ function bonusDone(id){
   if(id==='danse') return S.danceWinner!==0;
   if(id==='degustation') return S.players.length>0 && S.players.every((_,i)=>(S.kidDone.degustation||{})[i]);
   if(id==='eauglacee') return S.players.length>0 && S.players.every((_,i)=>(S.kidDone.eauglacee||{})[i]);
+  if(id==='panini') return S.players.length>0 && S.players.every((_,i)=>(S.kidDone.panini||{})[i]);
   return false;
 }
 function firstUndoneIndex(){ const i=STATIONS.findIndex(st=>!S.done[st.id]); return i===-1?STATIONS.length:i; }
@@ -737,6 +741,89 @@ function renderBonus(){
   else if(bo.id==='danse') gameDance();
   else if(bo.id==='degustation') gameTaste();
   else if(bo.id==='eauglacee') gameIce();
+  else if(bo.id==='panini') gameFoot();
+}
+
+/* ---- DÉFI PANINI / COUPE DU MONDE (quiz drapeaux + foot) ---- */
+const FOOT_FLAGS=[
+  {f:'🇫🇷', a:['France','Italie','Belgique'], ok:0},
+  {f:'🇧🇷', a:['Brésil','Argentine','Portugal'], ok:0},
+  {f:'🇮🇹', a:['Italie','Irlande','Mexique'], ok:0},
+  {f:'🇪🇸', a:['Espagne','Portugal','Colombie'], ok:0},
+  {f:'🇩🇪', a:['Allemagne','Belgique','Roumanie'], ok:0},
+  {f:'🇦🇷', a:['Argentine','Uruguay','Chili'], ok:0},
+  {f:'🇵🇹', a:['Portugal','Espagne','Maroc'], ok:0},
+  {f:'🇯🇵', a:['Japon','Corée','Chine'], ok:0},
+  {f:'🇲🇦', a:['Maroc','Tunisie','Sénégal'], ok:0},
+  {f:'🇧🇪', a:['Belgique','Pays-Bas','France'], ok:0},
+  {f:'🇳🇱', a:['Pays-Bas','Belgique','Croatie'], ok:0},
+  {f:'🇭🇷', a:['Croatie','Serbie','Suisse'], ok:0}
+];
+const FOOT_FACTS=[
+  {q:"Quel pays a gagné la Coupe du Monde 2018 ?", a:['La France 🇫🇷','La Croatie 🇭🇷','Le Brésil 🇧🇷'], ok:0},
+  {q:"Quel pays a gagné la Coupe du Monde 2022 (Qatar) ?", a:["L'Argentine 🇦🇷",'La France 🇫🇷',"L'Espagne 🇪🇸"], ok:0},
+  {q:"Quel pays a gagné 5 Coupes du Monde (record) ?", a:['Le Brésil 🇧🇷',"L'Italie 🇮🇹","L'Allemagne 🇩🇪"], ok:0},
+  {q:"De quel pays vient Lionel Messi ?", a:['Argentine 🇦🇷','Espagne 🇪🇸','Uruguay 🇺🇾'], ok:0},
+  {q:"De quel pays vient Cristiano Ronaldo ?", a:['Portugal 🇵🇹','Brésil 🇧🇷','Espagne 🇪🇸'], ok:0},
+  {q:"Combien de joueurs par équipe sur le terrain ?", a:['9','11','13'], ok:1},
+  {q:"Combien de temps dure un match (sans prolongation) ?", a:['60 min','90 min','120 min'], ok:1},
+  {q:"Où s'est jouée la Coupe du Monde 2022 ?", a:['Au Qatar 🇶🇦','En Russie 🇷🇺','Au Brésil 🇧🇷'], ok:0},
+  {q:"En quelle année la France a gagné sa 1re Coupe du Monde ?", a:['1998','2006','1986'], ok:0},
+  {q:"Kylian Mbappé joue pour quel pays ?", a:['La France 🇫🇷','La Belgique 🇧🇪','Le Portugal 🇵🇹'], ok:0},
+  {q:"Combien d'équipes à la Coupe du Monde 2022 ?", a:['32','16','24'], ok:0},
+  {q:"Quelle couleur de carton exclut un joueur ?", a:['Rouge 🟥','Jaune 🟨','Vert 🟩'], ok:0}
+];
+function kidFoot(age){
+  const R=n=>Math.floor(Math.random()*n);
+  let text, correct, opts;
+  if(age<=11){ const q=FOOT_FLAGS[R(FOOT_FLAGS.length)]; text=`Quel est ce drapeau ?<br><span class="bigflag">${q.f}</span>`; correct=q.a[q.ok]; opts=q.a.slice(); }
+  else { const q=FOOT_FACTS[R(FOOT_FACTS.length)]; text=q.q; correct=q.a[q.ok]; opts=q.a.slice(); }
+  opts.sort(()=>Math.random()-.5);
+  return {text, correct, opts};
+}
+function gameFoot(){
+  const z=document.getElementById('gamezone');
+  if(!S.kidDone.panini) S.kidDone.panini={};
+  const render=()=>{
+    const done=S.kidDone.panini;
+    const teamBlock=(tno)=>{
+      const members=S.players.map((p,i)=>({p,i})).filter(x=>x.p.team===tno);
+      if(!members.length) return '';
+      const cards=members.map(({p,i})=>{ const g=grade(p.age), d=!!done[i];
+        return `<button class="poolcard ${d?'done':''}" onclick="openFoot(${i})">
+          <div class="pc-em">${g.em}</div>
+          <div class="pc-info"><b>${esc(p.name)||g.rank}</b><span>${d?('⚽ réussi · +'+kidPoints(p.age)+' pts'):(p.age+' ans · '+(p.age<=11?'drapeaux':'quiz CDM'))}</span></div>
+          <div class="pc-stat">${d?'✅':'⚽'}</div>
+        </button>`; }).join('');
+      return `<div class="teamcol team${tno}"><div class="teamhd">${S.teams[tno].em} ${esc(S.teams[tno].name)}</div>${cards}</div>`;
+    };
+    z.innerHTML=`<div class="game">
+      <div class="q">⚽ Comme dans l'album Panini ! Touche ton prénom : les petits reconnaissent un drapeau, les grands répondent à une question Coupe du Monde. Chaque bonne réponse rapporte des points 🏆</div>
+      <div class="teams2">${teamBlock(1)}${teamBlock(2)}</div>
+    </div>`;
+  };
+  window.__footRender=render; render();
+}
+function openFoot(i){
+  const p=S.players[i], g=grade(p.age), q=kidFoot(p.age);
+  const z=document.getElementById('gamezone');
+  z.innerHTML=`<div class="game">
+    <button class="hint-btn" style="margin:0 0 4px" onclick="window.__footRender()">‹ Retour aux équipes</button>
+    <div class="q">${g.em} <b>${esc(p.name)||g.rank}</b> — ${p.age} ans <span class="ptsbadge">+${kidPoints(p.age)} pts</span></div>
+    <div class="pool-q">${q.text}</div>
+    <div class="opts">${q.opts.map(o=>`<button class="opt" data-ok="${o===q.correct?1:0}">${o}</button>`).join('')}</div>
+    <div id="footmsg"></div>
+  </div>`;
+  z.querySelectorAll('.opt').forEach(b=>b.onclick=()=>{
+    if(b.dataset.ok==='1'){
+      b.classList.add('good'); S.kidDone.panini[i]=true; save();
+      setTimeout(()=>renderBonus(),650);
+    }else{
+      b.classList.add('bad'); setTimeout(()=>b.classList.remove('bad'),400);
+      const m=document.getElementById('footmsg');
+      if(m){ m.innerHTML='<div class="msg err">Raté ! Réessaie ⚽</div>'; setTimeout(()=>{if(m)m.innerHTML='';},1100); }
+    }
+  });
 }
 
 /* ---- EAU GLACÉE (chrono d'endurance, 1'30 par joueur) ---- */

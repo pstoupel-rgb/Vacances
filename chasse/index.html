@@ -386,18 +386,12 @@ const STATIONS = [
 
 /* ---- Épreuves BONUS (points d'équipe + trésors perso, sans chiffre du coffre) ---- */
 const BONUS = [
-  { id:'roue',        emoji:'🎡', name:'La Roue de la Fortune',
-    desc:"Chaque pirate tourne la roue et gagne SON trésor rien qu'à lui 🎁" },
-  { id:'cailloux',    emoji:'🪨', name:'Les Cailloux Mystères',
-    desc:"Soulevez les cailloux : sous certains se cachent les lettres d'un indice secret 🔎" },
   { id:'deguisement', emoji:'🎭', name:'Le Concours de Déguisement',
     desc:"Défilé des pirates ! +1 point à l'équipe la mieux déguisée (c'est le juge qui décide)." },
   { id:'danse',       emoji:'💃', name:'Le Grand Défi Danse',
     desc:"Chaque équipe prépare une danse rigolote, puis la présente : +2 points à la meilleure 🏆" },
   { id:'degustation', emoji:'🫣', name:'La Dégustation à l\'Aveugle',
     desc:"Les yeux bandés, goûtez le produit mystère choisi par le parent 😋" },
-  { id:'eauglacee',   emoji:'🧊', name:'L\'Épreuve de l\'Eau Glacée',
-    desc:"Chaque joueur doit tenir au moins 1 min 30 dans l'eau glacée ⏱️ (chrono dans l'app)." },
   { id:'panini',      emoji:'⚽', name:'Le Défi Panini (Coupe du Monde)',
     desc:"Drapeaux et questions Coupe du Monde ! Chaque joueur répond et marque pour son équipe 🏆" }
 ];
@@ -1305,16 +1299,6 @@ function renderParents(){
       <div class="section-label" style="color:var(--wood)">🫣 Produit mystère (dégustation à l'aveugle)</div>
       <input class="name" style="width:100%" placeholder="Ex : olive, citron, miel, cornichon…" value="${esc(S.tasteProduct)}" oninput="S.tasteProduct=this.value;save()">
       <div style="font-size:.8rem;color:var(--ink2);font-weight:600;margin-top:6px">Visible seulement ici. Préparez ce produit et bandez les yeux des enfants pour l'épreuve bonus 🫣.</div>
-      <hr style="border:none;border-top:1.5px dashed var(--border);margin:16px 0">
-      <div class="section-label" style="color:var(--wood)">🪨 Indice caché sous les cailloux</div>
-      <input class="name" style="width:100%;text-transform:uppercase" placeholder="Ex : PISCINE, TRESOR, JARDIN…" value="${esc(S.indiceWord)}" oninput="S.indiceWord=this.value;save()">
-      <div style="font-size:.8rem;color:var(--ink2);font-weight:600;margin-top:6px">Le mot que les enfants reconstitueront en soulevant les cailloux (lettres uniquement). Idéal : un mot qui donne un vrai indice sur la cachette.</div>
-      <hr style="border:none;border-top:1.5px dashed var(--border);margin:16px 0">
-      <div class="section-label" style="color:var(--wood)">🎡 Trésors de la roue (un par ligne)</div>
-      <textarea class="treasure-set" oninput="S.wheelPrizes=this.value.split('\\n').map(x=>x.trim()).filter(Boolean);save()">${esc(S.wheelPrizes.join('\n'))}</textarea>
-      <div style="font-size:.8rem;color:var(--ink2);font-weight:600;margin-top:6px">Les cases de la roue de la fortune. Chaque enfant en gagne un « d'office ». Cachez ces petits trésors dans la maison.</div>
-      ${Object.keys(S.wheelResult).length?`<div class="section-label" style="color:var(--wood);margin-top:14px">🏅 Trésors déjà gagnés</div>
-        <div class="test-list">${S.players.map((p,i)=>S.wheelResult[i]?`<div class="test-row"><span>${grade(p.age).em} ${esc(p.name)||('n°'+(i+1))}</span><b style="color:var(--sea2);font-size:.85rem">${esc(S.wheelResult[i])}</b></div>`:'').join('')}</div>`:''}
       <hr style="border:none;border-top:1.5px dashed var(--border);margin:16px 0">
       <div class="section-label" style="color:var(--wood)">🧪 Mode test — annuler / valider les épreuves</div>
       <div class="test-list">

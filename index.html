@@ -1775,6 +1775,10 @@ async function _initFbAsync(){
     await _loadFbSDK();
     try{firebase.app();}catch(e){firebase.initializeApp(FB_CONFIG);}
     _fbDb=firebase.firestore();_fbSt=firebase.storage();
+    /* Persistance hors-ligne : les écritures (phrases, etc.) sont stockées localement (IndexedDB)
+       et synchronisées automatiquement au retour du réseau — plus de perte de données en réseau faible. */
+    try{await _fbDb.enablePersistence({synchronizeTabs:true});}catch(e){/* déjà activée ailleurs ou non supportée */}
+    _flushPhraseQueue();
     return true;
   }catch(e){console.warn('Firebase init',e);return false;}
 }
@@ -2499,6 +2503,7 @@ async function initPhrases(){
     if(typeof _initFbAsync==='function'){
       await _initFbAsync();
       if(_fbDb){
+        _flushPhraseQueue();
         /* Load team photos if the profil tab hasn't been visited yet */
         if(!_teamFbUnsub){
           _fbDb.collection('team').get().then(snap=>{
@@ -2616,6 +2621,21 @@ function previewPhrasePhoto(input){
   reader.onload=e=>{const img=document.getElementById('phrase-photo-preview');img.src=e.target.result;img.style.display='block';};
   reader.readAsDataURL(file);
 }
+/* File d'attente locale des phrases : si Firebase n'a pas pu se charger du tout,
+   la phrase est stockée ici (durable) et renvoyée dès que Firebase est prêt / le réseau revient. */
+const PHRASE_QUEUE_KEY='corse2026-phrase-queue';
+function _getPhraseQueue(){try{return JSON.parse(localStorage.getItem(PHRASE_QUEUE_KEY)||'[]');}catch(e){return[];}}
+function _setPhraseQueue(q){try{localStorage.setItem(PHRASE_QUEUE_KEY,JSON.stringify(q));}catch(e){}}
+function _queuePhrase(p){const q=_getPhraseQueue();const i=q.findIndex(x=>x.id===p.id);if(i>=0)q[i]=p;else q.push(p);_setPhraseQueue(q);}
+async function _flushPhraseQueue(){
+  if(!_fbDb)return;
+  const q=_getPhraseQueue();if(!q.length)return;
+  const remaining=[];
+  for(const p of q){try{await _fbDb.collection('phrases').doc(p.id).set(p);}catch(e){remaining.push(p);}}
+  _setPhraseQueue(remaining);
+}
+/* Renvoyer les phrases en attente dès que le réseau revient */
+window.addEventListener('online',function(){if(typeof _initFbAsync==='function')_initFbAsync().then(function(){_flushPhraseQueue();}).catch(function(){});});
 async function savePhrase(){
   const text=document.getElementById('phrase-text-input').value.trim();
   if(!text){document.getElementById('phrase-text-input').focus();return;}
@@ -2625,6 +2645,10 @@ async function savePhrase(){
   const p=isEdit?{...existing,text}:{id,text,author:_phraseAuthor,addedBy:'',ts:Date.now(),likes:[]};
   const file=document.getElementById('phrase-photo-input').files[0];
   closePhraseModal();
+  /* Affichage optimiste immédiat (même hors-ligne) */
+  if(isEdit){const i=PHRASES.findIndex(x=>x.id===id);if(i>=0)PHRASES[i]=p;}
+  else if(!PHRASES.find(x=>x.id===id)){PHRASES.unshift(p);}
+  renderPhrases();
   if(file&&_fbSt){
     try{
       const ref=_fbSt.ref('phrases/'+id+'.jpg');
@@ -2632,11 +2656,13 @@ async function savePhrase(){
       p.imgUrl=await ref.getDownloadURL();
     }catch(e){console.warn('photo upload',e);}
   }
-  if(_fbDb){try{await _fbDb.collection('phrases').doc(id).set(p);}catch(e){alert('Erreur : '+e.message);}}
-  else{
-    if(isEdit){const i=PHRASES.findIndex(x=>x.id===id);if(i>=0)PHRASES[i]=p;}
-    else{PHRASES.unshift(p);}
-    renderPhrases();
+  /* Toujours mettre en file (durable) ; l'écriture Firebase la retirera une fois confirmée côté serveur.
+     Si Firebase n'est pas chargé, elle reste en file et part au prochain _flushPhraseQueue(). */
+  _queuePhrase(p);
+  if(_fbDb){
+    _fbDb.collection('phrases').doc(id).set(p)
+      .then(()=>{const q=_getPhraseQueue().filter(x=>x.id!==id);_setPhraseQueue(q);})
+      .catch(e=>console.warn('phrase save (restera en file)',e));
   }
 }
 function expandPhrasePhoto(url){

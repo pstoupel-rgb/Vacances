@@ -2490,27 +2490,35 @@ function _phraseDevId(){let id=localStorage.getItem(PHRASE_DEV_KEY);if(!id){id=u
 let _phrasesFbUnsub=null,PHRASES=[],_phraseAuthor='',_phraseEditId=null;
 async function initPhrases(){
   renderPhraseAuthors();
-  if(typeof _initFbAsync==='function'){
-    await _initFbAsync();
-    if(_fbDb){
-      /* Load team photos if the profil tab hasn't been visited yet */
-      if(!_teamFbUnsub){
-        _fbDb.collection('team').get().then(snap=>{
-          snap.forEach(d=>{const v=d.data();if(v&&v.url)TEAM_PHOTOS[d.id]=v.url;});
+  /* Filet de sécurité : si Firebase ne répond pas (réseau faible), on affiche l'état courant
+     après 4 s au lieu de rester bloqué sur « Chargement… » à l'infini. */
+  let settled=false;
+  const settle=()=>{if(!settled){settled=true;renderPhrases();}};
+  const fallback=setTimeout(settle,4000);
+  try{
+    if(typeof _initFbAsync==='function'){
+      await _initFbAsync();
+      if(_fbDb){
+        /* Load team photos if the profil tab hasn't been visited yet */
+        if(!_teamFbUnsub){
+          _fbDb.collection('team').get().then(snap=>{
+            snap.forEach(d=>{const v=d.data();if(v&&v.url)TEAM_PHOTOS[d.id]=v.url;});
+            paintPhraseAuthors();
+          }).catch(()=>{});
+        } else {
           paintPhraseAuthors();
-        }).catch(()=>{});
-      } else {
-        paintPhraseAuthors();
-      }
-      if(!_phrasesFbUnsub){
-        _phrasesFbUnsub=_fbDb.collection('phrases').orderBy('ts','desc').onSnapshot(snap=>{
-          PHRASES=[];snap.forEach(d=>PHRASES.push(d.data()));renderPhrases();
-        },err=>console.warn('phrases',err));
-        return;
+        }
+        if(!_phrasesFbUnsub){
+          _phrasesFbUnsub=_fbDb.collection('phrases').orderBy('ts','desc').onSnapshot(snap=>{
+            settled=true;clearTimeout(fallback);
+            PHRASES=[];snap.forEach(d=>PHRASES.push(d.data()));renderPhrases();
+          },err=>{console.warn('phrases',err);settle();});
+          return;
+        }
       }
     }
-  }
-  renderPhrases();
+  }catch(e){console.warn('initPhrases',e);}
+  clearTimeout(fallback);settle();
 }
 function renderPhraseAuthors(){
   const el=document.getElementById('phrase-authors');if(!el)return;

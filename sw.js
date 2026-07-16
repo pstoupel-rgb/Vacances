@@ -1,7 +1,7 @@
 /* Service Worker — network-first pour HTML (toujours la dernière version),
    cache-first pour les assets statiques (offline OK),
    cache-first pour les photos Firebase (réseau faible OK, ex: Corse 📶). */
-const CACHE = 'corse-2026-v206';
+const CACHE = 'corse-2026-v207';
 const MEDIA_CACHE = 'corse-media-v1';   /* photos Firebase — conservé entre versions */
 const ASSETS = [
   './',
@@ -12,7 +12,15 @@ const ASSETS = [
 ];
 
 self.addEventListener('install', e => {
-  e.waitUntil(caches.open(CACHE).then(c => c.addAll(ASSETS)).then(() => self.skipWaiting()));
+  /* Install résilient : on met en cache chaque asset indépendamment (allSettled) et on
+     appelle skipWaiting QUOI QU'IL ARRIVE. Avant, un seul asset qui échouait (réseau faible)
+     faisait échouer toute la mise à jour → l'app restait coincée sur l'ancien SW. */
+  e.waitUntil(
+    caches.open(CACHE)
+      .then(c => Promise.allSettled(ASSETS.map(a => c.add(a))))
+      .catch(() => {})
+      .then(() => self.skipWaiting())
+  );
 });
 
 self.addEventListener('activate', e => {

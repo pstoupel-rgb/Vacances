@@ -1538,7 +1538,14 @@ function showWeek(n,btn){
 })();
 
 /* Splash */
-window.addEventListener('load',()=>setTimeout(()=>{const s=document.getElementById('splash');if(s)s.classList.add('hide');},700));
+/* Masquage robuste du splash : ne dépend PAS de window.load (qui peut ne jamais se déclencher
+   si une ressource externe — police/image — ne charge pas, ex. réseau faible en Corse).
+   → on masque dès que le DOM est prêt, et un filet de sécurité force le retrait après 2,5 s. */
+function _hideSplash(){const s=document.getElementById('splash');if(s)s.classList.add('hide');}
+if(document.readyState==='interactive'||document.readyState==='complete'){setTimeout(_hideSplash,400);}
+else{document.addEventListener('DOMContentLoaded',function(){setTimeout(_hideSplash,400);});}
+window.addEventListener('load',function(){setTimeout(_hideSplash,200);});
+setTimeout(_hideSplash,2500);
 
 /* 📅 PROGRAMME DU JOUR */
 const IMG={

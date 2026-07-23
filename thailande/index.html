@@ -481,6 +481,7 @@ const PLACES=[
   {n:'Elephant Rescue Park',lat:18.9218,lng:98.8493,ic:'🐘',grp:'Chiang Mai',d:'Tour privé · 22 déc matin'},
   {n:'Doi Suthep (Wat Phra That)',lat:18.8047,lng:98.9217,ic:'⛰️',grp:'Chiang Mai',d:'Temple perché · vue sur la ville'},
   {n:'Aéroport de Surat Thani (URT)',lat:9.1326,lng:99.1355,ic:'✈️',grp:'Transport',d:'Vol AirAsia FD5420 · 23 déc'},
+  {n:'Aéroport de Phuket (HKT)',lat:8.1132,lng:98.3169,ic:'✈️',grp:'Transport',d:'Vol retour Phuket → Bangkok · ~1er janv'},
   {n:'500 Rai Floating Resort',lat:8.9760,lng:98.6870,ic:'🛶',grp:'Khao Sok',stop:3,d:'Étape 3 · 23 → 25 déc · lac Cheow Lan'},
   {n:'Lac Cheow Lan (Ratchaprapha)',lat:8.9755,lng:98.7930,ic:'🏞️',grp:'Khao Sok',d:'Kayak, longtail, jungle'},
   {n:'Nirvana Beach Resort',lat:7.5450,lng:99.0450,ic:'🏝️',grp:'Koh Lanta',stop:4,d:'Étape 4 · 25 → 29 déc · villa piscine'},
@@ -562,8 +563,9 @@ const PLAN=[
       {time:'31 déc',dot:'food',ic:'🎆',t:'Réveillon du Nouvel An',sub:'Bonne année en famille ! ✨'}
     ]},
     {n:15,name:'Nouvel An & retour',vibe:'🏠',date:'Ven 1 janv',items:[
-      {time:'Matin',dot:'boat',ic:'⛵',t:'Retour vers Bangkok',sub:'Speedboat + route/avion vers l\'aéroport'},
-      {time:'Soir',dot:'plane',ic:'✈️',t:'Vol retour vers Bruxelles',sub:'Thai Airways · la tête pleine de souvenirs 🐘',resa:'vol-retour',rl:'Vol retour Bangkok → Bruxelles'}
+      {time:'Matin',dot:'boat',ic:'⛵',t:'Speedboat Koh Yao Yai → Phuket',sub:'Transfert vers l\'aéroport de Phuket'},
+      {time:'',dot:'plane',ic:'✈️',t:'Vol Phuket → Bangkok',sub:'Thai Airways · vol domestique',resa:'vol-hkt-bkk',rl:'Vol Phuket → Bangkok',waze:'8.1132,98.3169'},
+      {time:'Soir',dot:'plane',ic:'✈️',t:'Vol Bangkok → Bruxelles',sub:'Thai Airways · la tête pleine de souvenirs 🐘',resa:'vol-retour',rl:'Vol retour Bangkok → Bruxelles'}
     ]}
   ]}
 ];
@@ -573,6 +575,7 @@ const RESA=[
   {label:'Vols',ic:'✈️',items:[
     {key:'vol-aller',ic:'✈️',name:'Vol aller — Thai Airways',desc:'Bruxelles → Bangkok · 18 déc'},
     {key:'vol-cnx-urt',ic:'✈️',name:'Vol AirAsia FD5420',desc:'Chiang Mai → Surat Thani · 23 déc'},
+    {key:'vol-hkt-bkk',ic:'✈️',name:'Vol Phuket → Bangkok',desc:'Thai Airways · ~1er janv'},
     {key:'vol-retour',ic:'✈️',name:'Vol retour — Thai Airways',desc:'Bangkok → Bruxelles · ~1er janv'}
   ]},
   {label:'Train',ic:'🚂',items:[
@@ -834,6 +837,7 @@ const IMPORT_RULES=[
   [['nirvana'],'hotel-lanta'],
   [['santhiya','kohyaoyai','yaoyai'],'hotel-kohyao'],
   [['airpaz','fd5420','n7qbql','airasia'],'vol-cnx-urt'],
+  [['phuket','hkt'],'vol-hkt-bkk'],
   [['t729667','railway','railways','train'],'train-cnx'],
   [['elephant'],'elephants'],
   [['allianz','insurance','assurance'],'assurance-doc'],

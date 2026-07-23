@@ -30,6 +30,24 @@
   body{font-family:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;background:var(--bg);color:var(--text);height:100%;overflow:hidden;-webkit-touch-callout:none;-webkit-user-select:none;user-select:none;}
   a{-webkit-user-select:none;color:inherit;}
 
+  /* LOCK */
+  #lock{position:fixed;inset:0;z-index:10000;background:linear-gradient(160deg,#f6f3ec,#ece5d8);display:flex;align-items:center;justify-content:center;padding:24px env(safe-area-inset-right) 24px env(safe-area-inset-left);}
+  #lock.hide{display:none;}
+  .lock-inner{text-align:center;width:100%;max-width:290px;}
+  .lock-icon{font-size:3rem;}
+  .lock-title{font-family:'Playfair Display',serif;font-size:1.5rem;font-weight:700;color:var(--brown);margin-top:6px;}
+  .lock-sub{font-size:.82rem;color:var(--muted);margin-top:4px;}
+  .lock-dots{display:flex;gap:15px;justify-content:center;margin:22px 0 26px;}
+  .lock-dots span{width:13px;height:13px;border-radius:50%;border:2px solid var(--caramel);transition:background .12s;}
+  .lock-dots span.on{background:var(--brown);border-color:var(--brown);}
+  .lock-dots.err{animation:lockshake .42s;}
+  @keyframes lockshake{0%,100%{transform:translateX(0)}20%,60%{transform:translateX(-9px)}40%,80%{transform:translateX(9px)}}
+  .lock-pad{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;}
+  .lock-key{width:62px;height:62px;margin:0 auto;border-radius:50%;border:none;background:var(--card);box-shadow:var(--shadow);font-family:'Inter',sans-serif;font-size:1.5rem;font-weight:600;color:var(--text);cursor:pointer;display:grid;place-items:center;}
+  .lock-key:active{transform:scale(.9);background:var(--bg2);}
+  .lock-key.blank{background:none;box-shadow:none;cursor:default;}
+  .lock-key.act{font-size:1.3rem;}
+
   /* SPLASH */
   #splash{position:fixed;inset:0;z-index:9999;background:var(--bg);display:flex;align-items:center;justify-content:center;transition:opacity .45s ease;}
   #splash.hide{opacity:0;pointer-events:none;}
@@ -235,6 +253,14 @@
   <div class="splash-dots"><span></span><span></span><span></span></div>
 </div></div>
 
+<div id="lock"><div class="lock-inner">
+  <div class="lock-icon">🐘</div>
+  <div class="lock-title">Carnet privé</div>
+  <div class="lock-sub">Entre le code d'accès</div>
+  <div class="lock-dots" id="lock-dots"><span></span><span></span><span></span><span></span></div>
+  <div class="lock-pad" id="lock-pad"></div>
+</div></div>
+
 <div id="navbar"><span id="navbar-title">Thaïlande</span></div>
 
 <nav class="app-nav">
@@ -328,6 +354,7 @@
 <!-- ============ RESA ============ -->
 <div class="page page-content" id="page-resa">
   <div class="page-hero"><h2>Réservations</h2><p>Billets & confirmations · stockés hors-ligne sur ton téléphone</p></div>
+  <div style="padding:0 16px 4px"><button class="assur-edit" style="margin:0" onclick="importAll()">📥 Importer tous mes billets d'un coup</button></div>
   <div id="resa-groups"></div>
   <div class="disclaimer">🔒 100 % privé : rien n'est envoyé sur internet. Les PDF/photos sont stockés localement (IndexedDB) et restent accessibles sans réseau. Change de téléphone = à ré-attacher.</div>
 </div>
@@ -359,6 +386,8 @@
     <div class="assur-field"><span class="assur-k">Assistance 24h/24</span><span class="assur-v" id="as-tel"></span></div>
     <button class="assur-edit" onclick="openAssur()">✏️ Renseigner mon assurance</button>
   </div>
+
+  <div style="padding:16px 16px 0"><button class="assur-edit" style="margin:0" onclick="relock()">🔒 Verrouiller l'app</button></div>
 
   <div class="disclaimer">Les informations ci-dessus (visa, taux de change, prises) sont données à titre indicatif et peuvent changer — pense à les <b>vérifier avant le départ</b> (France Diplomatie / consulat de Thaïlande).</div>
 </div>
@@ -770,6 +799,80 @@ function saveAssur(){ASSUR={comp:document.getElementById('am-comp').value.trim()
 /* ===================== UTIL MODAL ===================== */
 function closeModal(id){document.getElementById(id).classList.remove('open');if(id==='resa-modal'&&_resaUrl){URL.revokeObjectURL(_resaUrl);_resaUrl=null;}}
 
+/* ===================== VERROU (code d'accès) ===================== */
+const PIN_H=2088295126;
+function pinHash(s){let x=5381;for(let i=0;i<s.length;i++)x=((x<<5)+x+s.charCodeAt(i))>>>0;return x;}
+let _pin='';
+function buildPad(){
+  const pad=document.getElementById('lock-pad');if(!pad)return;
+  const keys=['1','2','3','4','5','6','7','8','9','','0','⌫'];
+  pad.innerHTML=keys.map(k=>k===''?'<button class="lock-key blank" disabled></button>':'<button class="lock-key'+(k==='⌫'?' act':'')+'" onclick="pinPress(\''+k+'\')">'+k+'</button>').join('');
+}
+function pinPress(k){
+  if(k==='⌫')_pin=_pin.slice(0,-1);
+  else if(_pin.length<4)_pin+=k;
+  document.querySelectorAll('#lock-dots span').forEach((d,i)=>d.classList.toggle('on',i<_pin.length));
+  if(_pin.length===4)setTimeout(checkPin,130);
+}
+function checkPin(){
+  if(pinHash(_pin)===PIN_H){lset('unlocked',1);document.getElementById('lock').classList.add('hide');_pin='';}
+  else{
+    const d=document.getElementById('lock-dots');d.classList.add('err');
+    try{navigator.vibrate&&navigator.vibrate(120);}catch(e){}
+    setTimeout(()=>{d.classList.remove('err');_pin='';document.querySelectorAll('#lock-dots span').forEach(s=>s.classList.remove('on'));},460);
+  }
+}
+function relock(){lset('unlocked',0);_pin='';document.querySelectorAll('#lock-dots span').forEach(s=>s.classList.remove('on'));document.getElementById('lock').classList.remove('hide');}
+function initLock(){buildPad();if(lget('unlocked',0)===1)document.getElementById('lock').classList.add('hide');}
+
+/* ===================== IMPORT GROUPÉ DES BILLETS ===================== */
+/* Range automatiquement les fichiers dans les bons emplacements d'après leur nom. */
+const IMPORT_RULES=[
+  [['sivatel'],'hotel-bkk'],
+  [['pingviman'],'hotel-cnx'],
+  [['500rai','floatingresort','floating','khaosok','cheowlan'],'hotel-khaosok'],
+  [['nirvana'],'hotel-lanta'],
+  [['santhiya','kohyaoyai','yaoyai'],'hotel-kohyao'],
+  [['airpaz','fd5420','n7qbql','airasia'],'vol-cnx-urt'],
+  [['t729667','railway','railways','train'],'train-cnx'],
+  [['elephant'],'elephants'],
+  [['allianz','insurance','assurance'],'assurance-doc'],
+  [['passeport','passport'],'passeports'],
+  [['guide'],'guide-bangkok'],
+  [['retour','return','bkkbru'],'vol-retour'],
+  [['thai','eticket','emd','fctdtb','amadeus','ticket','aller','brubkk'],'vol-aller'],
+  [['transfert','transfer'],'transfert-lanta']
+];
+function normName(s){return (s||'').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/[^a-z0-9]/g,'');}
+function matchKey(fname){
+  const n=normName(fname);
+  for(const [kws,key] of IMPORT_RULES){for(const kw of kws){if(n.includes(kw))return key;}}
+  return null;
+}
+function resaLabel(key){for(const g of RESA)for(const it of g.items)if(it.key===key)return it.name;return key;}
+function importAll(){
+  const inp=document.createElement('input');inp.type='file';inp.accept='application/pdf,image/*';inp.multiple=true;
+  inp.onchange=async e=>{
+    const files=[...e.target.files];if(!files.length)return;
+    const done=[],skip=[];
+    for(const f of files){
+      const key=matchKey(f.name);
+      if(key){try{await FileDB.put(key,f,f.name);RESA_KEYS.add(key);done.push(f.name+' → '+resaLabel(key));}catch(_){skip.push(f.name);}}
+      else skip.push(f.name);
+    }
+    refreshResaMarks();
+    const modal=document.getElementById('resa-modal');
+    document.getElementById('resa-modal-title').textContent='📥 Import terminé';
+    let h='';
+    if(done.length)h+='<div style="font-size:.82rem;font-weight:700;color:#1f7a45;margin-bottom:6px">✓ '+done.length+' fichier(s) rangé(s)</div><div style="font-size:.75rem;color:var(--muted);line-height:1.6">'+done.map(d=>'• '+d).join('<br>')+'</div>';
+    if(skip.length)h+='<div style="font-size:.82rem;font-weight:700;color:#a05c00;margin:12px 0 6px">↷ '+skip.length+' non reconnu(s)</div><div style="font-size:.72rem;color:var(--muted);line-height:1.6">'+skip.map(s=>'• '+s).join('<br>')+'</div><div style="font-size:.72rem;color:var(--muted);margin-top:8px">Attache-les à la main en touchant l\'emplacement voulu.</div>';
+    if(!done.length&&!skip.length)h='<div style="color:var(--muted)">Aucun fichier sélectionné.</div>';
+    document.getElementById('resa-view').innerHTML=h;
+    modal.classList.add('open');
+  };
+  inp.click();
+}
+
 /* ===================== INIT ===================== */
 async function init(){
   RESA_KEYS=new Set(await FileDB.keys().catch(()=>[]));
@@ -781,6 +884,7 @@ async function init(){
   renderAssur();
   setInterval(renderCountdown,30000);
 }
+initLock();
 init();
 
 /* splash */

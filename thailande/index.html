@@ -6,7 +6,7 @@
 <meta name="googlebot" content="noindex, nofollow">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <meta name="format-detection" content="telephone=no">
-<title>Thaïlande 2027 🐘</title>
+<title>Thaïlande 2026 🐘</title>
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="Thaïlande">
@@ -144,7 +144,7 @@
   .tl-time{font-size:.66rem;font-weight:600;color:var(--muted);width:40px;flex-shrink:0;padding-top:3px;text-align:right;}
   .tl-dot{width:22px;height:22px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:.66rem;margin-top:1px;z-index:1;}
   .dot-plane{background:#ddf0ee;} .dot-food{background:#fbeee9;} .dot-hotel{background:#fdf3e0;}
-  .dot-activity{background:#e3f2ea;} .dot-boat{background:#dcedf8;} .dot-free{background:#efecf4;} .dot-temple{background:#f5ecdb;}
+  .dot-activity{background:#e3f2ea;} .dot-boat{background:#dcedf8;} .dot-free{background:#efecf4;} .dot-temple{background:#f5ecdb;} .dot-train{background:#efe1f2;}
   .tl-content{flex:1;min-width:0;}
   .tl-title{font-weight:600;font-size:.88rem;}
   .tl-sub{font-size:.74rem;color:var(--muted);margin-top:2px;line-height:1.4;}
@@ -214,7 +214,7 @@
 <div id="splash"><div class="splash-inner">
   <div class="splash-icon">🐘</div>
   <div class="splash-name">Thaïlande</div>
-  <div class="splash-sub">Notre voyage en famille</div>
+  <div class="splash-sub">Noël en famille 🎄</div>
   <div class="splash-dots"><span></span><span></span><span></span></div>
 </div></div>
 
@@ -251,18 +251,28 @@
     <div class="section-hdr">🗺️ L'itinéraire</div>
     <div class="card" onclick="showPage('planning',document.getElementById('nav-planning'))">
       <div class="card-icon">🏙️</div>
-      <div class="card-body"><div class="card-name">Bangkok</div><div class="card-meta">Temples, marchés & rivière · 3 nuits</div></div>
+      <div class="card-body"><div class="card-name">Bangkok</div><div class="card-meta">Temples & rivière · 18 → 20 déc</div></div>
       <div class="tag jade">Étape 1</div>
     </div>
     <div class="card" onclick="showPage('planning',document.getElementById('nav-planning'))">
       <div class="card-icon">🐘</div>
-      <div class="card-body"><div class="card-name">Chiang Mai</div><div class="card-meta">Nord, éléphants & montagnes · 3 nuits</div></div>
+      <div class="card-body"><div class="card-name">Chiang Mai</div><div class="card-meta">Train de nuit, éléphants · 21 → 23 déc</div></div>
       <div class="tag jade">Étape 2</div>
     </div>
     <div class="card" onclick="showPage('planning',document.getElementById('nav-planning'))">
-      <div class="card-icon">🏝️</div>
-      <div class="card-body"><div class="card-name">Krabi & Railay</div><div class="card-meta">Plages, îles & farniente · 7 nuits</div></div>
+      <div class="card-icon">🛶</div>
+      <div class="card-body"><div class="card-name">Khao Sok</div><div class="card-meta">Lac Cheow Lan, bungalow flottant · 23 → 25 déc</div></div>
       <div class="tag jade">Étape 3</div>
+    </div>
+    <div class="card" onclick="showPage('planning',document.getElementById('nav-planning'))">
+      <div class="card-icon">🏝️</div>
+      <div class="card-body"><div class="card-name">Koh Lanta</div><div class="card-meta">Villa piscine front de mer · 25 → 29 déc</div></div>
+      <div class="tag jade">Étape 4</div>
+    </div>
+    <div class="card" onclick="showPage('planning',document.getElementById('nav-planning'))">
+      <div class="card-icon">🎆</div>
+      <div class="card-body"><div class="card-name">Koh Yao Yai</div><div class="card-meta">Santhiya · Nouvel An · 29 déc → 1er janv</div></div>
+      <div class="tag jade">Étape 5</div>
     </div>
   </div>
 
@@ -280,7 +290,7 @@
     </div>
   </div>
 
-  <div class="disclaimer">🐘 Itinéraire de départ (2 semaines) — modifiable à ta guise. Attache tes vrais billets et confirmations dans l'onglet <b>Résa</b> : ils restent stockés <b>sur ton téléphone, hors-ligne</b>.</div>
+  <div class="disclaimer">🐘 Notre voyage de Noël (18 déc → 1er janv). Attache tes billets et confirmations dans l'onglet <b>Résa</b> (PNR, n° de résa, passeports) : ils restent stockés <b>sur ton téléphone, hors-ligne</b> — rien n'est mis en ligne.</div>
 </div>
 
 <!-- ============ PLANNING ============ -->
@@ -378,15 +388,15 @@ const LS='thai2027-';
 function lget(k,d){try{const v=localStorage.getItem(LS+k);return v==null?d:JSON.parse(v);}catch(e){return d;}}
 function lset(k,v){try{localStorage.setItem(LS+k,JSON.stringify(v));}catch(e){}}
 
-/* Dates (modifiables) — valeurs de départ à ajuster */
-let DATES=lget('dates',{start:'2027-02-13',end:'2027-02-27'});
+/* Dates (modifiables) — Noël & Nouvel An 2026-2027 */
+let DATES=lget('dates',{start:'2026-12-18',end:'2027-01-01'});
 
 /* Famille (4) — noms & photos modifiables */
 const FAM_DEF=[
-  {id:'p1',name:'Papa',color:'#8a6a3f'},
-  {id:'p2',name:'Maman',color:'#3f7d6b'},
-  {id:'p3',name:'Enfant 1',color:'#b98a2e'},
-  {id:'p4',name:'Enfant 2',color:'#a15b46'}
+  {id:'p1',name:'Philippe',color:'#8a6a3f'},
+  {id:'p2',name:'Chloé',color:'#3f7d6b'},
+  {id:'p3',name:'Vic',color:'#b98a2e'},
+  {id:'p4',name:'Cléa',color:'#a15b46'}
 ];
 let FAM=lget('fam',null)||FAM_DEF.map(f=>({id:f.id,name:f.name}));
 const FAM_COLOR={p1:'#8a6a3f',p2:'#3f7d6b',p3:'#b98a2e',p4:'#a15b46'};
@@ -412,84 +422,98 @@ let RESA_KEYS=new Set();
 /* Lieux (coordonnées réelles) pour la carte */
 const PLACES=[
   {n:'Aéroport Bangkok (Suvarnabhumi)',lat:13.6900,lng:100.7501,ic:'✈️',grp:'Transport'},
+  {n:'Sivatel Bangkok Hotel',lat:13.7407,lng:100.5403,ic:'🏨',grp:'Bangkok'},
   {n:'Grand Palais & Wat Phra Kaew',lat:13.7500,lng:100.4914,ic:'🏛️',grp:'Bangkok'},
   {n:'Wat Pho (Bouddha couché)',lat:13.7465,lng:100.4927,ic:'🛕',grp:'Bangkok'},
   {n:'Wat Arun (temple de l\'Aube)',lat:13.7437,lng:100.4889,ic:'🛕',grp:'Bangkok'},
-  {n:'Marché de Chatuchak',lat:13.7998,lng:100.5501,ic:'🛍️',grp:'Bangkok'},
-  {n:'Aéroport Chiang Mai',lat:18.7669,lng:98.9626,ic:'✈️',grp:'Transport'},
+  {n:'Gare Krung Thep Aphiwat (train nuit)',lat:13.8028,lng:100.5397,ic:'🚉',grp:'Bangkok'},
+  {n:'Pingviman Hotel (Chiang Mai)',lat:18.7855,lng:98.9855,ic:'🏨',grp:'Chiang Mai'},
   {n:'Vieille ville & Wat Chedi Luang',lat:18.7869,lng:98.9860,ic:'🛕',grp:'Chiang Mai'},
-  {n:'Sanctuaire d\'éléphants (éthique)',lat:19.2103,lng:98.8560,ic:'🐘',grp:'Chiang Mai'},
+  {n:'Elephant Rescue Park',lat:18.9218,lng:98.8493,ic:'🐘',grp:'Chiang Mai'},
   {n:'Doi Suthep (Wat Phra That)',lat:18.8047,lng:98.9217,ic:'⛰️',grp:'Chiang Mai'},
-  {n:'Aéroport de Krabi',lat:8.0992,lng:98.9862,ic:'✈️',grp:'Transport'},
-  {n:'Ao Nang (plage)',lat:8.0350,lng:98.8210,ic:'🏖️',grp:'Krabi'},
-  {n:'Railay Beach',lat:8.0110,lng:98.8380,ic:'🏝️',grp:'Krabi'},
-  {n:'Îles Phi Phi',lat:7.7407,lng:98.7784,ic:'⛵',grp:'Krabi'}
+  {n:'Aéroport de Surat Thani (URT)',lat:9.1326,lng:99.1355,ic:'✈️',grp:'Transport'},
+  {n:'500 Rai Floating Resort (Khao Sok)',lat:8.9760,lng:98.6870,ic:'🛶',grp:'Khao Sok'},
+  {n:'Lac Cheow Lan (barrage Ratchaprapha)',lat:8.9755,lng:98.7930,ic:'🏞️',grp:'Khao Sok'},
+  {n:'Nirvana Beach Resort (Koh Lanta)',lat:7.5450,lng:99.0450,ic:'🏝️',grp:'Koh Lanta'},
+  {n:'Santhiya Koh Yao Yai Resort & Spa',lat:8.0600,lng:98.5800,ic:'🏖️',grp:'Koh Yao Yai'}
 ];
 
 /* Planning : étapes -> jours -> items. resa = clé de réservation attachable */
 const PLAN=[
   {step:'Bangkok', days:[
-    {n:1,name:'Arrivée à Bangkok',vibe:'✈️',items:[
-      {time:'Matin',dot:'plane',ic:'✈️',t:'Atterrissage à Suvarnabhumi',sub:'Récupération bagages · transfert hôtel',resa:'vol-aller',rl:'Vol aller Paris → Bangkok'},
-      {time:'',dot:'hotel',ic:'🏨',t:'Check-in hôtel Bangkok',sub:'Repos & récupération du décalage',resa:'hotel-bkk',rl:'Hôtel Bangkok'},
+    {n:1,name:'Arrivée à Bangkok',vibe:'✈️',date:'Ven 18 déc',items:[
+      {time:'Matin',dot:'plane',ic:'✈️',t:'Arrivée à Bangkok',sub:'Vol Thai Airways depuis Bruxelles',resa:'vol-aller',rl:'Vol Bruxelles → Bangkok'},
+      {time:'',dot:'hotel',ic:'🏨',t:'Check-in — Sivatel Bangkok Hotel',sub:'2 nuits · récupération du décalage',resa:'hotel-bkk',rl:'Hôtel Bangkok — Sivatel',waze:'13.7407,100.5403'},
       {time:'Soir',dot:'food',ic:'🍜',t:'Premier dîner thaï',sub:'Pad thaï, mango sticky rice…'}
     ]},
-    {n:2,name:'Temples & rivière',vibe:'🛕',items:[
+    {n:2,name:'Temples & rivière',vibe:'🛕',date:'Sam 19 déc',items:[
       {time:'9h',dot:'temple',ic:'🏛️',t:'Grand Palais & Wat Phra Kaew',sub:'Tenue couvrante (épaules & genoux)',waze:'13.7500,100.4914'},
       {time:'11h',dot:'temple',ic:'🛕',t:'Wat Pho — Bouddha couché',sub:'À 5 min à pied du Grand Palais',waze:'13.7465,100.4927'},
-      {time:'13h',dot:'food',ic:'🍽️',t:'Déjeuner près de la rivière',sub:'Bord du Chao Phraya'},
-      {time:'15h',dot:'boat',ic:'⛵',t:'Traversée vers Wat Arun',sub:'Bateau local · temple de l\'Aube',waze:'13.7437,100.4889'},
-      {time:'19h',dot:'boat',ic:'🚢',t:'Croisière-dîner sur la rivière',sub:'Option féérique en famille',resa:'croisiere-diner',rl:'Croisière-dîner Chao Phraya'}
+      {time:'13h',dot:'food',ic:'🍽️',t:'Déjeuner au bord du Chao Phraya',sub:'Vue sur la rivière'},
+      {time:'15h',dot:'boat',ic:'⛵',t:'Traversée vers Wat Arun',sub:'Bateau local · temple de l\'Aube',waze:'13.7437,100.4889'}
     ]},
-    {n:3,name:'Marchés & détente',vibe:'🛍️',items:[
-      {time:'Matin',dot:'activity',ic:'🛍️',t:'Marché (Chatuchak ou flottant)',sub:'Souvenirs & street food',waze:'13.7998,100.5501'},
-      {time:'Aprem',dot:'free',ic:'🏊',t:'Piscine / repos à l\'hôtel',sub:'Rythme famille'},
-      {time:'Soir',dot:'plane',ic:'✈️',t:'Vol vers Chiang Mai',sub:'Vol intérieur ~1h10',resa:'vol-bkk-cnx',rl:'Vol Bangkok → Chiang Mai'}
+    {n:3,name:'Marché puis train de nuit',vibe:'🚂',date:'Dim 20 déc',items:[
+      {time:'Matin',dot:'activity',ic:'🛍️',t:'Marché & balade',sub:'Souvenirs & street food'},
+      {time:'Aprem',dot:'free',ic:'🏊',t:'Repos avant le train',sub:'Rythme famille'},
+      {time:'18h40',dot:'train',ic:'🚂',t:'Train de nuit → Chiang Mai',sub:'Special Express n°9 · 1re classe couchette · gare Krung Thep Aphiwat',resa:'train-cnx',rl:'Train de nuit Bangkok → Chiang Mai',waze:'13.8028,100.5397'}
     ]}
   ]},
   {step:'Chiang Mai', days:[
-    {n:4,name:'Vieille ville',vibe:'🛕',items:[
-      {time:'',dot:'hotel',ic:'🏨',t:'Check-in Chiang Mai',sub:'',resa:'hotel-cnx',rl:'Hôtel Chiang Mai'},
+    {n:4,name:'Arrivée à Chiang Mai',vibe:'🛕',date:'Lun 21 déc',items:[
+      {time:'7h15',dot:'train',ic:'🚉',t:'Arrivée en gare de Chiang Mai',sub:'Nuit en train depuis Bangkok'},
+      {time:'',dot:'hotel',ic:'🏨',t:'Check-in — Pingviman Hotel',sub:'2 nuits · vieille ville',resa:'hotel-cnx',rl:'Hôtel Chiang Mai — Pingviman',waze:'18.7855,98.9855'},
       {time:'10h',dot:'temple',ic:'🛕',t:'Temples de la vieille ville',sub:'Wat Chedi Luang, Wat Phra Singh',waze:'18.7869,98.9860'},
       {time:'18h',dot:'food',ic:'🌙',t:'Marché de nuit',sub:'Artisanat & cuisine du nord'}
     ]},
-    {n:5,name:'Journée éléphants',vibe:'🐘',items:[
-      {time:'8h',dot:'activity',ic:'🐘',t:'Sanctuaire d\'éléphants éthique',sub:'Observation & nourrissage · sans balade à dos',resa:'elephants',rl:'Sanctuaire d\'éléphants',waze:'19.2103,98.8560'},
-      {time:'Soir',dot:'free',ic:'😌',t:'Retour & repos',sub:''}
+    {n:5,name:'Journée éléphants',vibe:'🐘',date:'Mar 22 déc',items:[
+      {time:'Matin',dot:'activity',ic:'🐘',t:'Elephant Rescue Park',sub:'Programme A · tour privé du matin · sanctuaire éthique',resa:'elephants',rl:'Elephant Rescue Park',waze:'18.9218,98.8493'},
+      {time:'Aprem',dot:'temple',ic:'⛰️',t:'Doi Suthep (option)',sub:'Temple perché · vue sur la ville',waze:'18.8047,98.9217'}
     ]},
-    {n:6,name:'Montagne & cuisine',vibe:'⛰️',items:[
-      {time:'9h',dot:'temple',ic:'⛰️',t:'Doi Suthep',sub:'Temple perché · vue sur la ville',waze:'18.8047,98.9217'},
-      {time:'15h',dot:'activity',ic:'👨‍🍳',t:'Cours de cuisine thaï',sub:'En famille · marché + recettes',resa:'cours-cuisine',rl:'Cours de cuisine'},
-      {time:'Soir',dot:'plane',ic:'✈️',t:'Vol vers Krabi',sub:'Via Bangkok le plus souvent',resa:'vol-cnx-kbv',rl:'Vol Chiang Mai → Krabi'}
+    {n:6,name:'Envol vers le sud',vibe:'✈️',date:'Mer 23 déc',items:[
+      {time:'10h40',dot:'plane',ic:'✈️',t:'Vol Chiang Mai → Surat Thani',sub:'Thai AirAsia FD5420 · direct ~1h55',resa:'vol-cnx-urt',rl:'Vol Chiang Mai → Surat Thani',waze:'9.1326,99.1355'},
+      {time:'Aprem',dot:'boat',ic:'🚐',t:'Route vers le lac de Khao Sok',sub:'Direction 500 Rai Floating Resort'}
     ]}
   ]},
-  {step:'Krabi', days:[
-    {n:7,name:'Installation au sud',vibe:'🏝️',items:[
-      {time:'',dot:'hotel',ic:'🏨',t:'Check-in resort Krabi / Ao Nang',sub:'7 nuits · mode détente',resa:'hotel-krabi',rl:'Resort Krabi'},
-      {time:'',dot:'boat',ic:'🚐',t:'Transfert aéroport → hôtel',sub:'',resa:'transfert-krabi',rl:'Transfert Krabi'},
-      {time:'Soir',dot:'food',ic:'🌅',t:'Coucher de soleil à Ao Nang',sub:'Plage & dîner pieds dans le sable'}
+  {step:'Khao Sok', days:[
+    {n:7,name:'Le lac émeraude',vibe:'🛶',date:'Mer 23 déc',items:[
+      {time:'',dot:'hotel',ic:'🛶',t:'Check-in — 500 Rai Floating Resort',sub:'2 nuits · bungalow flottant sur le lac Cheow Lan',resa:'hotel-khaosok',rl:'500 Rai Floating Resort (Khao Sok)',waze:'8.9760,98.6870'},
+      {time:'Soir',dot:'free',ic:'🌄',t:'Coucher de soleil sur le lac',sub:'Falaises karstiques & jungle'}
     ]},
-    {n:8,name:'Îles Phi Phi',vibe:'⛵',items:[
-      {time:'8h',dot:'boat',ic:'⛵',t:'Excursion îles Phi Phi',sub:'Maya Bay, snorkeling, plages',resa:'excursion-phiphi',rl:'Excursion Phi Phi',waze:'7.7407,98.7784'}
+    {n:8,name:'Réveillon sur le lac',vibe:'🎄',date:'Jeu 24 déc',items:[
+      {time:'Matin',dot:'boat',ic:'🛶',t:'Lac Cheow Lan — kayak & baignade',sub:'Longtail, grottes, jungle',waze:'8.9755,98.7930'},
+      {time:'Soir',dot:'food',ic:'🎄',t:'Réveillon de Noël',sub:'Dîner sur le lac en famille'}
     ]},
-    {n:9,name:'Railay',vibe:'🧗',items:[
-      {time:'Journée',dot:'activity',ic:'🏝️',t:'Railay Beach',sub:'Falaises, kayak, plage de rêve',waze:'8.0110,98.8380'}
+    {n:9,name:'Cap sur Koh Lanta',vibe:'🎁',date:'Ven 25 déc',items:[
+      {time:'Matin',dot:'free',ic:'🎁',t:'Matin de Noël sur le lac',sub:''},
+      {time:'',dot:'boat',ic:'🚐',t:'Transfert privé vers Koh Lanta',sub:'Voiture + ferry · 500 Rai → Nirvana',resa:'transfert-lanta',rl:'Transfert Khao Sok → Koh Lanta'}
+    ]}
+  ]},
+  {step:'Koh Lanta', days:[
+    {n:10,name:'Villa les pieds dans l\'eau',vibe:'🏝️',date:'Ven 25 déc',items:[
+      {time:'',dot:'hotel',ic:'🏝️',t:'Check-in — Nirvana Beach Resort',sub:'4 nuits · villa piscine front de mer',resa:'hotel-lanta',rl:'Nirvana Beach Resort (Koh Lanta)',waze:'7.5450,99.0450'},
+      {time:'Soir',dot:'food',ic:'🌅',t:'Coucher de soleil sur la plage',sub:'Dîner pieds dans le sable'}
     ]},
-    {n:10,name:'4 îles / Hong',vibe:'🛶',items:[
-      {time:'9h',dot:'boat',ic:'🛶',t:'Excursion 4 îles ou Hong',sub:'Lagons & snorkeling',resa:'excursion-4iles',rl:'Excursion 4 îles / Hong'}
+    {n:11,name:'Farniente & plages',vibe:'😎',date:'Sam 26 → Lun 28 déc',items:[
+      {time:'Libre',dot:'free',ic:'🏖️',t:'Plages de Koh Lanta',sub:'Baignade, piscine, massage thaï'},
+      {time:'Option',dot:'boat',ic:'🤿',t:'Excursion snorkeling',sub:'Koh Rok / 4 îles (à réserver sur place)'}
     ]},
-    {n:11,name:'Farniente',vibe:'😎',items:[
-      {time:'Libre',dot:'free',ic:'🏖️',t:'Journée plage & piscine',sub:'Massage thaï en option'}
+    {n:12,name:'Vers Koh Yao Yai',vibe:'⛵',date:'Mar 29 déc',items:[
+      {time:'Matin',dot:'free',ic:'🏊',t:'Dernière baignade à Koh Lanta',sub:''},
+      {time:'',dot:'boat',ic:'⛵',t:'Speedboat vers Koh Yao Yai',sub:'Transfert Santhiya',resa:'transfert-kohyao',rl:'Transfert Koh Lanta → Koh Yao Yai'}
+    ]}
+  ]},
+  {step:'Koh Yao Yai', days:[
+    {n:13,name:'Santhiya Resort',vibe:'🏖️',date:'Mar 29 déc',items:[
+      {time:'',dot:'hotel',ic:'🏖️',t:'Check-in — Santhiya Koh Yao Yai',sub:'3 nuits · Deluxe Sea View · 2 chambres',resa:'hotel-kohyao',rl:'Santhiya Koh Yao Yai Resort & Spa',waze:'8.0600,98.5800'},
+      {time:'Soir',dot:'free',ic:'🌴',t:'Détente au resort',sub:'Plage, piscines, spa'}
     ]},
-    {n:12,name:'Au choix',vibe:'✨',items:[
-      {time:'Libre',dot:'free',ic:'🤿',t:'Snorkeling / kayak / repos',sub:'Selon l\'envie du jour'}
+    {n:14,name:'Réveillon du Nouvel An',vibe:'🎆',date:'Mer 30 → Jeu 31 déc',items:[
+      {time:'Journée',dot:'free',ic:'🤿',t:'Plage, snorkeling, kayak',sub:'Au rythme des envies'},
+      {time:'31 déc',dot:'food',ic:'🎆',t:'Réveillon du Nouvel An',sub:'Bonne année en famille ! ✨'}
     ]},
-    {n:13,name:'Dernier jour sud',vibe:'🌊',items:[
-      {time:'Matin',dot:'free',ic:'🏊',t:'Dernière baignade',sub:'Bagages tranquilles'},
-      {time:'Soir',dot:'plane',ic:'✈️',t:'Vol retour vers Bangkok',sub:'Nuit à l\'aéroport ou hôtel',resa:'vol-kbv-bkk',rl:'Vol Krabi → Bangkok'}
-    ]},
-    {n:14,name:'Retour',vibe:'🏠',items:[
-      {time:'',dot:'plane',ic:'✈️',t:'Vol retour vers Paris',sub:'La tête pleine de souvenirs 🐘',resa:'vol-retour',rl:'Vol retour Bangkok → Paris'}
+    {n:15,name:'Nouvel An & retour',vibe:'🏠',date:'Ven 1 janv',items:[
+      {time:'Matin',dot:'boat',ic:'⛵',t:'Retour vers Bangkok',sub:'Speedboat + route/avion vers l\'aéroport'},
+      {time:'Soir',dot:'plane',ic:'✈️',t:'Vol retour vers Bruxelles',sub:'Thai Airways · la tête pleine de souvenirs 🐘',resa:'vol-retour',rl:'Vol retour Bangkok → Bruxelles'}
     ]}
   ]}
 ];
@@ -497,30 +521,30 @@ const PLAN=[
 /* Réservations (coffre) — groupées */
 const RESA=[
   {label:'Vols',ic:'✈️',items:[
-    {key:'vol-aller',ic:'✈️',name:'Vol aller',desc:'Paris → Bangkok'},
-    {key:'vol-bkk-cnx',ic:'✈️',name:'Vol intérieur',desc:'Bangkok → Chiang Mai'},
-    {key:'vol-cnx-kbv',ic:'✈️',name:'Vol intérieur',desc:'Chiang Mai → Krabi'},
-    {key:'vol-kbv-bkk',ic:'✈️',name:'Vol intérieur',desc:'Krabi → Bangkok'},
-    {key:'vol-retour',ic:'✈️',name:'Vol retour',desc:'Bangkok → Paris'}
+    {key:'vol-aller',ic:'✈️',name:'Vol aller — Thai Airways',desc:'Bruxelles → Bangkok · 18 déc'},
+    {key:'vol-cnx-urt',ic:'✈️',name:'Vol AirAsia FD5420',desc:'Chiang Mai → Surat Thani · 23 déc'},
+    {key:'vol-retour',ic:'✈️',name:'Vol retour — Thai Airways',desc:'Bangkok → Bruxelles · ~1er janv'}
+  ]},
+  {label:'Train',ic:'🚂',items:[
+    {key:'train-cnx',ic:'🚂',name:'Train de nuit 1re classe',desc:'Bangkok → Chiang Mai · 20 déc 18h40'}
   ]},
   {label:'Hôtels',ic:'🏨',items:[
-    {key:'hotel-bkk',ic:'🏨',name:'Hôtel Bangkok',desc:'3 nuits'},
-    {key:'hotel-cnx',ic:'🏨',name:'Hôtel Chiang Mai',desc:'3 nuits'},
-    {key:'hotel-krabi',ic:'🏨',name:'Resort Krabi',desc:'7 nuits'}
+    {key:'hotel-bkk',ic:'🏨',name:'Sivatel Bangkok Hotel',desc:'18 → 20 déc · 2 nuits'},
+    {key:'hotel-cnx',ic:'🏨',name:'Pingviman Hotel',desc:'Chiang Mai · 21 → 23 déc'},
+    {key:'hotel-khaosok',ic:'🛶',name:'500 Rai Floating Resort',desc:'Khao Sok · 23 → 25 déc'},
+    {key:'hotel-lanta',ic:'🏝️',name:'Nirvana Beach Resort',desc:'Koh Lanta · 25 → 29 déc'},
+    {key:'hotel-kohyao',ic:'🏖️',name:'Santhiya Koh Yao Yai',desc:'29 déc → 1er janv · Nouvel An'}
   ]},
   {label:'Transferts',ic:'🚐',items:[
-    {key:'transfert-krabi',ic:'🚐',name:'Transfert Krabi',desc:'Aéroport → hôtel'}
+    {key:'transfert-lanta',ic:'🚐',name:'Khao Sok → Koh Lanta',desc:'Voiture + ferry · 25 déc'},
+    {key:'transfert-kohyao',ic:'⛵',name:'Koh Lanta → Koh Yao Yai',desc:'Speedboat · 29 déc'}
   ]},
   {label:'Activités',ic:'🎟️',items:[
-    {key:'croisiere-diner',ic:'🚢',name:'Croisière-dîner',desc:'Chao Phraya, Bangkok'},
-    {key:'elephants',ic:'🐘',name:'Sanctuaire d\'éléphants',desc:'Chiang Mai'},
-    {key:'cours-cuisine',ic:'👨‍🍳',name:'Cours de cuisine',desc:'Chiang Mai'},
-    {key:'excursion-phiphi',ic:'⛵',name:'Excursion Phi Phi',desc:'Krabi'},
-    {key:'excursion-4iles',ic:'🛶',name:'Excursion 4 îles / Hong',desc:'Krabi'}
+    {key:'elephants',ic:'🐘',name:'Elephant Rescue Park',desc:'Chiang Mai · 22 déc (matin)'}
   ]},
   {label:'Documents',ic:'🪪',items:[
     {key:'passeports',ic:'🛂',name:'Passeports',desc:'Scans de la famille'},
-    {key:'assurance-doc',ic:'🛡️',name:'Assurance voyage',desc:'Attestation'}
+    {key:'assurance-doc',ic:'🛡️',name:'Assurance Allianz',desc:'Attestation voyage'}
   ]}
 ];
 
@@ -599,7 +623,7 @@ function renderDays(){
       if(it.resa)row+='<button class="resa-btn'+(RESA_KEYS.has(it.resa)?' set':'')+'" data-resa="'+it.resa+'" onclick="openResa(\''+it.resa+'\',\''+esc(it.rl||it.t)+'\')">📄 '+(RESA_KEYS.has(it.resa)?'Résa ✓':'Résa')+'</button>';
       return '<div class="tl-item"><div class="tl-time">'+(it.time||'')+'</div><div class="tl-dot dot-'+it.dot+'">'+it.ic+'</div><div class="tl-content"><div class="tl-title">'+it.t+'</div>'+(it.sub?'<div class="tl-sub">'+it.sub+'</div>':'')+(row?'<div class="tl-row">'+row+'</div>':'')+'</div></div>';
     }).join('');
-    return '<div style="padding:0 16px"><div class="day-card"><div class="day-header"><div class="day-number">'+d.n+'</div><div class="day-info"><div class="day-name">'+d.name+'</div><div class="day-date">Jour '+d.n+'</div></div><div class="day-vibe">'+d.vibe+'</div></div><div class="timeline">'+items+'</div></div></div>';
+    return '<div style="padding:0 16px"><div class="day-card"><div class="day-header"><div class="day-number">'+d.n+'</div><div class="day-info"><div class="day-name">'+d.name+'</div><div class="day-date">'+(d.date||('Jour '+d.n))+'</div></div><div class="day-vibe">'+d.vibe+'</div></div><div class="timeline">'+items+'</div></div></div>';
   }).join('');
 }
 function esc(s){return (s||'').replace(/'/g,"\\'").replace(/"/g,'&quot;');}
@@ -683,7 +707,7 @@ function refreshResaMarks(){
 }
 
 /* ===================== ASSURANCE ===================== */
-let ASSUR=lget('assur',{comp:'',num:'',tel:''});
+let ASSUR=lget('assur',{comp:'Allianz',num:'',tel:''});
 function renderAssur(){
   const set=(id,v,tel)=>{const el=document.getElementById(id);if(v){el.textContent=v;el.classList.remove('empty');if(tel){el.innerHTML='<a href="tel:'+v.replace(/\s/g,'')+'" style="color:var(--brown);text-decoration:none">📞 '+v+'</a>';}}else{el.textContent='À renseigner';el.classList.add('empty');}};
   set('as-comp',ASSUR.comp);set('as-num',ASSUR.num);set('as-tel',ASSUR.tel,true);

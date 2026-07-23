@@ -1,0 +1,795 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="robots" content="noindex, nofollow, noarchive, nosnippet">
+<meta name="googlebot" content="noindex, nofollow">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="format-detection" content="telephone=no">
+<title>Thaïlande 2026 🐘</title>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Thaïlande">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#f6f3ec">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preconnect" href="https://images.unsplash.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;700&family=Cormorant+Garamond:ital,wght@1,600;1,700&family=Inter:wght@400;500;600;700&display=swap">
+<style>
+  *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+  :root{
+    --bg:#f6f3ec; --bg2:#ece5d8; --card:#fff; --border:#e2dacd;
+    --text:#231f1a; --muted:#8a8375; --brown:#8a6a3f; --caramel:#c9a877;
+    --jade:#3f7d6b; --gold:#b98a2e;
+    --radius:15px; --shadow:0 5px 20px rgba(0,0,0,.07);
+  }
+  html{-webkit-text-size-adjust:100%;height:100%;overflow:hidden;}
+  body{font-family:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;background:var(--bg);color:var(--text);height:100%;overflow:hidden;-webkit-touch-callout:none;-webkit-user-select:none;user-select:none;}
+  a{-webkit-user-select:none;color:inherit;}
+
+  /* SPLASH */
+  #splash{position:fixed;inset:0;z-index:9999;background:var(--bg);display:flex;align-items:center;justify-content:center;transition:opacity .45s ease;}
+  #splash.hide{opacity:0;pointer-events:none;}
+  .splash-inner{text-align:center;}
+  .splash-icon{font-size:4rem;animation:splashpop .6s cubic-bezier(.2,.8,.2,1);}
+  .splash-name{font-family:'Playfair Display',serif;font-size:1.9rem;font-weight:700;color:var(--brown);margin-top:6px;}
+  .splash-sub{font-size:.78rem;color:var(--muted);margin-top:2px;}
+  .splash-dots{display:flex;gap:6px;justify-content:center;margin-top:20px;}
+  .splash-dots span{width:7px;height:7px;border-radius:50%;background:var(--caramel);animation:splashdot 1s infinite;}
+  .splash-dots span:nth-child(2){animation-delay:.15s;}
+  .splash-dots span:nth-child(3){animation-delay:.3s;}
+  @keyframes splashpop{from{transform:scale(.6);opacity:0}to{transform:scale(1);opacity:1}}
+  @keyframes splashdot{0%,100%{opacity:.3;transform:translateY(0)}50%{opacity:1;transform:translateY(-4px)}}
+
+  /* NAVBAR */
+  #navbar{position:fixed;top:0;left:0;right:0;z-index:150;padding-top:env(safe-area-inset-top);height:calc(46px + env(safe-area-inset-top));display:flex;align-items:center;justify-content:center;background:rgba(246,243,236,.8);-webkit-backdrop-filter:saturate(180%) blur(20px);backdrop-filter:saturate(180%) blur(20px);border-bottom:1px solid rgba(0,0,0,.06);opacity:0;transform:translateY(-6px);transition:opacity .25s,transform .25s;pointer-events:none;}
+  #navbar.show{opacity:1;transform:none;}
+  #navbar-title{font-family:'Playfair Display',serif;font-weight:700;font-size:1.05rem;color:var(--text);}
+
+  /* BOTTOM NAV */
+  .app-nav{position:fixed;bottom:0;left:0;right:0;height:calc(60px + env(safe-area-inset-bottom));background:rgba(246,243,236,.82);-webkit-backdrop-filter:saturate(180%) blur(20px);backdrop-filter:saturate(180%) blur(20px);border-top:1px solid rgba(0,0,0,.08);display:flex;justify-content:space-around;align-items:flex-start;z-index:200;padding:12px 0 env(safe-area-inset-bottom);-webkit-transform:translateZ(0);transform:translateZ(0);}
+  .app-nav-btn{background:none;border:none;cursor:pointer;text-align:center;color:var(--muted);display:flex;flex-direction:column;align-items:center;gap:3px;transition:transform .15s,color .15s;}
+  .app-nav-btn:active{transform:scale(.88);}
+  .app-nav-btn .nav-icon{font-size:1.15rem;line-height:1;}
+  .app-nav-btn .nav-label{font-size:.58rem;font-weight:600;}
+  .app-nav-btn.active{color:var(--brown);}
+  .page-content{padding-bottom:calc(80px + env(safe-area-inset-bottom));}
+  .page{display:none;}
+  .page.active{display:block;animation:fade .25s ease;overflow-y:auto;height:100vh;-webkit-overflow-scrolling:touch;padding-top:env(safe-area-inset-top);}
+  @keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+
+  /* HERO */
+  .hero-wrap{position:relative;}
+  .hero-img{width:100%;height:210px;object-fit:cover;display:block;background:var(--bg2);}
+  .hero-overlay{position:absolute;inset:0;background:linear-gradient(to bottom,rgba(246,243,236,.05) 0%,rgba(246,243,236,0) 32%,rgba(246,243,236,.55) 74%,var(--bg) 100%);}
+  .hero-title{position:absolute;bottom:44px;left:20px;right:20px;text-align:center;}
+  .hero-title h1{font-family:'Cormorant Garamond',serif;font-size:3rem;font-weight:700;font-style:italic;color:var(--text);line-height:1;letter-spacing:.02em;text-shadow:0 2px 16px rgba(246,243,236,.7);}
+  .hero-title p{font-size:.82rem;color:#5a5249;margin-top:4px;font-weight:600;}
+
+  .countdown-card{margin:-34px 16px 0;position:relative;z-index:10;background:var(--bg2);border-radius:var(--radius);padding:9px 16px;box-shadow:0 10px 28px rgba(0,0,0,.12);}
+  .cd-label{font-size:.68rem;color:var(--muted);text-align:center;margin-bottom:4px;}
+  .cd-label b{color:var(--brown);}
+  .cd-nums{display:flex;justify-content:space-around;}
+  .cd-block{text-align:center;}
+  .cd-block strong{font-size:1.25rem;font-weight:700;color:var(--brown);display:inline-block;font-variant-numeric:tabular-nums;}
+  .cd-block span{display:block;font-size:.6rem;color:var(--muted);}
+  .cd-edit{display:block;margin:6px auto 0;background:none;border:none;color:var(--muted);font-size:.66rem;text-decoration:underline;cursor:pointer;font-family:inherit;}
+
+  /* SECTIONS / CARDS */
+  .section{padding:16px 16px 0;}
+  .section-hdr{font-size:.78rem;font-weight:700;color:var(--brown);margin-bottom:11px;display:flex;align-items:center;gap:8px;text-transform:uppercase;letter-spacing:.5px;}
+  .section-hdr::after{content:'';flex:1;height:1px;background:var(--border);}
+  .card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:14px 16px;margin-bottom:10px;display:flex;align-items:center;gap:14px;box-shadow:var(--shadow);text-decoration:none;color:inherit;}
+  .card-icon{font-size:1.6rem;width:48px;height:48px;display:flex;align-items:center;justify-content:center;border-radius:13px;flex-shrink:0;background:var(--bg2);}
+  .card-body{flex:1;min-width:0;}
+  .card-name{font-weight:700;font-size:.95rem;}
+  .card-meta{font-size:.74rem;color:var(--muted);margin-top:2px;line-height:1.4;}
+  .card-tags{display:flex;flex-wrap:wrap;gap:4px;margin-top:6px;}
+  .waze-btn{background:var(--brown);color:#fff;border:none;border-radius:12px;padding:10px 13px;font-size:.74rem;font-weight:700;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:2px;flex-shrink:0;text-decoration:none;min-width:56px;}
+  .waze-btn:active{opacity:.85;}
+  .waze-btn .waze-logo{font-size:1.3rem;}
+  .waze-btn span{font-size:.63rem;letter-spacing:.3px;}
+  .waze-btn.jade{background:var(--jade);}
+
+  /* TAGS */
+  .tag{font-size:.65rem;font-weight:600;padding:3px 8px;border-radius:7px;background:var(--bg2);color:var(--brown);}
+  .tag.green{background:#e4f1ea;color:#2a7d4f;}
+  .tag.orange{background:#fbeede;color:#a05c00;}
+  .tag.jade{background:#e0efe9;color:#2c6355;}
+  .tag.gold{background:#f7edd6;color:#8a6800;}
+
+  .waze-inline{background:var(--brown);color:#fff;border:none;border-radius:9px;padding:5px 11px;font-size:.68rem;font-weight:700;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;gap:4px;flex-shrink:0;}
+
+  /* RESA BTN */
+  .resa-btn{display:inline-flex;align-items:center;gap:3px;background:#fff8ee;border:1px solid #d4a85a;color:#9a6e10;border-radius:20px;padding:3px 9px;font-size:.72rem;font-weight:700;cursor:pointer;font-family:inherit;margin-top:4px;}
+  .resa-btn.set{background:#e6f2ea;border-color:#3FA66A;color:#1f7a45;}
+
+  /* FAMILY */
+  .fam-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;padding:0 2px;}
+  .fam-cell{display:flex;flex-direction:column;align-items:center;gap:7px;cursor:pointer;}
+  .fam-cell:active{transform:scale(.94);}
+  .fam-ava{width:64px;height:64px;border-radius:50%;display:grid;place-items:center;font-size:1.5rem;font-weight:700;color:#fff;overflow:hidden;box-shadow:0 3px 10px rgba(0,0,0,.12);position:relative;}
+  .fam-ava img{width:100%;height:100%;object-fit:cover;}
+  .fam-ava .cam{position:absolute;bottom:-2px;right:-2px;width:22px;height:22px;border-radius:50%;background:var(--card);display:grid;place-items:center;font-size:.62rem;box-shadow:0 1px 4px rgba(0,0,0,.2);}
+  .fam-name{font-size:.78rem;font-weight:600;color:var(--text);text-align:center;line-height:1.1;}
+
+  /* PAGE HERO */
+  .page-hero{padding:22px 16px 14px;}
+  .page-hero h2{font-family:'Playfair Display',serif;font-size:1.7rem;color:var(--brown);}
+  .page-hero p{font-size:.82rem;color:var(--muted);margin-top:5px;}
+
+  /* STEP TABS */
+  .steps{display:flex;gap:7px;overflow-x:auto;padding:0 16px 4px;scrollbar-width:none;-webkit-overflow-scrolling:touch;}
+  .steps::-webkit-scrollbar{display:none;}
+  .step-tab{flex:0 0 auto;background:var(--card);border:1.5px solid var(--border);border-radius:20px;padding:7px 14px;font-family:'Inter',sans-serif;font-size:.78rem;font-weight:600;color:var(--muted);cursor:pointer;white-space:nowrap;}
+  .step-tab.active{background:var(--brown);border-color:var(--brown);color:#fff;}
+
+  /* DAY CARD */
+  .day-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);margin-bottom:12px;overflow:hidden;box-shadow:var(--shadow);}
+  .day-header{padding:12px 16px 10px;display:flex;align-items:center;gap:12px;border-bottom:1px solid var(--border);background:var(--bg);}
+  .day-number{font-family:'Playfair Display',serif;font-size:1.7rem;font-weight:700;line-height:1;color:var(--brown);min-width:34px;text-align:center;}
+  .day-info{flex:1;min-width:0;}
+  .day-name{font-weight:700;font-size:.95rem;}
+  .day-date{font-size:.72rem;color:var(--muted);margin-top:1px;}
+  .day-vibe{font-size:1.5rem;flex-shrink:0;}
+
+  /* TIMELINE */
+  .timeline{padding:10px 16px 14px;}
+  .tl-item{display:flex;gap:12px;margin-bottom:11px;position:relative;}
+  .tl-item:last-child{margin-bottom:0;}
+  .tl-item:not(:last-child)::after{content:'';position:absolute;left:51px;top:26px;bottom:-11px;width:1px;background:var(--border);}
+  .tl-time{font-size:.66rem;font-weight:600;color:var(--muted);width:40px;flex-shrink:0;padding-top:3px;text-align:right;}
+  .tl-dot{width:22px;height:22px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:.66rem;margin-top:1px;z-index:1;}
+  .dot-plane{background:#ddf0ee;} .dot-food{background:#fbeee9;} .dot-hotel{background:#fdf3e0;}
+  .dot-activity{background:#e3f2ea;} .dot-boat{background:#dcedf8;} .dot-free{background:#efecf4;} .dot-temple{background:#f5ecdb;} .dot-train{background:#efe1f2;}
+  .tl-content{flex:1;min-width:0;}
+  .tl-title{font-weight:600;font-size:.88rem;}
+  .tl-sub{font-size:.74rem;color:var(--muted);margin-top:2px;line-height:1.4;}
+  .tl-row{display:flex;align-items:center;gap:8px;margin-top:6px;flex-wrap:wrap;}
+
+  /* CARTE */
+  #map{height:360px;margin:0 16px 8px;border-radius:var(--radius);overflow:hidden;border:1px solid var(--border);box-shadow:var(--shadow);background:var(--bg2);z-index:0;}
+  .leaflet-container{font-family:'Inter',sans-serif;background:#eae5db;}
+  /* Marqueurs personnalisés */
+  .mk-wrap{background:none;border:none;}
+  .mk{display:flex;align-items:center;justify-content:center;line-height:1;}
+  .mk-stop{width:34px;height:34px;border-radius:50% 50% 50% 0;transform:rotate(-45deg);color:#fff;font-weight:800;font-size:.95rem;box-shadow:0 3px 8px rgba(0,0,0,.35);border:2px solid #fff;}
+  .mk-stop{position:relative;}
+  .mk-stop::after{content:'';}
+  .mk-poi{width:26px;height:26px;border-radius:50%;background:#fff;border:2.5px solid #8a6a3f;font-size:.9rem;box-shadow:0 2px 6px rgba(0,0,0,.28);}
+  /* remet le chiffre à l'endroit dans la goutte */
+  .mk-stop>*{transform:rotate(45deg);}
+  .leaflet-popup-content-wrapper{border-radius:13px;box-shadow:0 8px 26px rgba(0,0,0,.22);}
+  .leaflet-popup-content{margin:11px 14px;}
+  .pop-t{font-weight:700;font-size:.9rem;color:var(--text);}
+  .pop-d{font-size:.75rem;color:var(--muted);margin-top:3px;line-height:1.35;}
+  .pop-go{display:inline-flex;align-items:center;gap:4px;margin-top:9px;background:var(--brown);color:#fff;border-radius:9px;padding:6px 12px;font-size:.74rem;font-weight:700;text-decoration:none;}
+  .map-legend{display:flex;flex-wrap:wrap;gap:7px 12px;justify-content:center;padding:2px 18px 6px;}
+  .map-legend .lg{display:flex;align-items:center;gap:5px;font-size:.72rem;font-weight:600;color:var(--muted);}
+  .map-legend .lg-dot{width:18px;height:18px;border-radius:50%;display:grid;place-items:center;color:#fff;font-size:.66rem;font-weight:800;box-shadow:0 1px 3px rgba(0,0,0,.25);}
+
+  /* RESA GROUPS */
+  .resa-group{padding:2px 16px 0;}
+  .resa-glabel{font-size:.78rem;font-weight:700;color:var(--brown);margin:14px 2px 8px;text-transform:uppercase;letter-spacing:.5px;display:flex;align-items:center;gap:7px;}
+  .resa-row{background:var(--card);border:1px solid var(--border);border-radius:13px;padding:12px 14px;margin-bottom:8px;display:flex;align-items:center;gap:12px;box-shadow:var(--shadow);cursor:pointer;}
+  .resa-row:active{transform:scale(.99);}
+  .resa-ic{font-size:1.35rem;width:42px;height:42px;border-radius:11px;background:var(--bg2);display:grid;place-items:center;flex-shrink:0;}
+  .resa-info{flex:1;min-width:0;}
+  .resa-name{font-weight:700;font-size:.9rem;}
+  .resa-desc{font-size:.72rem;color:var(--muted);margin-top:2px;}
+  .resa-state{font-size:.7rem;font-weight:700;padding:4px 10px;border-radius:20px;flex-shrink:0;background:#fbeede;color:#a05c00;}
+  .resa-state.ok{background:#e6f2ea;color:#1f7a45;}
+
+  /* INFO CARDS */
+  .info-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:0 16px;}
+  .info-tile{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:13px 14px;box-shadow:var(--shadow);}
+  .info-tile .it-ic{font-size:1.4rem;}
+  .info-tile .it-k{font-size:.62rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;margin-top:6px;}
+  .info-tile .it-v{font-size:.98rem;font-weight:700;color:var(--text);margin-top:2px;line-height:1.25;}
+  .info-tile .it-note{font-size:.66rem;color:var(--muted);margin-top:3px;line-height:1.35;}
+
+  .urg-card{margin:14px 16px 0;background:linear-gradient(135deg,#8a2e2e,#b04141);border-radius:var(--radius);padding:15px 17px;color:#fff;box-shadow:0 6px 18px rgba(138,46,46,.28);}
+  .urg-title{font-size:.66rem;font-weight:800;letter-spacing:.1em;text-transform:uppercase;opacity:.85;margin-bottom:9px;}
+  .urg-row{display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-top:1px solid rgba(255,255,255,.16);}
+  .urg-row:first-of-type{border-top:none;}
+  .urg-k{font-size:.82rem;}
+  .urg-num{font-size:1.05rem;font-weight:800;text-decoration:none;color:#fff;letter-spacing:.03em;}
+
+  .assur-card{margin:12px 16px 0;background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:15px 17px;box-shadow:var(--shadow);}
+  .assur-title{font-size:.66rem;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:10px;display:flex;align-items:center;gap:7px;}
+  .assur-field{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-top:1px solid var(--border);}
+  .assur-field:first-of-type{border-top:none;}
+  .assur-k{font-size:.78rem;color:var(--muted);}
+  .assur-v{font-size:.86rem;font-weight:700;color:var(--text);text-align:right;-webkit-user-select:text;user-select:text;}
+  .assur-v.empty{color:var(--caramel);font-style:italic;font-weight:600;}
+  .assur-edit{width:100%;margin-top:12px;background:var(--bg2);border:none;border-radius:11px;padding:11px;font-family:inherit;font-weight:700;font-size:.85rem;color:var(--brown);cursor:pointer;}
+
+  .disclaimer{margin:16px;font-size:.68rem;color:var(--muted);line-height:1.5;text-align:center;background:var(--bg2);border-radius:12px;padding:12px 14px;}
+
+  /* MODAL */
+  .modal{display:none;position:fixed;inset:0;z-index:1000;background:rgba(0,0,0,.6);align-items:center;justify-content:center;padding:24px;-webkit-transform:translateZ(0);transform:translateZ(0);}
+  .modal.open{display:flex;}
+  .modal-box{background:var(--card);border-radius:18px;padding:20px;width:100%;max-width:400px;box-shadow:0 20px 60px rgba(0,0,0,.3);}
+  .modal-title{font-weight:700;font-size:1.05rem;margin-bottom:14px;display:flex;align-items:center;gap:8px;}
+  .modal-box label{display:block;font-size:.72rem;font-weight:700;color:var(--muted);margin:10px 0 4px;text-transform:uppercase;letter-spacing:.03em;}
+  .modal-box input{width:100%;border:1.5px solid var(--border);border-radius:11px;padding:11px 13px;font-family:inherit;font-size:.92rem;color:var(--text);background:var(--bg);outline:none;-webkit-user-select:text;user-select:text;}
+  .modal-box input:focus{border-color:var(--caramel);}
+  .modal-btns{display:flex;gap:9px;margin-top:18px;}
+  .modal-btns button{flex:1;padding:12px;border-radius:12px;font-family:inherit;font-weight:700;font-size:.9rem;border:none;cursor:pointer;}
+  .mb-save{background:var(--brown);color:#fff;}
+  .mb-cancel{background:var(--bg2);color:var(--muted);}
+  .mb-danger{background:none;color:#c0392b;border:none;font-size:.8rem;text-decoration:underline;cursor:pointer;font-family:inherit;margin-top:12px;width:100%;padding:4px;}
+  #resa-view a.doc-link{display:flex;align-items:center;gap:8px;background:var(--bg2);border:1px solid var(--border);border-radius:11px;padding:13px 15px;color:var(--brown);font-weight:700;text-decoration:none;font-size:.95rem;}
+  #resa-view img.doc-img{width:100%;border-radius:11px;margin-top:10px;display:block;}
+</style>
+</head>
+<body>
+
+<div id="splash"><div class="splash-inner">
+  <div class="splash-icon">🐘</div>
+  <div class="splash-name">Thaïlande</div>
+  <div class="splash-sub">Noël en famille 🎄</div>
+  <div class="splash-dots"><span></span><span></span><span></span></div>
+</div></div>
+
+<div id="navbar"><span id="navbar-title">Thaïlande</span></div>
+
+<nav class="app-nav">
+  <button class="app-nav-btn active" id="nav-home" onclick="showPage('home',this)"><span class="nav-icon">🏠</span><span class="nav-label">Accueil</span></button>
+  <button class="app-nav-btn" id="nav-planning" onclick="showPage('planning',this)"><span class="nav-icon">📅</span><span class="nav-label">Planning</span></button>
+  <button class="app-nav-btn" id="nav-carte" onclick="showPage('carte',this)"><span class="nav-icon">📍</span><span class="nav-label">Carte</span></button>
+  <button class="app-nav-btn" id="nav-resa" onclick="showPage('resa',this)"><span class="nav-icon">🎫</span><span class="nav-label">Résa</span></button>
+  <button class="app-nav-btn" id="nav-infos" onclick="showPage('infos',this)"><span class="nav-icon">ℹ️</span><span class="nav-label">Infos</span></button>
+</nav>
+
+<!-- ============ HOME ============ -->
+<div class="page page-content active" id="page-home">
+  <div class="hero-wrap">
+    <img class="hero-img" src="https://images.unsplash.com/photo-1528181304800-259b08848526?w=900&q=80&fm=webp" alt="Thaïlande" onerror="this.style.display='none'">
+    <div class="hero-overlay"></div>
+    <div class="hero-title"><h1>Thaïlande</h1><p id="hero-dates">— · à nous 4 —</p></div>
+  </div>
+
+  <div class="countdown-card">
+    <div class="cd-label" id="cd-label">Plus que…</div>
+    <div class="cd-nums" id="cd-nums"></div>
+    <button class="cd-edit" onclick="openDates()">✏️ Modifier les dates</button>
+  </div>
+
+  <div class="section">
+    <div class="section-hdr">🧳 La famille</div>
+    <div class="fam-grid" id="fam-grid"></div>
+  </div>
+
+  <div class="section">
+    <div class="section-hdr">🗺️ L'itinéraire</div>
+    <div class="card" onclick="showPage('planning',document.getElementById('nav-planning'))">
+      <div class="card-icon">🏙️</div>
+      <div class="card-body"><div class="card-name">Bangkok</div><div class="card-meta">Temples & rivière · 18 → 20 déc</div></div>
+      <div class="tag jade">Étape 1</div>
+    </div>
+    <div class="card" onclick="showPage('planning',document.getElementById('nav-planning'))">
+      <div class="card-icon">🐘</div>
+      <div class="card-body"><div class="card-name">Chiang Mai</div><div class="card-meta">Train de nuit, éléphants · 21 → 23 déc</div></div>
+      <div class="tag jade">Étape 2</div>
+    </div>
+    <div class="card" onclick="showPage('planning',document.getElementById('nav-planning'))">
+      <div class="card-icon">🛶</div>
+      <div class="card-body"><div class="card-name">Khao Sok</div><div class="card-meta">Lac Cheow Lan, bungalow flottant · 23 → 25 déc</div></div>
+      <div class="tag jade">Étape 3</div>
+    </div>
+    <div class="card" onclick="showPage('planning',document.getElementById('nav-planning'))">
+      <div class="card-icon">🏝️</div>
+      <div class="card-body"><div class="card-name">Koh Lanta</div><div class="card-meta">Villa piscine front de mer · 25 → 29 déc</div></div>
+      <div class="tag jade">Étape 4</div>
+    </div>
+    <div class="card" onclick="showPage('planning',document.getElementById('nav-planning'))">
+      <div class="card-icon">🎆</div>
+      <div class="card-body"><div class="card-name">Koh Yao Yai</div><div class="card-meta">Santhiya · Nouvel An · 29 déc → 1er janv</div></div>
+      <div class="tag jade">Étape 5</div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-hdr">⚡ Accès rapide</div>
+    <div class="card" onclick="showPage('resa',document.getElementById('nav-resa'))">
+      <div class="card-icon">🎫</div>
+      <div class="card-body"><div class="card-name">Nos réservations</div><div class="card-meta" id="resa-count">Vols, hôtels, transferts & activités</div></div>
+      <div class="tag">Ouvrir</div>
+    </div>
+    <div class="card" onclick="showPage('infos',document.getElementById('nav-infos'))">
+      <div class="card-icon">ℹ️</div>
+      <div class="card-body"><div class="card-name">Infos pratiques</div><div class="card-meta">Visa, monnaie, décalage, urgences…</div></div>
+      <div class="tag">Ouvrir</div>
+    </div>
+  </div>
+
+  <div class="disclaimer">🐘 Notre voyage de Noël (18 déc → 1er janv). Attache tes billets et confirmations dans l'onglet <b>Résa</b> (PNR, n° de résa, passeports) : ils restent stockés <b>sur ton téléphone, hors-ligne</b> — rien n'est mis en ligne.</div>
+</div>
+
+<!-- ============ PLANNING ============ -->
+<div class="page page-content" id="page-planning">
+  <div class="page-hero"><h2>Planning</h2><p>Jour par jour · appuie sur 📄 Résa pour attacher un billet</p></div>
+  <div class="steps" id="plan-steps"></div>
+  <div id="plan-days" style="padding:12px 0 0"></div>
+</div>
+
+<!-- ============ CARTE ============ -->
+<div class="page page-content" id="page-carte">
+  <div class="page-hero"><h2>Carte</h2><p>L'itinéraire & tous les lieux du séjour · touche un point pour l'ouvrir</p></div>
+  <div id="map"></div>
+  <div id="map-legend" class="map-legend"></div>
+  <div id="carte-list" style="padding:8px 0 0"></div>
+</div>
+
+<!-- ============ RESA ============ -->
+<div class="page page-content" id="page-resa">
+  <div class="page-hero"><h2>Réservations</h2><p>Billets & confirmations · stockés hors-ligne sur ton téléphone</p></div>
+  <div id="resa-groups"></div>
+  <div class="disclaimer">🔒 100 % privé : rien n'est envoyé sur internet. Les PDF/photos sont stockés localement (IndexedDB) et restent accessibles sans réseau. Change de téléphone = à ré-attacher.</div>
+</div>
+
+<!-- ============ INFOS ============ -->
+<div class="page page-content" id="page-infos">
+  <div class="page-hero"><h2>Infos pratiques</h2><p>Thaïlande · l'essentiel à portée de main</p></div>
+  <div class="info-grid">
+    <div class="info-tile"><div class="it-ic">💵</div><div class="it-k">Monnaie</div><div class="it-v">Baht (฿)</div><div class="it-note">1 € ≈ 38 ฿ · taux indicatif</div></div>
+    <div class="info-tile"><div class="it-ic">🕐</div><div class="it-k">Décalage</div><div class="it-v">+6 h</div><div class="it-note">l'hiver (+5 h l'été) · UTC+7</div></div>
+    <div class="info-tile"><div class="it-ic">🛂</div><div class="it-k">Visa</div><div class="it-v">Exempté ≤ 60 j</div><div class="it-note">Français · passeport valide 6 mois. À vérifier avant départ.</div></div>
+    <div class="info-tile"><div class="it-ic">🔌</div><div class="it-k">Prises</div><div class="it-v">Type A/B/C</div><div class="it-note">220 V · adaptateur conseillé</div></div>
+    <div class="info-tile"><div class="it-ic">🗣️</div><div class="it-k">Bonjour</div><div class="it-v">Sawasdee</div><div class="it-note">« kráp » (h) / « kâ » (f) · Merci : Kop khun</div></div>
+    <div class="info-tile"><div class="it-ic">💧</div><div class="it-k">Eau</div><div class="it-v">En bouteille</div><div class="it-note">Éviter l'eau du robinet</div></div>
+  </div>
+
+  <div class="urg-card">
+    <div class="urg-title">🚨 Numéros d'urgence</div>
+    <div class="urg-row"><span class="urg-k">Police touristique</span><a class="urg-num" href="tel:1155">1155</a></div>
+    <div class="urg-row"><span class="urg-k">Urgences / Police</span><a class="urg-num" href="tel:191">191</a></div>
+    <div class="urg-row"><span class="urg-k">Ambulance / SAMU</span><a class="urg-num" href="tel:1669">1669</a></div>
+    <div class="urg-row"><span class="urg-k">Ambassade de France (Bangkok)</span><a class="urg-num" href="tel:+6626575100">+66 2 657 5100</a></div>
+  </div>
+
+  <div class="assur-card">
+    <div class="assur-title">🛡️ Assurance voyage</div>
+    <div class="assur-field"><span class="assur-k">Compagnie</span><span class="assur-v" id="as-comp"></span></div>
+    <div class="assur-field"><span class="assur-k">N° de contrat</span><span class="assur-v" id="as-num"></span></div>
+    <div class="assur-field"><span class="assur-k">Assistance 24h/24</span><span class="assur-v" id="as-tel"></span></div>
+    <button class="assur-edit" onclick="openAssur()">✏️ Renseigner mon assurance</button>
+  </div>
+
+  <div class="disclaimer">Les informations ci-dessus (visa, taux de change, prises) sont données à titre indicatif et peuvent changer — pense à les <b>vérifier avant le départ</b> (France Diplomatie / consulat de Thaïlande).</div>
+</div>
+
+<!-- ============ MODALS ============ -->
+<div class="modal" id="resa-modal" onclick="if(event.target===this)closeModal('resa-modal')">
+  <div class="modal-box">
+    <div class="modal-title" id="resa-modal-title">📄 Réservation</div>
+    <div id="resa-view"></div>
+    <div class="modal-btns"><button class="mb-cancel" onclick="closeModal('resa-modal')">Fermer</button></div>
+  </div>
+</div>
+
+<div class="modal" id="dates-modal" onclick="if(event.target===this)closeModal('dates-modal')">
+  <div class="modal-box">
+    <div class="modal-title">🗓️ Dates du voyage</div>
+    <label>Départ</label><input type="date" id="d-start">
+    <label>Retour</label><input type="date" id="d-end">
+    <div class="modal-btns"><button class="mb-cancel" onclick="closeModal('dates-modal')">Annuler</button><button class="mb-save" onclick="saveDates()">Enregistrer</button></div>
+  </div>
+</div>
+
+<div class="modal" id="fam-modal" onclick="if(event.target===this)closeModal('fam-modal')">
+  <div class="modal-box">
+    <div class="modal-title" id="fam-modal-title">Voyageur</div>
+    <label>Prénom</label><input type="text" id="fam-name" placeholder="Prénom" maxlength="16">
+    <div class="modal-btns"><button class="mb-cancel" onclick="closeModal('fam-modal')">Annuler</button><button class="mb-save" onclick="saveFam()">Enregistrer</button></div>
+    <button class="mb-danger" onclick="pickFamPhoto()">📷 Changer la photo</button>
+  </div>
+</div>
+
+<div class="modal" id="assur-modal" onclick="if(event.target===this)closeModal('assur-modal')">
+  <div class="modal-box">
+    <div class="modal-title">🛡️ Mon assurance</div>
+    <label>Compagnie</label><input type="text" id="am-comp" placeholder="ex. Chapka, Allianz…">
+    <label>N° de contrat</label><input type="text" id="am-num" placeholder="ex. 1234567">
+    <label>N° d'assistance 24h/24</label><input type="tel" id="am-tel" placeholder="ex. +33 1 ..">
+    <div class="modal-btns"><button class="mb-cancel" onclick="closeModal('assur-modal')">Annuler</button><button class="mb-save" onclick="saveAssur()">Enregistrer</button></div>
+  </div>
+</div>
+
+<script>
+/* ===================== ÉTAT & STOCKAGE ===================== */
+const LS='thai2027-';
+function lget(k,d){try{const v=localStorage.getItem(LS+k);return v==null?d:JSON.parse(v);}catch(e){return d;}}
+function lset(k,v){try{localStorage.setItem(LS+k,JSON.stringify(v));}catch(e){}}
+
+/* Dates (modifiables) — Noël & Nouvel An 2026-2027 */
+let DATES=lget('dates',{start:'2026-12-18',end:'2027-01-01'});
+
+/* Famille (4) — noms & photos modifiables */
+const FAM_DEF=[
+  {id:'p1',name:'Philippe',color:'#8a6a3f'},
+  {id:'p2',name:'Chloé',color:'#3f7d6b'},
+  {id:'p3',name:'Vic',color:'#b98a2e'},
+  {id:'p4',name:'Cléa',color:'#a15b46'}
+];
+let FAM=lget('fam',null)||FAM_DEF.map(f=>({id:f.id,name:f.name}));
+const FAM_COLOR={p1:'#8a6a3f',p2:'#3f7d6b',p3:'#b98a2e',p4:'#a15b46'};
+
+/* ===================== INDEXEDDB (fichiers résa + photos) ===================== */
+const FileDB={
+  _db:null,
+  open(){return new Promise((res,rej)=>{
+    if(this._db)return res(this._db);
+    const r=indexedDB.open('thai-files',1);
+    r.onupgradeneeded=e=>{e.target.result.createObjectStore('files',{keyPath:'id'});};
+    r.onsuccess=e=>{this._db=e.target.result;res(this._db);};
+    r.onerror=()=>rej(r.error);
+  });},
+  async put(id,blob,name){const db=await this.open();return new Promise((res,rej)=>{const tx=db.transaction('files','readwrite');tx.objectStore('files').put({id,blob,name});tx.oncomplete=res;tx.onerror=()=>rej(tx.error);});},
+  async get(id){const db=await this.open();return new Promise((res,rej)=>{const rq=db.transaction('files','readonly').objectStore('files').get(id);rq.onsuccess=()=>res(rq.result||null);rq.onerror=()=>rej(rq.error);});},
+  async del(id){const db=await this.open();return new Promise((res)=>{const tx=db.transaction('files','readwrite');tx.objectStore('files').delete(id);tx.oncomplete=res;});},
+  async keys(){const db=await this.open();return new Promise((res)=>{const rq=db.transaction('files','readonly').objectStore('files').getAllKeys();rq.onsuccess=()=>res(rq.result||[]);rq.onerror=()=>res([]);});}
+};
+let RESA_KEYS=new Set();
+
+/* ===================== DONNÉES VOYAGE ===================== */
+/* Lieux (coordonnées réelles) pour la carte */
+const GRP_COLORS={'Bangkok':'#c0392b','Chiang Mai':'#c98a2e','Khao Sok':'#2e8b6f','Koh Lanta':'#2a7d9f','Koh Yao Yai':'#7a5cae','Transport':'#9a9384'};
+const GRP_ICON={'Bangkok':'🏙️','Chiang Mai':'🐘','Khao Sok':'🛶','Koh Lanta':'🏝️','Koh Yao Yai':'🎆'};
+const PLACES=[
+  {n:'Aéroport Bangkok (Suvarnabhumi)',lat:13.6900,lng:100.7501,ic:'✈️',grp:'Transport',d:'Arrivée & départ internationaux'},
+  {n:'Sivatel Bangkok Hotel',lat:13.7407,lng:100.5403,ic:'🏨',grp:'Bangkok',stop:1,d:'Étape 1 · 18 → 20 déc · 2 nuits'},
+  {n:'Grand Palais & Wat Phra Kaew',lat:13.7500,lng:100.4914,ic:'🏛️',grp:'Bangkok',d:'Visite guidée · 19 déc'},
+  {n:'Wat Pho (Bouddha couché)',lat:13.7465,lng:100.4927,ic:'🛕',grp:'Bangkok',d:'À 5 min du Grand Palais'},
+  {n:'Wat Arun (temple de l\'Aube)',lat:13.7437,lng:100.4889,ic:'🛕',grp:'Bangkok',d:'Traversée en bateau'},
+  {n:'Gare Krung Thep Aphiwat',lat:13.8028,lng:100.5397,ic:'🚉',grp:'Bangkok',d:'Train de nuit · 20 déc 18h40'},
+  {n:'Pingviman Hotel',lat:18.7855,lng:98.9855,ic:'🏨',grp:'Chiang Mai',stop:2,d:'Étape 2 · 21 → 23 déc'},
+  {n:'Vieille ville & Wat Chedi Luang',lat:18.7869,lng:98.9860,ic:'🛕',grp:'Chiang Mai',d:'Temples · marché de nuit'},
+  {n:'Elephant Rescue Park',lat:18.9218,lng:98.8493,ic:'🐘',grp:'Chiang Mai',d:'Tour privé · 22 déc matin'},
+  {n:'Doi Suthep (Wat Phra That)',lat:18.8047,lng:98.9217,ic:'⛰️',grp:'Chiang Mai',d:'Temple perché · vue sur la ville'},
+  {n:'Aéroport de Surat Thani (URT)',lat:9.1326,lng:99.1355,ic:'✈️',grp:'Transport',d:'Vol AirAsia FD5420 · 23 déc'},
+  {n:'500 Rai Floating Resort',lat:8.9760,lng:98.6870,ic:'🛶',grp:'Khao Sok',stop:3,d:'Étape 3 · 23 → 25 déc · lac Cheow Lan'},
+  {n:'Lac Cheow Lan (Ratchaprapha)',lat:8.9755,lng:98.7930,ic:'🏞️',grp:'Khao Sok',d:'Kayak, longtail, jungle'},
+  {n:'Nirvana Beach Resort',lat:7.5450,lng:99.0450,ic:'🏝️',grp:'Koh Lanta',stop:4,d:'Étape 4 · 25 → 29 déc · villa piscine'},
+  {n:'Santhiya Koh Yao Yai Resort & Spa',lat:8.0600,lng:98.5800,ic:'🏖️',grp:'Koh Yao Yai',stop:5,d:'Étape 5 · 29 déc → 1 janv · Nouvel An'}
+];
+
+/* Planning : étapes -> jours -> items. resa = clé de réservation attachable */
+const PLAN=[
+  {step:'Bangkok', days:[
+    {n:1,name:'Arrivée à Bangkok',vibe:'✈️',date:'Ven 18 déc',items:[
+      {time:'Matin',dot:'plane',ic:'✈️',t:'Arrivée à Bangkok',sub:'Vol Thai Airways depuis Bruxelles',resa:'vol-aller',rl:'Vol Bruxelles → Bangkok'},
+      {time:'',dot:'hotel',ic:'🏨',t:'Check-in — Sivatel Bangkok Hotel',sub:'2 nuits · récupération du décalage',resa:'hotel-bkk',rl:'Hôtel Bangkok — Sivatel',waze:'13.7407,100.5403'},
+      {time:'Soir',dot:'food',ic:'🍜',t:'Premier dîner thaï',sub:'Pad thaï, mango sticky rice…'}
+    ]},
+    {n:2,name:'Bangkok avec guide',vibe:'🧭',date:'Sam 19 déc',items:[
+      {time:'Journée',dot:'activity',ic:'🧭',t:'Visite de Bangkok avec guide',sub:'Journée guidée en famille · temples & rivière',resa:'guide-bangkok',rl:'Visite guidée de Bangkok'},
+      {time:'9h',dot:'temple',ic:'🏛️',t:'Grand Palais & Wat Phra Kaew',sub:'Tenue couvrante (épaules & genoux)',waze:'13.7500,100.4914'},
+      {time:'11h',dot:'temple',ic:'🛕',t:'Wat Pho — Bouddha couché',sub:'À 5 min à pied du Grand Palais',waze:'13.7465,100.4927'},
+      {time:'13h',dot:'food',ic:'🍽️',t:'Déjeuner au bord du Chao Phraya',sub:'Vue sur la rivière'},
+      {time:'15h',dot:'boat',ic:'⛵',t:'Traversée vers Wat Arun',sub:'Bateau local · temple de l\'Aube',waze:'13.7437,100.4889'}
+    ]},
+    {n:3,name:'Marché puis train de nuit',vibe:'🚂',date:'Dim 20 déc',items:[
+      {time:'Matin',dot:'activity',ic:'🛍️',t:'Marché & balade',sub:'Souvenirs & street food'},
+      {time:'Aprem',dot:'free',ic:'🏊',t:'Repos avant le train',sub:'Rythme famille'},
+      {time:'18h40',dot:'train',ic:'🚂',t:'Train de nuit → Chiang Mai',sub:'Special Express n°9 · 1re classe couchette · gare Krung Thep Aphiwat',resa:'train-cnx',rl:'Train de nuit Bangkok → Chiang Mai',waze:'13.8028,100.5397'}
+    ]}
+  ]},
+  {step:'Chiang Mai', days:[
+    {n:4,name:'Arrivée à Chiang Mai',vibe:'🛕',date:'Lun 21 déc',items:[
+      {time:'7h15',dot:'train',ic:'🚉',t:'Arrivée en gare de Chiang Mai',sub:'Nuit en train depuis Bangkok'},
+      {time:'',dot:'hotel',ic:'🏨',t:'Check-in — Pingviman Hotel',sub:'2 nuits · vieille ville',resa:'hotel-cnx',rl:'Hôtel Chiang Mai — Pingviman',waze:'18.7855,98.9855'},
+      {time:'10h',dot:'temple',ic:'🛕',t:'Temples de la vieille ville',sub:'Wat Chedi Luang, Wat Phra Singh',waze:'18.7869,98.9860'},
+      {time:'18h',dot:'food',ic:'🌙',t:'Marché de nuit',sub:'Artisanat & cuisine du nord'}
+    ]},
+    {n:5,name:'Journée éléphants',vibe:'🐘',date:'Mar 22 déc',items:[
+      {time:'Matin',dot:'activity',ic:'🐘',t:'Elephant Rescue Park',sub:'Programme A · tour privé du matin · sanctuaire éthique',resa:'elephants',rl:'Elephant Rescue Park',waze:'18.9218,98.8493'},
+      {time:'Aprem',dot:'temple',ic:'⛰️',t:'Doi Suthep (option)',sub:'Temple perché · vue sur la ville',waze:'18.8047,98.9217'}
+    ]},
+    {n:6,name:'Envol vers le sud',vibe:'✈️',date:'Mer 23 déc',items:[
+      {time:'10h40',dot:'plane',ic:'✈️',t:'Vol Chiang Mai → Surat Thani',sub:'Thai AirAsia FD5420 · direct ~1h55',resa:'vol-cnx-urt',rl:'Vol Chiang Mai → Surat Thani',waze:'9.1326,99.1355'},
+      {time:'Aprem',dot:'boat',ic:'🚐',t:'Route vers le lac de Khao Sok',sub:'Direction 500 Rai Floating Resort'}
+    ]}
+  ]},
+  {step:'Khao Sok', days:[
+    {n:7,name:'Le lac émeraude',vibe:'🛶',date:'Mer 23 déc',items:[
+      {time:'',dot:'hotel',ic:'🛶',t:'Check-in — 500 Rai Floating Resort',sub:'2 nuits · bungalow flottant sur le lac Cheow Lan',resa:'hotel-khaosok',rl:'500 Rai Floating Resort (Khao Sok)',waze:'8.9760,98.6870'},
+      {time:'Soir',dot:'free',ic:'🌄',t:'Coucher de soleil sur le lac',sub:'Falaises karstiques & jungle'}
+    ]},
+    {n:8,name:'Réveillon sur le lac',vibe:'🎄',date:'Jeu 24 déc',items:[
+      {time:'Matin',dot:'boat',ic:'🛶',t:'Lac Cheow Lan — kayak & baignade',sub:'Longtail, grottes, jungle',waze:'8.9755,98.7930'},
+      {time:'Soir',dot:'food',ic:'🎄',t:'Réveillon de Noël',sub:'Dîner sur le lac en famille'}
+    ]},
+    {n:9,name:'Cap sur Koh Lanta',vibe:'🎁',date:'Ven 25 déc',items:[
+      {time:'Matin',dot:'free',ic:'🎁',t:'Matin de Noël sur le lac',sub:''},
+      {time:'',dot:'boat',ic:'🚐',t:'Transfert privé vers Koh Lanta',sub:'Voiture + ferry · 500 Rai → Nirvana',resa:'transfert-lanta',rl:'Transfert Khao Sok → Koh Lanta'}
+    ]}
+  ]},
+  {step:'Koh Lanta', days:[
+    {n:10,name:'Villa les pieds dans l\'eau',vibe:'🏝️',date:'Ven 25 déc',items:[
+      {time:'',dot:'hotel',ic:'🏝️',t:'Check-in — Nirvana Beach Resort',sub:'4 nuits · villa piscine front de mer',resa:'hotel-lanta',rl:'Nirvana Beach Resort (Koh Lanta)',waze:'7.5450,99.0450'},
+      {time:'Soir',dot:'food',ic:'🌅',t:'Coucher de soleil sur la plage',sub:'Dîner pieds dans le sable'}
+    ]},
+    {n:11,name:'Farniente & plages',vibe:'😎',date:'Sam 26 → Lun 28 déc',items:[
+      {time:'Libre',dot:'free',ic:'🏖️',t:'Plages de Koh Lanta',sub:'Baignade, piscine, massage thaï'},
+      {time:'Option',dot:'boat',ic:'🤿',t:'Excursion snorkeling',sub:'Koh Rok / 4 îles (à réserver sur place)'}
+    ]},
+    {n:12,name:'Vers Koh Yao Yai',vibe:'⛵',date:'Mar 29 déc',items:[
+      {time:'Matin',dot:'free',ic:'🏊',t:'Dernière baignade à Koh Lanta',sub:''},
+      {time:'',dot:'boat',ic:'⛵',t:'Speedboat vers Koh Yao Yai',sub:'Transfert Santhiya',resa:'transfert-kohyao',rl:'Transfert Koh Lanta → Koh Yao Yai'}
+    ]}
+  ]},
+  {step:'Koh Yao Yai', days:[
+    {n:13,name:'Santhiya Resort',vibe:'🏖️',date:'Mar 29 déc',items:[
+      {time:'',dot:'hotel',ic:'🏖️',t:'Check-in — Santhiya Koh Yao Yai',sub:'3 nuits · Deluxe Sea View · 2 chambres',resa:'hotel-kohyao',rl:'Santhiya Koh Yao Yai Resort & Spa',waze:'8.0600,98.5800'},
+      {time:'Soir',dot:'free',ic:'🌴',t:'Détente au resort',sub:'Plage, piscines, spa'}
+    ]},
+    {n:14,name:'Réveillon du Nouvel An',vibe:'🎆',date:'Mer 30 → Jeu 31 déc',items:[
+      {time:'Journée',dot:'free',ic:'🤿',t:'Plage, snorkeling, kayak',sub:'Au rythme des envies'},
+      {time:'31 déc',dot:'food',ic:'🎆',t:'Réveillon du Nouvel An',sub:'Bonne année en famille ! ✨'}
+    ]},
+    {n:15,name:'Nouvel An & retour',vibe:'🏠',date:'Ven 1 janv',items:[
+      {time:'Matin',dot:'boat',ic:'⛵',t:'Retour vers Bangkok',sub:'Speedboat + route/avion vers l\'aéroport'},
+      {time:'Soir',dot:'plane',ic:'✈️',t:'Vol retour vers Bruxelles',sub:'Thai Airways · la tête pleine de souvenirs 🐘',resa:'vol-retour',rl:'Vol retour Bangkok → Bruxelles'}
+    ]}
+  ]}
+];
+
+/* Réservations (coffre) — groupées */
+const RESA=[
+  {label:'Vols',ic:'✈️',items:[
+    {key:'vol-aller',ic:'✈️',name:'Vol aller — Thai Airways',desc:'Bruxelles → Bangkok · 18 déc'},
+    {key:'vol-cnx-urt',ic:'✈️',name:'Vol AirAsia FD5420',desc:'Chiang Mai → Surat Thani · 23 déc'},
+    {key:'vol-retour',ic:'✈️',name:'Vol retour — Thai Airways',desc:'Bangkok → Bruxelles · ~1er janv'}
+  ]},
+  {label:'Train',ic:'🚂',items:[
+    {key:'train-cnx',ic:'🚂',name:'Train de nuit 1re classe',desc:'Bangkok → Chiang Mai · 20 déc 18h40'}
+  ]},
+  {label:'Hôtels',ic:'🏨',items:[
+    {key:'hotel-bkk',ic:'🏨',name:'Sivatel Bangkok Hotel',desc:'18 → 20 déc · 2 nuits'},
+    {key:'hotel-cnx',ic:'🏨',name:'Pingviman Hotel',desc:'Chiang Mai · 21 → 23 déc'},
+    {key:'hotel-khaosok',ic:'🛶',name:'500 Rai Floating Resort',desc:'Khao Sok · 23 → 25 déc'},
+    {key:'hotel-lanta',ic:'🏝️',name:'Nirvana Beach Resort',desc:'Koh Lanta · 25 → 29 déc'},
+    {key:'hotel-kohyao',ic:'🏖️',name:'Santhiya Koh Yao Yai',desc:'29 déc → 1er janv · Nouvel An'}
+  ]},
+  {label:'Transferts',ic:'🚐',items:[
+    {key:'transfert-lanta',ic:'🚐',name:'Khao Sok → Koh Lanta',desc:'Voiture + ferry · 25 déc'},
+    {key:'transfert-kohyao',ic:'⛵',name:'Koh Lanta → Koh Yao Yai',desc:'Speedboat · 29 déc'}
+  ]},
+  {label:'Activités',ic:'🎟️',items:[
+    {key:'guide-bangkok',ic:'🧭',name:'Visite guidée de Bangkok',desc:'19 déc · journée avec guide'},
+    {key:'elephants',ic:'🐘',name:'Elephant Rescue Park',desc:'Chiang Mai · 22 déc (matin)'}
+  ]},
+  {label:'Documents',ic:'🪪',items:[
+    {key:'passeports',ic:'🛂',name:'Passeports',desc:'Scans de la famille'},
+    {key:'assurance-doc',ic:'🛡️',name:'Assurance Allianz',desc:'Attestation voyage'}
+  ]}
+];
+
+/* ===================== NAVIGATION ===================== */
+const NAV_TITLES={home:'Thaïlande',planning:'Planning',carte:'Carte',resa:'Réservations',infos:'Infos pratiques'};
+let _mapInit=false,_map=null;
+function showPage(name,btn){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.getElementById('page-'+name).classList.add('active');
+  document.querySelectorAll('.app-nav-btn').forEach(b=>b.classList.remove('active'));
+  if(btn)btn.classList.add('active');
+  const nb=document.getElementById('navbar');
+  document.getElementById('navbar-title').textContent=NAV_TITLES[name]||'Thaïlande';
+  if(name==='home'){nb.classList.remove('show');}else{nb.classList.add('show');}
+  document.getElementById('page-'+name).scrollTop=0;
+  if(name==='carte')initMap();
+}
+
+/* ===================== COMPTE À REBOURS + DATES ===================== */
+const MOIS=['janv.','févr.','mars','avr.','mai','juin','juil.','août','sept.','oct.','nov.','déc.'];
+function fmtDate(iso){const d=new Date(iso+'T00:00:00');return d.getDate()+' '+MOIS[d.getMonth()]+' '+d.getFullYear();}
+function fmtShort(iso){const d=new Date(iso+'T00:00:00');return d.getDate()+' '+MOIS[d.getMonth()];}
+function renderDates(){
+  document.getElementById('hero-dates').textContent='— '+fmtShort(DATES.start)+' au '+fmtShort(DATES.end)+' · à nous 4 —';
+  renderCountdown();
+}
+function renderCountdown(){
+  const el=document.getElementById('cd-nums');const lab=document.getElementById('cd-label');
+  const now=new Date();const start=new Date(DATES.start+'T00:00:00');const end=new Date(DATES.end+'T23:59:59');
+  if(now>=start&&now<=end){lab.innerHTML='🌴 <b>En Thaïlande !</b>';el.innerHTML='<div class="cd-block"><strong>Profitez bien 🐘</strong></div>';return;}
+  if(now>end){lab.innerHTML='📸 <b>Voyage terminé</b>';el.innerHTML='<div class="cd-block"><strong>Quels souvenirs ✨</strong></div>';return;}
+  const diff=start-now;const days=Math.floor(diff/864e5);const h=Math.floor(diff%864e5/36e5);const m=Math.floor(diff%36e5/6e4);
+  lab.innerHTML='Départ le <b>'+fmtDate(DATES.start)+'</b>';
+  el.innerHTML=[[days,'jours'],[h,'heures'],[m,'min']].map(x=>'<div class="cd-block"><strong>'+x[0]+'</strong><span>'+x[1]+'</span></div>').join('');
+}
+function openDates(){document.getElementById('d-start').value=DATES.start;document.getElementById('d-end').value=DATES.end;document.getElementById('dates-modal').classList.add('open');}
+function saveDates(){const s=document.getElementById('d-start').value,e=document.getElementById('d-end').value;if(s)DATES.start=s;if(e)DATES.end=e;lset('dates',DATES);renderDates();closeModal('dates-modal');}
+
+/* ===================== FAMILLE ===================== */
+let _famEdit=null;
+async function renderFam(){
+  const g=document.getElementById('fam-grid');g.innerHTML='';
+  for(const m of FAM){
+    const rec=await FileDB.get('fam-'+m.id).catch(()=>null);
+    let inner=(m.name||'?').charAt(0).toUpperCase();
+    let style='background:'+(FAM_COLOR[m.id]||'#8a6a3f');
+    if(rec&&rec.blob){inner='<img src="'+URL.createObjectURL(rec.blob)+'" alt="">';style='';}
+    const cell=document.createElement('div');cell.className='fam-cell';cell.onclick=()=>editFam(m.id);
+    cell.innerHTML='<div class="fam-ava" style="'+style+'">'+inner+'<span class="cam">📷</span></div><div class="fam-name">'+m.name+'</div>';
+    g.appendChild(cell);
+  }
+}
+function editFam(id){_famEdit=id;const m=FAM.find(x=>x.id===id);document.getElementById('fam-modal-title').textContent=m.name;document.getElementById('fam-name').value=m.name;document.getElementById('fam-modal').classList.add('open');}
+function saveFam(){const m=FAM.find(x=>x.id===_famEdit);if(m){const v=document.getElementById('fam-name').value.trim();if(v)m.name=v;lset('fam',FAM);renderFam();}closeModal('fam-modal');}
+function pickFamPhoto(){
+  const inp=document.createElement('input');inp.type='file';inp.accept='image/*';
+  inp.onchange=async e=>{const f=e.target.files[0];if(!f)return;await FileDB.put('fam-'+_famEdit,f,f.name);renderFam();};
+  inp.click();
+}
+
+/* ===================== PLANNING ===================== */
+let _stepIdx=0;
+function renderSteps(){
+  const bar=document.getElementById('plan-steps');
+  bar.innerHTML=PLAN.map((s,i)=>'<button class="step-tab'+(i===_stepIdx?' active':'')+'" onclick="selectStep('+i+')">'+s.step+'</button>').join('');
+}
+function selectStep(i){_stepIdx=i;renderSteps();renderDays();document.getElementById('page-planning').scrollTop=0;}
+function renderDays(){
+  const wrap=document.getElementById('plan-days');
+  const step=PLAN[_stepIdx];
+  wrap.innerHTML=step.days.map(d=>{
+    const items=d.items.map((it,idx)=>{
+      const last=idx===d.items.length-1;
+      let row='';
+      if(it.waze)row+='<a class="waze-inline" href="https://www.google.com/maps/search/?api=1&query='+it.waze+'" target="_blank" rel="noopener">🗺️ Y aller</a>';
+      if(it.resa)row+='<button class="resa-btn'+(RESA_KEYS.has(it.resa)?' set':'')+'" data-resa="'+it.resa+'" onclick="openResa(\''+it.resa+'\',\''+esc(it.rl||it.t)+'\')">📄 '+(RESA_KEYS.has(it.resa)?'Résa ✓':'Résa')+'</button>';
+      return '<div class="tl-item"><div class="tl-time">'+(it.time||'')+'</div><div class="tl-dot dot-'+it.dot+'">'+it.ic+'</div><div class="tl-content"><div class="tl-title">'+it.t+'</div>'+(it.sub?'<div class="tl-sub">'+it.sub+'</div>':'')+(row?'<div class="tl-row">'+row+'</div>':'')+'</div></div>';
+    }).join('');
+    return '<div style="padding:0 16px"><div class="day-card"><div class="day-header"><div class="day-number">'+d.n+'</div><div class="day-info"><div class="day-name">'+d.name+'</div><div class="day-date">'+(d.date||('Jour '+d.n))+'</div></div><div class="day-vibe">'+d.vibe+'</div></div><div class="timeline">'+items+'</div></div></div>';
+  }).join('');
+}
+function esc(s){return (s||'').replace(/'/g,"\\'").replace(/"/g,'&quot;');}
+
+/* ===================== CARTE ===================== */
+async function initMap(){
+  if(_mapInit){if(_map)setTimeout(()=>_map.invalidateSize(),150);return;}
+  _mapInit=true;
+  try{
+    await loadCSS('https://unpkg.com/leaflet@1.9.4/dist/leaflet.css');
+    await loadScript('https://unpkg.com/leaflet@1.9.4/dist/leaflet.js');
+    if(typeof L==='undefined')throw new Error('leaflet');
+    const map=L.map('map',{zoomControl:true,attributionControl:false,scrollWheelZoom:false,tap:true});
+    L.control.attribution({prefix:false}).addAttribution('© OpenStreetMap · © CARTO').addTo(map);
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png',{subdomains:'abcd',maxZoom:19}).addTo(map);
+
+    /* Tracé du voyage entre les 5 étapes, dans l'ordre */
+    const stops=PLACES.filter(p=>p.stop).sort((a,b)=>a.stop-b.stop);
+    const route=stops.map(p=>[p.lat,p.lng]);
+    L.polyline(route,{color:'#8a6a3f',weight:3,opacity:.55,dashArray:'2 9',lineCap:'round'}).addTo(map);
+
+    const pts=[];
+    PLACES.forEach(p=>{
+      const color=GRP_COLORS[p.grp]||'#8a6a3f';
+      const html=p.stop
+        ? '<div class="mk mk-stop" style="background:'+color+'"><span>'+p.stop+'</span></div>'
+        : '<div class="mk mk-poi" style="border-color:'+color+'">'+p.ic+'</div>';
+      const size=p.stop?34:26;
+      const icon=L.divIcon({html,className:'mk-wrap',iconSize:[size,size],iconAnchor:[size/2,size/2],popupAnchor:[0,-size/2]});
+      const pop='<div class="pop"><div class="pop-t">'+p.ic+' '+p.n+'</div>'+(p.d?'<div class="pop-d">'+p.d+'</div>':'')
+        +'<a class="pop-go" href="https://www.google.com/maps/search/?api=1&query='+p.lat+','+p.lng+'" target="_blank" rel="noopener">🗺️ Y aller</a></div>';
+      L.marker([p.lat,p.lng],{icon,zIndexOffset:p.stop?1000:0}).addTo(map).bindPopup(pop,{closeButton:false});
+      pts.push([p.lat,p.lng]);
+    });
+    map.fitBounds(pts,{padding:[38,38]});
+    _map=map;setTimeout(()=>map.invalidateSize(),200);
+  }catch(e){
+    document.getElementById('map').innerHTML='<div style="display:grid;place-items:center;height:100%;color:#888;font-size:.82rem;text-align:center;padding:16px">🌐 Carte indisponible hors-ligne.<br>Les lieux ci-dessous restent accessibles.</div>';
+  }
+  renderLegend();
+}
+function renderLegend(){
+  const el=document.getElementById('map-legend');if(!el)return;
+  const order=['Bangkok','Chiang Mai','Khao Sok','Koh Lanta','Koh Yao Yai'];
+  el.innerHTML=order.map((g,i)=>'<span class="lg"><span class="lg-dot" style="background:'+GRP_COLORS[g]+'">'+(i+1)+'</span>'+g+'</span>').join('');
+}
+function loadCSS(href){return new Promise((res)=>{if(document.querySelector('link[href="'+href+'"]'))return res();const l=document.createElement('link');l.rel='stylesheet';l.href=href;l.onload=res;l.onerror=res;document.head.appendChild(l);});}
+function loadScript(src){return new Promise((res,rej)=>{if(document.querySelector('script[src="'+src+'"]'))return res();const s=document.createElement('script');s.src=src;s.onload=res;s.onerror=rej;document.head.appendChild(s);});}
+function renderCarteList(){
+  const grps={};PLACES.forEach(p=>{(grps[p.grp]=grps[p.grp]||[]).push(p);});
+  const order=['Bangkok','Chiang Mai','Khao Sok','Koh Lanta','Koh Yao Yai','Transport'];
+  const keys=Object.keys(grps).sort((a,b)=>order.indexOf(a)-order.indexOf(b));
+  const el=document.getElementById('carte-list');
+  el.innerHTML=keys.map(g=>{
+    const col=GRP_COLORS[g]||'#8a6a3f';
+    const hd='<div class="section-hdr"><span style="display:inline-block;width:11px;height:11px;border-radius:50%;background:'+col+'"></span>'+(GRP_ICON[g]||'')+' '+g+'</div>';
+    return '<div class="section">'+hd+grps[g].map(p=>'<div class="card"><div class="card-icon">'+p.ic+'</div><div class="card-body"><div class="card-name">'+p.n+'</div>'+(p.d?'<div class="card-meta">'+p.d+'</div>':'')+'</div><a class="waze-btn jade" href="https://www.google.com/maps/search/?api=1&query='+p.lat+','+p.lng+'" target="_blank" rel="noopener"><span class="waze-logo">🗺️</span><span>Maps</span></a></div>').join('')+'</div>';
+  }).join('');
+}
+
+/* ===================== RÉSA (coffre PDF hors-ligne) ===================== */
+let _resaUrl=null;
+function renderResaGroups(){
+  const el=document.getElementById('resa-groups');
+  el.innerHTML=RESA.map(g=>'<div class="resa-group"><div class="resa-glabel">'+g.ic+' '+g.label+'</div>'+g.items.map(it=>{
+    const has=RESA_KEYS.has(it.key);
+    return '<div class="resa-row" onclick="openResa(\''+it.key+'\',\''+esc(it.name+' — '+it.desc)+'\')"><div class="resa-ic">'+it.ic+'</div><div class="resa-info"><div class="resa-name">'+it.name+'</div><div class="resa-desc">'+it.desc+'</div></div><div class="resa-state'+(has?' ok':'')+'">'+(has?'✓ Attaché':'À attacher')+'</div></div>';
+  }).join('')+'</div>').join('');
+  const total=RESA.reduce((a,g)=>a+g.items.length,0);
+  document.getElementById('resa-count').textContent=RESA_KEYS.size+' / '+total+' réservations attachées';
+}
+async function openResa(key,label){
+  const modal=document.getElementById('resa-modal');
+  document.getElementById('resa-modal-title').textContent='📄 '+label;
+  const view=document.getElementById('resa-view');
+  view.innerHTML='<div style="color:var(--muted);font-size:.85rem;text-align:center;padding:6px">Chargement…</div>';
+  modal.classList.add('open');
+  if(_resaUrl){URL.revokeObjectURL(_resaUrl);_resaUrl=null;}
+  const rec=await FileDB.get(key).catch(()=>null);
+  if(rec&&rec.blob){
+    _resaUrl=URL.createObjectURL(rec.blob);
+    const isImg=(rec.blob.type||'').startsWith('image/');
+    view.innerHTML='<a class="doc-link" href="'+_resaUrl+'" target="_blank" rel="noopener">📄 Ouvrir '+(rec.name||'le document')+'</a>'
+      +(isImg?'<img class="doc-img" src="'+_resaUrl+'" alt="">':'')
+      +'<button class="mb-danger" onclick="uploadResa(\''+key+'\',\''+esc(label)+'\')">Remplacer le fichier</button>'
+      +'<button class="mb-danger" onclick="deleteResa(\''+key+'\')">🗑️ Supprimer</button>';
+  }else{
+    view.innerHTML='<div style="color:var(--muted);font-size:.85rem;text-align:center;padding:10px 4px 16px">Aucun fichier attaché.<br>Ajoute le PDF ou la photo du billet.</div>'
+      +'<button class="assur-edit" style="margin:0" onclick="uploadResa(\''+key+'\',\''+esc(label)+'\')">📎 Attacher un PDF ou une photo</button>';
+  }
+}
+function uploadResa(key,label){
+  const inp=document.createElement('input');inp.type='file';inp.accept='application/pdf,image/*';
+  inp.onchange=async e=>{
+    const f=e.target.files[0];if(!f)return;
+    document.getElementById('resa-view').innerHTML='<div style="color:var(--muted);font-size:.85rem;text-align:center;padding:10px">Enregistrement…</div>';
+    try{await FileDB.put(key,f,f.name);RESA_KEYS.add(key);}catch(err){document.getElementById('resa-view').innerHTML='<div style="color:#c0392b">Erreur : '+err.message+'</div>';return;}
+    refreshResaMarks();openResa(key,label);
+  };
+  inp.click();
+}
+async function deleteResa(key){
+  await FileDB.del(key);RESA_KEYS.delete(key);refreshResaMarks();closeModal('resa-modal');
+}
+function refreshResaMarks(){
+  renderResaGroups();
+  document.querySelectorAll('#plan-days .resa-btn').forEach(b=>{
+    const k=b.getAttribute('data-resa');const has=RESA_KEYS.has(k);
+    b.classList.toggle('set',has);b.innerHTML='📄 '+(has?'Résa ✓':'Résa');
+  });
+}
+
+/* ===================== ASSURANCE ===================== */
+let ASSUR=lget('assur',{comp:'Allianz',num:'',tel:''});
+function renderAssur(){
+  const set=(id,v,tel)=>{const el=document.getElementById(id);if(v){el.textContent=v;el.classList.remove('empty');if(tel){el.innerHTML='<a href="tel:'+v.replace(/\s/g,'')+'" style="color:var(--brown);text-decoration:none">📞 '+v+'</a>';}}else{el.textContent='À renseigner';el.classList.add('empty');}};
+  set('as-comp',ASSUR.comp);set('as-num',ASSUR.num);set('as-tel',ASSUR.tel,true);
+}
+function openAssur(){document.getElementById('am-comp').value=ASSUR.comp;document.getElementById('am-num').value=ASSUR.num;document.getElementById('am-tel').value=ASSUR.tel;document.getElementById('assur-modal').classList.add('open');}
+function saveAssur(){ASSUR={comp:document.getElementById('am-comp').value.trim(),num:document.getElementById('am-num').value.trim(),tel:document.getElementById('am-tel').value.trim()};lset('assur',ASSUR);renderAssur();closeModal('assur-modal');}
+
+/* ===================== UTIL MODAL ===================== */
+function closeModal(id){document.getElementById(id).classList.remove('open');if(id==='resa-modal'&&_resaUrl){URL.revokeObjectURL(_resaUrl);_resaUrl=null;}}
+
+/* ===================== INIT ===================== */
+async function init(){
+  RESA_KEYS=new Set(await FileDB.keys().catch(()=>[]));
+  renderDates();
+  await renderFam();
+  renderSteps();renderDays();
+  renderCarteList();
+  renderResaGroups();
+  renderAssur();
+  setInterval(renderCountdown,30000);
+}
+init();
+
+/* splash */
+function hideSplash(){const s=document.getElementById('splash');if(s)s.classList.add('hide');}
+window.addEventListener('load',()=>setTimeout(hideSplash,650));
+setTimeout(hideSplash,2500);
+
+/* service worker */
+if('serviceWorker' in navigator){window.addEventListener('load',()=>{navigator.serviceWorker.register('sw.js').catch(()=>{});});}
+</script>
+</body>
+</html>

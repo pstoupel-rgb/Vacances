@@ -151,8 +151,25 @@
   .tl-row{display:flex;align-items:center;gap:8px;margin-top:6px;flex-wrap:wrap;}
 
   /* CARTE */
-  #map{height:300px;margin:0 16px 4px;border-radius:var(--radius);overflow:hidden;border:1px solid var(--border);box-shadow:var(--shadow);background:var(--bg2);z-index:0;}
-  .leaflet-container{font-family:'Inter',sans-serif;}
+  #map{height:360px;margin:0 16px 8px;border-radius:var(--radius);overflow:hidden;border:1px solid var(--border);box-shadow:var(--shadow);background:var(--bg2);z-index:0;}
+  .leaflet-container{font-family:'Inter',sans-serif;background:#eae5db;}
+  /* Marqueurs personnalisés */
+  .mk-wrap{background:none;border:none;}
+  .mk{display:flex;align-items:center;justify-content:center;line-height:1;}
+  .mk-stop{width:34px;height:34px;border-radius:50% 50% 50% 0;transform:rotate(-45deg);color:#fff;font-weight:800;font-size:.95rem;box-shadow:0 3px 8px rgba(0,0,0,.35);border:2px solid #fff;}
+  .mk-stop{position:relative;}
+  .mk-stop::after{content:'';}
+  .mk-poi{width:26px;height:26px;border-radius:50%;background:#fff;border:2.5px solid #8a6a3f;font-size:.9rem;box-shadow:0 2px 6px rgba(0,0,0,.28);}
+  /* remet le chiffre à l'endroit dans la goutte */
+  .mk-stop>*{transform:rotate(45deg);}
+  .leaflet-popup-content-wrapper{border-radius:13px;box-shadow:0 8px 26px rgba(0,0,0,.22);}
+  .leaflet-popup-content{margin:11px 14px;}
+  .pop-t{font-weight:700;font-size:.9rem;color:var(--text);}
+  .pop-d{font-size:.75rem;color:var(--muted);margin-top:3px;line-height:1.35;}
+  .pop-go{display:inline-flex;align-items:center;gap:4px;margin-top:9px;background:var(--brown);color:#fff;border-radius:9px;padding:6px 12px;font-size:.74rem;font-weight:700;text-decoration:none;}
+  .map-legend{display:flex;flex-wrap:wrap;gap:7px 12px;justify-content:center;padding:2px 18px 6px;}
+  .map-legend .lg{display:flex;align-items:center;gap:5px;font-size:.72rem;font-weight:600;color:var(--muted);}
+  .map-legend .lg-dot{width:18px;height:18px;border-radius:50%;display:grid;place-items:center;color:#fff;font-size:.66rem;font-weight:800;box-shadow:0 1px 3px rgba(0,0,0,.25);}
 
   /* RESA GROUPS */
   .resa-group{padding:2px 16px 0;}
@@ -302,8 +319,9 @@
 
 <!-- ============ CARTE ============ -->
 <div class="page page-content" id="page-carte">
-  <div class="page-hero"><h2>Carte</h2><p>Tous les lieux du séjour épinglés</p></div>
+  <div class="page-hero"><h2>Carte</h2><p>L'itinéraire & tous les lieux du séjour · touche un point pour l'ouvrir</p></div>
   <div id="map"></div>
+  <div id="map-legend" class="map-legend"></div>
   <div id="carte-list" style="padding:8px 0 0"></div>
 </div>
 
@@ -420,22 +438,24 @@ let RESA_KEYS=new Set();
 
 /* ===================== DONNÉES VOYAGE ===================== */
 /* Lieux (coordonnées réelles) pour la carte */
+const GRP_COLORS={'Bangkok':'#c0392b','Chiang Mai':'#c98a2e','Khao Sok':'#2e8b6f','Koh Lanta':'#2a7d9f','Koh Yao Yai':'#7a5cae','Transport':'#9a9384'};
+const GRP_ICON={'Bangkok':'🏙️','Chiang Mai':'🐘','Khao Sok':'🛶','Koh Lanta':'🏝️','Koh Yao Yai':'🎆'};
 const PLACES=[
-  {n:'Aéroport Bangkok (Suvarnabhumi)',lat:13.6900,lng:100.7501,ic:'✈️',grp:'Transport'},
-  {n:'Sivatel Bangkok Hotel',lat:13.7407,lng:100.5403,ic:'🏨',grp:'Bangkok'},
-  {n:'Grand Palais & Wat Phra Kaew',lat:13.7500,lng:100.4914,ic:'🏛️',grp:'Bangkok'},
-  {n:'Wat Pho (Bouddha couché)',lat:13.7465,lng:100.4927,ic:'🛕',grp:'Bangkok'},
-  {n:'Wat Arun (temple de l\'Aube)',lat:13.7437,lng:100.4889,ic:'🛕',grp:'Bangkok'},
-  {n:'Gare Krung Thep Aphiwat (train nuit)',lat:13.8028,lng:100.5397,ic:'🚉',grp:'Bangkok'},
-  {n:'Pingviman Hotel (Chiang Mai)',lat:18.7855,lng:98.9855,ic:'🏨',grp:'Chiang Mai'},
-  {n:'Vieille ville & Wat Chedi Luang',lat:18.7869,lng:98.9860,ic:'🛕',grp:'Chiang Mai'},
-  {n:'Elephant Rescue Park',lat:18.9218,lng:98.8493,ic:'🐘',grp:'Chiang Mai'},
-  {n:'Doi Suthep (Wat Phra That)',lat:18.8047,lng:98.9217,ic:'⛰️',grp:'Chiang Mai'},
-  {n:'Aéroport de Surat Thani (URT)',lat:9.1326,lng:99.1355,ic:'✈️',grp:'Transport'},
-  {n:'500 Rai Floating Resort (Khao Sok)',lat:8.9760,lng:98.6870,ic:'🛶',grp:'Khao Sok'},
-  {n:'Lac Cheow Lan (barrage Ratchaprapha)',lat:8.9755,lng:98.7930,ic:'🏞️',grp:'Khao Sok'},
-  {n:'Nirvana Beach Resort (Koh Lanta)',lat:7.5450,lng:99.0450,ic:'🏝️',grp:'Koh Lanta'},
-  {n:'Santhiya Koh Yao Yai Resort & Spa',lat:8.0600,lng:98.5800,ic:'🏖️',grp:'Koh Yao Yai'}
+  {n:'Aéroport Bangkok (Suvarnabhumi)',lat:13.6900,lng:100.7501,ic:'✈️',grp:'Transport',d:'Arrivée & départ internationaux'},
+  {n:'Sivatel Bangkok Hotel',lat:13.7407,lng:100.5403,ic:'🏨',grp:'Bangkok',stop:1,d:'Étape 1 · 18 → 20 déc · 2 nuits'},
+  {n:'Grand Palais & Wat Phra Kaew',lat:13.7500,lng:100.4914,ic:'🏛️',grp:'Bangkok',d:'Visite guidée · 19 déc'},
+  {n:'Wat Pho (Bouddha couché)',lat:13.7465,lng:100.4927,ic:'🛕',grp:'Bangkok',d:'À 5 min du Grand Palais'},
+  {n:'Wat Arun (temple de l\'Aube)',lat:13.7437,lng:100.4889,ic:'🛕',grp:'Bangkok',d:'Traversée en bateau'},
+  {n:'Gare Krung Thep Aphiwat',lat:13.8028,lng:100.5397,ic:'🚉',grp:'Bangkok',d:'Train de nuit · 20 déc 18h40'},
+  {n:'Pingviman Hotel',lat:18.7855,lng:98.9855,ic:'🏨',grp:'Chiang Mai',stop:2,d:'Étape 2 · 21 → 23 déc'},
+  {n:'Vieille ville & Wat Chedi Luang',lat:18.7869,lng:98.9860,ic:'🛕',grp:'Chiang Mai',d:'Temples · marché de nuit'},
+  {n:'Elephant Rescue Park',lat:18.9218,lng:98.8493,ic:'🐘',grp:'Chiang Mai',d:'Tour privé · 22 déc matin'},
+  {n:'Doi Suthep (Wat Phra That)',lat:18.8047,lng:98.9217,ic:'⛰️',grp:'Chiang Mai',d:'Temple perché · vue sur la ville'},
+  {n:'Aéroport de Surat Thani (URT)',lat:9.1326,lng:99.1355,ic:'✈️',grp:'Transport',d:'Vol AirAsia FD5420 · 23 déc'},
+  {n:'500 Rai Floating Resort',lat:8.9760,lng:98.6870,ic:'🛶',grp:'Khao Sok',stop:3,d:'Étape 3 · 23 → 25 déc · lac Cheow Lan'},
+  {n:'Lac Cheow Lan (Ratchaprapha)',lat:8.9755,lng:98.7930,ic:'🏞️',grp:'Khao Sok',d:'Kayak, longtail, jungle'},
+  {n:'Nirvana Beach Resort',lat:7.5450,lng:99.0450,ic:'🏝️',grp:'Koh Lanta',stop:4,d:'Étape 4 · 25 → 29 déc · villa piscine'},
+  {n:'Santhiya Koh Yao Yai Resort & Spa',lat:8.0600,lng:98.5800,ic:'🏖️',grp:'Koh Yao Yai',stop:5,d:'Étape 5 · 29 déc → 1 janv · Nouvel An'}
 ];
 
 /* Planning : étapes -> jours -> items. resa = clé de réservation attachable */
@@ -446,7 +466,8 @@ const PLAN=[
       {time:'',dot:'hotel',ic:'🏨',t:'Check-in — Sivatel Bangkok Hotel',sub:'2 nuits · récupération du décalage',resa:'hotel-bkk',rl:'Hôtel Bangkok — Sivatel',waze:'13.7407,100.5403'},
       {time:'Soir',dot:'food',ic:'🍜',t:'Premier dîner thaï',sub:'Pad thaï, mango sticky rice…'}
     ]},
-    {n:2,name:'Temples & rivière',vibe:'🛕',date:'Sam 19 déc',items:[
+    {n:2,name:'Bangkok avec guide',vibe:'🧭',date:'Sam 19 déc',items:[
+      {time:'Journée',dot:'activity',ic:'🧭',t:'Visite de Bangkok avec guide',sub:'Journée guidée en famille · temples & rivière',resa:'guide-bangkok',rl:'Visite guidée de Bangkok'},
       {time:'9h',dot:'temple',ic:'🏛️',t:'Grand Palais & Wat Phra Kaew',sub:'Tenue couvrante (épaules & genoux)',waze:'13.7500,100.4914'},
       {time:'11h',dot:'temple',ic:'🛕',t:'Wat Pho — Bouddha couché',sub:'À 5 min à pied du Grand Palais',waze:'13.7465,100.4927'},
       {time:'13h',dot:'food',ic:'🍽️',t:'Déjeuner au bord du Chao Phraya',sub:'Vue sur la rivière'},
@@ -540,6 +561,7 @@ const RESA=[
     {key:'transfert-kohyao',ic:'⛵',name:'Koh Lanta → Koh Yao Yai',desc:'Speedboat · 29 déc'}
   ]},
   {label:'Activités',ic:'🎟️',items:[
+    {key:'guide-bangkok',ic:'🧭',name:'Visite guidée de Bangkok',desc:'19 déc · journée avec guide'},
     {key:'elephants',ic:'🐘',name:'Elephant Rescue Park',desc:'Chiang Mai · 22 déc (matin)'}
   ]},
   {label:'Documents',ic:'🪪',items:[
@@ -636,22 +658,52 @@ async function initMap(){
     await loadCSS('https://unpkg.com/leaflet@1.9.4/dist/leaflet.css');
     await loadScript('https://unpkg.com/leaflet@1.9.4/dist/leaflet.js');
     if(typeof L==='undefined')throw new Error('leaflet');
-    const map=L.map('map',{zoomControl:true,attributionControl:false});
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:18}).addTo(map);
+    const map=L.map('map',{zoomControl:true,attributionControl:false,scrollWheelZoom:false,tap:true});
+    L.control.attribution({prefix:false}).addAttribution('© OpenStreetMap · © CARTO').addTo(map);
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png',{subdomains:'abcd',maxZoom:19}).addTo(map);
+
+    /* Tracé du voyage entre les 5 étapes, dans l'ordre */
+    const stops=PLACES.filter(p=>p.stop).sort((a,b)=>a.stop-b.stop);
+    const route=stops.map(p=>[p.lat,p.lng]);
+    L.polyline(route,{color:'#8a6a3f',weight:3,opacity:.55,dashArray:'2 9',lineCap:'round'}).addTo(map);
+
     const pts=[];
-    PLACES.forEach(p=>{L.marker([p.lat,p.lng]).addTo(map).bindPopup('<b>'+p.ic+' '+p.n+'</b>');pts.push([p.lat,p.lng]);});
-    map.fitBounds(pts,{padding:[30,30]});
+    PLACES.forEach(p=>{
+      const color=GRP_COLORS[p.grp]||'#8a6a3f';
+      const html=p.stop
+        ? '<div class="mk mk-stop" style="background:'+color+'"><span>'+p.stop+'</span></div>'
+        : '<div class="mk mk-poi" style="border-color:'+color+'">'+p.ic+'</div>';
+      const size=p.stop?34:26;
+      const icon=L.divIcon({html,className:'mk-wrap',iconSize:[size,size],iconAnchor:[size/2,size/2],popupAnchor:[0,-size/2]});
+      const pop='<div class="pop"><div class="pop-t">'+p.ic+' '+p.n+'</div>'+(p.d?'<div class="pop-d">'+p.d+'</div>':'')
+        +'<a class="pop-go" href="https://www.google.com/maps/search/?api=1&query='+p.lat+','+p.lng+'" target="_blank" rel="noopener">🗺️ Y aller</a></div>';
+      L.marker([p.lat,p.lng],{icon,zIndexOffset:p.stop?1000:0}).addTo(map).bindPopup(pop,{closeButton:false});
+      pts.push([p.lat,p.lng]);
+    });
+    map.fitBounds(pts,{padding:[38,38]});
     _map=map;setTimeout(()=>map.invalidateSize(),200);
   }catch(e){
     document.getElementById('map').innerHTML='<div style="display:grid;place-items:center;height:100%;color:#888;font-size:.82rem;text-align:center;padding:16px">🌐 Carte indisponible hors-ligne.<br>Les lieux ci-dessous restent accessibles.</div>';
   }
+  renderLegend();
+}
+function renderLegend(){
+  const el=document.getElementById('map-legend');if(!el)return;
+  const order=['Bangkok','Chiang Mai','Khao Sok','Koh Lanta','Koh Yao Yai'];
+  el.innerHTML=order.map((g,i)=>'<span class="lg"><span class="lg-dot" style="background:'+GRP_COLORS[g]+'">'+(i+1)+'</span>'+g+'</span>').join('');
 }
 function loadCSS(href){return new Promise((res)=>{if(document.querySelector('link[href="'+href+'"]'))return res();const l=document.createElement('link');l.rel='stylesheet';l.href=href;l.onload=res;l.onerror=res;document.head.appendChild(l);});}
 function loadScript(src){return new Promise((res,rej)=>{if(document.querySelector('script[src="'+src+'"]'))return res();const s=document.createElement('script');s.src=src;s.onload=res;s.onerror=rej;document.head.appendChild(s);});}
 function renderCarteList(){
   const grps={};PLACES.forEach(p=>{(grps[p.grp]=grps[p.grp]||[]).push(p);});
+  const order=['Bangkok','Chiang Mai','Khao Sok','Koh Lanta','Koh Yao Yai','Transport'];
+  const keys=Object.keys(grps).sort((a,b)=>order.indexOf(a)-order.indexOf(b));
   const el=document.getElementById('carte-list');
-  el.innerHTML=Object.keys(grps).map(g=>'<div class="section"><div class="section-hdr">'+g+'</div>'+grps[g].map(p=>'<div class="card"><div class="card-icon">'+p.ic+'</div><div class="card-body"><div class="card-name">'+p.n+'</div></div><a class="waze-btn jade" href="https://www.google.com/maps/search/?api=1&query='+p.lat+','+p.lng+'" target="_blank" rel="noopener"><span class="waze-logo">🗺️</span><span>Maps</span></a></div>').join('')+'</div>').join('');
+  el.innerHTML=keys.map(g=>{
+    const col=GRP_COLORS[g]||'#8a6a3f';
+    const hd='<div class="section-hdr"><span style="display:inline-block;width:11px;height:11px;border-radius:50%;background:'+col+'"></span>'+(GRP_ICON[g]||'')+' '+g+'</div>';
+    return '<div class="section">'+hd+grps[g].map(p=>'<div class="card"><div class="card-icon">'+p.ic+'</div><div class="card-body"><div class="card-name">'+p.n+'</div>'+(p.d?'<div class="card-meta">'+p.d+'</div>':'')+'</div><a class="waze-btn jade" href="https://www.google.com/maps/search/?api=1&query='+p.lat+','+p.lng+'" target="_blank" rel="noopener"><span class="waze-logo">🗺️</span><span>Maps</span></a></div>').join('')+'</div>';
+  }).join('');
 }
 
 /* ===================== RÉSA (coffre PDF hors-ligne) ===================== */

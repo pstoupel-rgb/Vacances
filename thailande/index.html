@@ -225,6 +225,11 @@
   .rchip.active{background:var(--brown);border-color:var(--brown);color:#fff;}
   .rchip-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;}
   .rchip.active .rchip-dot{box-shadow:0 0 0 2px rgba(255,255,255,.55);}
+  .rchip-play{background:var(--jade);border-color:var(--jade);color:#fff;font-weight:700;}
+  .rchip-play:active{opacity:.9;}
+  /* Tracé animé qui « coule » */
+  .route-line{animation:routeflow 1s linear infinite;}
+  @keyframes routeflow{to{stroke-dashoffset:-24;}}
   #carte-list .card{cursor:pointer;}
   .map-legend .lg{display:flex;align-items:center;gap:5px;font-size:.72rem;font-weight:600;color:var(--muted);cursor:pointer;}
   .map-legend .lg-dot{width:18px;height:18px;border-radius:50%;display:grid;place-items:center;color:#fff;font-size:.66rem;font-weight:800;box-shadow:0 1px 3px rgba(0,0,0,.25);}
@@ -329,11 +334,6 @@
   </div>
 
   <div class="section">
-    <div class="section-hdr">🧳 La famille</div>
-    <div class="fam-grid" id="fam-grid"></div>
-  </div>
-
-  <div class="section">
     <div class="section-hdr">🗺️ L'itinéraire</div>
     <div class="card" onclick="showPage('planning',document.getElementById('nav-planning'))">
       <div class="card-icon">🏙️</div>
@@ -435,7 +435,7 @@
   <div style="padding:16px 16px 0"><button class="assur-edit" style="margin:0" onclick="relock()">🔒 Verrouiller l'app</button></div>
 
   <div class="disclaimer">Les informations ci-dessus (visa, taux de change, prises) sont données à titre indicatif et peuvent changer — pense à les <b>vérifier avant le départ</b> (France Diplomatie / consulat de Thaïlande).</div>
-  <div style="text-align:center;font-size:.62rem;color:var(--muted);padding:2px 0 18px">Thaïlande · <b>v5</b> · mise à jour auto</div>
+  <div style="text-align:center;font-size:.62rem;color:var(--muted);padding:2px 0 18px">Thaïlande · <b>v6</b> · mise à jour auto</div>
 </div>
 
 <!-- ============ MODALS ============ -->
@@ -453,15 +453,6 @@
     <label>Départ</label><input type="date" id="d-start">
     <label>Retour</label><input type="date" id="d-end">
     <div class="modal-btns"><button class="mb-cancel" onclick="closeModal('dates-modal')">Annuler</button><button class="mb-save" onclick="saveDates()">Enregistrer</button></div>
-  </div>
-</div>
-
-<div class="modal" id="fam-modal" onclick="if(event.target===this)closeModal('fam-modal')">
-  <div class="modal-box">
-    <div class="modal-title" id="fam-modal-title">Voyageur</div>
-    <label>Prénom</label><input type="text" id="fam-name" placeholder="Prénom" maxlength="16">
-    <div class="modal-btns"><button class="mb-cancel" onclick="closeModal('fam-modal')">Annuler</button><button class="mb-save" onclick="saveFam()">Enregistrer</button></div>
-    <button class="mb-danger" onclick="pickFamPhoto()">📷 Changer la photo</button>
   </div>
 </div>
 
@@ -779,7 +770,7 @@ async function initMap(){
     /* Tracé du voyage entre les 5 étapes, dans l'ordre */
     const stops=PLACES.filter(p=>p.stop).sort((a,b)=>a.stop-b.stop);
     const route=stops.map(p=>[p.lat,p.lng]);
-    L.polyline(route,{color:'#8a6a3f',weight:3,opacity:.55,dashArray:'2 9',lineCap:'round'}).addTo(map);
+    L.polyline(route,{color:'#8a6a3f',weight:3,opacity:.6,dashArray:'2 10',lineCap:'round',className:'route-line'}).addTo(map);
 
     _markers=[];const pts=[];
     PLACES.forEach((p,idx)=>{
@@ -811,10 +802,33 @@ function renderLegend(){
 const MAP_REGIONS=['Tout','Bangkok','Chiang Mai','Khao Sok','Koh Lanta','Koh Yao Yai'];
 function renderRegions(){
   const el=document.getElementById('map-regions');if(!el)return;
-  el.innerHTML=MAP_REGIONS.map(g=>{
+  const chips=MAP_REGIONS.map(g=>{
     const c=g==='Tout'?'#8a6a3f':(GRP_COLORS[g]||'#8a6a3f');
     return '<button class="rchip'+(g==='Tout'?' active':'')+'" data-region="'+g+'" onclick="flyToRegion(\''+g+'\')"><span class="rchip-dot" style="background:'+c+'"></span>'+g+'</button>';
   }).join('');
+  el.innerHTML='<button class="rchip rchip-play" onclick="playTour()">▶ Suivre l\'itinéraire</button>'+chips;
+}
+let _tourTimers=[];
+function stopTour(){_tourTimers.forEach(clearTimeout);_tourTimers=[];}
+function playTour(){
+  if(!_map){initMap();}
+  document.getElementById('page-carte').scrollTo({top:0,behavior:'smooth'});
+  stopTour();
+  const wait=(_map?0:900);
+  _tourTimers.push(setTimeout(()=>{
+    if(!_map)return;
+    const stops=PLACES.map((p,i)=>({p,i})).filter(x=>x.p.stop).sort((a,b)=>a.p.stop-b.p.stop);
+    let delay=0;
+    stops.forEach(x=>{
+      _tourTimers.push(setTimeout(()=>{
+        _map.flyTo([x.p.lat,x.p.lng],11.5,{duration:1.1});
+        setRegionActive(x.p.grp);
+        const mk=_markers[x.i];if(mk)_tourTimers.push(setTimeout(()=>mk.openPopup(),1050));
+      },delay));
+      delay+=2700;
+    });
+    _tourTimers.push(setTimeout(()=>{if(_map){_map.closePopup();_map.flyToBounds(_allPts,{padding:[38,38],maxZoom:11});setRegionActive('Tout');}},delay+300));
+  },wait));
 }
 function setRegionActive(g){document.querySelectorAll('#map-regions .rchip').forEach(b=>b.classList.toggle('active',b.getAttribute('data-region')===g));}
 function flyToRegion(g){
@@ -1011,7 +1025,6 @@ async function assignPending(i,key){
 async function init(){
   RESA_KEYS=new Set(await FileDB.keys().catch(()=>[]));
   renderDates();
-  await renderFam();
   planningFocus();renderJourney();renderBanner();renderDays();
   renderCarteList();
   renderResaGroups();

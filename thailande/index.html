@@ -145,6 +145,33 @@
   .step-tab{flex:0 0 auto;background:var(--card);border:1.5px solid var(--border);border-radius:20px;padding:7px 14px;font-family:'Inter',sans-serif;font-size:.78rem;font-weight:600;color:var(--muted);cursor:pointer;white-space:nowrap;}
   .step-tab.active{background:var(--brown);border-color:var(--brown);color:#fff;}
 
+  /* JOURNEY (fil d'étapes) */
+  .journey{display:flex;overflow-x:auto;padding:10px 16px 6px;scrollbar-width:none;-webkit-overflow-scrolling:touch;}
+  .journey::-webkit-scrollbar{display:none;}
+  .jstep{flex:0 0 auto;min-width:72px;display:flex;flex-direction:column;align-items:center;position:relative;cursor:pointer;padding:0 3px;}
+  .jstep::before{content:'';position:absolute;top:15px;left:-50%;width:100%;height:2px;background:var(--border);z-index:0;}
+  .jstep:first-child::before{display:none;}
+  .jdot{position:relative;z-index:1;width:30px;height:30px;border-radius:50%;display:grid;place-items:center;color:#fff;font-weight:800;font-size:.85rem;box-shadow:0 2px 6px rgba(0,0,0,.22);border:2px solid var(--bg);transition:transform .18s;}
+  .jname{font-size:.66rem;font-weight:700;color:var(--muted);margin-top:6px;text-align:center;line-height:1.1;}
+  .jdate{font-size:.57rem;color:var(--muted);opacity:.75;margin-top:1px;text-align:center;}
+  .jstep.active .jdot{transform:scale(1.2);box-shadow:0 0 0 3px var(--bg),0 3px 9px rgba(0,0,0,.28);}
+  .jstep.active .jname{color:var(--text);}
+
+  /* BANNIÈRE D'ÉTAPE */
+  .plan-banner{margin:2px 16px 8px;border-radius:16px;padding:15px 18px;color:#fff;display:flex;align-items:center;gap:14px;box-shadow:0 6px 18px rgba(0,0,0,.16);animation:fade .3s ease;}
+  .plan-banner .pb-emoji{font-size:2.4rem;line-height:1;flex-shrink:0;}
+  .plan-banner .pb-step{font-size:.6rem;font-weight:800;letter-spacing:.09em;text-transform:uppercase;opacity:.82;}
+  .plan-banner .pb-name{font-family:'Playfair Display',serif;font-size:1.5rem;font-weight:700;line-height:1.05;}
+  .plan-banner .pb-meta{font-size:.78rem;opacity:.94;margin-top:3px;font-weight:600;}
+  .plan-banner .pb-sub{font-size:.72rem;opacity:.82;margin-top:2px;}
+
+  /* JOURS REPLIABLES */
+  .day-header{cursor:pointer;}
+  .day-toggle{font-size:.95rem;color:var(--muted);transition:transform .22s;flex-shrink:0;margin-left:2px;}
+  .day-card.collapsed .day-toggle{transform:rotate(-90deg);}
+  .day-card.collapsed .timeline{display:none;}
+  .day-card .timeline{animation:fade .22s ease;}
+
   /* DAY CARD */
   .day-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);margin-bottom:12px;overflow:hidden;box-shadow:var(--shadow);}
   .day-header{padding:12px 16px 10px;display:flex;align-items:center;gap:12px;border-bottom:1px solid var(--border);background:var(--bg);}
@@ -341,9 +368,10 @@
 
 <!-- ============ PLANNING ============ -->
 <div class="page page-content" id="page-planning">
-  <div class="page-hero"><h2>Planning</h2><p>Jour par jour · appuie sur 📄 Résa pour attacher un billet</p></div>
-  <div class="steps" id="plan-steps"></div>
-  <div id="plan-days" style="padding:12px 0 0"></div>
+  <div class="page-hero"><h2>Planning</h2><p>Ton parcours, étape par étape · touche un jour pour le replier</p></div>
+  <div class="journey" id="plan-journey"></div>
+  <div class="plan-banner" id="plan-banner"></div>
+  <div id="plan-days" style="padding:8px 0 0"></div>
 </div>
 
 <!-- ============ CARTE ============ -->
@@ -665,14 +693,34 @@ function pickFamPhoto(){
 
 /* ===================== PLANNING ===================== */
 let _stepIdx=0;
-function renderSteps(){
-  const bar=document.getElementById('plan-steps');
-  bar.innerHTML=PLAN.map((s,i)=>'<button class="step-tab'+(i===_stepIdx?' active':'')+'" onclick="selectStep('+i+')">'+s.step+'</button>').join('');
+const STEP_META={
+  'Bangkok':{dates:'18 → 20 déc',nights:'2 nuits',sub:'Temples, rivière & visite guidée'},
+  'Chiang Mai':{dates:'21 → 23 déc',nights:'2 nuits',sub:'Train de nuit, éléphants, montagnes'},
+  'Khao Sok':{dates:'23 → 25 déc',nights:'2 nuits',sub:'Lac Cheow Lan · bungalow flottant'},
+  'Koh Lanta':{dates:'25 → 29 déc',nights:'4 nuits',sub:'Villa piscine, front de mer'},
+  'Koh Yao Yai':{dates:'29 déc → 1 janv',nights:'3 nuits',sub:'Santhiya · Réveillon du Nouvel An'}
+};
+function shade(hex,p){const n=parseInt(hex.slice(1),16);let r=(n>>16)&255,g=(n>>8)&255,b=n&255;r=Math.max(0,Math.min(255,r+p));g=Math.max(0,Math.min(255,g+p));b=Math.max(0,Math.min(255,b+p));return '#'+((1<<24)+(r<<16)+(g<<8)+b).toString(16).slice(1);}
+function renderJourney(){
+  const bar=document.getElementById('plan-journey');
+  bar.innerHTML=PLAN.map((s,i)=>{
+    const c=GRP_COLORS[s.step]||'#8a6a3f';const m=STEP_META[s.step]||{};
+    return '<div class="jstep'+(i===_stepIdx?' active':'')+'" onclick="selectStep('+i+')"><div class="jdot" style="background:'+c+'">'+(i+1)+'</div><div class="jname">'+s.step+'</div><div class="jdate">'+(m.dates||'')+'</div></div>';
+  }).join('');
+  requestAnimationFrame(()=>{const a=bar.querySelector('.jstep.active');if(a)a.scrollIntoView({inline:'center',block:'nearest',behavior:'smooth'});});
 }
-function selectStep(i){_stepIdx=i;renderSteps();renderDays();document.getElementById('page-planning').scrollTop=0;}
+function renderBanner(){
+  const s=PLAN[_stepIdx];const c=GRP_COLORS[s.step]||'#8a6a3f';const m=STEP_META[s.step]||{};
+  const el=document.getElementById('plan-banner');
+  el.style.background='linear-gradient(135deg,'+c+' 0%,'+shade(c,-32)+' 100%)';
+  el.innerHTML='<div class="pb-emoji">'+(GRP_ICON[s.step]||'📍')+'</div><div><div class="pb-step">Étape '+(_stepIdx+1)+' sur '+PLAN.length+'</div><div class="pb-name">'+s.step+'</div><div class="pb-meta">'+(m.dates||'')+(m.nights?' · '+m.nights:'')+'</div>'+(m.sub?'<div class="pb-sub">'+m.sub+'</div>':'')+'</div>';
+}
+function toggleDay(el){const c=el.closest('.day-card');if(c)c.classList.toggle('collapsed');}
+function selectStep(i){_stepIdx=i;renderJourney();renderBanner();renderDays();document.getElementById('page-planning').scrollTop=0;}
 function renderDays(){
   const wrap=document.getElementById('plan-days');
   const step=PLAN[_stepIdx];
+  const c=GRP_COLORS[step.step]||'#8a6a3f';
   wrap.innerHTML=step.days.map(d=>{
     const items=d.items.map((it,idx)=>{
       const last=idx===d.items.length-1;
@@ -681,7 +729,7 @@ function renderDays(){
       if(it.resa)row+='<button class="resa-btn'+(RESA_KEYS.has(it.resa)?' set':'')+'" data-resa="'+it.resa+'" onclick="openResa(\''+it.resa+'\',\''+esc(it.rl||it.t)+'\')">📄 '+(RESA_KEYS.has(it.resa)?'Résa ✓':'Résa')+'</button>';
       return '<div class="tl-item"><div class="tl-time">'+(it.time||'')+'</div><div class="tl-dot dot-'+it.dot+'">'+it.ic+'</div><div class="tl-content"><div class="tl-title">'+it.t+'</div>'+(it.sub?'<div class="tl-sub">'+it.sub+'</div>':'')+(row?'<div class="tl-row">'+row+'</div>':'')+'</div></div>';
     }).join('');
-    return '<div style="padding:0 16px"><div class="day-card"><div class="day-header"><div class="day-number">'+d.n+'</div><div class="day-info"><div class="day-name">'+d.name+'</div><div class="day-date">'+(d.date||('Jour '+d.n))+'</div></div><div class="day-vibe">'+d.vibe+'</div></div><div class="timeline">'+items+'</div></div></div>';
+    return '<div style="padding:0 16px"><div class="day-card" style="border-top:3px solid '+c+'"><div class="day-header" onclick="toggleDay(this)"><div class="day-number" style="color:'+c+'">'+d.n+'</div><div class="day-info"><div class="day-name">'+d.name+'</div><div class="day-date">'+(d.date||('Jour '+d.n))+'</div></div><div class="day-vibe">'+d.vibe+'</div><span class="day-toggle">▾</span></div><div class="timeline">'+items+'</div></div></div>';
   }).join('');
 }
 function esc(s){return (s||'').replace(/'/g,"\\'").replace(/"/g,'&quot;');}
@@ -907,7 +955,7 @@ async function init(){
   RESA_KEYS=new Set(await FileDB.keys().catch(()=>[]));
   renderDates();
   await renderFam();
-  renderSteps();renderDays();
+  renderJourney();renderBanner();renderDays();
   renderCarteList();
   renderResaGroups();
   renderAssur();

@@ -171,6 +171,12 @@
   .day-card.collapsed .day-toggle{transform:rotate(-90deg);}
   .day-card.collapsed .timeline{display:none;}
   .day-card .timeline{animation:fade .22s ease;}
+  /* REPÈRE JOUR J */
+  .day-card.today{box-shadow:0 0 0 2px #c0392b,0 8px 22px rgba(192,57,43,.2);}
+  .today-badge{display:inline-block;background:#c0392b;color:#fff;font-size:.57rem;font-weight:800;letter-spacing:.05em;text-transform:uppercase;padding:3px 9px;border-radius:20px;margin-top:5px;animation:todaypulse 1.8s ease-in-out infinite;}
+  @keyframes todaypulse{0%,100%{opacity:1}50%{opacity:.62}}
+  .jx-badge{display:inline-block;background:var(--bg2);color:var(--brown);font-size:.57rem;font-weight:800;letter-spacing:.05em;text-transform:uppercase;padding:3px 9px;border-radius:20px;margin-top:5px;}
+  .jstep.jtoday .jdot{box-shadow:0 0 0 3px var(--bg),0 0 0 5px #c0392b;}
 
   /* DAY CARD */
   .day-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);margin-bottom:12px;overflow:hidden;box-shadow:var(--shadow);}
@@ -647,6 +653,7 @@ function showPage(name,btn){
   if(name==='home'){nb.classList.remove('show');}else{nb.classList.add('show');}
   document.getElementById('page-'+name).scrollTop=0;
   if(name==='carte')initMap();
+  if(name==='planning'){planningFocus();renderJourney();renderBanner();renderDays();scrollToToday();}
 }
 
 /* ===================== COMPTE À REBOURS + DATES ===================== */
@@ -701,11 +708,21 @@ const STEP_META={
   'Koh Yao Yai':{dates:'29 déc → 1 janv',nights:'3 nuits',sub:'Santhiya · Réveillon du Nouvel An'}
 };
 function shade(hex,p){const n=parseInt(hex.slice(1),16);let r=(n>>16)&255,g=(n>>8)&255,b=n&255;r=Math.max(0,Math.min(255,r+p));g=Math.max(0,Math.min(255,g+p));b=Math.max(0,Math.min(255,b+p));return '#'+((1<<24)+(r<<16)+(g<<8)+b).toString(16).slice(1);}
+/* Repère Jour J — date calendaire de chaque jour (n = numéro de jour) */
+const DAY_DATES={1:'2026-12-18',2:'2026-12-19',3:'2026-12-20',4:'2026-12-21',5:'2026-12-22',6:'2026-12-23',7:'2026-12-23',8:'2026-12-24',9:'2026-12-25',10:'2026-12-25',11:['2026-12-26','2026-12-28'],12:'2026-12-29',13:'2026-12-29',14:['2026-12-30','2026-12-31'],15:'2027-01-01'};
+function todayISO(){const n=new Date();return n.getFullYear()+'-'+String(n.getMonth()+1).padStart(2,'0')+'-'+String(n.getDate()).padStart(2,'0');}
+function dayRange(n){const d=DAY_DATES[n];return Array.isArray(d)?d:[d,d];}
+function isDayToday(n){if(!DAY_DATES[n])return false;const t=todayISO(),[a,b]=dayRange(n);return t>=a&&t<=b;}
+function tripPhase(){const t=todayISO();if(t<DATES.start)return 'before';if(t>DATES.end)return 'after';return 'during';}
+function daysToStart(){const t=new Date(todayISO()+'T00:00:00'),s=new Date(DATES.start+'T00:00:00');return Math.max(0,Math.round((s-t)/864e5));}
+function stepHasToday(s){return s.days.some(d=>isDayToday(d.n));}
+function planningFocus(){if(tripPhase()==='during'){const i=PLAN.findIndex(stepHasToday);if(i>=0)_stepIdx=i;}}
+function scrollToToday(){if(tripPhase()!=='during')return;requestAnimationFrame(()=>setTimeout(()=>{const el=document.querySelector('.day-card.today');if(el)el.scrollIntoView({block:'center',behavior:'smooth'});},120));}
 function renderJourney(){
   const bar=document.getElementById('plan-journey');
   bar.innerHTML=PLAN.map((s,i)=>{
     const c=GRP_COLORS[s.step]||'#8a6a3f';const m=STEP_META[s.step]||{};
-    return '<div class="jstep'+(i===_stepIdx?' active':'')+'" onclick="selectStep('+i+')"><div class="jdot" style="background:'+c+'">'+(i+1)+'</div><div class="jname">'+s.step+'</div><div class="jdate">'+(m.dates||'')+'</div></div>';
+    return '<div class="jstep'+(i===_stepIdx?' active':'')+(stepHasToday(s)?' jtoday':'')+'" onclick="selectStep('+i+')"><div class="jdot" style="background:'+c+'">'+(i+1)+'</div><div class="jname">'+s.step+'</div><div class="jdate">'+(m.dates||'')+'</div></div>';
   }).join('');
   requestAnimationFrame(()=>{const a=bar.querySelector('.jstep.active');if(a)a.scrollIntoView({inline:'center',block:'nearest',behavior:'smooth'});});
 }
@@ -729,7 +746,11 @@ function renderDays(){
       if(it.resa)row+='<button class="resa-btn'+(RESA_KEYS.has(it.resa)?' set':'')+'" data-resa="'+it.resa+'" onclick="openResa(\''+it.resa+'\',\''+esc(it.rl||it.t)+'\')">📄 '+(RESA_KEYS.has(it.resa)?'Résa ✓':'Résa')+'</button>';
       return '<div class="tl-item"><div class="tl-time">'+(it.time||'')+'</div><div class="tl-dot dot-'+it.dot+'">'+it.ic+'</div><div class="tl-content"><div class="tl-title">'+it.t+'</div>'+(it.sub?'<div class="tl-sub">'+it.sub+'</div>':'')+(row?'<div class="tl-row">'+row+'</div>':'')+'</div></div>';
     }).join('');
-    return '<div style="padding:0 16px"><div class="day-card" style="border-top:3px solid '+c+'"><div class="day-header" onclick="toggleDay(this)"><div class="day-number" style="color:'+c+'">'+d.n+'</div><div class="day-info"><div class="day-name">'+d.name+'</div><div class="day-date">'+(d.date||('Jour '+d.n))+'</div></div><div class="day-vibe">'+d.vibe+'</div><span class="day-toggle">▾</span></div><div class="timeline">'+items+'</div></div></div>';
+    let badge='';
+    if(isDayToday(d.n))badge='<div class="today-badge">● Aujourd\'hui</div>';
+    else if(tripPhase()==='before'&&d.n===1)badge='<div class="jx-badge">J-'+daysToStart()+' avant le départ</div>';
+    const tcls=isDayToday(d.n)?' today':'';
+    return '<div style="padding:0 16px"><div class="day-card'+tcls+'" style="border-top:3px solid '+c+'"><div class="day-header" onclick="toggleDay(this)"><div class="day-number" style="color:'+c+'">'+d.n+'</div><div class="day-info"><div class="day-name">'+d.name+'</div><div class="day-date">'+(d.date||('Jour '+d.n))+'</div>'+badge+'</div><div class="day-vibe">'+d.vibe+'</div><span class="day-toggle">▾</span></div><div class="timeline">'+items+'</div></div></div>';
   }).join('');
 }
 function esc(s){return (s||'').replace(/'/g,"\\'").replace(/"/g,'&quot;');}
@@ -955,7 +976,7 @@ async function init(){
   RESA_KEYS=new Set(await FileDB.keys().catch(()=>[]));
   renderDates();
   await renderFam();
-  renderJourney();renderBanner();renderDays();
+  planningFocus();renderJourney();renderBanner();renderDays();
   renderCarteList();
   renderResaGroups();
   renderAssur();

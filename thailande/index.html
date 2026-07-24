@@ -854,27 +854,41 @@ function matchKey(fname){
   return null;
 }
 function resaLabel(key){for(const g of RESA)for(const it of g.items)if(it.key===key)return it.name;return key;}
+function escH(s){return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+function resaOptions(){return RESA.map(g=>'<optgroup label="'+g.label+'">'+g.items.map(it=>'<option value="'+it.key+'">'+it.name+' — '+it.desc+'</option>').join('')+'</optgroup>').join('');}
+let _pending=[];
 function importAll(){
   const inp=document.createElement('input');inp.type='file';inp.accept='application/pdf,image/*';inp.multiple=true;
   inp.onchange=async e=>{
     const files=[...e.target.files];if(!files.length)return;
-    const done=[],skip=[];
+    const done=[];_pending=[];
     for(const f of files){
       const key=matchKey(f.name);
-      if(key){try{await FileDB.put(key,f,f.name);RESA_KEYS.add(key);done.push(f.name+' → '+resaLabel(key));}catch(_){skip.push(f.name);}}
-      else skip.push(f.name);
+      if(key){try{await FileDB.put(key,f,f.name);RESA_KEYS.add(key);done.push(f.name+' → '+resaLabel(key));}catch(_){_pending.push(f);}}
+      else _pending.push(f);
     }
     refreshResaMarks();
     const modal=document.getElementById('resa-modal');
-    document.getElementById('resa-modal-title').textContent='📥 Import terminé';
+    document.getElementById('resa-modal-title').textContent='📥 Import des billets';
     let h='';
-    if(done.length)h+='<div style="font-size:.82rem;font-weight:700;color:#1f7a45;margin-bottom:6px">✓ '+done.length+' fichier(s) rangé(s)</div><div style="font-size:.75rem;color:var(--muted);line-height:1.6">'+done.map(d=>'• '+d).join('<br>')+'</div>';
-    if(skip.length)h+='<div style="font-size:.82rem;font-weight:700;color:#a05c00;margin:12px 0 6px">↷ '+skip.length+' non reconnu(s)</div><div style="font-size:.72rem;color:var(--muted);line-height:1.6">'+skip.map(s=>'• '+s).join('<br>')+'</div><div style="font-size:.72rem;color:var(--muted);margin-top:8px">Attache-les à la main en touchant l\'emplacement voulu.</div>';
-    if(!done.length&&!skip.length)h='<div style="color:var(--muted)">Aucun fichier sélectionné.</div>';
+    if(done.length)h+='<div style="font-size:.82rem;font-weight:700;color:#1f7a45;margin-bottom:6px">✓ '+done.length+' rangé(s) automatiquement</div><div style="font-size:.73rem;color:var(--muted);line-height:1.6;margin-bottom:10px">'+done.map(d=>'• '+escH(d)).join('<br>')+'</div>';
+    if(_pending.length){
+      h+='<div style="font-size:.8rem;font-weight:700;color:#a05c00;margin:4px 0 10px">↷ '+_pending.length+' fichier(s) à ranger — choisis l\'emplacement :</div>';
+      h+=_pending.map((f,i)=>'<div id="pi-'+i+'" style="margin-bottom:11px;padding-bottom:11px;border-bottom:1px solid var(--border)"><div style="font-size:.76rem;font-weight:600;color:var(--text);word-break:break-all;margin-bottom:5px">📄 '+escH(f.name)+'</div><select onchange="assignPending('+i+',this.value)" style="width:100%;border:1.5px solid var(--border);border-radius:9px;padding:10px;font-family:inherit;font-size:.84rem;background:var(--bg);color:var(--text)"><option value="">— choisir l\'emplacement —</option>'+resaOptions()+'</select></div>').join('');
+    }
+    if(!done.length&&!_pending.length)h='<div style="color:var(--muted)">Aucun fichier sélectionné.</div>';
     document.getElementById('resa-view').innerHTML=h;
     modal.classList.add('open');
   };
   inp.click();
+}
+async function assignPending(i,key){
+  if(!key||!_pending[i])return;
+  const f=_pending[i];
+  try{await FileDB.put(key,f,f.name);RESA_KEYS.add(key);}catch(e){return;}
+  refreshResaMarks();
+  const row=document.getElementById('pi-'+i);
+  if(row)row.innerHTML='<div style="font-size:.78rem;color:#1f7a45;font-weight:700">✓ '+escH(f.name)+' → '+escH(resaLabel(key))+'</div>';
 }
 
 /* ===================== INIT ===================== */

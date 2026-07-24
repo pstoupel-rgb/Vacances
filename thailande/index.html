@@ -427,6 +427,7 @@
   <div style="padding:16px 16px 0"><button class="assur-edit" style="margin:0" onclick="relock()">🔒 Verrouiller l'app</button></div>
 
   <div class="disclaimer">Les informations ci-dessus (visa, taux de change, prises) sont données à titre indicatif et peuvent changer — pense à les <b>vérifier avant le départ</b> (France Diplomatie / consulat de Thaïlande).</div>
+  <div style="text-align:center;font-size:.62rem;color:var(--muted);padding:2px 0 18px">Thaïlande · <b>v5</b> · mise à jour auto</div>
 </div>
 
 <!-- ============ MODALS ============ -->
@@ -990,8 +991,17 @@ function hideSplash(){const s=document.getElementById('splash');if(s)s.classList
 window.addEventListener('load',()=>setTimeout(hideSplash,650));
 setTimeout(hideSplash,2500);
 
-/* service worker */
-if('serviceWorker' in navigator){window.addEventListener('load',()=>{navigator.serviceWorker.register('sw.js').catch(()=>{});});}
+/* service worker — mise à jour automatique */
+if('serviceWorker' in navigator){
+  let _refreshing=false;
+  navigator.serviceWorker.addEventListener('controllerchange',()=>{if(_refreshing)return;_refreshing=true;location.reload();});
+  window.addEventListener('load',()=>{
+    navigator.serviceWorker.register('sw.js').then(reg=>{
+      reg.update();
+      setInterval(()=>reg.update(),30*60*1000);
+    }).catch(()=>{});
+  });
+}
 </script>
 </body>
 </html>

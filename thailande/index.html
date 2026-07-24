@@ -219,7 +219,14 @@
   .pop-d{font-size:.75rem;color:var(--muted);margin-top:3px;line-height:1.35;}
   .pop-go{display:inline-flex;align-items:center;gap:4px;margin-top:9px;background:var(--brown);color:#fff;border-radius:9px;padding:6px 12px;font-size:.74rem;font-weight:700;text-decoration:none;}
   .map-legend{display:flex;flex-wrap:wrap;gap:7px 12px;justify-content:center;padding:2px 18px 6px;}
-  .map-legend .lg{display:flex;align-items:center;gap:5px;font-size:.72rem;font-weight:600;color:var(--muted);}
+  .map-regions{display:flex;gap:7px;overflow-x:auto;padding:6px 16px 8px;scrollbar-width:none;-webkit-overflow-scrolling:touch;}
+  .map-regions::-webkit-scrollbar{display:none;}
+  .rchip{flex:0 0 auto;display:flex;align-items:center;gap:6px;background:var(--card);border:1.5px solid var(--border);border-radius:20px;padding:6px 13px;font-family:'Inter',sans-serif;font-size:.76rem;font-weight:600;color:var(--muted);cursor:pointer;white-space:nowrap;transition:background .14s,color .14s,border-color .14s;}
+  .rchip.active{background:var(--brown);border-color:var(--brown);color:#fff;}
+  .rchip-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;}
+  .rchip.active .rchip-dot{box-shadow:0 0 0 2px rgba(255,255,255,.55);}
+  #carte-list .card{cursor:pointer;}
+  .map-legend .lg{display:flex;align-items:center;gap:5px;font-size:.72rem;font-weight:600;color:var(--muted);cursor:pointer;}
   .map-legend .lg-dot{width:18px;height:18px;border-radius:50%;display:grid;place-items:center;color:#fff;font-size:.66rem;font-weight:800;box-shadow:0 1px 3px rgba(0,0,0,.25);}
 
   /* RESA GROUPS */
@@ -383,6 +390,7 @@
 <!-- ============ CARTE ============ -->
 <div class="page page-content" id="page-carte">
   <div class="page-hero"><h2>Carte</h2><p>L'itinéraire & tous les lieux du séjour · touche un point pour l'ouvrir</p></div>
+  <div id="map-regions" class="map-regions"></div>
   <div id="map"></div>
   <div id="map-legend" class="map-legend"></div>
   <div id="carte-list" style="padding:8px 0 0"></div>
@@ -643,7 +651,7 @@ function findResaItem(key){for(const g of RESA)for(const it of g.items)if(it.key
 
 /* ===================== NAVIGATION ===================== */
 const NAV_TITLES={home:'Thaïlande',planning:'Planning',carte:'Carte',resa:'Réservations',infos:'Infos pratiques'};
-let _mapInit=false,_map=null;
+let _mapInit=false,_map=null,_markers=[],_allPts=[];
 function showPage(name,btn){
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
   document.getElementById('page-'+name).classList.add('active');
@@ -773,8 +781,8 @@ async function initMap(){
     const route=stops.map(p=>[p.lat,p.lng]);
     L.polyline(route,{color:'#8a6a3f',weight:3,opacity:.55,dashArray:'2 9',lineCap:'round'}).addTo(map);
 
-    const pts=[];
-    PLACES.forEach(p=>{
+    _markers=[];const pts=[];
+    PLACES.forEach((p,idx)=>{
       const color=GRP_COLORS[p.grp]||'#8a6a3f';
       const html=p.stop
         ? '<div class="mk mk-stop" style="background:'+color+'"><span>'+p.stop+'</span></div>'
@@ -783,11 +791,13 @@ async function initMap(){
       const icon=L.divIcon({html,className:'mk-wrap',iconSize:[size,size],iconAnchor:[size/2,size/2],popupAnchor:[0,-size/2]});
       const pop='<div class="pop"><div class="pop-t">'+p.ic+' '+p.n+'</div>'+(p.d?'<div class="pop-d">'+p.d+'</div>':'')
         +'<a class="pop-go" href="https://www.google.com/maps/search/?api=1&query='+p.lat+','+p.lng+'" target="_blank" rel="noopener">🗺️ Y aller</a></div>';
-      L.marker([p.lat,p.lng],{icon,zIndexOffset:p.stop?1000:0}).addTo(map).bindPopup(pop,{closeButton:false});
+      _markers[idx]=L.marker([p.lat,p.lng],{icon,zIndexOffset:p.stop?1000:0}).addTo(map).bindPopup(pop,{closeButton:false});
       pts.push([p.lat,p.lng]);
     });
+    _allPts=pts;
     map.fitBounds(pts,{padding:[38,38]});
     _map=map;setTimeout(()=>map.invalidateSize(),200);
+    setRegionActive('Tout');
   }catch(e){
     document.getElementById('map').innerHTML='<div style="display:grid;place-items:center;height:100%;color:#888;font-size:.82rem;text-align:center;padding:16px">🌐 Carte indisponible hors-ligne.<br>Les lieux ci-dessous restent accessibles.</div>';
   }
@@ -796,7 +806,31 @@ async function initMap(){
 function renderLegend(){
   const el=document.getElementById('map-legend');if(!el)return;
   const order=['Bangkok','Chiang Mai','Khao Sok','Koh Lanta','Koh Yao Yai'];
-  el.innerHTML=order.map((g,i)=>'<span class="lg"><span class="lg-dot" style="background:'+GRP_COLORS[g]+'">'+(i+1)+'</span>'+g+'</span>').join('');
+  el.innerHTML=order.map((g,i)=>'<span class="lg" onclick="flyToRegion(\''+g+'\')"><span class="lg-dot" style="background:'+GRP_COLORS[g]+'">'+(i+1)+'</span>'+g+'</span>').join('');
+}
+const MAP_REGIONS=['Tout','Bangkok','Chiang Mai','Khao Sok','Koh Lanta','Koh Yao Yai'];
+function renderRegions(){
+  const el=document.getElementById('map-regions');if(!el)return;
+  el.innerHTML=MAP_REGIONS.map(g=>{
+    const c=g==='Tout'?'#8a6a3f':(GRP_COLORS[g]||'#8a6a3f');
+    return '<button class="rchip'+(g==='Tout'?' active':'')+'" data-region="'+g+'" onclick="flyToRegion(\''+g+'\')"><span class="rchip-dot" style="background:'+c+'"></span>'+g+'</button>';
+  }).join('');
+}
+function setRegionActive(g){document.querySelectorAll('#map-regions .rchip').forEach(b=>b.classList.toggle('active',b.getAttribute('data-region')===g));}
+function flyToRegion(g){
+  if(!_map){return;}
+  setRegionActive(g);
+  if(g==='Tout'){_map.flyToBounds(_allPts,{padding:[38,38],maxZoom:11,duration:.8});return;}
+  const pts=PLACES.filter(p=>p.grp===g).map(p=>[p.lat,p.lng]);
+  if(!pts.length)return;
+  if(pts.length===1)_map.flyTo(pts[0],13,{duration:.8});
+  else _map.flyToBounds(pts,{padding:[55,55],maxZoom:13,duration:.8});
+}
+function focusPlace(idx){
+  const p=PLACES[idx];if(!p)return;
+  document.getElementById('page-carte').scrollTo({top:0,behavior:'smooth'});
+  if(!_map){initMap();}
+  setTimeout(()=>{if(!_map)return;_map.flyTo([p.lat,p.lng],14,{duration:.8});const mk=_markers[idx];if(mk)setTimeout(()=>mk.openPopup(),500);setRegionActive(p.grp);},380);
 }
 function loadCSS(href){return new Promise((res)=>{if(document.querySelector('link[href="'+href+'"]'))return res();const l=document.createElement('link');l.rel='stylesheet';l.href=href;l.onload=res;l.onerror=res;document.head.appendChild(l);});}
 function loadScript(src){return new Promise((res,rej)=>{if(document.querySelector('script[src="'+src+'"]'))return res();const s=document.createElement('script');s.src=src;s.onload=res;s.onerror=rej;document.head.appendChild(s);});}
@@ -808,8 +842,9 @@ function renderCarteList(){
   el.innerHTML=keys.map(g=>{
     const col=GRP_COLORS[g]||'#8a6a3f';
     const hd='<div class="section-hdr"><span style="display:inline-block;width:11px;height:11px;border-radius:50%;background:'+col+'"></span>'+(GRP_ICON[g]||'')+' '+g+'</div>';
-    return '<div class="section">'+hd+grps[g].map(p=>'<div class="card"><div class="card-icon">'+p.ic+'</div><div class="card-body"><div class="card-name">'+p.n+'</div>'+(p.d?'<div class="card-meta">'+p.d+'</div>':'')+'</div><a class="waze-btn jade" href="https://www.google.com/maps/search/?api=1&query='+p.lat+','+p.lng+'" target="_blank" rel="noopener"><span class="waze-logo">🗺️</span><span>Maps</span></a></div>').join('')+'</div>';
+    return '<div class="section">'+hd+grps[g].map(p=>'<div class="card" onclick="focusPlace('+PLACES.indexOf(p)+')"><div class="card-icon">'+p.ic+'</div><div class="card-body"><div class="card-name">'+p.n+'</div>'+(p.d?'<div class="card-meta">'+p.d+'</div>':'')+'</div><a class="waze-btn jade" onclick="event.stopPropagation()" href="https://www.google.com/maps/search/?api=1&query='+p.lat+','+p.lng+'" target="_blank" rel="noopener"><span class="waze-logo">🗺️</span><span>Maps</span></a></div>').join('')+'</div>';
   }).join('');
+  renderRegions();
 }
 
 /* ===================== RÉSA (coffre PDF hors-ligne) ===================== */

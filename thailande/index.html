@@ -435,7 +435,7 @@
   <div style="padding:16px 16px 0"><button class="assur-edit" style="margin:0" onclick="relock()">🔒 Verrouiller l'app</button></div>
 
   <div class="disclaimer">Les informations ci-dessus (visa, taux de change, prises) sont données à titre indicatif et peuvent changer — pense à les <b>vérifier avant le départ</b> (Affaires étrangères Belgique · diplomatie.belgium.be / consulat de Thaïlande).</div>
-  <div style="text-align:center;font-size:.62rem;color:var(--muted);padding:2px 0 18px">Thaïlande · <b>v7</b> · mise à jour auto</div>
+  <div style="text-align:center;font-size:.62rem;color:var(--muted);padding:2px 0 18px">Thaïlande · <b>v8</b> · mise à jour auto</div>
 </div>
 
 <!-- ============ MODALS ============ -->
@@ -512,6 +512,8 @@ const PLACES=[
   {n:'Grand Palais & Wat Phra Kaew',lat:13.7500,lng:100.4914,ic:'🏛️',grp:'Bangkok',d:'Visite guidée · 19 déc'},
   {n:'Wat Pho (Bouddha couché)',lat:13.7465,lng:100.4927,ic:'🛕',grp:'Bangkok',d:'À 5 min du Grand Palais'},
   {n:'Wat Arun (temple de l\'Aube)',lat:13.7437,lng:100.4889,ic:'🛕',grp:'Bangkok',d:'Traversée en bateau'},
+  {n:'Marchés flottants de Thonburi',lat:13.7794,lng:100.4562,ic:'🛶',grp:'Bangkok',d:'Journée guidée · 19 déc'},
+  {n:'Wat Prayoon',lat:13.7386,lng:100.4908,ic:'🐢',grp:'Bangkok',d:'Tortues · 19 déc'},
   {n:'Gare Krung Thep Aphiwat',lat:13.8028,lng:100.5397,ic:'🚉',grp:'Bangkok',d:'Train de nuit · 20 déc 18h40'},
   {n:'Pingviman Hotel',lat:18.7855,lng:98.9855,ic:'🏨',grp:'Chiang Mai',stop:2,d:'Étape 2 · 21 → 23 déc'},
   {n:'Vieille ville & Wat Chedi Luang',lat:18.7869,lng:98.9860,ic:'🛕',grp:'Chiang Mai',d:'Temples · marché de nuit'},
@@ -533,15 +535,17 @@ const PLAN=[
       {time:'',dot:'hotel',ic:'🏨',t:'Check-in — Sivatel Bangkok Hotel',sub:'2 nuits · récupération du décalage',resa:'hotel-bkk',rl:'Hôtel Bangkok — Sivatel',waze:'13.7407,100.5403'},
       {time:'Soir',dot:'food',ic:'🍜',t:'Premier dîner thaï',sub:'Pad thaï, mango sticky rice…'}
     ]},
-    {n:2,name:'Bangkok avec guide',vibe:'🧭',date:'Sam 19 déc',items:[
-      {time:'Journée',dot:'activity',ic:'🧭',t:'Visite de Bangkok avec guide',sub:'Journée guidée en famille · temples & rivière',resa:'guide-bangkok',rl:'Visite guidée de Bangkok'},
-      {time:'9h',dot:'temple',ic:'🏛️',t:'Grand Palais & Wat Phra Kaew',sub:'Tenue couvrante (épaules & genoux)',waze:'13.7500,100.4914'},
-      {time:'11h',dot:'temple',ic:'🛕',t:'Wat Pho — Bouddha couché',sub:'À 5 min à pied du Grand Palais',waze:'13.7465,100.4927'},
-      {time:'13h',dot:'food',ic:'🍽️',t:'Déjeuner au bord du Chao Phraya',sub:'Vue sur la rivière'},
-      {time:'15h',dot:'boat',ic:'⛵',t:'Traversée vers Wat Arun',sub:'Bateau local · temple de l\'Aube',waze:'13.7437,100.4889'}
+    {n:2,name:'Bangkok · marchés flottants',vibe:'🛶',date:'Sam 19 déc',items:[
+      {time:'9h00',dot:'activity',ic:'🧭',t:'Journée guidée avec Kunrawee',sub:'Guide francophone · prise en charge à l\'hôtel · privé famille',resa:'guide-bangkok',rl:'Visite guidée de Bangkok — Kunrawee'},
+      {time:'',dot:'activity',ic:'🧿',t:'Marché aux amulettes & marché gourmand',sub:'Immersion locale'},
+      {time:'',dot:'boat',ic:'🛶',t:'Balade en bateau privé sur les klongs',sub:'Thonburi 1h30 · Wat Paknam, Klong Bang Luang, Artist\'s House',waze:'13.7217,100.4405'},
+      {time:'',dot:'activity',ic:'🛍️',t:'Marché flottant Taling Chan',sub:'',waze:'13.7794,100.4562'},
+      {time:'',dot:'boat',ic:'🛶',t:'Marché flottant Khlong Lat Mayom',sub:'Cuisine & fruits',waze:'13.7745,100.4090'},
+      {time:'',dot:'temple',ic:'🐢',t:'Wat Prayoon',sub:'Temple · nourrir les tortues',waze:'13.7386,100.4908'},
+      {time:'Fin',dot:'activity',ic:'💐',t:'Marché aux fleurs (Pak Khlong Talat) ou Chinatown',sub:''}
     ]},
-    {n:3,name:'Marché puis train de nuit',vibe:'🚂',date:'Dim 20 déc',items:[
-      {time:'Matin',dot:'activity',ic:'🛍️',t:'Marché & balade',sub:'Souvenirs & street food'},
+    {n:3,name:'Temples (option) & train de nuit',vibe:'🚂',date:'Dim 20 déc',items:[
+      {time:'Matin',dot:'temple',ic:'🏛️',t:'Grand Palais, Wat Pho & Wat Arun (option)',sub:'Si le temps le permet · tenue couvrante',waze:'13.7500,100.4914'},
       {time:'Aprem',dot:'free',ic:'🏊',t:'Repos avant le train',sub:'Rythme famille'},
       {time:'18h40',dot:'train',ic:'🚂',t:'Train de nuit → Chiang Mai',sub:'Special Express n°9 · 1re classe couchette · gare Krung Thep Aphiwat',resa:'train-cnx',rl:'Train de nuit Bangkok → Chiang Mai',waze:'13.8028,100.5397'}
     ]}
@@ -630,7 +634,7 @@ const RESA=[
     {key:'transfert-kohyao',ic:'⛵',name:'Koh Lanta → Koh Yao Yai',desc:'Speedboat Santhiya · 29 déc',mailq:'Santhiya'}
   ]},
   {label:'Activités',ic:'🎟️',items:[
-    {key:'guide-bangkok',ic:'🧭',name:'Visite guidée de Bangkok',desc:'19 déc · journée avec guide',mailq:'Bangkok guide tour'},
+    {key:'guide-bangkok',ic:'🧭',name:'Visite guidée de Bangkok',desc:'19 déc · 9h · guide Kunrawee',mailq:'from:guidekunrawee@gmail.com',tel:'+66876591666',telName:'le guide Kunrawee',info:['Guide francophone — Kunrawee Sai (licence 1-025483)','RDV 9h00, prise en charge à l\'hôtel','Marchés flottants de Thonburi + balade en bateau privé','~6 500 ฿ pour 4 · à régler en cash sur place']},
     {key:'elephants',ic:'🐘',name:'Elephant Rescue Park',desc:'Chiang Mai · 22 déc (matin)',mailq:'Elephant Rescue Park'}
   ]},
   {label:'Documents',ic:'🪪',items:[
@@ -882,7 +886,8 @@ async function openResa(key,label){
   const it=findResaItem(key);
   let head='';
   if(it){
-    head+='<div class="resa-detail"><b>'+it.name+'</b><br>'+it.desc+'</div>';
+    head+='<div class="resa-detail"><b>'+it.name+'</b><br>'+it.desc+(it.info?('<br>'+it.info.map(x=>'· '+x).join('<br>')):'')+'</div>';
+    if(it.tel)head+='<a class="mailbtn" style="background:var(--jade)" href="tel:'+it.tel.replace(/\s/g,'')+'">📞 Appeler '+(it.telName||'le contact')+'</a>';
     if(it.mailq)head+='<a class="mailbtn" href="https://mail.google.com/mail/#search/'+encodeURIComponent(it.mailq)+'" target="_blank" rel="noopener">📧 Ouvrir le mail (billet PDF) dans Gmail</a>';
   }
   const rec=await FileDB.get(key).catch(()=>null);
@@ -972,7 +977,7 @@ const IMPORT_RULES=[
   [['elephant'],'elephants'],
   [['allianz','insurance','assurance'],'assurance-doc'],
   [['passeport','passport'],'passeports'],
-  [['guide'],'guide-bangkok'],
+  [['guide','kunrawee'],'guide-bangkok'],
   [['retour','return','bkkbru'],'vol-retour'],
   [['thai','eticket','emd','fctdtb','amadeus','ticket','aller','brubkk'],'vol-aller'],
   [['transfert','transfer'],'transfert-lanta']

@@ -941,6 +941,10 @@ function renderDonnees(wrap){
       <li>enregistre-le dans <b>Fichiers</b> (ou reçois-le par AirDrop), puis choisis-le ci-dessous</li>
     </ol>
     <input type="file" id="hkfile" accept=".zip,.xml,application/zip,text/xml" style="display:none">
+    <label style="display:flex;align-items:center;gap:9px;margin:2px 0 12px;font-size:13px;color:${C.bone};cursor:pointer">
+      <input type="checkbox" id="hkwindow" checked style="width:18px;height:18px;accent-color:${C.ember}">
+      Garder seulement les <b>12 derniers mois</b> <span style="color:${C.fog}">(courbes plus lisibles)</span>
+    </label>
     <button class="btn btn-primary" id="hkbtn">Choisir export.zip / export.xml</button>
     <div id="hkprog" style="margin-top:14px;display:none">
       <div class="prog"><i></i></div>
@@ -1060,7 +1064,9 @@ function importHealth(file, card){
       applyImport(m.data); }
   };
   worker.onerror=e=>{ msg.textContent="❌ Erreur d'analyse"; toast("Erreur pendant l'analyse du fichier"); };
-  worker.postMessage({file});
+  const win = card.querySelector("#hkwindow");
+  const monthsWindow = (win && win.checked) ? 12 : null;
+  worker.postMessage({file, monthsWindow});
 }
 
 function applyImport(d){
@@ -1087,7 +1093,7 @@ function makeWorker(){
     const ms=Date.UTC(+m[1],+m[2]-1,+m[3],+m[4],+m[5],+m[6])-off; return {ms,local:m[1]+"-"+m[2]+"-"+m[3],hour:+m[4],dt:m[1]+"-"+m[2]+"-"+m[3]+"T"+m[4]+":"+m[5]+":"+m[6]}; }
   function localDateShift(ms,hoursBack){ const d=new Date(ms-hoursBack*3600000); return d.getUTCFullYear()+"-"+String(d.getUTCMonth()+1).padStart(2,"0")+"-"+String(d.getUTCDate()).padStart(2,"0"); }
 
-  const acc={ vo2:[], rhr:{}, weight:[], sleep:{}, runs:[], others:{}, cur:null, records:0 };
+  const acc={ vo2:[], rhr:{}, weight:[], sleep:{}, runs:[], otherList:[], cur:null, records:0 };
   function pushAvg(map,date,val){ if(!map[date])map[date]={s:0,n:0}; map[date].s+=val; map[date].n++; }
 
   function onRecord(a){
@@ -1117,7 +1123,7 @@ function makeWorker(){
     const w={type,date:d?d.local:null,datetime:d?d.dt:null,duration_min:+dur.toFixed(1),
       distance_km:isNaN(dist)?null:+dist.toFixed(2),energy_kcal:isNaN(kcal)?null:Math.round(kcal),avg_hr:null,max_hr:null};
     if(type==="Running"){ acc.runs.push(w); acc.cur=w; }
-    else { acc.cur=w; acc.curOther=w; if(!acc.others[type])acc.others[type]={count:0,duration:0}; acc.others[type].count++; acc.others[type].duration+=dur; }
+    else { acc.cur=w; acc.otherList.push({type,date:w.date,duration:dur}); }
     if(a._selfclose) acc.cur=null;
   }
   function onStat(a,workoutOpen){
@@ -1149,19 +1155,40 @@ function makeWorker(){
     return rest;
   }
 
-  function finalize(){
-    const rhr_daily=Object.keys(acc.rhr).sort().map(d=>({date:d,value:+(acc.rhr[d].s/acc.rhr[d].n).toFixed(1)}));
+  function finalize(monthsWindow){
+    let rhr_daily=Object.keys(acc.rhr).sort().map(d=>({date:d,value:+(acc.rhr[d].s/acc.rhr[d].n).toFixed(1)}));
     const weightMap={}; acc.weight.forEach(w=>{ (weightMap[w.date]=weightMap[w.date]||[]).push(w.value); });
-    const weight_daily=Object.keys(weightMap).sort().map(d=>({date:d,value:+(weightMap[d].reduce((x,y)=>x+y,0)/weightMap[d].length).toFixed(2)}));
-    const sleep_nightly=Object.keys(acc.sleep).sort().map(d=>{ const s=acc.sleep[d]; return {date:d,deep:+s.deep.toFixed(1),rem:+s.rem.toFixed(1),core:+s.core.toFixed(1),total:+(s.deep+s.rem+s.core).toFixed(1)}; })
+    let weight_daily=Object.keys(weightMap).sort().map(d=>({date:d,value:+(weightMap[d].reduce((x,y)=>x+y,0)/weightMap[d].length).toFixed(2)}));
+    let sleep_nightly=Object.keys(acc.sleep).sort().map(d=>{ const s=acc.sleep[d]; return {date:d,deep:+s.deep.toFixed(1),rem:+s.rem.toFixed(1),core:+s.core.toFixed(1),total:+(s.deep+s.rem+s.core).toFixed(1)}; })
       .filter(n=>n.total>60);
     const vo2Map={}; acc.vo2.forEach(v=>vo2Map[v.date]=v.value);
-    const vo2max=Object.keys(vo2Map).sort().map(d=>({date:d,value:vo2Map[d]}));
+    let vo2max=Object.keys(vo2Map).sort().map(d=>({date:d,value:vo2Map[d]}));
     // effort par FC
     acc.runs.forEach(r=>{ if(r.avg_hr==null){ r.effort=null; } else if(r.avg_hr<=152) r.effort="facile"; else if(r.avg_hr>=160) r.effort="intense"; else r.effort="modere";
       if(r.distance_km&&r.duration_min) r.pace_min_km=+(r.duration_min/r.distance_km).toFixed(2); else r.pace_min_km=null; });
-    const runs=acc.runs.filter(r=>r.date&&r.distance_km>0).sort((a,b)=>a.datetime<b.datetime?-1:1);
-    const other_activities=Object.keys(acc.others).map(t=>({type:t,label:ACT[t]||t,count:acc.others[t].count,duration:Math.round(acc.others[t].duration)})).sort((a,b)=>b.count-a.count);
+    let runs=acc.runs.filter(r=>r.date&&r.distance_km>0).sort((a,b)=>a.datetime<b.datetime?-1:1);
+    let otherList=acc.otherList.slice();
+
+    // Fenêtre « N derniers mois » : coupe relativement à la donnée la plus récente
+    if(monthsWindow){
+      const allDates=[]
+        .concat(vo2max.map(x=>x.date),rhr_daily.map(x=>x.date),weight_daily.map(x=>x.date),
+                sleep_nightly.map(x=>x.date),runs.map(x=>x.date),otherList.map(x=>x.date))
+        .filter(Boolean);
+      if(allDates.length){
+        const maxD=allDates.reduce((a,b)=>a>b?a:b);
+        const md=new Date(maxD+"T00:00:00"); md.setMonth(md.getMonth()-monthsWindow);
+        const cut=md.toISOString().slice(0,10);
+        const keep=x=>x.date>=cut;
+        vo2max=vo2max.filter(keep); rhr_daily=rhr_daily.filter(keep);
+        weight_daily=weight_daily.filter(keep); sleep_nightly=sleep_nightly.filter(keep);
+        runs=runs.filter(keep); otherList=otherList.filter(keep);
+      }
+    }
+
+    const othersMap={};
+    otherList.forEach(o=>{ if(!othersMap[o.type])othersMap[o.type]={count:0,duration:0}; othersMap[o.type].count++; othersMap[o.type].duration+=o.duration; });
+    const other_activities=Object.keys(othersMap).map(t=>({type:t,label:ACT[t]||t,count:othersMap[t].count,duration:Math.round(othersMap[t].duration)})).sort((a,b)=>b.count-a.count);
     return {vo2max,rhr_daily,weight_daily,sleep_nightly,runs,other_activities};
   }
 
@@ -1191,7 +1218,7 @@ function makeWorker(){
     return {comp,method:best.method};
   }
 
-  async function run(file){
+  async function run(file, monthsWindow){
     const name=(file.name||"").toLowerCase();
     let stream;
     if(name.endsWith(".xml")){
@@ -1219,10 +1246,10 @@ function makeWorker(){
     }
     buf+=dec.decode(); processBuffer(buf+">");
     postMessage({type:"progress",pct:98,msg:"Agrégation…"});
-    postMessage({type:"done",data:finalize()});
+    postMessage({type:"done",data:finalize(monthsWindow)});
   }
 
-  onmessage=async e=>{ try{ await run(e.data.file); }catch(err){ postMessage({type:"error",msg:(err&&err.message)||"échec"}); } };
+  onmessage=async e=>{ try{ await run(e.data.file, e.data.monthsWindow); }catch(err){ postMessage({type:"error",msg:(err&&err.message)||"échec"}); } };
   `;
   const blob=new Blob([src],{type:"application/javascript"});
   return new Worker(URL.createObjectURL(blob));

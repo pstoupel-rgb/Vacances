@@ -1,0 +1,13 @@
+{
+  "name": "Ma Santé — suivi & coach longévité",
+  "short_name": "Santé",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#12201C",
+  "theme_color": "#12201C",
+  "icons": [
+    { "src": "icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }
+  ]
+}

@@ -457,6 +457,7 @@ function barChart(container, cfg){
    ============================================================ */
 const TABS=[
   {id:"apercu",label:"Aperçu",emoji:"🏠"},
+  {id:"progres",label:"Progrès",emoji:"📈"},
   {id:"coach",label:"Coach",emoji:"🩺"},
   {id:"sante",label:"Bilan sanguin",emoji:"🩸"},
   {id:"sommeil",label:"Sommeil",emoji:"🌙"},
@@ -479,7 +480,7 @@ function render(){
   app.appendChild(tabsEl());
   const wrap=h(`<div class="wrap"></div>`);
   app.appendChild(wrap);
-  ({apercu:renderApercu, coach:renderCoach, sante:renderSante, sommeil:renderSommeil, poids:renderPoids,
+  ({apercu:renderApercu, progres:renderProgres, coach:renderCoach, sante:renderSante, sommeil:renderSommeil, poids:renderPoids,
     courses:renderCourses, autres:renderAutres, donnees:renderDonnees}[TAB])(wrap);
   app.appendChild(h(`<div class="footer">100% privé · tout reste sur ton appareil · aucune donnée envoyée sur internet<br>
     ${STORE.imported.meta && STORE.imported.meta.source ? "Source : "+esc(STORE.imported.meta.source)+(STORE.imported.meta.when?" · "+esc(STORE.imported.meta.when):"") : ""}</div>`));
@@ -747,6 +748,112 @@ function emptyImport(t,s){ const el=h(`<div class="card" style="padding:22px;tex
   <div class="info" style="margin-bottom:14px">${s}</div>
   <button class="btn btn-primary">📥 Aller à Données</button></div>`);
   el.querySelector("button").onclick=()=>{TAB="donnees";render();}; return el; }
+
+/* ============================================================
+   ONGLET PROGRÈS : tableau départ → actuel (sport, sang, poids)
+   ============================================================ */
+function fmtWeekDate(week){ return fmtDate(isoWeekToThursday(week)); }
+function progImprovement(first,last,dir){
+  const d=last-first;
+  if(Math.abs(d)<1e-9) return "neutral";
+  if(dir==="high") return d>0?"good":"bad";
+  if(dir==="low")  return d<0?"good":"bad";
+  return "neutral";
+}
+function fmtNum(v){ if(v==null) return "—"; return (Math.round(v*100)/100).toString(); }
+function progRow(label, first, last, unit, dir, subFrom, subTo){
+  if(first==null||last==null) return null;
+  const tone=progImprovement(first,last,dir);
+  const d=last-first;
+  const pct = first!==0 ? d/Math.abs(first)*100 : 0;
+  const arrow = d>0?"↑":d<0?"↓":"→";
+  const deltaTxt = `${arrow} ${d>0?"+":""}${fmtNum(d)}${unit?" "+unit:""}`;
+  return {label, first, last, unit, tone, deltaTxt, absPct:Math.abs(pct), subFrom, subTo, dir};
+}
+
+function renderProgres(wrap){
+  const sport=[], poids=[], sang=[];
+
+  // ---- Sport / forme ----
+  const vo2=D.vo2max;
+  if(vo2.length>=2) sport.push(progRow("VO2 max", vo2[0].value, vo2[vo2.length-1].value, "mL/min/kg", "high", fmtDate(vo2[0].date), fmtDate(vo2[vo2.length-1].date)));
+  const rhr=D.resting_hr_weekly;
+  if(rhr.length>=2) sport.push(progRow("FC de repos", rhr[0].value, rhr[rhr.length-1].value, "bpm", "low", fmtWeekDate(rhr[0].week), fmtWeekDate(rhr[rhr.length-1].week)));
+  // Volume hebdo moyen : 4 premières vs 4 dernières semaines
+  const vol=D.weekly_volume;
+  if(vol.length>=4){
+    const avg=arr=>arr.reduce((a,w)=>a+w.distance,0)/arr.length;
+    sport.push(progRow("Volume hebdo moyen", +avg(vol.slice(0,4)).toFixed(1), +avg(vol.slice(-4)).toFixed(1), "km/sem", "high", "S"+vol[0].week.split("-W")[1], "S"+vol[vol.length-1].week.split("-W")[1]));
+  }
+
+  // ---- Poids ----
+  const w=D.weekly_weight;
+  if(w.length>=2) poids.push(progRow("Poids", w[0].avg_kg, w[w.length-1].avg_kg, "kg", "neutral", fmtWeekDate(w[0].week), fmtWeekDate(w[w.length-1].week)));
+
+  // ---- Prise de sang ----
+  // MARKERS.dir = sens « défavorable » ; on le convertit en « sens qui progresse »
+  MARKERS.forEach(m=>{
+    const pts=labSeriesVals(m.key);
+    if(pts.length<2) return;
+    const betterDir = m.dir==="high" ? "low" : m.dir==="low" ? "high" : "neutral";
+    sang.push(progRow(m.label, pts[0].v, pts[pts.length-1].v, m.unit, betterDir, fmtDate(pts[0].date), fmtDate(pts[pts.length-1].date)));
+  });
+
+  const allRows=[...sport,...poids,...sang].filter(Boolean);
+  if(!allRows.length){
+    wrap.appendChild(h(`<div class="card" style="padding:22px;text-align:center">
+      <div style="font-size:15px;font-weight:600;margin-bottom:6px">Pas encore de quoi comparer</div>
+      <div class="info" style="margin-bottom:14px">Importe tes données ou saisis au moins deux bilans pour voir ta progression.</div>
+      <button class="btn btn-primary" id="pgo">📥 Aller à Données</button></div>`));
+    document.getElementById("pgo").onclick=()=>{TAB="donnees";render();}; return;
+  }
+
+  // ---- Temps forts ----
+  const wins=allRows.filter(r=>r.tone==="good").sort((a,b)=>b.absPct-a.absPct).slice(0,3);
+  if(wins.length){
+    const hc=h(`<div class="card" style="padding:18px;margin-bottom:16px;border-color:${C.moss}55">
+      ${sectionTitle("🏅 Tes plus belles progressions","Depuis le début de ton suivi")}
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:14px;margin-top:6px"></div></div>`);
+    const box=hc.lastElementChild;
+    wins.forEach(rrow=>{
+      box.appendChild(h(`<div>
+        <div style="font-size:11px;color:${C.fog};margin-bottom:2px">${esc(rrow.label)}</div>
+        <div class="display mono" style="font-size:22px;font-weight:700;color:${C.moss}">${rrow.first} → ${rrow.last}</div>
+        <div class="mono" style="font-size:12px;color:${C.moss};margin-top:2px">${rrow.deltaTxt}</div></div>`));
+    });
+    wrap.appendChild(hc);
+  }
+
+  // ---- Tableaux par domaine ----
+  progressGroup(wrap, "🏃 Sport & forme", sport);
+  progressGroup(wrap, "⚖️ Poids", poids);
+  progressGroup(wrap, "🩸 Prise de sang", sang, true);
+
+  wrap.appendChild(h(`<div class="info" style="margin-top:4px">🟢 amélioration · 🔴 en recul · 🔵 neutre (ou selon ton objectif). Pour la prise de sang, le sens « mieux/moins bien » suit les seuils du labo — ce ne sont pas des diagnostics.</div>`));
+}
+
+function progressGroup(wrap, title, rows, isLab){
+  rows=(rows||[]).filter(Boolean);
+  if(!rows.length) return;
+  const card=h(`<div class="card" style="padding:0;overflow:hidden;margin-bottom:16px">
+    <div style="padding:14px 16px;border-bottom:1px solid ${C.line};font-size:14px;font-weight:600">${title}</div>
+    <div></div></div>`);
+  const box=card.lastElementChild;
+  rows.forEach((r,i)=>{
+    const col=r.tone==="good"?C.moss:r.tone==="bad"?C.flame:C.signal;
+    box.appendChild(h(`<div style="display:flex;align-items:center;gap:12px;padding:12px 16px;${i<rows.length-1?`border-bottom:1px solid ${C.line}`:""}">
+      <div style="flex:1;min-width:0">
+        <div style="font-size:13.5px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(r.label)}</div>
+        <div class="mono" style="font-size:10.5px;color:${C.fog};margin-top:2px">${esc(r.subFrom)} → ${esc(r.subTo)}</div>
+      </div>
+      <div style="text-align:right;flex:0 0 auto">
+        <div class="mono" style="font-size:14px"><span style="color:${C.fog}">${r.first}</span> <span style="color:${C.fog};opacity:.6">→</span> <span style="font-weight:700">${r.last}</span> <span style="font-size:11px;color:${C.fog}">${esc(r.unit||"")}</span></div>
+        <div class="mono pill" style="font-size:11px;margin-top:3px;background:${col}26;color:${col}">${r.deltaTxt}</div>
+      </div>
+    </div>`));
+  });
+  wrap.appendChild(card);
+}
 
 /* ============================================================
    ONGLET COACH : conseils médecin + préparateur longévité

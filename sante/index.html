@@ -334,8 +334,21 @@ function buildLabs(entries){
 function fmtPace(min){ if(min==null) return "—"; const m=Math.floor(min),s=Math.round((min-m)*60);
   return s===60?`${m+1}:00`:`${m}:${String(s).padStart(2,"0")}`; }
 function fmtDate(d){ if(!d) return "—"; const dt=new Date(d+"T00:00:00");
-  return dt.toLocaleDateString("fr-BE",{day:"2-digit",month:"short"}); }
+  return dt.toLocaleDateString("fr-BE",{day:"2-digit",month:"short",year:"2-digit"}); }
+function fmtMY(d){ if(!d) return ""; const dt=new Date(d+"T00:00:00");
+  return dt.toLocaleDateString("fr-BE",{month:"short"})+" "+String(dt.getFullYear()).slice(2); }
+function weekYear(week){ return week.split("-W")[0]; }
 function fmtHM(totalMin){ const h=Math.floor(totalMin/60),m=Math.round(totalMin%60); return `${h}h${String(m).padStart(2,"0")}`; }
+
+/* ---------- Appréciations « excellent / bon / à surveiller / hors norme » ---------- */
+function ratePill(r){ if(!r) return ""; const c=(r.t==="great"||r.t==="good")?C.moss:r.t==="warn"?C.ember:C.flame;
+  return `<span class="pill" style="background:${c}26;color:${c};font-size:10px;font-weight:600">${r.l}</span>`; }
+function rateVO2(v){ if(v==null)return null; if(v>=52)return{l:"Excellent",t:"great"}; if(v>=45)return{l:"Très bon",t:"good"}; if(v>=40)return{l:"Bon",t:"good"}; if(v>=35)return{l:"Moyen",t:"warn"}; return{l:"À travailler",t:"bad"}; }
+function rateRHR(v){ if(v==null)return null; if(v<58)return{l:"Excellent",t:"great"}; if(v<65)return{l:"Bon",t:"good"}; if(v<72)return{l:"Correct",t:"warn"}; return{l:"Élevé",t:"bad"}; }
+function rateLab(v,m){ if(v==null||!m)return null; const lo=m.range[0], hi=m.range[1];
+  if(m.dir==="high"){ if(v>hi)return{l:"Hors norme",t:"bad"}; const p=hi>0?v/hi:0; if(p<=0.5)return{l:"Excellent",t:"great"}; if(p<=0.8)return{l:"Bon",t:"good"}; return{l:"Limite",t:"warn"}; }
+  if(m.dir==="low"){ if(v<lo)return{l:"Hors norme",t:"bad"}; if(v>=lo*1.5)return{l:"Excellent",t:"great"}; if(v>=lo*1.2)return{l:"Bon",t:"good"}; return{l:"Correct",t:"warn"}; }
+  if(v<lo||v>hi)return{l:"Hors norme",t:"bad"}; const mid=(lo+hi)/2, half=(hi-lo)/2||1; return (Math.abs(v-mid)/half<=0.6)?{l:"Bon",t:"good"}:{l:"Limite",t:"warn"}; }
 function rangeText(m){ if(m.range[0]<=0 && m.range[1]>=999) return `≥ ${m.range[0]}`;
   if(m.range[1]>=999) return `≥ ${m.range[0]}`; if(m.range[0]<=0) return `≤ ${m.range[1]}`; return `${m.range[0]}–${m.range[1]}`; }
 
@@ -397,7 +410,8 @@ function lineChart(container, cfg){
     svg.appendChild(lb);
   });
   if(cfg.xTick){ for(let i=0;i<n;i++){ const lb=cfg.xTick(i); if(lb==null||lb==="")continue;
-    const t=sv("text",{x:x(i),y:H-6,"text-anchor":"middle","font-size":9,fill:C.fog}); t.textContent=lb; svg.appendChild(t); } }
+    const anchor = x(i)<mL+18?"start":x(i)>W-mR-18?"end":"middle";
+    const t=sv("text",{x:x(i),y:H-6,"text-anchor":anchor,"font-size":9,fill:C.fog}); t.textContent=lb; svg.appendChild(t); } }
   cfg.series.forEach((s,si)=>{
     if(s.area){
       const id="grad"+Math.random().toString(36).slice(2,7);
@@ -441,7 +455,8 @@ function barChart(container, cfg){
     const lb=sv("text",{x:mL-6,y:y(t)+3,"text-anchor":"end","font-size":10,fill:C.fog}); lb.textContent=cfg.yFmt?cfg.yFmt(t):t; svg.appendChild(lb);
   });
   if(cfg.xTick){ cfg.items.forEach((it,i)=>{ const lb=cfg.xTick(i); if(lb==null||lb==="")return;
-    const t=sv("text",{x:x(i),y:H-6,"text-anchor":"middle","font-size":9,fill:C.fog}); t.textContent=lb; svg.appendChild(t); }); }
+    const anchor = x(i)<mL+18?"start":x(i)>W-mR-18?"end":"middle";
+    const t=sv("text",{x:x(i),y:H-6,"text-anchor":anchor,"font-size":9,fill:C.fog}); t.textContent=lb; svg.appendChild(t); }); }
   cfg.items.forEach((it,i)=>{ let base=0;
     keys.forEach((k,ki)=>{ const v=it[k.key]||0; if(v<=0)return;
       const h=(H-mT-mB)*v/yMax; const yTop=y(base+v);
@@ -496,7 +511,8 @@ function heroEl(){
   const el=h(`<div class="hero">
     <div class="kicker mono">Ma santé · Apple Watch + bilans</div>
     <div class="hero-big display">${s.vo2_now!=null?s.vo2_now:"—"}<span class="hero-unit">mL/min/kg — VO2 max</span></div>
-    <div style="display:flex;align-items:center;gap:10px;margin-top:4px;flex-wrap:wrap">
+    <div style="margin-top:6px">${ratePill(rateVO2(s.vo2_now))}</div>
+    <div style="display:flex;align-items:center;gap:10px;margin-top:6px;flex-wrap:wrap">
       ${delta!=null?`<span class="mono" style="color:${delta>=0?C.moss:C.flame};font-weight:600;font-size:15px">${delta>=0?"+":""}${delta.toFixed(1)} depuis le début</span>
       ${pct!=null?`<span style="color:${C.fog};font-size:13px">— la taille de ton moteur a ${delta>=0?"grossi":"changé"} de ${Math.abs(pct)}%</span>`:""}`:""}
     </div>
@@ -570,23 +586,23 @@ function renderApercu(wrap){
   const eff=D.weeklyEffort;
   barChart(document.getElementById("c-eff"),{height:180,items:eff,
     keys:[{key:"facile",color:C.moss},{key:"modere",color:C.ember},{key:"intense",color:C.flame},{key:"inconnu",color:C.line}],
-    xTick:i=> i%3===0? eff[i].week.split("-W")[1]:"",
-    tip:i=>{const w=eff[i];return `<b>Sem. ${w.week.split("-W")[1]}</b><br>Facile ${w.facile.toFixed(1)} · Mod. ${w.modere.toFixed(1)} · Int. ${w.intense.toFixed(1)} km`;}});
+    xTick:i=> i%4===0? fmtMY(isoWeekToThursday(eff[i].week)):"",
+    tip:i=>{const w=eff[i];return `<b>Sem. ${w.week.split("-W")[1]} · ${weekYear(w.week)}</b><br>Facile ${w.facile.toFixed(1)} · Mod. ${w.modere.toFixed(1)} · Int. ${w.intense.toFixed(1)} km`;}});
   const vo2=D.vo2max;
   lineChart(document.getElementById("c-vo2"),{height:150,n:vo2.length,
     series:[{values:vo2.map(v=>v.value),color:C.moss,dots:true,dotR:3}],
     yMin:Math.min(...vo2.map(v=>v.value))-1,yMax:Math.max(...vo2.map(v=>v.value))+1,
-    xTick:i=> i%2===0? fmtDate(vo2[i].date):"",
+    xTick:i=> i%2===0? fmtMY(vo2[i].date):"",
     tip:i=>`<b>${fmtDate(vo2[i].date)}</b><br>VO2 max ${vo2[i].value}`});
   const rhr=D.resting_hr_weekly;
   lineChart(document.getElementById("c-rhr"),{height:150,n:rhr.length,
     series:[{values:rhr.map(v=>v.value),color:C.signal,width:2.5}],
-    xTick:i=> i%4===0? rhr[i].week.split("-W")[1]:"",
-    tip:i=>`<b>Sem. ${rhr[i].week.split("-W")[1]}</b><br>FC repos ${rhr[i].value} bpm`});
+    xTick:i=> i%5===0? fmtMY(isoWeekToThursday(rhr[i].week)):"",
+    tip:i=>`<b>Sem. ${rhr[i].week.split("-W")[1]} · ${weekYear(rhr[i].week)}</b><br>FC repos ${rhr[i].value} bpm`});
   const vol=D.weekly_volume;
   barChart(document.getElementById("c-vol"),{height:150,items:vol,keys:[{key:"distance",color:C.ember}],
-    xTick:i=> i%2===0? vol[i].week.split("-W")[1]:"", yFmt:t=>t,
-    tip:i=>`<b>Sem. ${vol[i].week.split("-W")[1]}</b><br>${vol[i].distance} km · ${vol[i].count} sortie(s)`});
+    xTick:i=> i%4===0? fmtMY(isoWeekToThursday(vol[i].week)):"", yFmt:t=>t,
+    tip:i=>`<b>Sem. ${vol[i].week.split("-W")[1]} · ${weekYear(vol[i].week)}</b><br>${vol[i].distance} km · ${vol[i].count} sortie(s)`});
 }
 function projTile(l,v,c){ return `<div><div style="font-size:11px;color:${C.fog};margin-bottom:4px">${l}</div><div class="display mono" style="font-size:26px;font-weight:700;color:${c}">${v!=null?v:"—"}</div></div>`; }
 
@@ -645,9 +661,13 @@ function renderSante(wrap){
     if(pts.length<2){ if(pts.length===1) twoPoint.push({m,pts}); return; }
     const id="lab-"+m.key;
     const card=h(`<div class="card" style="padding:14px">
-      <div style="font-size:12px;color:${C.fog};margin-bottom:2px">${m.label}</div>
-      <div class="mono display" style="font-size:20px;font-weight:700">${pts[pts.length-1].v}<span style="font-size:12px;color:${C.fog}"> ${m.unit}</span></div>
-      ${chartHost(id,66)}</div>`);
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:6px">
+        <div style="font-size:12px;color:${C.fog}">${m.label}</div>
+        ${ratePill(rateLab(pts[pts.length-1].v, m))}
+      </div>
+      <div class="mono display" style="font-size:20px;font-weight:700;margin-top:2px">${pts[pts.length-1].v}<span style="font-size:12px;color:${C.fog}"> ${m.unit}</span></div>
+      ${chartHost(id,66)}
+      <div class="mono" style="font-size:9.5px;color:${C.fog};margin-top:2px">${fmtDate(pts[0].date)} → ${fmtDate(pts[pts.length-1].date)}</div></div>`);
     grid.appendChild(card);
     lineChart(document.getElementById(id),{height:66,mL:8,n:pts.length,
       series:[{values:pts.map(p=>p.v),color:m.color,dots:true,dotR:2.5,width:2}],
@@ -658,8 +678,11 @@ function renderSante(wrap){
     const g2=h(`<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px"></div>`);
     twoPoint.forEach(({m,pts})=>{ const p=pts[pts.length-1];
       g2.appendChild(h(`<div class="card" style="padding:14px">
-        <div style="font-size:11px;color:${C.fog};margin-bottom:4px">${m.label} (${m.unit})</div>
-        <div class="mono" style="font-size:18px;font-weight:700">${p.v}</div>
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:6px">
+          <div style="font-size:11px;color:${C.fog}">${m.label} (${m.unit})</div>
+          ${ratePill(rateLab(p.v,m))}
+        </div>
+        <div class="mono" style="font-size:18px;font-weight:700;margin-top:4px">${p.v}</div>
         <div style="font-size:10px;color:${C.fog};margin-top:2px">${fmtDate(p.date)}</div></div>`)); });
     wrap.appendChild(g2);
   }
@@ -685,8 +708,8 @@ function renderSommeil(wrap){
   lineChart(document.getElementById("c-sleep"),{height:180,n:sl.length,
     series:[{values:sl.map(w=>w.avg_hours),color:C.violet,area:true,dots:true,dotR:2,width:2.5}],
     yMin:Math.min(...sl.map(w=>w.avg_hours))-.5,yMax:Math.max(...sl.map(w=>w.avg_hours))+.5,
-    xTick:i=> i%3===0? sl[i].week.split("-W")[1]:"",
-    tip:i=>`<b>Sem. ${sl[i].week.split("-W")[1]}</b><br>${sl[i].avg_hours} h · ${sl[i].nights} nuit(s)`});
+    xTick:i=> i%5===0? fmtMY(isoWeekToThursday(sl[i].week)):"",
+    tip:i=>`<b>Sem. ${sl[i].week.split("-W")[1]} · ${weekYear(sl[i].week)}</b><br>${sl[i].avg_hours} h · ${sl[i].nights} nuit(s)`});
 }
 function sleepTile(l,v,c,info){ return `<div><div style="font-size:11px;color:${C.fog}">${l}</div><div class="mono" style="font-size:22px;font-weight:700;color:${c}">${fmtHM(v)}</div><div class="info">${info}</div></div>`; }
 
@@ -701,8 +724,8 @@ function renderPoids(wrap){
   lineChart(document.getElementById("c-w"),{height:200,n:w.length,
     series:[{values:w.map(x=>x.avg_kg),color:C.ember,dots:true,dotR:3,width:2.5}],
     yMin:Math.min(...w.map(x=>x.avg_kg))-1,yMax:Math.max(...w.map(x=>x.avg_kg))+1,
-    xTick:i=> i%2===0? w[i].week.split("-W")[1]:"",
-    tip:i=>`<b>Sem. ${w[i].week.split("-W")[1]}</b><br>${w[i].avg_kg} kg`});
+    xTick:i=> i%4===0? fmtMY(isoWeekToThursday(w[i].week)):"",
+    tip:i=>`<b>Sem. ${w[i].week.split("-W")[1]} · ${weekYear(w[i].week)}</b><br>${w[i].avg_kg} kg`});
 }
 
 /* ---------- COURSES ---------- */
@@ -779,14 +802,16 @@ function renderProgres(wrap){
 
   // ---- Sport / forme ----
   const vo2=D.vo2max;
-  if(vo2.length>=2) sport.push(progRow("VO2 max", vo2[0].value, vo2[vo2.length-1].value, "mL/min/kg", "high", fmtDate(vo2[0].date), fmtDate(vo2[vo2.length-1].date)));
+  if(vo2.length>=2){ const r=progRow("VO2 max", vo2[0].value, vo2[vo2.length-1].value, "mL/min/kg", "high", fmtDate(vo2[0].date), fmtDate(vo2[vo2.length-1].date));
+    if(r){ r.rating=rateVO2(vo2[vo2.length-1].value); sport.push(r); } }
   const rhr=D.resting_hr_weekly;
-  if(rhr.length>=2) sport.push(progRow("FC de repos", rhr[0].value, rhr[rhr.length-1].value, "bpm", "low", fmtWeekDate(rhr[0].week), fmtWeekDate(rhr[rhr.length-1].week)));
+  if(rhr.length>=2){ const r=progRow("FC de repos", rhr[0].value, rhr[rhr.length-1].value, "bpm", "low", fmtWeekDate(rhr[0].week), fmtWeekDate(rhr[rhr.length-1].week));
+    if(r){ r.rating=rateRHR(rhr[rhr.length-1].value); sport.push(r); } }
   // Volume hebdo moyen : 4 premières vs 4 dernières semaines
   const vol=D.weekly_volume;
   if(vol.length>=4){
     const avg=arr=>arr.reduce((a,w)=>a+w.distance,0)/arr.length;
-    sport.push(progRow("Volume hebdo moyen", +avg(vol.slice(0,4)).toFixed(1), +avg(vol.slice(-4)).toFixed(1), "km/sem", "high", "S"+vol[0].week.split("-W")[1], "S"+vol[vol.length-1].week.split("-W")[1]));
+    sport.push(progRow("Volume hebdo moyen", +avg(vol.slice(0,4)).toFixed(1), +avg(vol.slice(-4)).toFixed(1), "km/sem", "high", fmtWeekDate(vol[0].week), fmtWeekDate(vol[vol.length-1].week)));
   }
 
   // ---- Poids ----
@@ -799,7 +824,8 @@ function renderProgres(wrap){
     const pts=labSeriesVals(m.key);
     if(pts.length<2) return;
     const betterDir = m.dir==="high" ? "low" : m.dir==="low" ? "high" : "neutral";
-    sang.push(progRow(m.label, pts[0].v, pts[pts.length-1].v, m.unit, betterDir, fmtDate(pts[0].date), fmtDate(pts[pts.length-1].date)));
+    const r=progRow(m.label, pts[0].v, pts[pts.length-1].v, m.unit, betterDir, fmtDate(pts[0].date), fmtDate(pts[pts.length-1].date));
+    if(r){ r.rating=rateLab(pts[pts.length-1].v, m); sang.push(r); }
   });
 
   const allRows=[...sport,...poids,...sang].filter(Boolean);
@@ -851,7 +877,7 @@ function progressGroup(wrap, title, rows, isLab){
       </div>
       <div style="text-align:right;flex:0 0 auto">
         <div class="mono" style="font-size:14px"><span style="color:${C.fog}">${r.first}</span> <span style="color:${C.fog};opacity:.6">→</span> <span style="font-weight:700">${r.last}</span> <span style="font-size:11px;color:${C.fog}">${esc(r.unit||"")}</span></div>
-        <div class="mono pill" style="font-size:11px;margin-top:3px;background:${col}26;color:${col}">${r.deltaTxt}</div>
+        <div style="display:flex;gap:5px;justify-content:flex-end;margin-top:3px;flex-wrap:wrap">${ratePill(r.rating)}<span class="mono pill" style="font-size:11px;background:${col}26;color:${col}">${r.deltaTxt}</span></div>
       </div>
     </div>`));
   });

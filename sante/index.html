@@ -184,13 +184,22 @@ function seedStore(){
     manual: { weight:[], lab_entries: SEED.lab_entries.slice(), fidage: SEED.fidage,
       smoke_quit:"2026-07-18T16:50:00", cigs_per_day:10, price_per_cig:0.896 },
     seed: true,
+    seedVersion: SEED_VERSION,
   };
 }
 
-/* ---------- Persistance ---------- */
+/* ---------- Persistance ----------
+   SEED_VERSION : à incrémenter à chaque mise à jour des données d'exemple.
+   Tant que l'utilisateur n'a rien saisi lui-même (seed !== false), on
+   rafraîchit automatiquement l'exemple vers la dernière version publiée. */
+const SEED_VERSION = 5;
 let STORE = load();
 function load(){
-  try{ const raw = localStorage.getItem(STORE_KEY); if(raw) return JSON.parse(raw); }catch(e){}
+  try{ const raw = localStorage.getItem(STORE_KEY); if(raw){
+    const s = JSON.parse(raw);
+    if(s && s.seed !== false && s.seedVersion !== SEED_VERSION){ const fresh = seedStore(); persist(fresh); return fresh; }
+    return s;
+  } }catch(e){}
   const s = seedStore(); persist(s); return s;
 }
 function persist(s){ try{ localStorage.setItem(STORE_KEY, JSON.stringify(s)); }catch(e){ toast("Stockage plein — impossible de sauvegarder"); } }

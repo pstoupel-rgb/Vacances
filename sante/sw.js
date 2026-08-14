@@ -1,5 +1,5 @@
 /* Service worker — Ma Santé */
-const CACHE = 'sante-v1';
+const CACHE = 'sante-v2';
 const ASSETS = ['./', './index.html', './manifest.webmanifest', './icon.svg'];
 
 self.addEventListener('install', (e) => {

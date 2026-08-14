@@ -1,0 +1,1247 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="robots" content="noindex, nofollow, noarchive, nosnippet">
+<meta name="googlebot" content="noindex, nofollow">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="format-detection" content="telephone=no">
+<title>Ma Santé 🫀</title>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Santé">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#12201C">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@500;700;800&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+  :root{
+    --ink:#12201C; --panel:#1B2B24; --panel2:#213329; --line:#2E4038;
+    --bone:#F0ECE0; --fog:#8FA398; --moss:#7FA66B; --ember:#E2823D;
+    --flame:#C1483A; --signal:#5FA8D3; --violet:#9B84C9;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+  html,body{background:var(--ink);color:var(--bone);}
+  body{font-family:'IBM Plex Sans',-apple-system,BlinkMacSystemFont,sans-serif;min-height:100vh;
+    padding-bottom:env(safe-area-inset-bottom);-webkit-text-size-adjust:100%;}
+  .display{font-family:'Big Shoulders Display','IBM Plex Sans',sans-serif;}
+  .mono{font-family:'IBM Plex Mono',ui-monospace,monospace;}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:6px;}
+  button{font-family:inherit;cursor:pointer;}
+  input,select{font-family:inherit;}
+  a{color:var(--signal);}
+  ::-webkit-scrollbar{height:6px;width:6px;}
+  ::-webkit-scrollbar-thumb{background:var(--line);border-radius:3px;}
+
+  /* HERO */
+  .hero{padding:calc(24px + env(safe-area-inset-top)) 20px 18px;border-bottom:1px solid var(--line);}
+  .kicker{font-size:11px;letter-spacing:.12em;color:var(--fog);text-transform:uppercase;margin-bottom:6px;}
+  .hero-big{font-size:clamp(46px,13vw,84px);font-weight:800;line-height:.9;color:var(--bone);
+    display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;}
+  .hero-unit{font-size:clamp(15px,4vw,22px);font-family:'IBM Plex Sans',sans-serif;font-weight:500;color:var(--fog);}
+  .hero-stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(96px,1fr));gap:14px;margin-top:22px;}
+  .stat-v{font-size:24px;font-weight:700;color:var(--bone);}
+  .stat-l{font-size:11px;color:var(--fog);margin-top:2px;}
+
+  /* TABS */
+  .tabs{display:flex;gap:2px;padding:12px 12px 0;border-bottom:1px solid var(--line);
+    overflow-x:auto;position:sticky;top:0;background:var(--ink);z-index:5;}
+  .tab{background:none;border:none;padding:9px 13px 12px;font-size:13px;font-weight:600;
+    white-space:nowrap;color:var(--fog);border-bottom:2px solid transparent;margin-bottom:-1px;transition:color .15s;}
+  .tab.active{color:var(--ember);border-bottom-color:var(--ember);}
+
+  .wrap{padding:18px 16px 40px;max-width:920px;margin:0 auto;}
+  .sect-t{font-size:14px;font-weight:600;color:var(--bone);}
+  .sect-s{font-size:12px;color:var(--fog);margin-top:2px;}
+  .info{font-size:12.5px;color:var(--fog);line-height:1.5;margin-top:6px;}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+  @media(max-width:620px){.grid2{grid-template-columns:1fr;}}
+  .chart{position:relative;width:100%;}
+  .chart-tip{position:absolute;pointer-events:none;background:var(--panel2);border:1px solid var(--line);
+    border-radius:5px;padding:7px 9px;font-size:11.5px;color:var(--bone);opacity:0;transition:opacity .1s;
+    z-index:3;white-space:nowrap;box-shadow:0 4px 14px rgba(0,0,0,.35);transform:translate(-50%,-115%);}
+  .legend{display:flex;gap:16px;margin-top:8px;font-size:11px;color:var(--fog);flex-wrap:wrap;}
+  .dot{display:inline-block;width:8px;height:8px;border-radius:2px;margin-right:5px;vertical-align:middle;}
+  table{width:100%;border-collapse:collapse;font-size:13px;}
+  th{text-align:left;padding:10px 14px;font-size:10px;color:var(--fog);text-transform:uppercase;
+    letter-spacing:.06em;font-weight:500;border-bottom:1px solid var(--line);}
+  td{padding:10px 14px;border-bottom:1px solid var(--line);}
+  tr:last-child td{border-bottom:none;}
+  .pill{font-size:11px;padding:2px 8px;border-radius:10px;display:inline-block;}
+  .btn{background:var(--panel2);border:1px solid var(--line);color:var(--bone);border-radius:6px;
+    padding:10px 14px;font-size:13px;font-weight:600;}
+  .btn:active{transform:scale(.98);}
+  .btn-primary{background:var(--ember);border-color:var(--ember);color:#20140a;}
+  .btn-ghost{background:none;}
+  .field{display:flex;flex-direction:column;gap:4px;}
+  .field label{font-size:11px;color:var(--fog);}
+  .field input,.field select{background:var(--ink);border:1px solid var(--line);color:var(--bone);
+    border-radius:6px;padding:9px 10px;font-size:14px;}
+  .field input:focus,.field select:focus{outline:none;border-color:var(--ember);}
+  .toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%) translateY(20px);
+    background:var(--panel2);border:1px solid var(--line);color:var(--bone);padding:11px 18px;border-radius:8px;
+    font-size:13px;opacity:0;transition:all .25s;z-index:50;box-shadow:0 8px 30px rgba(0,0,0,.5);max-width:90vw;text-align:center;}
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+  .prog{height:8px;background:var(--ink);border-radius:99px;overflow:hidden;border:1px solid var(--line);}
+  .prog>i{display:block;height:100%;background:var(--ember);width:0;transition:width .2s;}
+  .muted{color:var(--fog);}
+  .footer{padding:16px;font-size:11px;color:var(--fog);border-top:1px solid var(--line);text-align:center;}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<div class="toast" id="toast"></div>
+
+<script>
+/* ============================================================
+   Ma Santé — application locale (100% privée, hors-ligne)
+   - Importe un export Apple Santé (export.zip / export.xml)
+   - Saisie manuelle des bilans sanguins & du poids
+   - Toutes les données restent sur l'appareil (localStorage)
+   ============================================================ */
+
+const C = { ink:"#12201C", panel:"#1B2B24", panel2:"#213329", line:"#2E4038",
+  bone:"#F0ECE0", fog:"#8FA398", moss:"#7FA66B", ember:"#E2823D",
+  flame:"#C1483A", signal:"#5FA8D3", violet:"#9B84C9" };
+
+const STORE_KEY = "sante_store_v1";
+
+/* ---------- Référentiels bilan sanguin ---------- */
+const MARKERS = [
+  { key:"crp", label:"CRP (inflammation)", unit:"mg/L", range:[0,3.0], color:C.flame, dir:"high" },
+  { key:"cholesterol_total", label:"Cholestérol total", unit:"mg/dL", range:[0,190], color:C.signal, dir:"high" },
+  { key:"hdl", label:"HDL (bon cholestérol)", unit:"mg/dL", range:[40,999], color:C.moss, dir:"low" },
+  { key:"ldl", label:"LDL (mauvais cholestérol)", unit:"mg/dL", range:[0,115], color:C.flame, dir:"high" },
+  { key:"triglycerides", label:"Triglycérides", unit:"mg/dL", range:[0,150], color:C.signal, dir:"high" },
+  { key:"got_ast", label:"GOT / AST (foie)", unit:"U/L", range:[0,49], color:C.violet, dir:"high" },
+  { key:"gpt_alt", label:"GPT / ALT (foie)", unit:"U/L", range:[0,49], color:C.violet, dir:"high" },
+  { key:"gamma_gt", label:"Gamma-GT (foie)", unit:"U/L", range:[0,61], color:C.violet, dir:"high" },
+  { key:"psa", label:"PSA", unit:"µg/L", range:[0,4.0], color:C.ember, dir:"high" },
+  { key:"creatinine", label:"Créatinine (reins)", unit:"mg/dL", range:[0.7,1.2], color:C.signal, dir:"both" },
+  { key:"ferritine", label:"Ferritine", unit:"µg/L", range:[30,400], color:C.ember, dir:"both" },
+  { key:"fer", label:"Fer", unit:"µg/dL", range:[65,175], color:C.ember, dir:"both" },
+  { key:"vitamine_d", label:"Vitamine D", unit:"ng/mL", range:[30,100], color:C.moss, dir:"low" },
+  { key:"tsh", label:"TSH", unit:"mU/L", range:[0.27,4.2], color:C.violet, dir:"both" },
+  { key:"glycemie", label:"Glycémie", unit:"mg/dL", range:[70,99], color:C.signal, dir:"both" },
+];
+const MARKER_BY_KEY = Object.fromEntries(MARKERS.map(m=>[m.key,m]));
+
+const ACTIVITY_LABELS = {
+  Cycling:"Vélo", UnderwaterDiving:"Plongée", Hockey:"Hockey", Golf:"Golf",
+  Elliptical:"Elliptique", Walking:"Marche", Swimming:"Natation", Hiking:"Randonnée",
+  FunctionalStrengthTraining:"Muscu", TraditionalStrengthTraining:"Muscu",
+  HighIntensityIntervalTraining:"HIIT", Yoga:"Yoga", CoreTraining:"Gainage",
+  Tennis:"Tennis", Soccer:"Foot", Basketball:"Basket", Rowing:"Rameur",
+  Cooldown:"Récup", MixedCardio:"Cardio", Pilates:"Pilates",
+};
+
+/* ============================================================
+   Données d'exemple (ton export du 14 août 2026) — remplacées
+   dès que tu importes tes propres données ou saisis un bilan.
+   ============================================================ */
+const SEED = {"summary": {"vo2_start": 43.27, "vo2_now": 52.23}, "vo2max": [{"date": "2026-01-02", "value": 43.27}, {"date": "2026-02-15", "value": 43.03}, {"date": "2026-04-03", "value": 42.3}, {"date": "2026-04-25", "value": 42.9}, {"date": "2026-04-25", "value": 44.62}, {"date": "2026-05-02", "value": 45.7}, {"date": "2026-06-14", "value": 48.22}, {"date": "2026-07-20", "value": 48.22}, {"date": "2026-07-24", "value": 49.16}, {"date": "2026-07-30", "value": 50.25}, {"date": "2026-08-06", "value": 51.35}, {"date": "2026-08-08", "value": 51.27}, {"date": "2026-08-10", "value": 51.41}, {"date": "2026-08-14", "value": 52.23}], "resting_hr_weekly": [{"week": "2025-W51", "value": 63.6}, {"week": "2025-W52", "value": 68.6}, {"week": "2026-W01", "value": 63.7}, {"week": "2026-W02", "value": 61.7}, {"week": "2026-W03", "value": 61.3}, {"week": "2026-W04", "value": 56.4}, {"week": "2026-W05", "value": 58.7}, {"week": "2026-W06", "value": 62.5}, {"week": "2026-W07", "value": 65.4}, {"week": "2026-W08", "value": 73.4}, {"week": "2026-W09", "value": 59.6}, {"week": "2026-W10", "value": 58.7}, {"week": "2026-W11", "value": 59.3}, {"week": "2026-W12", "value": 60.3}, {"week": "2026-W13", "value": 64.6}, {"week": "2026-W14", "value": 57.3}, {"week": "2026-W15", "value": 60.4}, {"week": "2026-W16", "value": 59.1}, {"week": "2026-W17", "value": 63.6}, {"week": "2026-W18", "value": 62.3}, {"week": "2026-W19", "value": 57.2}, {"week": "2026-W20", "value": 62.2}, {"week": "2026-W21", "value": 63.4}, {"week": "2026-W22", "value": 65.4}, {"week": "2026-W23", "value": 57.6}, {"week": "2026-W24", "value": 59.7}, {"week": "2026-W25", "value": 59.3}, {"week": "2026-W26", "value": 65.2}, {"week": "2026-W27", "value": 55.5}, {"week": "2026-W30", "value": 61.5}, {"week": "2026-W31", "value": 57.3}, {"week": "2026-W32", "value": 60.8}, {"week": "2026-W33", "value": 57.6}], "weekly_weight": [{"week": "2025-W49", "avg_kg": 81.47}, {"week": "2025-W50", "avg_kg": 81.67}, {"week": "2025-W51", "avg_kg": 82.0}, {"week": "2026-W05", "avg_kg": 82.81}, {"week": "2026-W06", "avg_kg": 81.71}, {"week": "2026-W07", "avg_kg": 81.17}, {"week": "2026-W09", "avg_kg": 81.86}, {"week": "2026-W10", "avg_kg": 82.68}, {"week": "2026-W11", "avg_kg": 81.19}, {"week": "2026-W12", "avg_kg": 81.43}, {"week": "2026-W13", "avg_kg": 80.59}, {"week": "2026-W14", "avg_kg": 81.84}, {"week": "2026-W15", "avg_kg": 80.46}, {"week": "2026-W16", "avg_kg": 80.01}, {"week": "2026-W17", "avg_kg": 79.77}, {"week": "2026-W18", "avg_kg": 80.05}, {"week": "2026-W19", "avg_kg": 80.04}, {"week": "2026-W20", "avg_kg": 79.98}, {"week": "2026-W21", "avg_kg": 79.39}, {"week": "2026-W22", "avg_kg": 79.47}, {"week": "2026-W23", "avg_kg": 79.12}, {"week": "2026-W24", "avg_kg": 79.15}, {"week": "2026-W25", "avg_kg": 78.97}], "weekly_sleep": [{"week": "2025-W51", "avg_hours": 8.07}, {"week": "2025-W52", "avg_hours": 8.61}, {"week": "2026-W01", "avg_hours": 9.13}, {"week": "2026-W02", "avg_hours": 8.21}, {"week": "2026-W03", "avg_hours": 8.04}, {"week": "2026-W04", "avg_hours": 8.21}, {"week": "2026-W05", "avg_hours": 8.15}, {"week": "2026-W06", "avg_hours": 7.63}, {"week": "2026-W07", "avg_hours": 7.41}, {"week": "2026-W08", "avg_hours": 8.35}, {"week": "2026-W09", "avg_hours": 8.79}, {"week": "2026-W10", "avg_hours": 7.18}, {"week": "2026-W11", "avg_hours": 8.37}, {"week": "2026-W12", "avg_hours": 8.56}, {"week": "2026-W13", "avg_hours": 7.95}, {"week": "2026-W14", "avg_hours": 8.15}, {"week": "2026-W15", "avg_hours": 7.57}, {"week": "2026-W16", "avg_hours": 7.63}, {"week": "2026-W17", "avg_hours": 7.68}, {"week": "2026-W18", "avg_hours": 8.55}, {"week": "2026-W19", "avg_hours": 8.05}, {"week": "2026-W20", "avg_hours": 8.33}, {"week": "2026-W21", "avg_hours": 8.38}, {"week": "2026-W22", "avg_hours": 7.9}, {"week": "2026-W23", "avg_hours": 7.73}, {"week": "2026-W24", "avg_hours": 8.03}, {"week": "2026-W25", "avg_hours": 7.64}, {"week": "2026-W26", "avg_hours": 8.1}, {"week": "2026-W27", "avg_hours": 8.2}, {"week": "2026-W30", "avg_hours": 8.05}, {"week": "2026-W31", "avg_hours": 7.68}, {"week": "2026-W32", "avg_hours": 7.44}, {"week": "2026-W33", "avg_hours": 8.3}], "sleep_composition": {"deep_min": 45.6, "rem_min": 104.3, "core_min": 316.3, "total_min": 466.2}, "runs": [{"date": "2025-12-20", "datetime": "2025-12-20T11:14:41", "duration_min": 30.4, "distance_km": 5.32, "pace_min_km": 5.7, "energy_kcal": 397.0, "avg_hr": 162.0, "effort": "intense"}, {"date": "2026-01-05", "datetime": "2026-01-05T20:04:40", "duration_min": 27.8, "distance_km": 4.38, "pace_min_km": 6.34, "energy_kcal": 330.0, "avg_hr": 142.0, "effort": "facile"}, {"date": "2026-01-10", "datetime": "2026-01-10T10:57:51", "duration_min": 35.0, "distance_km": 5.53, "pace_min_km": 6.32, "energy_kcal": 411.0, "avg_hr": 154.0, "effort": "modere"}, {"date": "2026-01-12", "datetime": "2026-01-12T20:00:44", "duration_min": 34.1, "distance_km": 5.46, "pace_min_km": 6.25, "energy_kcal": 414.0, "avg_hr": 155.0, "effort": "modere"}, {"date": "2026-01-17", "datetime": "2026-01-17T10:59:14", "duration_min": 34.9, "distance_km": 5.42, "pace_min_km": 6.44, "energy_kcal": 405.0, "avg_hr": 157.0, "effort": "modere"}, {"date": "2026-01-24", "datetime": "2026-01-24T11:27:37", "duration_min": 36.2, "distance_km": 5.71, "pace_min_km": 6.34, "energy_kcal": 436.0, "avg_hr": 156.0, "effort": "modere"}, {"date": "2026-01-26", "datetime": "2026-01-26T20:00:15", "duration_min": 29.7, "distance_km": 5.4, "pace_min_km": 5.5, "energy_kcal": 391.0, "avg_hr": 151.0, "effort": "facile"}, {"date": "2026-01-31", "datetime": "2026-01-31T10:25:54", "duration_min": 29.8, "distance_km": 5.38, "pace_min_km": 5.55, "energy_kcal": 389.0, "avg_hr": 155.0, "effort": "modere"}, {"date": "2026-02-02", "datetime": "2026-02-02T20:01:11", "duration_min": 32.8, "distance_km": 5.38, "pace_min_km": 6.1, "energy_kcal": 401.0, "avg_hr": 152.0, "effort": "facile"}, {"date": "2026-02-07", "datetime": "2026-02-07T11:21:49", "duration_min": 29.9, "distance_km": 5.2, "pace_min_km": 5.75, "energy_kcal": 380.0, "avg_hr": 163.0, "effort": "intense"}, {"date": "2026-02-09", "datetime": "2026-02-09T19:58:21", "duration_min": 30.6, "distance_km": 5.47, "pace_min_km": 5.6, "energy_kcal": 401.0, "avg_hr": 158.0, "effort": "modere"}, {"date": "2026-02-17", "datetime": "2026-02-17T18:29:18", "duration_min": 14.5, "distance_km": 1.33, "pace_min_km": 10.91, "energy_kcal": 110.0, "avg_hr": 154.0, "effort": "modere"}, {"date": "2026-02-27", "datetime": "2026-02-27T09:16:38", "duration_min": 29.9, "distance_km": 5.36, "pace_min_km": 5.57, "energy_kcal": 388.0, "avg_hr": 157.0, "effort": "modere"}, {"date": "2026-03-07", "datetime": "2026-03-07T12:15:28", "duration_min": 28.6, "distance_km": 4.29, "pace_min_km": 6.67, "energy_kcal": 342.0, "avg_hr": 134.0, "effort": "facile"}, {"date": "2026-03-09", "datetime": "2026-03-09T17:58:48", "duration_min": 30.9, "distance_km": 4.96, "pace_min_km": 6.23, "energy_kcal": 365.0, "avg_hr": 141.0, "effort": "facile"}, {"date": "2026-03-12", "datetime": "2026-03-12T09:25:48", "duration_min": 39.8, "distance_km": 5.53, "pace_min_km": 7.2, "energy_kcal": 436.0, "avg_hr": 150.0, "effort": "facile"}, {"date": "2026-03-23", "datetime": "2026-03-23T17:51:10", "duration_min": 31.7, "distance_km": 6.41, "pace_min_km": 4.95, "energy_kcal": 403.0, "avg_hr": 153.0, "effort": "modere"}, {"date": "2026-03-27", "datetime": "2026-03-27T18:04:03", "duration_min": 34.1, "distance_km": 6.31, "pace_min_km": 5.4, "energy_kcal": 413.0, "avg_hr": 158.0, "effort": "modere"}, {"date": "2026-03-28", "datetime": "2026-03-28T11:35:24", "duration_min": 31.9, "distance_km": 6.41, "pace_min_km": 4.98, "energy_kcal": 402.0, "avg_hr": 149.0, "effort": "facile"}, {"date": "2026-04-02", "datetime": "2026-04-02T08:07:06", "duration_min": 44.0, "distance_km": 5.75, "pace_min_km": 7.65, "energy_kcal": 457.0, "avg_hr": 150.0, "effort": "facile"}, {"date": "2026-04-10", "datetime": "2026-04-10T16:51:19", "duration_min": 29.7, "distance_km": 5.22, "pace_min_km": 5.68, "energy_kcal": 389.0, "avg_hr": 164.0, "effort": "intense"}, {"date": "2026-04-13", "datetime": "2026-04-13T16:52:43", "duration_min": 31.1, "distance_km": 5.44, "pace_min_km": 5.72, "energy_kcal": 397.0, "avg_hr": 146.0, "effort": "facile"}, {"date": "2026-04-17", "datetime": "2026-04-17T16:52:56", "duration_min": 30.4, "distance_km": 5.36, "pace_min_km": 5.68, "energy_kcal": 399.0, "avg_hr": 160.0, "effort": "intense"}, {"date": "2026-04-23", "datetime": "2026-04-23T08:17:30", "duration_min": 29.1, "distance_km": 5.11, "pace_min_km": 5.69, "energy_kcal": 374.0, "avg_hr": 159.0, "effort": "modere"}, {"date": "2026-04-25", "datetime": "2026-04-25T12:58:52", "duration_min": 30.4, "distance_km": 5.5, "pace_min_km": 5.53, "energy_kcal": 414.0, "avg_hr": 159.0, "effort": "modere"}, {"date": "2026-04-30", "datetime": "2026-04-30T16:16:04", "duration_min": 10.2, "distance_km": 1.83, "pace_min_km": 5.58, "energy_kcal": 130.0, "avg_hr": 142.0, "effort": "facile"}, {"date": "2026-05-02", "datetime": "2026-05-02T09:41:49", "duration_min": 38.2, "distance_km": 7.22, "pace_min_km": 5.29, "energy_kcal": 510.0, "avg_hr": 152.0, "effort": "facile"}, {"date": "2026-05-11", "datetime": "2026-05-11T16:44:32", "duration_min": 26.5, "distance_km": 3.75, "pace_min_km": 7.06, "energy_kcal": 274.0, "avg_hr": 137.0, "effort": "facile"}, {"date": "2026-05-21", "datetime": "2026-05-21T08:08:35", "duration_min": 19.9, "distance_km": 3.57, "pace_min_km": 5.56, "energy_kcal": 251.0, "avg_hr": 150.0, "effort": "facile"}, {"date": "2026-05-28", "datetime": "2026-05-28T08:13:37", "duration_min": 20.3, "distance_km": 3.54, "pace_min_km": 5.75, "energy_kcal": 249.0, "avg_hr": 142.0, "effort": "facile"}, {"date": "2026-05-30", "datetime": "2026-05-30T10:51:58", "duration_min": 8.9, "distance_km": 1.48, "pace_min_km": 6.02, "energy_kcal": 107.0, "avg_hr": 133.0, "effort": "facile"}, {"date": "2026-06-01", "datetime": "2026-06-01T16:58:43", "duration_min": 15.2, "distance_km": 2.72, "pace_min_km": 5.6, "energy_kcal": 192.0, "avg_hr": 142.0, "effort": "facile"}, {"date": "2026-06-04", "datetime": "2026-06-04T08:04:22", "duration_min": 20.9, "distance_km": 3.41, "pace_min_km": 6.14, "energy_kcal": 241.0, "avg_hr": 140.0, "effort": "facile"}, {"date": "2026-06-11", "datetime": "2026-06-11T08:34:43", "duration_min": 30.1, "distance_km": 5.41, "pace_min_km": 5.57, "energy_kcal": 379.0, "avg_hr": 155.0, "effort": "modere"}, {"date": "2026-06-13", "datetime": "2026-06-13T10:37:21", "duration_min": 30.3, "distance_km": 5.28, "pace_min_km": 5.75, "energy_kcal": 373.0, "avg_hr": 154.0, "effort": "modere"}, {"date": "2026-06-14", "datetime": "2026-06-14T10:01:40", "duration_min": 41.8, "distance_km": 7.68, "pace_min_km": 5.44, "energy_kcal": 569.0, "avg_hr": 151.0, "effort": "facile"}, {"date": "2026-06-18", "datetime": "2026-06-18T08:06:23", "duration_min": 20.2, "distance_km": 3.69, "pace_min_km": 5.47, "energy_kcal": 261.0, "avg_hr": 146.0, "effort": "facile"}, {"date": "2026-06-19", "datetime": "2026-06-19T16:28:50", "duration_min": 20.7, "distance_km": 3.65, "pace_min_km": 5.67, "energy_kcal": 264.0, "avg_hr": 147.0, "effort": "facile"}, {"date": "2026-07-02", "datetime": "2026-07-02T08:04:22", "duration_min": 20.2, "distance_km": 3.66, "pace_min_km": 5.53, "energy_kcal": 260.0, "avg_hr": 144.0, "effort": "facile"}, {"date": "2026-07-20", "datetime": "2026-07-20T12:15:29", "duration_min": 44.6, "distance_km": 8.32, "pace_min_km": 5.36, "energy_kcal": null, "avg_hr": null, "effort": null}, {"date": "2026-07-23", "datetime": "2026-07-23T08:02:22", "duration_min": 20.1, "distance_km": 3.58, "pace_min_km": 5.61, "energy_kcal": 251.0, "avg_hr": 138.0, "effort": "facile"}, {"date": "2026-07-24", "datetime": "2026-07-24T16:33:25", "duration_min": 45.4, "distance_km": 8.66, "pace_min_km": 5.24, "energy_kcal": null, "avg_hr": null, "effort": null}, {"date": "2026-07-30", "datetime": "2026-07-30T07:52:22", "duration_min": 7.6, "distance_km": 1.38, "pace_min_km": 5.49, "energy_kcal": 99.0, "avg_hr": 133.0, "effort": "facile"}, {"date": "2026-07-31", "datetime": "2026-07-31T09:15:25", "duration_min": 29.6, "distance_km": 5.03, "pace_min_km": 5.88, "energy_kcal": null, "avg_hr": null, "effort": null}, {"date": "2026-08-06", "datetime": "2026-08-06T08:01:46", "duration_min": 13.5, "distance_km": 2.05, "pace_min_km": 6.57, "energy_kcal": 141.0, "avg_hr": 116.0, "effort": "facile"}, {"date": "2026-08-08", "datetime": "2026-08-08T10:30:28", "duration_min": 48.2, "distance_km": 6.43, "pace_min_km": 7.5, "energy_kcal": 441.0, "avg_hr": 121.0, "effort": "facile"}, {"date": "2026-08-10", "datetime": "2026-08-10T08:19:38", "duration_min": 57.0, "distance_km": 10.33, "pace_min_km": 5.52, "energy_kcal": null, "avg_hr": null, "effort": null}, {"date": "2026-08-14", "datetime": "2026-08-14T07:42:36", "duration_min": 51.1, "distance_km": 8.01, "pace_min_km": 6.38, "energy_kcal": null, "avg_hr": null, "effort": null}], "other_activities": [{"type": "Cycling", "label": "Vélo", "count": 7, "duration": 348}, {"type": "UnderwaterDiving", "label": "Plongée", "count": 9, "duration": 172}, {"type": "Hockey", "label": "Hockey", "count": 3, "duration": 186}, {"type": "Golf", "label": "Golf", "count": 1, "duration": 152}, {"type": "Elliptical", "label": "Elliptique", "count": 2, "duration": 46}, {"type": "Walking", "label": "Marche", "count": 2, "duration": 48}], "lab_entries": [
+  {"date":"2023-12-12","values":{"crp":48}},
+  {"date":"2024-03-28","values":{"cholesterol_total":169,"hdl":55,"ldl":100,"triglycerides":70,"got_ast":31,"gpt_alt":53,"gamma_gt":30,"psa":1.56,"creatinine":0.88}},
+  {"date":"2025-05-15","values":{"crp":1.6,"cholesterol_total":170,"hdl":58,"ldl":94,"triglycerides":88,"got_ast":38,"gpt_alt":49,"gamma_gt":26,"psa":1.6,"creatinine":0.95,"ferritine":124,"fer":56,"vitamine_d":35.7,"tsh":1.74,"glycemie":81}},
+  {"date":"2026-04-17","values":{"crp":3.3,"cholesterol_total":167,"hdl":67,"ldl":85,"triglycerides":64,"got_ast":30,"gpt_alt":35,"gamma_gt":15,"psa":1.72,"creatinine":0.94,"ferritine":263,"fer":95,"vitamine_d":24.5,"tsh":1.31,"glycemie":84}}
+], "fidage": {"date":"2026-04-17","biological_age":56,"chronological_age":48,"body_fat_pct":19.3,"risks":[
+  {"label":"Inflammation","level":"accrue","detail":"CRP ultrasensible 3.3 mg/L (seuil ≤ 3.0)"},
+  {"label":"Résistance à l'insuline","level":"faible","detail":"HOMA2-IR 0.4, très bon"},
+  {"label":"Risque cardiovasculaire","level":"accrue","detail":"Score ESC2021 : 3% à 10 ans"},
+  {"label":"Bilan nutritionnel","level":"faible","detail":"Équilibre global correct"},
+  {"label":"Stress oxydatif","level":"accrue","detail":"Lié au tabac déclaré, à l'inflammation et à la charge hépatique"}
+]}};
+
+const SEED_RAW = {"vo2max":[{"date":"2026-01-02","value":43.27},{"date":"2026-02-15","value":43.03},{"date":"2026-04-03","value":42.3},{"date":"2026-04-25","value":44.62},{"date":"2026-05-02","value":45.7},{"date":"2026-06-14","value":48.22},{"date":"2026-07-20","value":48.22},{"date":"2026-07-24","value":49.16},{"date":"2026-07-30","value":50.25},{"date":"2026-08-06","value":51.35},{"date":"2026-08-08","value":51.27},{"date":"2026-08-10","value":51.41},{"date":"2026-08-14","value":52.23}],"rhr_daily":[{"date":"2025-12-17","value":64},{"date":"2025-12-18","value":60},{"date":"2025-12-19","value":60},{"date":"2025-12-20","value":71},{"date":"2025-12-21","value":63},{"date":"2025-12-22","value":63},{"date":"2025-12-23","value":59},{"date":"2025-12-25","value":71},{"date":"2025-12-26","value":73},{"date":"2025-12-27","value":71},{"date":"2025-12-28","value":84},{"date":"2025-12-29","value":66},{"date":"2025-12-30","value":71},{"date":"2025-12-31","value":63},{"date":"2026-01-02","value":71},{"date":"2026-01-03","value":53},{"date":"2026-01-04","value":59},{"date":"2026-01-05","value":58},{"date":"2026-01-06","value":58},{"date":"2026-01-07","value":59},{"date":"2026-01-08","value":60},{"date":"2026-01-09","value":63},{"date":"2026-01-10","value":67},{"date":"2026-01-11","value":67},{"date":"2026-01-12","value":63},{"date":"2026-01-13","value":63},{"date":"2026-01-14","value":63},{"date":"2026-01-15","value":58},{"date":"2026-01-16","value":59},{"date":"2026-01-17","value":59},{"date":"2026-01-18","value":64},{"date":"2026-01-19","value":55},{"date":"2026-01-20","value":55},{"date":"2026-01-21","value":54},{"date":"2026-01-22","value":58},{"date":"2026-01-23","value":58},{"date":"2026-01-24","value":59},{"date":"2026-01-25","value":56},{"date":"2026-01-26","value":62},{"date":"2026-01-27","value":59},{"date":"2026-01-28","value":59},{"date":"2026-01-29","value":57},{"date":"2026-01-30","value":53},{"date":"2026-01-31","value":55},{"date":"2026-02-01","value":66},{"date":"2026-02-02","value":65},{"date":"2026-02-03","value":60},{"date":"2026-02-04","value":55},{"date":"2026-02-05","value":57},{"date":"2026-02-07","value":76},{"date":"2026-02-08","value":62},{"date":"2026-02-09","value":63},{"date":"2026-02-10","value":63},{"date":"2026-02-11","value":60},{"date":"2026-02-12","value":64},{"date":"2026-02-13","value":66},{"date":"2026-02-14","value":71},{"date":"2026-02-15","value":71},{"date":"2026-02-16","value":78},{"date":"2026-02-17","value":78},{"date":"2026-02-18","value":84},{"date":"2026-02-19","value":76},{"date":"2026-02-20","value":68},{"date":"2026-02-21","value":66},{"date":"2026-02-22","value":64},{"date":"2026-02-23","value":62},{"date":"2026-02-24","value":59},{"date":"2026-02-25","value":59},{"date":"2026-02-26","value":58},{"date":"2026-02-27","value":57},{"date":"2026-02-28","value":63},{"date":"2026-03-01","value":59},{"date":"2026-03-02","value":58},{"date":"2026-03-03","value":58},{"date":"2026-03-04","value":59},{"date":"2026-03-05","value":54},{"date":"2026-03-07","value":71},{"date":"2026-03-08","value":52},{"date":"2026-03-09","value":59},{"date":"2026-03-10","value":58},{"date":"2026-03-11","value":57},{"date":"2026-03-12","value":56},{"date":"2026-03-13","value":58},{"date":"2026-03-14","value":63},{"date":"2026-03-15","value":64},{"date":"2026-03-16","value":59},{"date":"2026-03-17","value":59},{"date":"2026-03-18","value":57},{"date":"2026-03-19","value":63},{"date":"2026-03-21","value":71},{"date":"2026-03-22","value":53},{"date":"2026-03-23","value":63},{"date":"2026-03-24","value":55},{"date":"2026-03-25","value":59},{"date":"2026-03-26","value":55},{"date":"2026-03-27","value":80},{"date":"2026-03-28","value":68},{"date":"2026-03-29","value":72},{"date":"2026-03-30","value":58},{"date":"2026-03-31","value":59},{"date":"2026-04-01","value":58},{"date":"2026-04-02","value":59},{"date":"2026-04-03","value":56},{"date":"2026-04-04","value":59},{"date":"2026-04-05","value":52},{"date":"2026-04-06","value":59},{"date":"2026-04-07","value":54},{"date":"2026-04-08","value":53},{"date":"2026-04-09","value":59},{"date":"2026-04-10","value":75},{"date":"2026-04-11","value":60},{"date":"2026-04-12","value":63},{"date":"2026-04-13","value":64},{"date":"2026-04-14","value":60},{"date":"2026-04-15","value":58},{"date":"2026-04-16","value":59},{"date":"2026-04-17","value":58},{"date":"2026-04-18","value":58},{"date":"2026-04-19","value":57},{"date":"2026-04-20","value":59},{"date":"2026-04-21","value":59},{"date":"2026-04-23","value":65},{"date":"2026-04-25","value":72},{"date":"2026-04-26","value":63},{"date":"2026-04-27","value":67},{"date":"2026-04-28","value":63},{"date":"2026-04-29","value":55},{"date":"2026-04-30","value":64},{"date":"2026-05-01","value":61},{"date":"2026-05-02","value":72},{"date":"2026-05-03","value":54},{"date":"2026-05-04","value":59},{"date":"2026-05-05","value":59},{"date":"2026-05-07","value":59},{"date":"2026-05-08","value":55},{"date":"2026-05-09","value":54},{"date":"2026-05-11","value":63},{"date":"2026-05-12","value":58},{"date":"2026-05-13","value":64},{"date":"2026-05-14","value":59},{"date":"2026-05-17","value":67},{"date":"2026-05-18","value":59},{"date":"2026-05-19","value":59},{"date":"2026-05-20","value":61},{"date":"2026-05-21","value":61},{"date":"2026-05-22","value":62},{"date":"2026-05-23","value":58},{"date":"2026-05-24","value":84},{"date":"2026-05-25","value":73},{"date":"2026-05-26","value":60},{"date":"2026-05-27","value":56},{"date":"2026-05-28","value":63},{"date":"2026-05-30","value":75},{"date":"2026-06-01","value":59},{"date":"2026-06-02","value":52},{"date":"2026-06-03","value":53},{"date":"2026-06-04","value":53},{"date":"2026-06-06","value":71},{"date":"2026-06-08","value":51},{"date":"2026-06-09","value":54},{"date":"2026-06-11","value":63},{"date":"2026-06-12","value":58},{"date":"2026-06-13","value":72},{"date":"2026-06-14","value":60},{"date":"2026-06-15","value":58},{"date":"2026-06-16","value":55},{"date":"2026-06-17","value":53},{"date":"2026-06-18","value":58},{"date":"2026-06-19","value":73},{"date":"2026-06-20","value":59},{"date":"2026-06-24","value":52},{"date":"2026-06-25","value":73},{"date":"2026-06-27","value":77},{"date":"2026-06-28","value":59},{"date":"2026-06-30","value":60},{"date":"2026-07-02","value":59},{"date":"2026-07-03","value":53},{"date":"2026-07-04","value":50},{"date":"2026-07-21","value":64},{"date":"2026-07-23","value":59},{"date":"2026-07-25","value":68},{"date":"2026-07-26","value":55},{"date":"2026-07-27","value":54},{"date":"2026-07-28","value":55},{"date":"2026-07-29","value":53},{"date":"2026-07-30","value":60},{"date":"2026-07-31","value":58},{"date":"2026-08-01","value":67},{"date":"2026-08-02","value":54},{"date":"2026-08-03","value":53},{"date":"2026-08-05","value":67},{"date":"2026-08-06","value":58},{"date":"2026-08-08","value":67},{"date":"2026-08-09","value":59},{"date":"2026-08-10","value":50},{"date":"2026-08-11","value":58},{"date":"2026-08-12","value":66},{"date":"2026-08-13","value":58},{"date":"2026-08-14","value":56}],"weight_daily":[{"date":"2025-10-10","value":82.8},{"date":"2025-10-20","value":83.12},{"date":"2025-10-21","value":82.63},{"date":"2025-10-22","value":81.8},{"date":"2025-10-24","value":83.01},{"date":"2025-10-29","value":82.72},{"date":"2025-11-01","value":82.72},{"date":"2025-11-04","value":83},{"date":"2025-11-17","value":84.14},{"date":"2025-11-24","value":81.95},{"date":"2025-11-27","value":82.56},{"date":"2025-12-01","value":82.83},{"date":"2025-12-03","value":80.75},{"date":"2025-12-04","value":80.83},{"date":"2025-12-09","value":81.67},{"date":"2025-12-17","value":82},{"date":"2026-01-28","value":84.71},{"date":"2026-01-29","value":80.92},{"date":"2026-02-03","value":81.99},{"date":"2026-02-04","value":81.71},{"date":"2026-02-06","value":81.43},{"date":"2026-02-10","value":80.96},{"date":"2026-02-11","value":81.37},{"date":"2026-02-23","value":81.86},{"date":"2026-03-03","value":81.6},{"date":"2026-03-04","value":83.75},{"date":"2026-03-11","value":81.93},{"date":"2026-03-12","value":81.23},{"date":"2026-03-13","value":80.41},{"date":"2026-03-15","value":81.19},{"date":"2026-03-18","value":82.03},{"date":"2026-03-19","value":81.24},{"date":"2026-03-20","value":81.21},{"date":"2026-03-23","value":81.35},{"date":"2026-03-24","value":80.33},{"date":"2026-03-26","value":80.13},{"date":"2026-03-27","value":80.17},{"date":"2026-03-30","value":84.02},{"date":"2026-03-31","value":82.31},{"date":"2026-04-01","value":82.1},{"date":"2026-04-02","value":80.93},{"date":"2026-04-03","value":80.51},{"date":"2026-04-05","value":79.85},{"date":"2026-04-07","value":81.13},{"date":"2026-04-08","value":80.47},{"date":"2026-04-09","value":80.67},{"date":"2026-04-10","value":79.73},{"date":"2026-04-11","value":80.28},{"date":"2026-04-13","value":80.42},{"date":"2026-04-14","value":80.14},{"date":"2026-04-15","value":80.19},{"date":"2026-04-16","value":79.96},{"date":"2026-04-17","value":79.8},{"date":"2026-04-18","value":79.41},{"date":"2026-04-19","value":79.56},{"date":"2026-04-21","value":80.43},{"date":"2026-04-22","value":79.94},{"date":"2026-04-23","value":79.64},{"date":"2026-04-24","value":79.13},{"date":"2026-04-28","value":80.09},{"date":"2026-04-29","value":80.04},{"date":"2026-04-30","value":79.28},{"date":"2026-05-03","value":81.53},{"date":"2026-05-04","value":80.32},{"date":"2026-05-05","value":79.94},{"date":"2026-05-06","value":79.87},{"date":"2026-05-07","value":79.96},{"date":"2026-05-08","value":79.76},{"date":"2026-05-09","value":80.15},{"date":"2026-05-10","value":80.33},{"date":"2026-05-11","value":80.23},{"date":"2026-05-12","value":80.23},{"date":"2026-05-13","value":79.92},{"date":"2026-05-14","value":79.11},{"date":"2026-05-15","value":80.22},{"date":"2026-05-16","value":79.75},{"date":"2026-05-18","value":80.26},{"date":"2026-05-19","value":79.87},{"date":"2026-05-20","value":79.92},{"date":"2026-05-21","value":79.02},{"date":"2026-05-22","value":78.75},{"date":"2026-05-23","value":78.73},{"date":"2026-05-25","value":79.33},{"date":"2026-05-26","value":80.89},{"date":"2026-05-27","value":79.87},{"date":"2026-05-28","value":78.6},{"date":"2026-05-29","value":78.22},{"date":"2026-05-30","value":80.04},{"date":"2026-05-31","value":79.96},{"date":"2026-06-01","value":80.13},{"date":"2026-06-02","value":79.69},{"date":"2026-06-03","value":79.29},{"date":"2026-06-04","value":78.57},{"date":"2026-06-05","value":77.33},{"date":"2026-06-06","value":78.53},{"date":"2026-06-08","value":80.28},{"date":"2026-06-09","value":80.02},{"date":"2026-06-10","value":78.58},{"date":"2026-06-11","value":78.75},{"date":"2026-06-12","value":77.73},{"date":"2026-06-13","value":78.04},{"date":"2026-06-14","value":79.06},{"date":"2026-06-15","value":79.54},{"date":"2026-06-16","value":78.13},{"date":"2026-06-17","value":79.11}],"sleep_nightly":[{"date":"2025-12-17","deep":41.5,"rem":130,"core":317,"total":488.5},{"date":"2025-12-18","deep":27.9,"rem":152.1,"core":412.4,"total":592.3},{"date":"2025-12-20","deep":30.4,"rem":94.7,"core":246.8,"total":372},{"date":"2025-12-23","deep":34.9,"rem":128.1,"core":353.5,"total":516.6},{"date":"2026-01-02","deep":37.4,"rem":148.6,"core":329.5,"total":515.5},{"date":"2026-01-04","deep":53.9,"rem":186.5,"core":340,"total":580.4},{"date":"2026-01-05","deep":30.4,"rem":112.2,"core":299.1,"total":441.7},{"date":"2026-01-06","deep":23.9,"rem":155.6,"core":340.5,"total":520},{"date":"2026-01-07","deep":46.9,"rem":151.6,"core":285.7,"total":484.1},{"date":"2026-01-08","deep":44.9,"rem":132.1,"core":348.5,"total":525.5},{"date":"2026-01-09","deep":39.4,"rem":97.7,"core":355.5,"total":492.6},{"date":"2026-01-11","deep":48.4,"rem":122.7,"core":319.6,"total":490.7},{"date":"2026-01-12","deep":38.4,"rem":120.2,"core":321.6,"total":480.1},{"date":"2026-01-13","deep":25.9,"rem":138.1,"core":411.4,"total":575.4},{"date":"2026-01-14","deep":37.4,"rem":137.1,"core":310.6,"total":485.1},{"date":"2026-01-15","deep":33.4,"rem":84.3,"core":396.9,"total":514.6},{"date":"2026-01-16","deep":30.4,"rem":78.3,"core":364.5,"total":473.2},{"date":"2026-01-17","deep":40.9,"rem":55.8,"core":234.3,"total":331.1},{"date":"2026-01-18","deep":35.4,"rem":96.2,"core":384.9,"total":516.5},{"date":"2026-01-19","deep":27.4,"rem":106.2,"core":258.3,"total":391.9},{"date":"2026-01-20","deep":34.4,"rem":157.5,"core":401.4,"total":593.3},{"date":"2026-01-21","deep":24.5,"rem":135.1,"core":352,"total":511.6},{"date":"2026-01-22","deep":54.8,"rem":136.1,"core":240.8,"total":431.8},{"date":"2026-01-23","deep":50.4,"rem":136.2,"core":370.9,"total":557.4},{"date":"2026-01-24","deep":36.4,"rem":104.7,"core":326.5,"total":467.7},{"date":"2026-01-25","deep":27.9,"rem":125.1,"core":343.1,"total":496.1},{"date":"2026-01-26","deep":45.9,"rem":93.7,"core":386.9,"total":526.5},{"date":"2026-01-27","deep":29.4,"rem":128.6,"core":314.6,"total":472.6},{"date":"2026-01-28","deep":38.9,"rem":95.2,"core":298.1,"total":432.3},{"date":"2026-01-29","deep":28.4,"rem":131.1,"core":304.6,"total":464.2},{"date":"2026-01-30","deep":25,"rem":171.5,"core":385.4,"total":581.9},{"date":"2026-01-31","deep":54.3,"rem":79.3,"core":300.1,"total":433.7},{"date":"2026-02-01","deep":76.3,"rem":110.2,"core":325.5,"total":512},{"date":"2026-02-02","deep":33.9,"rem":127.6,"core":289.6,"total":451.2},{"date":"2026-02-03","deep":35.4,"rem":146.6,"core":288.1,"total":470.1},{"date":"2026-02-04","deep":42.9,"rem":120.2,"core":266.2,"total":429.3},{"date":"2026-02-05","deep":35.4,"rem":133.2,"core":311.1,"total":479.6},{"date":"2026-02-06","deep":37.4,"rem":26.4,"core":191.5,"total":255.3},{"date":"2026-02-07","deep":67.8,"rem":159,"core":412.3,"total":639.2},{"date":"2026-02-08","deep":38.4,"rem":82.3,"core":358.5,"total":479.1},{"date":"2026-02-09","deep":54.3,"rem":107.7,"core":357.5,"total":519.5},{"date":"2026-02-10","deep":20.5,"rem":109.2,"core":389.9,"total":519.5},{"date":"2026-02-11","deep":26.4,"rem":137.6,"core":364.5,"total":528.5},{"date":"2026-02-12","deep":55.3,"rem":47.4,"core":182.5,"total":285.2},{"date":"2026-02-13","deep":24.9,"rem":78.3,"core":349.5,"total":452.7},{"date":"2026-02-14","deep":27.9,"rem":122.7,"core":346,"total":496.5},{"date":"2026-02-15","deep":18.9,"rem":55.8,"core":233.9,"total":308.6},{"date":"2026-02-16","deep":35.9,"rem":141.1,"core":414.3,"total":591.3},{"date":"2026-02-17","deep":29.9,"rem":28.4,"core":141.6,"total":199.9},{"date":"2026-02-18","deep":40.4,"rem":93.7,"core":334.1,"total":468.2},{"date":"2026-02-19","deep":25.4,"rem":122.7,"core":407.9,"total":556},{"date":"2026-02-21","deep":34.9,"rem":202.9,"core":422.8,"total":660.6},{"date":"2026-02-22","deep":33.4,"rem":154.1,"core":343,"total":530.5},{"date":"2026-02-23","deep":41.9,"rem":175.5,"core":336.1,"total":553.5},{"date":"2026-02-24","deep":45.4,"rem":110.2,"core":356.5,"total":512.1},{"date":"2026-02-25","deep":51.3,"rem":125.2,"core":282.2,"total":458.7},{"date":"2026-02-26","deep":53.4,"rem":133.6,"core":361.4,"total":548.4},{"date":"2026-02-27","deep":33.9,"rem":82.2,"core":350.5,"total":466.6},{"date":"2026-02-28","deep":32.9,"rem":133.6,"core":437.8,"total":604.3},{"date":"2026-03-01","deep":57.3,"rem":126.2,"core":364.4,"total":547.9},{"date":"2026-03-02","deep":42.4,"rem":92.2,"core":420.3,"total":554.9},{"date":"2026-03-03","deep":52.4,"rem":120.2,"core":331.6,"total":504.1},{"date":"2026-03-04","deep":40.9,"rem":142.6,"core":278.7,"total":462.2},{"date":"2026-03-05","deep":42.9,"rem":146.6,"core":338.5,"total":528},{"date":"2026-03-06","deep":28.4,"rem":34.4,"core":266.2,"total":329.1},{"date":"2026-03-07","deep":29.9,"rem":105.2,"core":363.5,"total":498.6},{"date":"2026-03-08","deep":0,"rem":0,"core":139.6,"total":139.6},{"date":"2026-03-09","deep":26.4,"rem":210.4,"core":348.6,"total":585.4},{"date":"2026-03-10","deep":33.4,"rem":131.2,"core":294.6,"total":459.2},{"date":"2026-03-11","deep":37.4,"rem":168,"core":317.6,"total":523},{"date":"2026-03-12","deep":42.9,"rem":121.1,"core":327.6,"total":491.6},{"date":"2026-03-13","deep":37.9,"rem":152.1,"core":342,"total":532},{"date":"2026-03-14","deep":36.9,"rem":127.1,"core":304.6,"total":468.6},{"date":"2026-03-15","deep":28.4,"rem":108.2,"core":319.6,"total":456.2},{"date":"2026-03-16","deep":45.9,"rem":150.5,"core":320.6,"total":517},{"date":"2026-03-17","deep":46.9,"rem":133.1,"core":303.6,"total":483.6},{"date":"2026-03-18","deep":12.5,"rem":124.2,"core":335,"total":471.6},{"date":"2026-03-19","deep":37.9,"rem":120.7,"core":328,"total":486.6},{"date":"2026-03-21","deep":25.9,"rem":168,"core":415.8,"total":609.8},{"date":"2026-03-23","deep":16.4,"rem":128.6,"core":403.4,"total":548.5},{"date":"2026-03-24","deep":51.9,"rem":141.1,"core":272.2,"total":465.2},{"date":"2026-03-25","deep":47.4,"rem":154.1,"core":322.6,"total":524},{"date":"2026-03-26","deep":51.8,"rem":118.2,"core":332.1,"total":502.1},{"date":"2026-03-27","deep":27.9,"rem":72.3,"core":331.6,"total":431.8},{"date":"2026-03-28","deep":38.9,"rem":104.7,"core":206.9,"total":350.5},{"date":"2026-03-29","deep":34.9,"rem":128.1,"core":355.5,"total":518.5},{"date":"2026-03-30","deep":24.9,"rem":107.7,"core":383.4,"total":516},{"date":"2026-03-31","deep":29.9,"rem":113.7,"core":296.2,"total":439.8},{"date":"2026-04-01","deep":27.9,"rem":111.2,"core":365.5,"total":504.6},{"date":"2026-04-02","deep":28.4,"rem":110.2,"core":331.1,"total":469.7},{"date":"2026-04-04","deep":28.9,"rem":143.6,"core":342,"total":514.6},{"date":"2026-04-06","deep":35.9,"rem":166.6,"core":314.1,"total":516.5},{"date":"2026-04-07","deep":26.9,"rem":114.7,"core":292.2,"total":433.8},{"date":"2026-04-08","deep":29.9,"rem":138.6,"core":277.7,"total":446.3},{"date":"2026-04-09","deep":28.9,"rem":98.7,"core":370,"total":497.6},{"date":"2026-04-10","deep":31.9,"rem":59.3,"core":300.1,"total":391.4},{"date":"2026-04-11","deep":24.9,"rem":49.9,"core":319.6,"total":394.4},{"date":"2026-04-12","deep":40.4,"rem":99.7,"core":358.5,"total":498.6},{"date":"2026-04-13","deep":22.4,"rem":113.7,"core":277.7,"total":413.9},{"date":"2026-04-14","deep":12.5,"rem":118.2,"core":321.1,"total":451.7},{"date":"2026-04-15","deep":62.4,"rem":128.6,"core":334,"total":525},{"date":"2026-04-16","deep":32.4,"rem":124.6,"core":344,"total":501.1},{"date":"2026-04-17","deep":13.9,"rem":14,"core":169.5,"total":197.4},{"date":"2026-04-18","deep":37.9,"rem":124.1,"core":403.4,"total":565.4},{"date":"2026-04-19","deep":27.4,"rem":161.5,"core":363,"total":551.9},{"date":"2026-04-20","deep":46.9,"rem":121.2,"core":328.6,"total":496.6},{"date":"2026-04-21","deep":53.3,"rem":109.6,"core":325.6,"total":488.6},{"date":"2026-04-22","deep":26.9,"rem":123.2,"core":299.1,"total":449.2},{"date":"2026-04-23","deep":29.5,"rem":101.2,"core":378.4,"total":509},{"date":"2026-04-24","deep":34.4,"rem":45.4,"core":196.5,"total":276.3},{"date":"2026-04-25","deep":40.9,"rem":155.6,"core":357.5,"total":553.9},{"date":"2026-04-26","deep":27.4,"rem":118.7,"core":305.2,"total":451.2},{"date":"2026-04-27","deep":27.9,"rem":135.1,"core":393.9,"total":556.9},{"date":"2026-04-28","deep":42.4,"rem":94.7,"core":291.2,"total":428.3},{"date":"2026-04-29","deep":31.9,"rem":119.2,"core":367.5,"total":518.5},{"date":"2026-04-30","deep":36.9,"rem":153.6,"core":346,"total":536.5},{"date":"2026-05-03","deep":44.9,"rem":124.6,"core":355,"total":524.5},{"date":"2026-05-04","deep":19.4,"rem":135.6,"core":340.5,"total":495.6},{"date":"2026-05-05","deep":25.4,"rem":126.1,"core":308.6,"total":460.2},{"date":"2026-05-07","deep":42.9,"rem":107.1,"core":353.1,"total":503.1},{"date":"2026-05-08","deep":23.9,"rem":106.7,"core":381.9,"total":512.5},{"date":"2026-05-10","deep":30.4,"rem":97.3,"core":315.1,"total":442.7},{"date":"2026-05-11","deep":52.9,"rem":106.7,"core":303.1,"total":462.7},{"date":"2026-05-12","deep":25.9,"rem":117.7,"core":340.1,"total":483.6},{"date":"2026-05-13","deep":50.8,"rem":135.1,"core":349,"total":535},{"date":"2026-05-14","deep":45.8,"rem":114.2,"core":364.4,"total":524.5},{"date":"2026-05-17","deep":31.9,"rem":129.6,"core":331.7,"total":493.3},{"date":"2026-05-18","deep":24.4,"rem":126.6,"core":353,"total":504.1},{"date":"2026-05-19","deep":39.9,"rem":130.1,"core":336.6,"total":506.6},{"date":"2026-05-20","deep":26.4,"rem":136.1,"core":345,"total":507.6},{"date":"2026-05-21","deep":55.3,"rem":111.7,"core":303.2,"total":470.2},{"date":"2026-05-22","deep":45.9,"rem":129.1,"core":351,"total":526},{"date":"2026-05-25","deep":46.4,"rem":121.6,"core":355.6,"total":523.6},{"date":"2026-05-26","deep":32.9,"rem":77.8,"core":314.7,"total":425.4},{"date":"2026-05-27","deep":43.9,"rem":145.1,"core":326.2,"total":515.2},{"date":"2026-05-28","deep":46.3,"rem":109.7,"core":275.7,"total":431.8},{"date":"2026-06-01","deep":24,"rem":129.2,"core":364.4,"total":517.5},{"date":"2026-06-02","deep":29.9,"rem":96.2,"core":317.6,"total":443.7},{"date":"2026-06-03","deep":47.8,"rem":139.6,"core":289.2,"total":476.7},{"date":"2026-06-04","deep":29.4,"rem":136.6,"core":301.6,"total":467.7},{"date":"2026-06-05","deep":29.4,"rem":66.3,"core":317.6,"total":413.3},{"date":"2026-06-08","deep":54.9,"rem":141.2,"core":296.1,"total":492.2},{"date":"2026-06-09","deep":26.4,"rem":136.6,"core":387,"total":550},{"date":"2026-06-10","deep":41.9,"rem":93.8,"core":295.3,"total":430.9},{"date":"2026-06-11","deep":34.4,"rem":109.2,"core":345,"total":488.6},{"date":"2026-06-12","deep":34.9,"rem":122.2,"core":337.5,"total":494.6},{"date":"2026-06-13","deep":45.9,"rem":80.8,"core":301.7,"total":428.3},{"date":"2026-06-14","deep":27.9,"rem":103.7,"core":355.9,"total":487.6},{"date":"2026-06-15","deep":42.9,"rem":78.8,"core":302.7,"total":424.3},{"date":"2026-06-16","deep":65.8,"rem":116.7,"core":272.7,"total":455.2},{"date":"2026-06-17","deep":27.9,"rem":114.7,"core":324.1,"total":466.7},{"date":"2026-06-18","deep":33.4,"rem":101.2,"core":334.6,"total":469.2},{"date":"2026-06-19","deep":33.4,"rem":137.1,"core":306.1,"total":476.7},{"date":"2026-06-23","deep":33.9,"rem":116.7,"core":308.1,"total":458.7},{"date":"2026-06-24","deep":23.4,"rem":129.6,"core":357,"total":510.1},{"date":"2026-06-27","deep":41.4,"rem":115.7,"core":358.1,"total":515.1},{"date":"2026-06-28","deep":67.8,"rem":102.2,"core":290.2,"total":460.2},{"date":"2026-06-29","deep":41.4,"rem":127.7,"core":269.8,"total":438.8},{"date":"2026-06-30","deep":25.9,"rem":123.2,"core":375.4,"total":524.5},{"date":"2026-07-02","deep":45.9,"rem":116.7,"core":340.5,"total":503.1},{"date":"2026-07-03","deep":40.4,"rem":129.7,"core":331.1,"total":501.2},{"date":"2026-07-23","deep":60.3,"rem":153.6,"core":284.2,"total":498.1},{"date":"2026-07-25","deep":14.9,"rem":107.7,"core":349.5,"total":472.2},{"date":"2026-07-26","deep":60.3,"rem":146.6,"core":272.8,"total":479.6},{"date":"2026-07-27","deep":39.4,"rem":141.1,"core":335.6,"total":516.1},{"date":"2026-07-28","deep":26.4,"rem":78.3,"core":334.1,"total":438.9},{"date":"2026-07-29","deep":42.9,"rem":144.1,"core":272.2,"total":459.2},{"date":"2026-07-30","deep":35.4,"rem":100.2,"core":344.5,"total":480.1},{"date":"2026-07-31","deep":61.8,"rem":64.3,"core":289.2,"total":415.3},{"date":"2026-08-02","deep":38.9,"rem":82.3,"core":335.5,"total":456.7},{"date":"2026-08-05","deep":46.9,"rem":101.8,"core":304.3,"total":452.9},{"date":"2026-08-07","deep":36.9,"rem":88.3,"core":287.6,"total":412.8},{"date":"2026-08-08","deep":63.3,"rem":84.8,"core":283.7,"total":431.8},{"date":"2026-08-09","deep":41.4,"rem":109.7,"core":337.6,"total":488.7},{"date":"2026-08-10","deep":46.9,"rem":101.7,"core":355.1,"total":503.7},{"date":"2026-08-12","deep":61.3,"rem":109.7,"core":388.9,"total":559.9},{"date":"2026-08-13","deep":36.4,"rem":107.2,"core":287.2,"total":430.8}],"runs":[{"type":"Running","date":"2025-12-20","datetime":"2025-12-20T11:14:41","duration_min":30.4,"distance_km":5.32,"pace_min_km":5.71,"energy_kcal":null,"avg_hr":162,"max_hr":179,"effort":"intense"},{"type":"Running","date":"2026-01-05","datetime":"2026-01-05T20:04:40","duration_min":27.8,"distance_km":4.38,"pace_min_km":6.35,"energy_kcal":null,"avg_hr":142,"max_hr":167,"effort":"facile"},{"type":"Running","date":"2026-01-10","datetime":"2026-01-10T10:57:51","duration_min":35,"distance_km":5.53,"pace_min_km":6.33,"energy_kcal":null,"avg_hr":154,"max_hr":173,"effort":"modere"},{"type":"Running","date":"2026-01-12","datetime":"2026-01-12T20:00:44","duration_min":34.1,"distance_km":5.46,"pace_min_km":6.25,"energy_kcal":null,"avg_hr":155,"max_hr":175,"effort":"modere"},{"type":"Running","date":"2026-01-17","datetime":"2026-01-17T10:59:14","duration_min":34.9,"distance_km":5.42,"pace_min_km":6.44,"energy_kcal":null,"avg_hr":157,"max_hr":178,"effort":"modere"},{"type":"Running","date":"2026-01-24","datetime":"2026-01-24T11:27:37","duration_min":36.2,"distance_km":5.71,"pace_min_km":6.34,"energy_kcal":null,"avg_hr":156,"max_hr":176,"effort":"modere"},{"type":"Running","date":"2026-01-26","datetime":"2026-01-26T20:00:15","duration_min":29.7,"distance_km":5.4,"pace_min_km":5.5,"energy_kcal":null,"avg_hr":151,"max_hr":171,"effort":"facile"},{"type":"Running","date":"2026-01-31","datetime":"2026-01-31T10:25:54","duration_min":29.8,"distance_km":5.38,"pace_min_km":5.54,"energy_kcal":null,"avg_hr":155,"max_hr":171,"effort":"modere"},{"type":"Running","date":"2026-02-02","datetime":"2026-02-02T20:01:11","duration_min":32.8,"distance_km":5.38,"pace_min_km":6.1,"energy_kcal":null,"avg_hr":152,"max_hr":172,"effort":"facile"},{"type":"Running","date":"2026-02-07","datetime":"2026-02-07T11:21:49","duration_min":29.9,"distance_km":5.2,"pace_min_km":5.75,"energy_kcal":null,"avg_hr":163,"max_hr":176,"effort":"intense"},{"type":"Running","date":"2026-02-09","datetime":"2026-02-09T19:58:21","duration_min":30.6,"distance_km":5.47,"pace_min_km":5.59,"energy_kcal":null,"avg_hr":158,"max_hr":177,"effort":"modere"},{"type":"Running","date":"2026-02-17","datetime":"2026-02-17T18:29:18","duration_min":14.5,"distance_km":1.33,"pace_min_km":10.9,"energy_kcal":null,"avg_hr":154,"max_hr":164,"effort":"modere"},{"type":"Running","date":"2026-02-27","datetime":"2026-02-27T09:16:38","duration_min":29.9,"distance_km":5.36,"pace_min_km":5.58,"energy_kcal":null,"avg_hr":157,"max_hr":177,"effort":"modere"},{"type":"Running","date":"2026-03-07","datetime":"2026-03-07T12:15:28","duration_min":28.6,"distance_km":4.29,"pace_min_km":6.67,"energy_kcal":null,"avg_hr":134,"max_hr":145,"effort":"facile"},{"type":"Running","date":"2026-03-09","datetime":"2026-03-09T17:58:48","duration_min":30.9,"distance_km":4.96,"pace_min_km":6.23,"energy_kcal":null,"avg_hr":141,"max_hr":157,"effort":"facile"},{"type":"Running","date":"2026-03-12","datetime":"2026-03-12T09:25:48","duration_min":39.8,"distance_km":5.53,"pace_min_km":7.2,"energy_kcal":null,"avg_hr":150,"max_hr":178,"effort":"facile"},{"type":"Running","date":"2026-03-23","datetime":"2026-03-23T17:51:10","duration_min":31.7,"distance_km":6.41,"pace_min_km":4.95,"energy_kcal":null,"avg_hr":153,"max_hr":170,"effort":"modere"},{"type":"Running","date":"2026-03-27","datetime":"2026-03-27T18:04:03","duration_min":34.1,"distance_km":6.31,"pace_min_km":5.4,"energy_kcal":null,"avg_hr":158,"max_hr":182,"effort":"modere"},{"type":"Running","date":"2026-03-28","datetime":"2026-03-28T11:35:24","duration_min":31.9,"distance_km":6.41,"pace_min_km":4.98,"energy_kcal":null,"avg_hr":149,"max_hr":163,"effort":"facile"},{"type":"Running","date":"2026-04-02","datetime":"2026-04-02T08:07:06","duration_min":44,"distance_km":5.75,"pace_min_km":7.65,"energy_kcal":null,"avg_hr":150,"max_hr":173,"effort":"facile"},{"type":"Running","date":"2026-04-09","datetime":"2026-04-09T08:03:30","duration_min":2.1,"distance_km":0.1,"pace_min_km":21,"energy_kcal":null,"avg_hr":103,"max_hr":113,"effort":"facile"},{"type":"Running","date":"2026-04-10","datetime":"2026-04-10T16:51:19","duration_min":29.7,"distance_km":5.22,"pace_min_km":5.69,"energy_kcal":null,"avg_hr":164,"max_hr":181,"effort":"intense"},{"type":"Running","date":"2026-04-13","datetime":"2026-04-13T16:52:43","duration_min":31.1,"distance_km":5.44,"pace_min_km":5.72,"energy_kcal":null,"avg_hr":146,"max_hr":167,"effort":"facile"},{"type":"Running","date":"2026-04-17","datetime":"2026-04-17T16:52:56","duration_min":30.4,"distance_km":5.36,"pace_min_km":5.67,"energy_kcal":null,"avg_hr":160,"max_hr":179,"effort":"intense"},{"type":"Running","date":"2026-04-19","datetime":"2026-04-19T09:34:49","duration_min":8.1,"distance_km":0.9,"pace_min_km":9,"energy_kcal":null,"avg_hr":126,"max_hr":142,"effort":"facile"},{"type":"Running","date":"2026-04-20","datetime":"2026-04-20T16:57:52","duration_min":3.3,"distance_km":0.04,"pace_min_km":82.5,"energy_kcal":null,"avg_hr":82,"max_hr":161,"effort":"facile"},{"type":"Running","date":"2026-04-23","datetime":"2026-04-23T08:17:30","duration_min":29.1,"distance_km":5.11,"pace_min_km":5.69,"energy_kcal":null,"avg_hr":159,"max_hr":171,"effort":"modere"},{"type":"Running","date":"2026-04-25","datetime":"2026-04-25T12:58:52","duration_min":30.4,"distance_km":5.5,"pace_min_km":5.53,"energy_kcal":null,"avg_hr":159,"max_hr":168,"effort":"modere"},{"type":"Running","date":"2026-04-30","datetime":"2026-04-30T16:16:04","duration_min":10.2,"distance_km":1.83,"pace_min_km":5.57,"energy_kcal":null,"avg_hr":142,"max_hr":159,"effort":"facile"},{"type":"Running","date":"2026-05-02","datetime":"2026-05-02T09:41:49","duration_min":38.2,"distance_km":7.22,"pace_min_km":5.29,"energy_kcal":null,"avg_hr":152,"max_hr":165,"effort":"facile"},{"type":"Running","date":"2026-05-11","datetime":"2026-05-11T16:44:32","duration_min":26.5,"distance_km":3.75,"pace_min_km":7.07,"energy_kcal":null,"avg_hr":137,"max_hr":159,"effort":"facile"},{"type":"Running","date":"2026-05-21","datetime":"2026-05-21T08:08:35","duration_min":19.9,"distance_km":3.57,"pace_min_km":5.57,"energy_kcal":null,"avg_hr":150,"max_hr":167,"effort":"facile"},{"type":"Running","date":"2026-05-28","datetime":"2026-05-28T08:13:37","duration_min":20.3,"distance_km":3.54,"pace_min_km":5.73,"energy_kcal":null,"avg_hr":142,"max_hr":163,"effort":"facile"},{"type":"Running","date":"2026-05-30","datetime":"2026-05-30T10:51:58","duration_min":8.9,"distance_km":1.48,"pace_min_km":6.01,"energy_kcal":null,"avg_hr":133,"max_hr":144,"effort":"facile"},{"type":"Running","date":"2026-06-01","datetime":"2026-06-01T16:58:43","duration_min":15.2,"distance_km":2.72,"pace_min_km":5.59,"energy_kcal":null,"avg_hr":142,"max_hr":158,"effort":"facile"},{"type":"Running","date":"2026-06-04","datetime":"2026-06-04T08:04:22","duration_min":20.9,"distance_km":3.41,"pace_min_km":6.13,"energy_kcal":null,"avg_hr":140,"max_hr":160,"effort":"facile"},{"type":"Running","date":"2026-06-11","datetime":"2026-06-11T08:34:43","duration_min":30.1,"distance_km":5.41,"pace_min_km":5.56,"energy_kcal":null,"avg_hr":155,"max_hr":174,"effort":"modere"},{"type":"Running","date":"2026-06-13","datetime":"2026-06-13T10:37:21","duration_min":30.3,"distance_km":5.28,"pace_min_km":5.74,"energy_kcal":null,"avg_hr":154,"max_hr":170,"effort":"modere"},{"type":"Running","date":"2026-06-14","datetime":"2026-06-14T10:01:40","duration_min":41.8,"distance_km":7.68,"pace_min_km":5.44,"energy_kcal":null,"avg_hr":151,"max_hr":164,"effort":"facile"},{"type":"Running","date":"2026-06-18","datetime":"2026-06-18T08:06:23","duration_min":20.2,"distance_km":3.69,"pace_min_km":5.47,"energy_kcal":null,"avg_hr":146,"max_hr":168,"effort":"facile"},{"type":"Running","date":"2026-06-19","datetime":"2026-06-19T16:28:50","duration_min":20.7,"distance_km":3.65,"pace_min_km":5.67,"energy_kcal":null,"avg_hr":147,"max_hr":168,"effort":"facile"},{"type":"Running","date":"2026-07-02","datetime":"2026-07-02T08:04:22","duration_min":20.2,"distance_km":3.66,"pace_min_km":5.52,"energy_kcal":null,"avg_hr":144,"max_hr":159,"effort":"facile"},{"type":"Running","date":"2026-07-20","datetime":"2026-07-20T12:15:29","duration_min":44.6,"distance_km":8.32,"pace_min_km":5.36,"energy_kcal":null,"avg_hr":null,"max_hr":null,"effort":null},{"type":"Running","date":"2026-07-20","datetime":"2026-07-20T12:15:53","duration_min":44.3,"distance_km":8.28,"pace_min_km":5.35,"energy_kcal":null,"avg_hr":154,"max_hr":166,"effort":"modere"},{"type":"Running","date":"2026-07-23","datetime":"2026-07-23T08:02:22","duration_min":20.1,"distance_km":3.58,"pace_min_km":5.61,"energy_kcal":null,"avg_hr":138,"max_hr":159,"effort":"facile"},{"type":"Running","date":"2026-07-24","datetime":"2026-07-24T16:33:25","duration_min":45.4,"distance_km":8.66,"pace_min_km":5.24,"energy_kcal":null,"avg_hr":null,"max_hr":null,"effort":null},{"type":"Running","date":"2026-07-24","datetime":"2026-07-24T16:33:48","duration_min":45.2,"distance_km":8.62,"pace_min_km":5.24,"energy_kcal":null,"avg_hr":158,"max_hr":173,"effort":"modere"},{"type":"Running","date":"2026-07-26","datetime":"2026-07-26T11:45:42","duration_min":2.9,"distance_km":0.58,"pace_min_km":5,"energy_kcal":null,"avg_hr":137,"max_hr":146,"effort":"facile"},{"type":"Running","date":"2026-07-30","datetime":"2026-07-30T07:52:22","duration_min":7.6,"distance_km":1.38,"pace_min_km":5.51,"energy_kcal":null,"avg_hr":133,"max_hr":141,"effort":"facile"},{"type":"Running","date":"2026-07-31","datetime":"2026-07-31T09:15:13","duration_min":3.7,"distance_km":0.45,"pace_min_km":8.22,"energy_kcal":null,"avg_hr":78,"max_hr":86,"effort":"facile"},{"type":"Running","date":"2026-07-31","datetime":"2026-07-31T09:15:25","duration_min":29.6,"distance_km":5.03,"pace_min_km":5.88,"energy_kcal":null,"avg_hr":null,"max_hr":null,"effort":null},{"type":"Running","date":"2026-08-06","datetime":"2026-08-06T08:01:46","duration_min":13.5,"distance_km":2.05,"pace_min_km":6.59,"energy_kcal":null,"avg_hr":116,"max_hr":130,"effort":"facile"},{"type":"Running","date":"2026-08-08","datetime":"2026-08-08T10:29:54","duration_min":10.6,"distance_km":1.91,"pace_min_km":5.55,"energy_kcal":null,"avg_hr":139,"max_hr":155,"effort":"facile"},{"type":"Running","date":"2026-08-08","datetime":"2026-08-08T10:29:54","duration_min":32,"distance_km":2.35,"pace_min_km":13.62,"energy_kcal":null,"avg_hr":null,"max_hr":null,"effort":null},{"type":"Running","date":"2026-08-08","datetime":"2026-08-08T10:30:28","duration_min":48.2,"distance_km":6.43,"pace_min_km":7.5,"energy_kcal":null,"avg_hr":121,"max_hr":151,"effort":"facile"},{"type":"Running","date":"2026-08-08","datetime":"2026-08-08T10:50:40","duration_min":4.3,"distance_km":0.45,"pace_min_km":9.56,"energy_kcal":null,"avg_hr":112,"max_hr":144,"effort":"facile"},{"type":"Running","date":"2026-08-10","datetime":"2026-08-10T08:19:36","duration_min":0.6,"distance_km":0.08,"pace_min_km":7.5,"energy_kcal":null,"avg_hr":83,"max_hr":99,"effort":"facile"},{"type":"Running","date":"2026-08-10","datetime":"2026-08-10T08:19:38","duration_min":57,"distance_km":10.33,"pace_min_km":5.52,"energy_kcal":null,"avg_hr":null,"max_hr":null,"effort":null},{"type":"Running","date":"2026-08-10","datetime":"2026-08-10T08:21:13","duration_min":55.7,"distance_km":10.27,"pace_min_km":5.42,"energy_kcal":null,"avg_hr":149,"max_hr":171,"effort":"facile"},{"type":"Running","date":"2026-08-14","datetime":"2026-08-14T07:42:36","duration_min":51.1,"distance_km":8.01,"pace_min_km":6.38,"energy_kcal":null,"avg_hr":null,"max_hr":null,"effort":null}],"other_activities":[{"type":"UnderwaterDiving","label":"Plongée","count":9,"duration":172},{"type":"Cycling","label":"Vélo","count":7,"duration":348},{"type":"Hockey","label":"Hockey","count":3,"duration":187},{"type":"Walking","label":"Marche","count":2,"duration":48},{"type":"Elliptical","label":"Elliptique","count":2,"duration":46},{"type":"Golf","label":"Golf","count":1,"duration":152}]};
+/* ---------- Construit le store initial à partir du SEED ---------- */
+function isoWeekToThursday(weekKey){
+  const [y,wRaw] = weekKey.split("-W"); const week=parseInt(wRaw,10);
+  const jan4 = new Date(parseInt(y,10),0,4);
+  const dow = (jan4.getDay()+6)%7; // 0=lundi
+  const mondayW1 = new Date(jan4); mondayW1.setDate(jan4.getDate()-dow);
+  const thu = new Date(mondayW1); thu.setDate(mondayW1.getDate()+7*(week-1)+3);
+  return thu.toISOString().slice(0,10);
+}
+function seedStore(){
+  const R = SEED_RAW;
+  return {
+    imported: {
+      vo2max: R.vo2max.slice(),
+      rhr_daily: R.rhr_daily.slice(),
+      weight_daily: R.weight_daily.slice(),
+      sleep_nightly: R.sleep_nightly.slice(),
+      runs: R.runs.slice(),
+      other_activities: R.other_activities.slice(),
+      meta: { source:"Apple Santé (snapshot)", when:"14 août 2026" },
+    },
+    manual: { weight:[], lab_entries: SEED.lab_entries.slice(), fidage: SEED.fidage },
+    seed: true,
+  };
+}
+
+/* ---------- Persistance ---------- */
+let STORE = load();
+function load(){
+  try{ const raw = localStorage.getItem(STORE_KEY); if(raw) return JSON.parse(raw); }catch(e){}
+  const s = seedStore(); persist(s); return s;
+}
+function persist(s){ try{ localStorage.setItem(STORE_KEY, JSON.stringify(s)); }catch(e){ toast("Stockage plein — impossible de sauvegarder"); } }
+function saveStore(){ STORE.seed=false; persist(STORE); }
+
+/* ============================================================
+   Agrégation : transforme le store brut en données d'affichage
+   ============================================================ */
+function isoWeekKey(dateStr){
+  const d = new Date(dateStr+"T00:00:00");
+  const t = new Date(d.valueOf());
+  const dayNr = (d.getDay()+6)%7;
+  t.setDate(t.getDate()-dayNr+3);
+  const firstThu = new Date(t.getFullYear(),0,4);
+  const week = 1+Math.round(((t-firstThu)/86400000 - 3 + ((firstThu.getDay()+6)%7))/7);
+  return `${t.getFullYear()}-W${String(week).padStart(2,"0")}`;
+}
+function weeklyAvg(points, valKey){
+  const m={};
+  points.forEach(p=>{ const wk=isoWeekKey(p.date); (m[wk]=m[wk]||[]).push(p[valKey]); });
+  return Object.keys(m).sort().map(wk=>({week:wk, value:+(m[wk].reduce((a,b)=>a+b,0)/m[wk].length).toFixed(2), n:m[wk].length}));
+}
+function linreg(pts){
+  const n=pts.length; if(n<2) return null;
+  let sx=0,sy=0,sxx=0,sxy=0;
+  pts.forEach(p=>{sx+=p.t;sy+=p.v;sxx+=p.t*p.t;sxy+=p.t*p.v;});
+  const d=n*sxx-sx*sx; if(!d) return null;
+  const b=(n*sxy-sx*sy)/d; return {a:(sy-b*sx)/n,b};
+}
+function project(points, valKey, monthsAhead){
+  const pts = points.map(p=>({t:new Date(p.date+"T00:00:00").getTime()/86400000, v:p[valKey]}));
+  const recent = pts.slice(-8);
+  const r = linreg(recent); if(!r) return points.length?points[points.length-1][valKey]:null;
+  const lastT = pts[pts.length-1].t;
+  return +(r.a + r.b*(lastT+monthsAhead*30.4)).toFixed(1);
+}
+
+function compute(){
+  const I = STORE.imported, M = STORE.manual;
+  const runs = (I.runs||[]).slice().sort((a,b)=>a.datetime<b.datetime?-1:1);
+  const vo2 = (I.vo2max||[]).slice().sort((a,b)=>a.date<b.date?-1:1);
+
+  // Poids : importé + saisi à la main
+  const weightPts = (I.weight_daily||[]).slice()
+    .concat((M.weight||[]).map(w=>({date:w.date, value:w.kg})))
+    .sort((a,b)=>a.date<b.date?-1:1);
+
+  const rhrWeekly = weeklyAvg(I.rhr_daily||[], "value");
+  const weightWeekly = weeklyAvg(weightPts, "value").map(w=>({week:w.week, avg_kg:w.value}));
+  const sleepWeekly = (function(){
+    const m={};
+    (I.sleep_nightly||[]).forEach(n=>{ const wk=isoWeekKey(n.date); (m[wk]=m[wk]||[]).push(n.total/60); });
+    return Object.keys(m).sort().map(wk=>({week:wk, avg_hours:+(m[wk].reduce((a,b)=>a+b,0)/m[wk].length).toFixed(2), nights:m[wk].length}));
+  })();
+
+  // Composition du sommeil = moyenne des 2 dernières semaines de nuits
+  const sc = (function(){
+    const nights = (I.sleep_nightly||[]).slice().sort((a,b)=>a.date<b.date?-1:1);
+    if(!nights.length) return {deep_min:0,rem_min:0,core_min:0,total_min:0};
+    const lastWk = isoWeekKey(nights[nights.length-1].date);
+    const recent = nights.filter(n=>{ const wk=isoWeekKey(n.date); return wk>=isoWeekKey(nights[Math.max(0,nights.length-14)].date); });
+    const use = recent.length?recent:nights.slice(-14);
+    const avg = k=>use.reduce((a,n)=>a+(n[k]||0),0)/use.length;
+    return {deep_min:+avg("deep").toFixed(1),rem_min:+avg("rem").toFixed(1),core_min:+avg("core").toFixed(1),total_min:+avg("total").toFixed(1)};
+  })();
+
+  // Volume hebdo + effort
+  const volMap={}, effMap={};
+  runs.forEach(r=>{
+    const wk=isoWeekKey(r.date);
+    if(!volMap[wk]) volMap[wk]={week:wk,distance:0,count:0};
+    volMap[wk].distance+=r.distance_km; volMap[wk].count++;
+    if(!effMap[wk]) effMap[wk]={week:wk,facile:0,modere:0,intense:0,inconnu:0};
+    effMap[wk][r.effort||"inconnu"]+=r.distance_km;
+  });
+  const weekly_volume = Object.keys(volMap).sort().map(wk=>({week:wk,distance:+volMap[wk].distance.toFixed(1),count:volMap[wk].count}));
+  const weeklyEffort = Object.keys(effMap).sort().map(wk=>effMap[wk]);
+  const ec={facile:0,modere:0,intense:0};
+  runs.forEach(r=>{ if(r.effort) ec[r.effort]++; });
+  const ecTotal=ec.facile+ec.modere+ec.intense;
+
+  // Résumé
+  const totalDist = runs.reduce((a,r)=>a+r.distance_km,0);
+  const totalTime = runs.reduce((a,r)=>a+r.duration_min,0);
+  const paces = runs.map(r=>r.pace_min_km).filter(p=>p>0);
+  const summary = {
+    total_distance:+totalDist.toFixed(1), total_runs:runs.length,
+    avg_pace: totalDist? +(totalTime/totalDist).toFixed(2):null,
+    best_pace: paces.length? Math.min(...paces):null,
+    vo2_start: vo2.length?vo2[0].value:null, vo2_now: vo2.length?vo2[vo2.length-1].value:null,
+    rhr_now: rhrWeekly.length?rhrWeekly[rhrWeekly.length-1].value:null,
+  };
+
+  const projections = {
+    vo2max: { current: summary.vo2_now, "1m": project(vo2,"value",1), "3m": project(vo2,"value",3) },
+    resting_hr: { current: summary.rhr_now,
+      "1m": project(rhrWeekly.map(w=>({date:isoWeekToThursday(w.week),value:w.value})),"value",1),
+      "3m": project(rhrWeekly.map(w=>({date:isoWeekToThursday(w.week),value:w.value})),"value",3) },
+  };
+
+  // Bilan sanguin depuis les saisies
+  const labs = buildLabs(M.lab_entries||[]);
+  labs.fidage = M.fidage || null;
+
+  return { summary, vo2max:vo2, resting_hr_weekly:rhrWeekly, weekly_weight:weightWeekly,
+    weekly_sleep:sleepWeekly, sleep_composition:sc, weekly_volume, weeklyEffort,
+    effortCounts:{...ec,total:ecTotal,facilePct:ecTotal?Math.round(ec.facile/ecTotal*100):0},
+    runs, other_activities:I.other_activities||[], projections, labs, weightPts };
+}
+
+function buildLabs(entries){
+  const sorted = entries.slice().sort((a,b)=>a.date<b.date?-1:1);
+  const dates = sorted.map(e=>e.date);
+  const series={};
+  MARKERS.forEach(m=>{ series[m.key]=sorted.map(e=> (e.values && e.values[m.key]!=null)? e.values[m.key] : null); });
+  // points hors norme → attention
+  const attention=[];
+  MARKERS.forEach(m=>{
+    const pts = sorted.map(e=>({date:e.date,v:e.values?e.values[m.key]:null})).filter(p=>p.v!=null);
+    if(!pts.length) return;
+    const last = pts[pts.length-1];
+    const below = last.v < m.range[0], above = last.v > m.range[1];
+    const bad = (m.dir==="low" && below) || (m.dir==="high" && above) || (m.dir==="both" && (below||above));
+    if(bad){
+      attention.push({severity:"warn", title:`${m.label} hors norme`,
+        detail:`${last.v} ${m.unit} au dernier bilan (${fmtDate(last.date)}). Norme du labo : ${rangeText(m)}. À discuter avec ton médecin.`});
+    } else if(pts.length>=3){
+      const first=pts[0].v, worseHigh=(m.dir==="high"||m.dir==="both") && last.v>first*1.2;
+      const worseLow=(m.dir==="low") && last.v<first*0.85;
+      if(worseHigh||worseLow){
+        attention.push({severity:"info", title:`${m.label} — tendance à surveiller`,
+          detail:`${first} → ${last.v} ${m.unit} entre ${fmtDate(pts[0].date)} et ${fmtDate(last.date)}. Reste dans la norme, mais la tendance vaut d'être mentionnée.`});
+      }
+    }
+  });
+  if(!attention.length && sorted.length){
+    attention.push({severity:"good", title:"Rien hors norme", detail:"Tous tes marqueurs disponibles sont dans les seuils du labo. Continue comme ça !"});
+  }
+  return { dates, series, attention_points:attention };
+}
+
+/* ---------- Formatage ---------- */
+function fmtPace(min){ if(min==null) return "—"; const m=Math.floor(min),s=Math.round((min-m)*60);
+  return s===60?`${m+1}:00`:`${m}:${String(s).padStart(2,"0")}`; }
+function fmtDate(d){ if(!d) return "—"; const dt=new Date(d+"T00:00:00");
+  return dt.toLocaleDateString("fr-BE",{day:"2-digit",month:"short"}); }
+function fmtHM(totalMin){ const h=Math.floor(totalMin/60),m=Math.round(totalMin%60); return `${h}h${String(m).padStart(2,"0")}`; }
+function rangeText(m){ if(m.range[0]<=0 && m.range[1]>=999) return `≥ ${m.range[0]}`;
+  if(m.range[1]>=999) return `≥ ${m.range[0]}`; if(m.range[0]<=0) return `≤ ${m.range[1]}`; return `${m.range[0]}–${m.range[1]}`; }
+
+/* ============================================================
+   Graphiques SVG (aucune dépendance)
+   ============================================================ */
+const SVGNS="http://www.w3.org/2000/svg";
+function sv(tag,a){ const e=document.createElementNS(SVGNS,tag); for(const k in a) e.setAttribute(k,a[k]); return e; }
+function niceTicks(min,max,count){
+  const span=max-min||1, step0=span/count, mag=Math.pow(10,Math.floor(Math.log10(step0)));
+  const norm=step0/mag, step=(norm>=5?5:norm>=2?2:1)*mag;
+  const t0=Math.ceil(min/step)*step, out=[];
+  for(let v=t0; v<=max+1e-9; v+=step) out.push(+v.toFixed(6));
+  return out;
+}
+function attachTip(container, svg, layout, onIndex){
+  let tip=container.querySelector(".chart-tip");
+  if(!tip){ tip=document.createElement("div"); tip.className="chart-tip"; container.appendChild(tip); }
+  const {mL,mR,W,n,x}=layout;
+  const guide=sv("line",{stroke:C.fog,"stroke-width":1,"stroke-dasharray":"3 3",opacity:0});
+  svg.appendChild(guide);
+  function handle(ev){
+    const rect=svg.getBoundingClientRect();
+    const px=(ev.touches?ev.touches[0].clientX:ev.clientX)-rect.left;
+    let i=Math.round((px-mL)/((W-mL-mR)/Math.max(1,n-1)));
+    i=Math.max(0,Math.min(n-1,i));
+    const res=onIndex(i); if(!res){ hide(); return; }
+    const gx=x(i);
+    guide.setAttribute("x1",gx); guide.setAttribute("x2",gx);
+    guide.setAttribute("y1",layout.mT); guide.setAttribute("y2",layout.H-layout.mB);
+    guide.setAttribute("opacity",.5);
+    tip.innerHTML=res.html; tip.style.opacity=1;
+    tip.style.left=Math.max(4,Math.min(W-4,gx))+"px";
+    tip.style.top=(res.top!=null?res.top:layout.mT+10)+"px";
+  }
+  function hide(){ tip.style.opacity=0; guide.setAttribute("opacity",0); }
+  svg.addEventListener("pointermove",handle);
+  svg.addEventListener("pointerdown",handle);
+  svg.addEventListener("pointerleave",hide);
+  svg.addEventListener("touchmove",handle,{passive:true});
+  svg.addEventListener("touchstart",handle,{passive:true});
+  svg.addEventListener("touchend",hide);
+}
+function lineChart(container, cfg){
+  container.classList.add("chart");
+  const W=Math.max(220,container.clientWidth||280), H=cfg.height||150;
+  const mL=cfg.mL!=null?cfg.mL:34, mR=12, mT=10, mB=22;
+  const svg=sv("svg",{width:W,height:H,viewBox:`0 0 ${W} ${H}`,style:"display:block;touch-action:pan-y"});
+  const all=[]; cfg.series.forEach(s=>s.values.forEach(v=>{if(v!=null)all.push(v);}));
+  let yMin=cfg.yMin!=null?cfg.yMin:Math.min(...all), yMax=cfg.yMax!=null?cfg.yMax:Math.max(...all);
+  if(yMin===yMax){yMin-=1;yMax+=1;}
+  const n=cfg.n||cfg.series[0].values.length;
+  const x=i=> n<=1? (mL+(W-mL-mR)/2) : mL+i*(W-mL-mR)/(n-1);
+  const y=v=> mT+(H-mT-mB)*(1-(v-yMin)/(yMax-yMin));
+  const ticks=cfg.yTicks||niceTicks(yMin,yMax,4);
+  ticks.forEach(t=>{ if(t<yMin-1e-9||t>yMax+1e-9)return;
+    svg.appendChild(sv("line",{x1:mL,x2:W-mR,y1:y(t),y2:y(t),stroke:C.line,"stroke-dasharray":"2 4"}));
+    const lb=sv("text",{x:mL-6,y:y(t)+3,"text-anchor":"end","font-size":10,fill:C.fog}); lb.textContent=cfg.yFmt?cfg.yFmt(t):t;
+    svg.appendChild(lb);
+  });
+  if(cfg.xTick){ for(let i=0;i<n;i++){ const lb=cfg.xTick(i); if(lb==null||lb==="")continue;
+    const t=sv("text",{x:x(i),y:H-6,"text-anchor":"middle","font-size":9,fill:C.fog}); t.textContent=lb; svg.appendChild(t); } }
+  cfg.series.forEach((s,si)=>{
+    if(s.area){
+      const id="grad"+Math.random().toString(36).slice(2,7);
+      const defs=sv("defs",{}); const lg=sv("linearGradient",{id,x1:0,y1:0,x2:0,y2:1});
+      lg.appendChild(sv("stop",{offset:"0%","stop-color":s.color,"stop-opacity":.45}));
+      lg.appendChild(sv("stop",{offset:"100%","stop-color":s.color,"stop-opacity":0}));
+      defs.appendChild(lg); svg.appendChild(defs);
+      let d="",started=false,firstX=null,lastX=null;
+      s.values.forEach((v,i)=>{ if(v==null){return;} const X=x(i),Y=y(v); if(!started){d=`M ${X} ${Y}`;firstX=X;started=true;}else d+=` L ${X} ${Y}`; lastX=X; });
+      if(started){ d+=` L ${lastX} ${y(yMin)} L ${firstX} ${y(yMin)} Z`;
+        svg.appendChild(sv("path",{d,fill:`url(#${id})`})); }
+    }
+    let d="",started=false;
+    s.values.forEach((v,i)=>{ if(v==null){started=false;return;} const X=x(i),Y=y(v);
+      if(!started){d+=`M ${X} ${Y}`;started=true;}else d+=` L ${X} ${Y}`; });
+    svg.appendChild(sv("path",{d,fill:"none",stroke:s.color,"stroke-width":s.width||2.5,"stroke-linejoin":"round","stroke-linecap":"round"}));
+    if(s.dots) s.values.forEach((v,i)=>{ if(v==null)return; svg.appendChild(sv("circle",{cx:x(i),cy:y(v),r:s.dotR||2.5,fill:s.color})); });
+  });
+  container.innerHTML=""; container.appendChild(svg);
+  attachTip(container, svg, {mL,mR,mT,mB,W,H,n,x}, (i)=>{
+    const rows=cfg.tip(i); if(!rows) return null;
+    const vals=cfg.series.map(s=>s.values[i]).filter(v=>v!=null);
+    const top = vals.length? y(Math.max(...vals)) : mT;
+    return { html: rows, top };
+  });
+}
+function barChart(container, cfg){
+  container.classList.add("chart");
+  const W=Math.max(220,container.clientWidth||280), H=cfg.height||150;
+  const mL=cfg.mL!=null?cfg.mL:30, mR=12, mT=10, mB=22;
+  const svg=sv("svg",{width:W,height:H,viewBox:`0 0 ${W} ${H}`,style:"display:block;touch-action:pan-y"});
+  const n=cfg.items.length;
+  const keys=cfg.keys;
+  let yMax=cfg.yMax!=null?cfg.yMax:0;
+  if(!cfg.yMax){ cfg.items.forEach(it=>{ let s=0; keys.forEach(k=>s+=(it[k.key]||0)); if(s>yMax)yMax=s; }); yMax=yMax*1.1||1; }
+  const bw=(W-mL-mR)/n, barW=Math.min(26,bw*0.64);
+  const x=i=> mL+bw*i+bw/2;
+  const y=v=> mT+(H-mT-mB)*(1-v/yMax);
+  niceTicks(0,yMax,4).forEach(t=>{ if(t>yMax)return;
+    svg.appendChild(sv("line",{x1:mL,x2:W-mR,y1:y(t),y2:y(t),stroke:C.line,"stroke-dasharray":"2 4"}));
+    const lb=sv("text",{x:mL-6,y:y(t)+3,"text-anchor":"end","font-size":10,fill:C.fog}); lb.textContent=cfg.yFmt?cfg.yFmt(t):t; svg.appendChild(lb);
+  });
+  if(cfg.xTick){ cfg.items.forEach((it,i)=>{ const lb=cfg.xTick(i); if(lb==null||lb==="")return;
+    const t=sv("text",{x:x(i),y:H-6,"text-anchor":"middle","font-size":9,fill:C.fog}); t.textContent=lb; svg.appendChild(t); }); }
+  cfg.items.forEach((it,i)=>{ let base=0;
+    keys.forEach((k,ki)=>{ const v=it[k.key]||0; if(v<=0)return;
+      const h=(H-mT-mB)*v/yMax; const yTop=y(base+v);
+      const r=(ki===keys.length-1 || keys.slice(ki+1).every(kk=>!(it[kk.key]>0)))?3:0;
+      svg.appendChild(sv("rect",{x:x(i)-barW/2,y:yTop,width:barW,height:Math.max(0,h),fill:k.color,rx:r}));
+      base+=v;
+    });
+  });
+  container.innerHTML=""; container.appendChild(svg);
+  attachTip(container, svg, {mL,mR,mT,mB,W,H,n,x}, (i)=>{ const rows=cfg.tip(i); if(!rows)return null;
+    let base=0; cfg.keys.forEach(k=>base+=(cfg.items[i][k.key]||0)); return {html:rows, top:y(base)}; });
+}
+
+/* ============================================================
+   Rendu de l'interface
+   ============================================================ */
+const TABS=[
+  {id:"apercu",label:"Aperçu",emoji:"🏠"},
+  {id:"coach",label:"Coach",emoji:"🩺"},
+  {id:"sante",label:"Bilan sanguin",emoji:"🩸"},
+  {id:"sommeil",label:"Sommeil",emoji:"🌙"},
+  {id:"poids",label:"Poids",emoji:"⚖️"},
+  {id:"courses",label:"Courses",emoji:"🏃"},
+  {id:"autres",label:"Autres sports",emoji:"🏒"},
+  {id:"donnees",label:"Données",emoji:"📥"},
+];
+let TAB = "apercu";
+let D = compute();
+
+function h(html){ const t=document.createElement("template"); t.innerHTML=html.trim(); return t.content.firstElementChild; }
+function esc(s){ return String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c])); }
+
+function render(){
+  D = compute();
+  const app=document.getElementById("app");
+  app.innerHTML="";
+  app.appendChild(heroEl());
+  app.appendChild(tabsEl());
+  const wrap=h(`<div class="wrap"></div>`);
+  app.appendChild(wrap);
+  ({apercu:renderApercu, coach:renderCoach, sante:renderSante, sommeil:renderSommeil, poids:renderPoids,
+    courses:renderCourses, autres:renderAutres, donnees:renderDonnees}[TAB])(wrap);
+  app.appendChild(h(`<div class="footer">100% privé · tout reste sur ton appareil · aucune donnée envoyée sur internet<br>
+    ${STORE.imported.meta && STORE.imported.meta.source ? "Source : "+esc(STORE.imported.meta.source)+(STORE.imported.meta.when?" · "+esc(STORE.imported.meta.when):"") : ""}</div>`));
+}
+
+function heroEl(){
+  const s=D.summary, sc=D.sleep_composition;
+  const delta = (s.vo2_now!=null&&s.vo2_start!=null)? (s.vo2_now-s.vo2_start):null;
+  const pct = (delta!=null&&s.vo2_start)? Math.round(delta/s.vo2_start*100):null;
+  const el=h(`<div class="hero">
+    <div class="kicker mono">Ma santé · Apple Watch + bilans</div>
+    <div class="hero-big display">${s.vo2_now!=null?s.vo2_now:"—"}<span class="hero-unit">mL/min/kg — VO2 max</span></div>
+    <div style="display:flex;align-items:center;gap:10px;margin-top:4px;flex-wrap:wrap">
+      ${delta!=null?`<span class="mono" style="color:${delta>=0?C.moss:C.flame};font-weight:600;font-size:15px">${delta>=0?"+":""}${delta.toFixed(1)} depuis le début</span>
+      ${pct!=null?`<span style="color:${C.fog};font-size:13px">— la taille de ton moteur a ${delta>=0?"grossi":"changé"} de ${Math.abs(pct)}%</span>`:""}`:""}
+    </div>
+    <div class="hero-stats">
+      ${statTile(s.total_distance!=null?s.total_distance:"—","km","Distance totale")}
+      ${statTile(s.total_runs,"","Sorties course")}
+      ${statTile(fmtPace(s.avg_pace),"/km","Allure moy.")}
+      ${statTile(s.rhr_now!=null?s.rhr_now:"—","bpm","FC repos")}
+      ${statTile(sc.total_min?fmtHM(sc.total_min):"—","","Sommeil / nuit")}
+    </div>
+  </div>`);
+  return el;
+}
+function statTile(v,u,l){ return `<div><div class="stat-v mono display">${v}</div><div class="stat-l">${l} <span class="mono" style="opacity:.7">${u}</span></div></div>`; }
+
+function tabsEl(){
+  const el=h(`<div class="tabs"></div>`);
+  TABS.forEach(t=>{ const b=h(`<button class="tab ${TAB===t.id?"active":""}">${t.emoji} ${t.label}</button>`);
+    b.onclick=()=>{ TAB=t.id; render(); document.querySelector(".wrap").scrollIntoView({block:"start"}); };
+    el.appendChild(b); });
+  return el;
+}
+
+function sectionTitle(t,s){ return `<div style="margin-bottom:10px"><div class="sect-t">${t}</div>${s?`<div class="sect-s">${s}</div>`:""}</div>`; }
+function chartHost(id,h){ return `<div class="chart" id="${id}" style="height:${h}px;margin-top:10px"></div>`; }
+
+/* ---------- APERÇU ---------- */
+function renderApercu(wrap){
+  const p=D.projections, ec=D.effortCounts;
+  wrap.appendChild(h(`<div class="card" style="padding:18px;margin-bottom:16px;border-color:${C.ember}55">
+    ${sectionTitle("🔮 Si tu continues comme ça…","Une simple prolongation de ta courbe actuelle — pas une science exacte !")}
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:14px">
+      ${projTile("VO2 max dans 1 mois",p.vo2max["1m"],C.moss)}
+      ${projTile("VO2 max dans 3 mois",p.vo2max["3m"],C.moss)}
+      ${projTile("FC repos dans 1 mois",p.resting_hr["1m"],C.signal)}
+      ${projTile("FC repos dans 3 mois",p.resting_hr["3m"],C.signal)}
+    </div>
+    <div class="info">🧠 <b>Pourquoi c'est juste une estimation :</b> ton corps, c'est comme un jeu vidéo — les premiers niveaux montent vite, puis ça ralentit. Ces chiffres montrent juste « si le rythme actuel continuait pile pareil », ce qui n'arrive jamais exactement.</div>
+  </div>`));
+
+  const effCard=h(`<div class="card" style="padding:18px;margin-bottom:16px">
+    ${sectionTitle("Répartition d'effort par semaine",`${ec.facilePct}% de tes sorties sont « faciles » — c'est la règle du 80/20`)}
+    <div class="info">Plus une course est verte, plus ton cœur était tranquille. L'orange et le rouge, c'est quand tu as poussé fort.</div>
+    ${chartHost("c-eff",180)}
+    <div class="legend">
+      <span><span class="dot" style="background:${C.moss}"></span>Facile</span>
+      <span><span class="dot" style="background:${C.ember}"></span>Modéré</span>
+      <span><span class="dot" style="background:${C.flame}"></span>Intense</span>
+      <span><span class="dot" style="background:${C.line}"></span>Inconnu</span>
+    </div></div>`);
+  wrap.appendChild(effCard);
+
+  const grid=h(`<div class="grid2" style="margin-bottom:16px">
+    <div class="card" style="padding:18px">
+      ${sectionTitle("VO2 max — le moteur", D.summary.vo2_start!=null?`${D.summary.vo2_start} → ${D.summary.vo2_now} mL/min/kg`:"")}
+      <div class="info">La quantité d'oxygène que ton corps peut utiliser à fond. Plus le chiffre est grand, plus ton moteur est puissant.</div>
+      ${chartHost("c-vo2",150)}
+    </div>
+    <div class="card" style="padding:18px">
+      ${sectionTitle("FC de repos — le cœur tranquille","Battements/min au repos")}
+      <div class="info">Le nombre de battements au repos. Un cœur entraîné est plus fort, donc il bat moins souvent.</div>
+      ${chartHost("c-rhr",150)}
+    </div></div>`);
+  wrap.appendChild(grid);
+
+  wrap.appendChild(h(`<div class="card" style="padding:18px">
+    ${sectionTitle("Volume hebdomadaire","Kilomètres de course par semaine")}
+    ${chartHost("c-vol",150)}</div>`));
+
+  // charts
+  const eff=D.weeklyEffort;
+  barChart(document.getElementById("c-eff"),{height:180,items:eff,
+    keys:[{key:"facile",color:C.moss},{key:"modere",color:C.ember},{key:"intense",color:C.flame},{key:"inconnu",color:C.line}],
+    xTick:i=> i%3===0? eff[i].week.split("-W")[1]:"",
+    tip:i=>{const w=eff[i];return `<b>Sem. ${w.week.split("-W")[1]}</b><br>Facile ${w.facile.toFixed(1)} · Mod. ${w.modere.toFixed(1)} · Int. ${w.intense.toFixed(1)} km`;}});
+  const vo2=D.vo2max;
+  lineChart(document.getElementById("c-vo2"),{height:150,n:vo2.length,
+    series:[{values:vo2.map(v=>v.value),color:C.moss,dots:true,dotR:3}],
+    yMin:Math.min(...vo2.map(v=>v.value))-1,yMax:Math.max(...vo2.map(v=>v.value))+1,
+    xTick:i=> i%2===0? fmtDate(vo2[i].date):"",
+    tip:i=>`<b>${fmtDate(vo2[i].date)}</b><br>VO2 max ${vo2[i].value}`});
+  const rhr=D.resting_hr_weekly;
+  lineChart(document.getElementById("c-rhr"),{height:150,n:rhr.length,
+    series:[{values:rhr.map(v=>v.value),color:C.signal,width:2.5}],
+    xTick:i=> i%4===0? rhr[i].week.split("-W")[1]:"",
+    tip:i=>`<b>Sem. ${rhr[i].week.split("-W")[1]}</b><br>FC repos ${rhr[i].value} bpm`});
+  const vol=D.weekly_volume;
+  barChart(document.getElementById("c-vol"),{height:150,items:vol,keys:[{key:"distance",color:C.ember}],
+    xTick:i=> i%2===0? vol[i].week.split("-W")[1]:"", yFmt:t=>t,
+    tip:i=>`<b>Sem. ${vol[i].week.split("-W")[1]}</b><br>${vol[i].distance} km · ${vol[i].count} sortie(s)`});
+}
+function projTile(l,v,c){ return `<div><div style="font-size:11px;color:${C.fog};margin-bottom:4px">${l}</div><div class="display mono" style="font-size:26px;font-weight:700;color:${c}">${v!=null?v:"—"}</div></div>`; }
+
+/* ---------- BILAN SANGUIN ---------- */
+function renderSante(wrap){
+  const labs=D.labs;
+  if(!labs.dates.length){
+    wrap.appendChild(h(`<div class="card" style="padding:20px;text-align:center">
+      <div style="font-size:15px;font-weight:600;margin-bottom:6px">Aucun bilan sanguin saisi</div>
+      <div class="info" style="margin-bottom:14px">Ajoute tes résultats depuis l'onglet <b>📥 Données</b> pour suivre l'évolution de tes marqueurs.</div>
+      <button class="btn btn-primary" id="goData">Saisir un bilan</button></div>`));
+    document.getElementById("goData").onclick=()=>{TAB="donnees";render();};
+    return;
+  }
+  const ap=h(`<div class="card" style="padding:18px;margin-bottom:16px">
+    ${sectionTitle("⚠️ Points d'attention","Générés automatiquement à partir de tes valeurs face aux seuils du labo")}
+    <div style="display:flex;flex-direction:column;gap:10px;margin-top:8px"></div>
+    <div class="info">Ce ne sont pas des diagnostics — juste tes propres chiffres comparés aux seuils. Pour toute interprétation, parles-en à ton médecin.</div></div>`);
+  const apBox=ap.querySelector("div>div").parentElement.querySelector("div[style*='flex-direction']");
+  labs.attention_points.forEach(p=>{
+    const col=p.severity==="warn"?C.ember:p.severity==="good"?C.moss:C.signal;
+    apBox.appendChild(h(`<div style="padding:10px 14px;background:${C.panel2};border-left:3px solid ${col};border-radius:4px">
+      <div style="font-size:13px;font-weight:600;margin-bottom:3px">${esc(p.title)}</div>
+      <div style="font-size:12.5px;color:${C.fog};line-height:1.5">${esc(p.detail)}</div></div>`));
+  });
+  wrap.appendChild(ap);
+
+  if(labs.fidage){
+    const f=labs.fidage;
+    const fc=h(`<div class="card" style="padding:18px;margin-bottom:16px">
+      ${sectionTitle("🧬 Âge biologique (FidAge)",`Saisi le ${fmtDate(f.date)}`)}
+      <div style="display:flex;gap:24px;align-items:baseline;flex-wrap:wrap">
+        ${fidTile("Âge biologique estimé",f.biological_age,C.flame)}
+        ${fidTile("Âge réel",f.chronological_age,C.bone)}
+        ${f.body_fat_pct!=null?fidTile("% de graisse",f.body_fat_pct+"%",C.moss):""}
+      </div>
+      <div class="info">Un « âge du corps » calculé à partir de plusieurs marqueurs. Ce n'est pas une mesure exacte de ton espérance de vie — juste un score composite parmi d'autres.</div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:10px;margin-top:14px"></div></div>`);
+    const rbox=fc.lastElementChild;
+    (f.risks||[]).forEach(r=>{ const col=r.level==="faible"?C.moss:r.level==="accrue"?C.ember:C.flame;
+      rbox.appendChild(h(`<div style="padding:10px 12px;background:${C.panel2};border-radius:4px">
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <span style="font-size:12.5px;font-weight:600">${esc(r.label)}</span>
+          <span class="mono pill" style="font-size:10px;background:${col}30;color:${col}">${esc(r.level)}</span></div>
+        <div style="font-size:11px;color:${C.fog};margin-top:4px">${esc(r.detail)}</div></div>`)); });
+    wrap.appendChild(fc);
+  }
+
+  // graphiques marqueurs (>=2 points)
+  wrap.appendChild(h(sectionTitle("📈 Évolution des marqueurs","Dès qu'au moins 2 mesures existent")));
+  const grid=h(`<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:12px"></div>`);
+  wrap.appendChild(grid);
+  const twoPoint=[];
+  MARKERS.forEach(m=>{
+    const pts=labs.dates.map((d,i)=>({date:d,v:labs.series[m.key][i]})).filter(p=>p.v!=null);
+    if(pts.length<2){ if(pts.length===1) twoPoint.push({m,pts}); return; }
+    const id="lab-"+m.key;
+    const card=h(`<div class="card" style="padding:14px">
+      <div style="font-size:12px;color:${C.fog};margin-bottom:2px">${m.label}</div>
+      <div class="mono display" style="font-size:20px;font-weight:700">${pts[pts.length-1].v}<span style="font-size:12px;color:${C.fog}"> ${m.unit}</span></div>
+      ${chartHost(id,66)}</div>`);
+    grid.appendChild(card);
+    lineChart(document.getElementById(id),{height:66,mL:8,n:pts.length,
+      series:[{values:pts.map(p=>p.v),color:m.color,dots:true,dotR:2.5,width:2}],
+      yTicks:[], xTick:()=>"", tip:i=>`<b>${fmtDate(pts[i].date)}</b><br>${pts[i].v} ${m.unit}`});
+  });
+  if(twoPoint.length){
+    wrap.appendChild(h(`<div style="margin-top:16px">${sectionTitle("Marqueurs à une seule mesure")}</div>`));
+    const g2=h(`<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px"></div>`);
+    twoPoint.forEach(({m,pts})=>{ const p=pts[pts.length-1];
+      g2.appendChild(h(`<div class="card" style="padding:14px">
+        <div style="font-size:11px;color:${C.fog};margin-bottom:4px">${m.label} (${m.unit})</div>
+        <div class="mono" style="font-size:18px;font-weight:700">${p.v}</div>
+        <div style="font-size:10px;color:${C.fog};margin-top:2px">${fmtDate(p.date)}</div></div>`)); });
+    wrap.appendChild(g2);
+  }
+}
+function fidTile(l,v,c){ return `<div><div style="font-size:11px;color:${C.fog}">${l}</div><div class="display mono" style="font-size:36px;font-weight:800;color:${c}">${v}</div></div>`; }
+
+/* ---------- SOMMEIL ---------- */
+function renderSommeil(wrap){
+  const sc=D.sleep_composition, sl=D.weekly_sleep;
+  if(!sc.total_min){ wrap.appendChild(emptyImport("Aucune donnée de sommeil","Importe ton export Apple Santé pour voir ton sommeil.")); return; }
+  wrap.appendChild(h(`<div class="card" style="padding:18px;margin-bottom:16px">
+    ${sectionTitle("🌙 Ton sommeil","Moyenne des 2 dernières semaines")}
+    <div class="display mono" style="font-size:40px;font-weight:800">${fmtHM(sc.total_min)}</div>
+    <div class="info">Les adultes ont besoin d'environ 7 à 9 h par nuit pour bien récupérer.</div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:16px;margin-top:18px">
+      ${sleepTile("Sommeil profond",sc.deep_min,C.violet,"C'est là que ton corps se répare à fond.")}
+      ${sleepTile("Sommeil REM (rêves)",sc.rem_min,C.signal,"Quand tu rêves. Ton cerveau range ses souvenirs.")}
+      ${sleepTile("Sommeil léger",sc.core_min,C.moss,"Entre les phases profondes. Normal et utile.")}
+    </div></div>`));
+  wrap.appendChild(h(`<div class="card" style="padding:18px">
+    ${sectionTitle("Évolution du sommeil","Heures moyennes par semaine")}
+    ${chartHost("c-sleep",180)}</div>`));
+  lineChart(document.getElementById("c-sleep"),{height:180,n:sl.length,
+    series:[{values:sl.map(w=>w.avg_hours),color:C.violet,area:true,dots:true,dotR:2,width:2.5}],
+    yMin:Math.min(...sl.map(w=>w.avg_hours))-.5,yMax:Math.max(...sl.map(w=>w.avg_hours))+.5,
+    xTick:i=> i%3===0? sl[i].week.split("-W")[1]:"",
+    tip:i=>`<b>Sem. ${sl[i].week.split("-W")[1]}</b><br>${sl[i].avg_hours} h · ${sl[i].nights} nuit(s)`});
+}
+function sleepTile(l,v,c,info){ return `<div><div style="font-size:11px;color:${C.fog}">${l}</div><div class="mono" style="font-size:22px;font-weight:700;color:${c}">${fmtHM(v)}</div><div class="info">${info}</div></div>`; }
+
+/* ---------- POIDS ---------- */
+function renderPoids(wrap){
+  const w=D.weekly_weight;
+  if(!w.length){ wrap.appendChild(emptyImport("Aucune donnée de poids","Importe Apple Santé ou saisis ton poids dans l'onglet 📥 Données.")); return; }
+  wrap.appendChild(h(`<div class="card" style="padding:18px">
+    ${sectionTitle("⚖️ Évolution du poids",`${w[0].avg_kg} kg → ${w[w.length-1].avg_kg} kg`)}
+    <div class="info">Ajoute une pesée quand tu veux depuis l'onglet 📥 Données pour garder la courbe à jour.</div>
+    ${chartHost("c-w",200)}</div>`));
+  lineChart(document.getElementById("c-w"),{height:200,n:w.length,
+    series:[{values:w.map(x=>x.avg_kg),color:C.ember,dots:true,dotR:3,width:2.5}],
+    yMin:Math.min(...w.map(x=>x.avg_kg))-1,yMax:Math.max(...w.map(x=>x.avg_kg))+1,
+    xTick:i=> i%2===0? w[i].week.split("-W")[1]:"",
+    tip:i=>`<b>Sem. ${w[i].week.split("-W")[1]}</b><br>${w[i].avg_kg} kg`});
+}
+
+/* ---------- COURSES ---------- */
+function renderCourses(wrap){
+  const runs=[...D.runs].reverse();
+  if(!runs.length){ wrap.appendChild(emptyImport("Aucune course","Importe ton export Apple Santé pour voir tes courses.")); return; }
+  const card=h(`<div class="card" style="padding:0;overflow:hidden">
+    <div style="padding:14px 18px;border-bottom:1px solid ${C.line};display:flex;justify-content:space-between;align-items:center">
+      <div style="font-size:14px;font-weight:600">Courses récentes</div>
+      <div class="mono" style="font-size:11px;color:${C.fog}">${runs.length} au total</div></div>
+    <div style="overflow-x:auto"><table><thead><tr>
+      <th>Date</th><th>Distance</th><th>Durée</th><th>Allure</th><th>FC moy.</th><th>Effort</th>
+    </tr></thead><tbody></tbody></table></div></div>`);
+  const tb=card.querySelector("tbody");
+  runs.slice(0,30).forEach(r=>{
+    const eff=r.effort, col=eff==="facile"?C.moss:eff==="modere"?C.ember:eff==="intense"?C.flame:C.fog;
+    const lbl=eff==="facile"?"Facile":eff==="modere"?"Modéré":eff==="intense"?"Intense":"—";
+    tb.appendChild(h(`<tr>
+      <td>${fmtDate(r.date)}</td>
+      <td class="mono">${r.distance_km.toFixed(2)} km</td>
+      <td class="mono">${Math.round(r.duration_min)} min</td>
+      <td class="mono">${fmtPace(r.pace_min_km)} /km</td>
+      <td class="mono">${r.avg_hr?r.avg_hr+" bpm":"—"}</td>
+      <td>${eff?`<span class="pill" style="background:${col}30;color:${col}">${lbl}</span>`:`<span style="color:${C.fog}">—</span>`}</td>
+    </tr>`));
+  });
+  wrap.appendChild(card);
+}
+
+/* ---------- AUTRES SPORTS ---------- */
+function renderAutres(wrap){
+  const a=D.other_activities;
+  if(!a.length){ wrap.appendChild(emptyImport("Aucun autre sport","Importe ton export Apple Santé pour voir vélo, plongée, etc.")); return; }
+  const g=h(`<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:14px"></div>`);
+  a.slice().sort((x,y)=>y.count-x.count).forEach(x=>{
+    g.appendChild(h(`<div class="card" style="padding:16px">
+      <div style="font-size:13px;color:${C.fog};margin-bottom:8px">${esc(x.label||x.type)}</div>
+      <div class="display mono" style="font-size:30px;font-weight:700">${x.count}</div>
+      <div style="font-size:11px;color:${C.fog};margin-top:4px">sorties · <span class="mono">${x.duration} min</span> au total</div></div>`));
+  });
+  wrap.appendChild(g);
+}
+
+function emptyImport(t,s){ const el=h(`<div class="card" style="padding:22px;text-align:center">
+  <div style="font-size:15px;font-weight:600;margin-bottom:6px">${t}</div>
+  <div class="info" style="margin-bottom:14px">${s}</div>
+  <button class="btn btn-primary">📥 Aller à Données</button></div>`);
+  el.querySelector("button").onclick=()=>{TAB="donnees";render();}; return el; }
+
+/* ============================================================
+   ONGLET COACH : conseils médecin + préparateur longévité
+   Moteur basé sur des règles (aucune donnée envoyée) — à partir
+   de TES chiffres. Ce ne sont pas des prescriptions médicales.
+   ============================================================ */
+function labLatest(key){
+  const s=D.labs.series&&D.labs.series[key]; if(!s) return null;
+  for(let i=s.length-1;i>=0;i--){ if(s[i]!=null) return {value:s[i], date:D.labs.dates[i]}; }
+  return null;
+}
+function labSeriesVals(key){ const s=(D.labs.series&&D.labs.series[key])||[]; return D.labs.dates.map((d,i)=>({date:d,v:s[i]})).filter(p=>p.v!=null); }
+
+function coachData(){
+  const s=D.summary, sc=D.sleep_composition, f=D.labs.fidage;
+  const age = f && f.chronological_age ? f.chronological_age : null;
+  const vo2 = s.vo2_now;
+  const rhr = s.rhr_now;
+  const nightH = sc.total_min? sc.total_min/60 : null;
+  const deep = sc.deep_min, rem = sc.rem_min;
+  const ec = D.effortCounts;
+  const nWeeks = D.weekly_volume.length||1;
+  const avgKm = D.weekly_volume.reduce((a,w)=>a+w.distance,0)/nWeeks;
+  const strengthTypes = ["FunctionalStrengthTraining","TraditionalStrengthTraining","CoreTraining","HighIntensityIntervalTraining"];
+  const hasStrength = (D.other_activities||[]).some(a=>strengthTypes.includes(a.type));
+  const vitD = labLatest("vitamine_d"), crp = labLatest("crp"), ldl = labLatest("ldl"),
+        hdl = labLatest("hdl"), trig = labLatest("triglycerides"), ggt = labLatest("gamma_gt"),
+        ferr = labSeriesVals("ferritine"), psa = labSeriesVals("psa"), gly = labLatest("glycemie");
+  const smoking = !!(f && (f.risks||[]).some(r=>/tabac|fumeur/i.test(r.detail+" "+r.label)));
+  const bioGap = (f && f.biological_age && f.chronological_age)? f.biological_age-f.chronological_age : null;
+  return {age,vo2,rhr,nightH,deep,rem,ec,avgKm,hasStrength,vitD,crp,ldl,hdl,trig,ggt,ferr,psa,gly,smoking,bioGap,fat:f&&f.body_fat_pct};
+}
+
+function renderCoach(wrap){
+  const c=coachData();
+
+  wrap.appendChild(h(`<div class="card" style="padding:18px;margin-bottom:16px;border-color:${C.moss}55">
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">
+      <div style="font-size:26px">🩺</div>
+      <div><div class="sect-t" style="font-size:16px">Ton coach santé & longévité</div>
+      <div class="sect-s">Un médecin qui lit tes chiffres + un préparateur obsédé par le « bien vieillir »</div></div>
+    </div>
+    <div class="info">Voici ce que <b>tes</b> données me racontent aujourd'hui. ⚠️ Ce ne sont pas des prescriptions : pour toute décision (supplément, médicament, dépistage), c'est ton médecin — <b>Dr Jungers</b> — qui tranche. Moi je te donne le cap et les priorités.</div>
+  </div>`));
+
+  // ---- Priorités ----
+  const pr = coachPriorities(c);
+  if(pr.length){
+    const card=h(`<div class="card" style="padding:18px;margin-bottom:16px">
+      ${sectionTitle("🎯 Tes 3 priorités du moment","Là où chaque effort rapporte le plus")}
+      <div style="display:flex;flex-direction:column;gap:10px;margin-top:8px"></div></div>`);
+    const box=card.lastElementChild;
+    pr.slice(0,3).forEach((p,i)=>{
+      const col=p.tone==="warn"?C.ember:p.tone==="bad"?C.flame:C.moss;
+      box.appendChild(h(`<div style="display:flex;gap:12px;align-items:flex-start;padding:12px 14px;background:${C.panel2};border-left:3px solid ${col};border-radius:5px">
+        <div class="display mono" style="font-size:26px;font-weight:800;color:${col};line-height:1">${i+1}</div>
+        <div><div style="font-size:14px;font-weight:600;margin-bottom:3px">${esc(p.title)}</div>
+        <div style="font-size:12.5px;color:${C.fog};line-height:1.55">${p.body}</div></div></div>`));
+    });
+    wrap.appendChild(card);
+  }
+
+  // ---- Sections détaillées ----
+  coachSections(c).forEach(sec=>{
+    const card=h(`<div class="card" style="padding:18px;margin-bottom:16px">
+      ${sectionTitle(sec.icon+" "+sec.title, sec.sub||"")}
+      <div style="display:flex;flex-direction:column;gap:12px;margin-top:6px"></div></div>`);
+    const box=card.lastElementChild;
+    sec.items.forEach(it=>{
+      const col=it.tone==="good"?C.moss:it.tone==="warn"?C.ember:it.tone==="bad"?C.flame:C.signal;
+      box.appendChild(h(`<div>
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:3px">
+          <span style="width:7px;height:7px;border-radius:99px;background:${col};display:inline-block;flex:0 0 auto"></span>
+          <span style="font-size:13.5px;font-weight:600">${esc(it.h)}</span></div>
+        <div style="font-size:12.5px;color:${C.fog};line-height:1.55;padding-left:15px">${it.body}</div></div>`));
+    });
+    wrap.appendChild(card);
+  });
+
+  // ---- Plan de la semaine ----
+  wrap.appendChild(h(`<div class="card" style="padding:18px;border-color:${C.ember}44">
+    ${sectionTitle("🗓️ Ton plan-type de la semaine","À adapter à ta vie — la régularité bat la perfection")}
+    <div style="display:flex;flex-direction:column;gap:9px;margin-top:8px">
+      ${planLine("🏃","3–4 courses",`dont ~80% <b>faciles</b> (Zone 2, tu peux parler) + <b>1 séance rapide</b> (fractionné) pour continuer à pousser le VO2 max`)}
+      ${planLine("🏋️",(c.hasStrength?"2 séances de force (garde-les !)":"2 séances de force (le grand manque)"),`full-body 30–40 min : squat, fente, tirage, pompe, gainage, port de charge. <b>Le pilier n°1 du bien-vieillir après 45 ans.</b>`)}
+      ${planLine("🧘","Mobilité 10 min/j",`hanches, chevilles, épaules — ça protège le dos et les articulations sur le long terme`)}
+      ${planLine("😴","Sommeil régulier 7,5–8 h",`mêmes horaires, chambre fraîche et sombre, pas d'alcool tard — vise plus de sommeil <b>profond</b>`)}
+      ${planLine("🥗","Assiette méditerranéenne",`protéines ~1,6 g/kg (≈130 g/j pour toi), légumes à chaque repas, oméga-3 (poisson gras), moins d'ultra-transformé`)}
+      ${c.vitD&&c.vitD.value<30?planLine("☀️","Vitamine D",`ta dernière valeur (${c.vitD.value} ng/mL) est basse — supplémentation à valider avec ton médecin`):""}
+      ${c.smoking?planLine("🚭","Zéro cigarette",`c'est de loin le plus gros levier de longévité que tu aies — et ça ferait baisser ton score de risque cardio et ton âge biologique`):""}
+      ${planLine("🩸","Prochain bilan",`recontrôle la <b>CRP</b> et la <b>vitamine D</b> pour vérifier que ça s'améliore`)}
+    </div>
+    <div class="info" style="margin-top:12px">Rappel : je suis un outil, pas ton médecin. Tout ce qui touche aux médicaments, compléments ou dépistages se décide avec Dr Jungers. 💚</div>
+  </div>`));
+}
+function planLine(ic,t,b){ return `<div style="display:flex;gap:10px;align-items:flex-start">
+  <span style="font-size:17px;flex:0 0 auto">${ic}</span>
+  <div><span style="font-size:13px;font-weight:600">${t}</span> <span style="font-size:12.5px;color:${C.fog}">— ${b}</span></div></div>`; }
+
+function coachPriorities(c){
+  const P=[];
+  if(c.smoking) P.push({tone:"bad",title:"Arrêter le tabac",body:"C'est <b>le</b> levier n°1 pour ton espérance de vie en bonne santé. Il tire vers le haut ton inflammation (CRP), ton stress oxydatif et ton risque cardiovasculaire — les trois choses qui gonflent ton âge biologique. Si tu as déjà arrêté, fais corriger l'info dans ton dossier."});
+  if(!c.hasStrength) P.push({tone:"warn",title:"Ajouter 2 séances de musculation / semaine",body:"Tu cours, tu plonges, tu fais du hockey — mais je ne vois <b>aucune séance de force</b>. Après 45 ans on perd 1–2% de muscle par an. La force est le meilleur bouclier anti-âge : métabolisme, os, équilibre, autonomie plus tard. C'est ton plus gros gain potentiel."});
+  if(c.vitD && c.vitD.value<30) P.push({tone:"warn",title:"Remonter ta vitamine D",body:`À ${c.vitD.value} ng/mL tu es en zone « insuffisant » (cible ≥ 30). Elle soutient os, muscles et immunité — d'autant plus utile que tu veux protéger ta masse musculaire. Supplémentation à caler avec ton médecin.`});
+  if(c.crp && c.crp.value>3) P.push({tone:"warn",title:"Faire baisser l'inflammation (CRP)",body:`Ta CRP est à ${c.crp.value} mg/L (seuil ≤ 3). Une inflammation « de bas grade » use l'organisme sur la durée. Leviers : tabac, sommeil profond, alcool/foie, alimentation anti-inflammatoire. À recontrôler au prochain bilan.`});
+  if(P.length<3 && c.bioGap && c.bioGap>0) P.push({tone:"warn",title:"Refermer l'écart d'âge biologique",body:`Ton âge biologique estimé dépasse ton âge réel de ${c.bioGap} ans — mais il est tiré par des facteurs <b>modifiables</b> (inflammation, stress oxydatif). Bonne nouvelle : chaque priorité ci-dessus le fait redescendre.`});
+  if(P.length<3) P.push({tone:"good",title:"Continuer sur ta lancée cardio",body:`Ton VO2 max grimpe fort et ton profil lipidique est excellent. Verrouille la régularité (course facile + 1 séance rapide) et ajoute la force pour un corps complet.`});
+  return P;
+}
+
+function coachSections(c){
+  const S=[];
+  // Cardio & VO2max
+  const cardio={icon:"🫀",title:"Cardio & VO2 max — ton moteur",items:[]};
+  if(c.vo2!=null){
+    const lvl = c.vo2>=50?"supérieur (parmi les meilleurs pour ton âge)":c.vo2>=43?"bon à très bon":c.vo2>=35?"moyen":"à développer";
+    cardio.items.push({tone:c.vo2>=43?"good":"warn",h:`VO2 max ${c.vo2} — niveau « ${lvl} »`,
+      body:`Le VO2 max est l'un des <b>meilleurs prédicteurs de longévité</b> qu'on connaisse : mieux vaut être ici que dans la moyenne. ${c.age?`Pour un homme de ${c.age} ans, `:""}ton chiffre est excellent — objectif maintenant : le <b>maintenir haut</b> dans la durée, ce qui compte plus que de battre des records.`});
+  }
+  cardio.items.push({tone:"good",h:`Garde la règle du 80/20 (tu es à ~${c.ec.facilePct}% facile)`,
+    body:`La majorité de tes sorties en Zone 2 (facile, tu peux tenir une conversation) construit le moteur sans t'user. Ajoute <b>une</b> séance rapide/semaine (ex : 4×4 min forts / 3 min récup, ou 30/30) pour continuer à pousser le plafond. Ne dépasse pas ~20% de dur.`});
+  cardio.items.push({tone:"info",h:"La progression va ralentir — c'est normal",
+    body:`Tu as pris beaucoup de VO2 max récemment (les « gains de débutant »). Plus tu montes, plus chaque point se mérite. Vise la <b>constance sur 6–12 mois</b> plutôt que la courbe qui monte tout droit.`});
+  S.push(cardio);
+
+  // Force
+  S.push({icon:"🏋️",title:"Force & masse musculaire — le pilier oublié",items:[
+    {tone:c.hasStrength?"good":"warn",
+     h:c.hasStrength?"Tu fais déjà de la force — continue":"Aucune séance de force détectée",
+     body:c.hasStrength?"Garde 2 séances/semaine avec surcharge progressive (un peu plus lourd/plus de reps au fil des semaines)."
+       :"C'est le grand absent de ton entraînement. 2 séances full-body par semaine (squat, soulevé/charnière de hanche, tirage, poussée, port de charge) suffisent. La force protège les <b>os</b> (utile vu ta vitamine D basse), le métabolisme, l'équilibre — et c'est ce qui détermine ton autonomie à 70-80 ans."},
+    {tone:"info",h:"Protéines : le carburant du muscle",
+     body:`Vise ~1,6 g de protéines par kg et par jour, réparties sur les repas. Muscu + protéines + un peu de vitamine D = le trio anti-fonte musculaire.`},
+  ]});
+
+  // Sommeil
+  const sleep={icon:"🌙",title:"Sommeil — ta récupération",items:[]};
+  if(c.nightH){
+    sleep.items.push({tone:(c.nightH>=7&&c.nightH<=9)?"good":"warn",h:`~${c.nightH.toFixed(1)} h par nuit`,
+      body:(c.nightH>=7&&c.nightH<=9)?"Pile dans la zone idéale (7–9 h). C'est là que le corps répare le muscle et nettoie le cerveau — un pilier de longévité au même titre que le sport.":"Vise 7–9 h. Le manque de sommeil augmente l'inflammation et la faim, et freine la récupération."});
+  }
+  if(c.deep!=null){
+    sleep.items.push({tone:c.deep>=60?"good":"warn",h:`Sommeil profond ~${Math.round(c.deep)} min`,
+      body:c.deep>=60?"Bon niveau de sommeil profond — c'est la phase la plus réparatrice."
+        :"Un peu court côté sommeil profond. Pour en gagner : horaires réguliers, chambre <b>fraîche et sombre</b>, pas d'alcool ni d'écran juste avant, et… l'activité physique (que tu fais déjà)."});
+  }
+  sleep.items.push({tone:"info",h:"La régularité prime sur la durée",
+    body:"Te coucher/lever à heures fixes (même le week-end) vaut mieux qu'une grasse mat' pour compenser. Ton corps adore la routine."});
+  S.push(sleep);
+
+  // Nutrition & inflammation & lipides
+  const nutri={icon:"🥗",title:"Nutrition, inflammation & cœur",items:[]};
+  const lip=[];
+  if(c.hdl) lip.push(`HDL ${c.hdl.value}`); if(c.ldl) lip.push(`LDL ${c.ldl.value}`); if(c.trig) lip.push(`triglycérides ${c.trig.value}`);
+  if(lip.length) nutri.items.push({tone:"good",h:"Ton bilan lipidique est excellent",
+    body:`${lip.join(", ")} mg/dL — HDL haut, LDL et triglycérides bas : un profil qui protège tes artères. ${c.ggt?`Ton foie s'améliore aussi (Gamma-GT à ${c.ggt.value}). `:""}Continue l'huile d'olive, les poissons gras, les fibres.`});
+  if(c.crp) nutri.items.push({tone:c.crp.value>3?"warn":"good",h:`Inflammation (CRP) : ${c.crp.value} mg/L`,
+    body:c.crp.value>3?"Légèrement au-dessus du seuil (≤ 3). Cible les causes : tabac, sommeil, alcool, aliments ultra-transformés. Une alimentation méditerranéenne + oméga-3 aide à la faire baisser. À recontrôler.":"Dans la norme — bon signe pour tes artères et ton âge biologique."});
+  if(c.vitD) nutri.items.push({tone:c.vitD.value<30?"warn":"good",h:`Vitamine D : ${c.vitD.value} ng/mL`,
+    body:c.vitD.value<30?"En dessous de 30 (insuffisant). Utile pour os, muscles et immunité. Supplémentation à valider avec ton médecin, surtout en sortie d'hiver.":"Correct. Garde le cap, surtout l'hiver."});
+  if(c.ferr.length>=2){ const a=c.ferr[0],b=c.ferr[c.ferr.length-1];
+    if(b.v>a.v*1.5) nutri.items.push({tone:"info",h:`Ferritine en hausse (${a.v} → ${b.v} µg/L)`,
+      body:"Encore dans la norme, mais elle a bien monté. La ferritine grimpe aussi avec l'inflammation — à relier à ta CRP et à surveiller au prochain bilan."}); }
+  if(c.gly) nutri.items.push({tone:c.gly.value<100?"good":"warn",h:`Glycémie : ${c.gly.value} mg/dL`,
+    body:c.gly.value<100?"Normale — et ta sensibilité à l'insuline est excellente d'après ton bilan. Un vrai point fort.":"Un peu élevée — à surveiller avec ton médecin."});
+  if(nutri.items.length) S.push(nutri);
+
+  // Suivi médical
+  const med={icon:"🩺",title:"Suivi médical — à garder à l'œil",items:[]};
+  if(c.psa.length>=2){ const first=c.psa[0].v,last=c.psa[c.psa.length-1].v;
+    med.items.push({tone:"info",h:`PSA : ${first} → ${last} µg/L`,
+      body:`Toujours bien en dessous du seuil général (4,0), et ton urologue a jugé la densité rassurante. La légère tendance à la hausse vaut d'être <b>mentionnée à chaque contrôle annuel</b> — sans inquiétude particulière à ce stade.`}); }
+  if(c.bioGap!=null) med.items.push({tone:c.bioGap>0?"warn":"good",h:`Âge biologique ${c.bioGap>0?"+"+c.bioGap+" ans":"≤ âge réel"}`,
+    body:c.bioGap>0?`Un score composite (pas un diagnostic) tiré par l'inflammation et le stress oxydatif. Le bon côté : ce sont des leviers sur lesquels tu peux agir dès cette semaine.`:"Ton corps « fait plus jeune » que ton âge — continue."});
+  med.items.push({tone:"info",h:"Le rythme des contrôles",
+    body:"Un bilan sanguin par an, contrôle urologique/PSA selon ton urologue, et tension au repos. Note tout ici pour voir les tendances plutôt que des points isolés."});
+  S.push(med);
+
+  return S;
+}
+
+/* ============================================================
+   ONGLET DONNÉES : import Apple Santé + saisie manuelle
+   ============================================================ */
+function renderDonnees(wrap){
+  // --- Import Apple Santé ---
+  const imp=h(`<div class="card" style="padding:18px;margin-bottom:16px">
+    ${sectionTitle("📲 Pomper les données de l'iPhone","Import direct de ton export Apple Santé — rien ne quitte l'appareil")}
+    <ol style="font-size:12.5px;color:${C.fog};line-height:1.7;margin:8px 0 12px 18px">
+      <li>iPhone → app <b>Santé</b> → touche ta <b>photo</b> (en haut à droite)</li>
+      <li>tout en bas : <b>Exporter toutes les données Santé</b> → tu obtiens <b>export.zip</b></li>
+      <li>enregistre-le dans <b>Fichiers</b> (ou reçois-le par AirDrop), puis choisis-le ci-dessous</li>
+    </ol>
+    <input type="file" id="hkfile" accept=".zip,.xml,application/zip,text/xml" style="display:none">
+    <button class="btn btn-primary" id="hkbtn">Choisir export.zip / export.xml</button>
+    <div id="hkprog" style="margin-top:14px;display:none">
+      <div class="prog"><i></i></div>
+      <div class="mono" style="font-size:11px;color:${C.fog};margin-top:6px" id="hkmsg">Préparation…</div>
+    </div>
+    <div class="info" style="margin-top:10px">Le fichier peut être volumineux (plusieurs dizaines de Mo). L'analyse se fait entièrement dans le navigateur, hors-ligne. On récupère : VO2 max, FC de repos, poids, sommeil, courses et autres sports.</div>
+  </div>`);
+  wrap.appendChild(imp);
+  imp.querySelector("#hkbtn").onclick=()=>imp.querySelector("#hkfile").click();
+  imp.querySelector("#hkfile").onchange=e=>{ const f=e.target.files[0]; if(f) importHealth(f, imp); };
+
+  // --- Saisie poids ---
+  const today=new Date().toISOString().slice(0,10);
+  const wCard=h(`<div class="card" style="padding:18px;margin-bottom:16px">
+    ${sectionTitle("⚖️ Ajouter une pesée")}
+    <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end;margin-top:8px">
+      <div class="field" style="flex:1;min-width:130px"><label>Date</label><input type="date" id="wdate" value="${today}" max="${today}"></div>
+      <div class="field" style="flex:1;min-width:110px"><label>Poids (kg)</label><input type="number" id="wkg" step="0.1" inputmode="decimal" placeholder="80.0"></div>
+      <button class="btn btn-primary" id="waddbtn">Ajouter</button>
+    </div>
+    <div id="wlist" style="margin-top:12px"></div></div>`);
+  wrap.appendChild(wCard);
+  wCard.querySelector("#waddbtn").onclick=()=>{
+    const d=wCard.querySelector("#wdate").value, kg=parseFloat(wCard.querySelector("#wkg").value);
+    if(!d||!(kg>0)){ toast("Entre une date et un poids valides"); return; }
+    STORE.manual.weight=(STORE.manual.weight||[]).filter(x=>x.date!==d);
+    STORE.manual.weight.push({date:d,kg:+kg.toFixed(1)});
+    saveStore(); toast("Pesée ajoutée ✓"); render();
+  };
+  const wl=wCard.querySelector("#wlist");
+  const mw=(STORE.manual.weight||[]).slice().sort((a,b)=>a.date<b.date?1:-1);
+  if(mw.length){ wl.appendChild(h(`<div style="font-size:11px;color:${C.fog};margin-bottom:6px">Pesées saisies à la main</div>`));
+    mw.slice(0,8).forEach(x=>{ const row=h(`<div style="display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px solid ${C.line}">
+      <span class="mono" style="font-size:13px">${fmtDate(x.date)} — ${x.kg} kg</span>
+      <button class="btn btn-ghost" style="padding:4px 10px;color:${C.flame}">Suppr.</button></div>`);
+      row.querySelector("button").onclick=()=>{ STORE.manual.weight=STORE.manual.weight.filter(y=>y.date!==x.date); saveStore(); render(); };
+      wl.appendChild(row); }); }
+
+  // --- Saisie bilan sanguin ---
+  const lCard=h(`<div class="card" style="padding:18px;margin-bottom:16px">
+    ${sectionTitle("🩸 Ajouter un bilan sanguin","Remplis seulement les marqueurs que tu as — les autres restent vides")}
+    <div class="field" style="max-width:220px;margin-top:8px"><label>Date du prélèvement</label><input type="date" id="ldate" value="${today}" max="${today}"></div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-top:12px" id="lgrid"></div>
+    <div style="margin-top:14px;padding-top:14px;border-top:1px solid ${C.line}">
+      <div style="font-size:12px;color:${C.fog};margin-bottom:8px">FidAge / composition (optionnel)</div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px">
+        <div class="field"><label>Âge biologique</label><input type="number" id="fbio" inputmode="numeric"></div>
+        <div class="field"><label>Âge réel</label><input type="number" id="fchr" inputmode="numeric"></div>
+        <div class="field"><label>% de graisse</label><input type="number" id="ffat" step="0.1" inputmode="decimal"></div>
+      </div>
+    </div>
+    <button class="btn btn-primary" id="laddbtn" style="margin-top:14px">Enregistrer le bilan</button>
+    <div id="llist" style="margin-top:14px"></div></div>`);
+  wrap.appendChild(lCard);
+  const lg=lCard.querySelector("#lgrid");
+  MARKERS.forEach(m=>{ lg.appendChild(h(`<div class="field"><label>${m.label} <span class="mono" style="opacity:.6">${m.unit}</span></label>
+    <input type="number" step="0.01" inputmode="decimal" data-mk="${m.key}" placeholder="${rangeText(m)}"></div>`)); });
+  lCard.querySelector("#laddbtn").onclick=()=>{
+    const d=lCard.querySelector("#ldate").value; if(!d){ toast("Choisis une date"); return; }
+    const values={}; lg.querySelectorAll("input[data-mk]").forEach(inp=>{ const v=parseFloat(inp.value); if(!isNaN(v)) values[inp.dataset.mk]=v; });
+    if(!Object.keys(values).length){ toast("Remplis au moins un marqueur"); return; }
+    STORE.manual.lab_entries=(STORE.manual.lab_entries||[]).filter(e=>e.date!==d);
+    STORE.manual.lab_entries.push({date:d,values});
+    const bio=parseInt(lCard.querySelector("#fbio").value,10), chr=parseInt(lCard.querySelector("#fchr").value,10), fat=parseFloat(lCard.querySelector("#ffat").value);
+    if(!isNaN(bio)&&!isNaN(chr)){ STORE.manual.fidage={date:d,biological_age:bio,chronological_age:chr,body_fat_pct:isNaN(fat)?null:fat,risks:(STORE.manual.fidage&&STORE.manual.fidage.risks)||[]}; }
+    saveStore(); toast("Bilan enregistré ✓"); TAB="sante"; render();
+  };
+  const ll=lCard.querySelector("#llist");
+  const le=(STORE.manual.lab_entries||[]).slice().sort((a,b)=>a.date<b.date?1:-1);
+  if(le.length){ ll.appendChild(h(`<div style="font-size:11px;color:${C.fog};margin-bottom:6px">Bilans enregistrés</div>`));
+    le.forEach(e=>{ const cnt=Object.keys(e.values||{}).length;
+      const row=h(`<div style="display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px solid ${C.line}">
+        <span class="mono" style="font-size:13px">${fmtDate(e.date)} — ${cnt} marqueur(s)</span>
+        <button class="btn btn-ghost" style="padding:4px 10px;color:${C.flame}">Suppr.</button></div>`);
+      row.querySelector("button").onclick=()=>{ STORE.manual.lab_entries=STORE.manual.lab_entries.filter(x=>x.date!==e.date); saveStore(); render(); };
+      ll.appendChild(row); }); }
+
+  // --- Sauvegarde / restauration ---
+  const mCard=h(`<div class="card" style="padding:18px">
+    ${sectionTitle("💾 Sauvegarde & remise à zéro")}
+    <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:10px">
+      <button class="btn" id="backup">Sauvegarder (.json)</button>
+      <button class="btn" id="restore">Importer une sauvegarde</button>
+      <button class="btn btn-ghost" id="demo" style="color:${C.fog}">Recharger l'exemple</button>
+      <button class="btn btn-ghost" id="clear" style="color:${C.flame}">Tout effacer</button>
+    </div>
+    <input type="file" id="restfile" accept=".json,application/json" style="display:none">
+    <div class="info" style="margin-top:10px">La sauvegarde est un simple fichier <b>.json</b> que tu gardes où tu veux. Rien n'est envoyé sur internet.</div></div>`);
+  wrap.appendChild(mCard);
+  mCard.querySelector("#backup").onclick=()=>{
+    const blob=new Blob([JSON.stringify(STORE,null,2)],{type:"application/json"});
+    const a=document.createElement("a"); a.href=URL.createObjectURL(blob);
+    a.download="ma-sante-"+new Date().toISOString().slice(0,10)+".json"; a.click();
+    setTimeout(()=>URL.revokeObjectURL(a.href),2000);
+  };
+  mCard.querySelector("#restore").onclick=()=>mCard.querySelector("#restfile").click();
+  mCard.querySelector("#restfile").onchange=e=>{ const f=e.target.files[0]; if(!f)return;
+    const r=new FileReader(); r.onload=()=>{ try{ const s=JSON.parse(r.result);
+      if(!s.imported||!s.manual) throw 0; STORE=s; persist(STORE); toast("Sauvegarde restaurée ✓"); TAB="apercu"; render();
+    }catch(err){ toast("Fichier invalide"); } }; r.readAsText(f); };
+  mCard.querySelector("#demo").onclick=()=>{ if(confirm("Recharger les données d'exemple ? Tes saisies actuelles seront remplacées.")){ STORE=seedStore(); persist(STORE); toast("Exemple rechargé"); TAB="apercu"; render(); } };
+  mCard.querySelector("#clear").onclick=()=>{ if(confirm("Effacer TOUTES les données de l'app ? Action irréversible.")){ STORE={imported:{vo2max:[],rhr_daily:[],weight_daily:[],sleep_nightly:[],runs:[],other_activities:[],meta:{}},manual:{weight:[],lab_entries:[],fidage:null},seed:false}; persist(STORE); toast("Données effacées"); TAB="donnees"; render(); } };
+}
+
+/* ============================================================
+   Import Apple Santé — worker (unzip via DecompressionStream)
+   ============================================================ */
+function importHealth(file, card){
+  const prog=card.querySelector("#hkprog"), bar=prog.querySelector("i"), msg=card.querySelector("#hkmsg");
+  prog.style.display="block"; bar.style.width="4%"; msg.textContent="Lecture du fichier…";
+  const worker=makeWorker();
+  worker.onmessage=ev=>{
+    const m=ev.data;
+    if(m.type==="progress"){ bar.style.width=Math.min(96,m.pct||10)+"%"; if(m.msg)msg.textContent=m.msg; }
+    else if(m.type==="error"){ bar.style.width="0"; msg.textContent="❌ "+m.msg; toast("Import impossible : "+m.msg); worker.terminate(); }
+    else if(m.type==="done"){ bar.style.width="100%"; msg.textContent="Terminé ✓"; worker.terminate();
+      applyImport(m.data); }
+  };
+  worker.onerror=e=>{ msg.textContent="❌ Erreur d'analyse"; toast("Erreur pendant l'analyse du fichier"); };
+  worker.postMessage({file});
+}
+
+function applyImport(d){
+  // Résumé lisible
+  const parts=[];
+  if(d.runs.length) parts.push(d.runs.length+" courses");
+  if(d.vo2max.length) parts.push(d.vo2max.length+" VO2 max");
+  if(d.weight_daily.length) parts.push(d.weight_daily.length+" pesées");
+  if(d.sleep_nightly.length) parts.push(d.sleep_nightly.length+" nuits");
+  STORE.imported={ vo2max:d.vo2max, rhr_daily:d.rhr_daily, weight_daily:d.weight_daily,
+    sleep_nightly:d.sleep_nightly, runs:d.runs, other_activities:d.other_activities,
+    meta:{source:"Apple Santé", when:new Date().toLocaleDateString("fr-BE")} };
+  saveStore();
+  toast("Import réussi : "+(parts.join(" · ")||"aucune donnée reconnue"));
+  TAB="apercu"; render();
+}
+
+function makeWorker(){
+  const src = `
+  const ACT=${JSON.stringify(ACTIVITY_LABELS)};
+  function parseAttrs(tag){ const o={}; const re=/(\\w+)="([^"]*)"/g; let m; while(m=re.exec(tag)){ o[m[1]]=m[2]; } return o; }
+  function pDate(s){ const m=/(\\d{4})-(\\d\\d)-(\\d\\d) (\\d\\d):(\\d\\d):(\\d\\d)\\s*([+-])(\\d\\d)(\\d\\d)/.exec(s||"");
+    if(!m) return null; const off=(m[7]==="-"?-1:1)*(parseInt(m[8])*60+parseInt(m[9]))*60000;
+    const ms=Date.UTC(+m[1],+m[2]-1,+m[3],+m[4],+m[5],+m[6])-off; return {ms,local:m[1]+"-"+m[2]+"-"+m[3],hour:+m[4],dt:m[1]+"-"+m[2]+"-"+m[3]+"T"+m[4]+":"+m[5]+":"+m[6]}; }
+  function localDateShift(ms,hoursBack){ const d=new Date(ms-hoursBack*3600000); return d.getUTCFullYear()+"-"+String(d.getUTCMonth()+1).padStart(2,"0")+"-"+String(d.getUTCDate()).padStart(2,"0"); }
+
+  const acc={ vo2:[], rhr:{}, weight:[], sleep:{}, runs:[], others:{}, cur:null, records:0 };
+  function pushAvg(map,date,val){ if(!map[date])map[date]={s:0,n:0}; map[date].s+=val; map[date].n++; }
+
+  function onRecord(a){
+    acc.records++;
+    const t=a.type, v=parseFloat(a.value);
+    if(t==="HKQuantityTypeIdentifierVO2Max"){ const d=pDate(a.startDate); if(d&&!isNaN(v)) acc.vo2.push({date:d.local,value:+v.toFixed(2)}); }
+    else if(t==="HKQuantityTypeIdentifierRestingHeartRate"){ const d=pDate(a.startDate); if(d&&!isNaN(v)) pushAvg(acc.rhr,d.local,v); }
+    else if(t==="HKQuantityTypeIdentifierBodyMass"){ const d=pDate(a.startDate); if(d&&!isNaN(v)){ let kg=v; if((a.unit||"").toLowerCase().indexOf("lb")>=0) kg=v*0.45359237; acc.weight.push({date:d.local,value:kg}); } }
+    else if(t==="HKCategoryTypeIdentifierSleepAnalysis"){
+      const ds=pDate(a.startDate), de=pDate(a.endDate); if(!ds||!de) return;
+      const mins=(de.ms-ds.ms)/60000; if(mins<=0||mins>16*60) return;
+      const val=a.value||""; let stage=null;
+      if(/Deep/.test(val)) stage="deep"; else if(/REM/.test(val)) stage="rem";
+      else if(/Core/.test(val)) stage="core"; else if(/Asleep(Unspecified)?$/.test(val)||val==="HKCategoryValueSleepAnalysisAsleep") stage="core";
+      if(!stage) return; // InBed / Awake ignorés
+      const bucket=localDateShift(ds.ms,12);
+      const s=acc.sleep[bucket]||(acc.sleep[bucket]={deep:0,rem:0,core:0});
+      s[stage]+=mins;
+    }
+  }
+  function onWorkout(a){
+    const type=(a.workoutActivityType||"").replace("HKWorkoutActivityType","");
+    const d=pDate(a.startDate);
+    let dur=parseFloat(a.duration)||0; if((a.durationUnit||"min")==="sec") dur/=60;
+    let dist=parseFloat(a.totalDistance); if((a.totalDistanceUnit||"km")==="mi"&&!isNaN(dist)) dist*=1.609344;
+    let kcal=parseFloat(a.totalEnergyBurned); if((a.totalEnergyBurnedUnit||"kcal")==="kJ"&&!isNaN(kcal)) kcal/=4.184;
+    const w={type,date:d?d.local:null,datetime:d?d.dt:null,duration_min:+dur.toFixed(1),
+      distance_km:isNaN(dist)?null:+dist.toFixed(2),energy_kcal:isNaN(kcal)?null:Math.round(kcal),avg_hr:null,max_hr:null};
+    if(type==="Running"){ acc.runs.push(w); acc.cur=w; }
+    else { acc.cur=w; acc.curOther=w; if(!acc.others[type])acc.others[type]={count:0,duration:0}; acc.others[type].count++; acc.others[type].duration+=dur; }
+    if(a._selfclose) acc.cur=null;
+  }
+  function onStat(a,workoutOpen){
+    if(!acc.cur) return;
+    if(a.type==="HKQuantityTypeIdentifierHeartRate"){
+      const avg=parseFloat(a.average), mx=parseFloat(a.maximum);
+      if(!isNaN(avg)) acc.cur.avg_hr=Math.round(avg);
+      if(!isNaN(mx)) acc.cur.max_hr=Math.round(mx);
+    } else if(a.type==="HKQuantityTypeIdentifierDistanceWalkingRunning" && acc.cur.distance_km==null){
+      const s=parseFloat(a.sum); if(!isNaN(s)) acc.cur.distance_km=+s.toFixed(2);
+    } else if(a.type==="HKQuantityTypeIdentifierActiveEnergyBurned" && acc.cur.energy_kcal==null){
+      const s=parseFloat(a.sum); if(!isNaN(s)) acc.cur.energy_kcal=Math.round(s);
+    }
+  }
+
+  const tokRe=/<(Record|Workout|WorkoutStatistics)\\b([^>]*)>|<\\/Workout>/g;
+  function processBuffer(buf){
+    const cut=buf.lastIndexOf(">"); if(cut<0) return buf;
+    const chunk=buf.slice(0,cut+1); const rest=buf.slice(cut+1);
+    tokRe.lastIndex=0; let m;
+    while(m=tokRe.exec(chunk)){
+      if(m[0]==="</Workout>"){ acc.cur=null; continue; }
+      const tag=m[1], attrsRaw=m[2]||""; const a=parseAttrs(attrsRaw);
+      a._selfclose=/\\/\\s*$/.test(attrsRaw);
+      if(tag==="Record") onRecord(a);
+      else if(tag==="Workout") onWorkout(a);
+      else if(tag==="WorkoutStatistics") onStat(a);
+    }
+    return rest;
+  }
+
+  function finalize(){
+    const rhr_daily=Object.keys(acc.rhr).sort().map(d=>({date:d,value:+(acc.rhr[d].s/acc.rhr[d].n).toFixed(1)}));
+    const weightMap={}; acc.weight.forEach(w=>{ (weightMap[w.date]=weightMap[w.date]||[]).push(w.value); });
+    const weight_daily=Object.keys(weightMap).sort().map(d=>({date:d,value:+(weightMap[d].reduce((x,y)=>x+y,0)/weightMap[d].length).toFixed(2)}));
+    const sleep_nightly=Object.keys(acc.sleep).sort().map(d=>{ const s=acc.sleep[d]; return {date:d,deep:+s.deep.toFixed(1),rem:+s.rem.toFixed(1),core:+s.core.toFixed(1),total:+(s.deep+s.rem+s.core).toFixed(1)}; })
+      .filter(n=>n.total>60);
+    const vo2Map={}; acc.vo2.forEach(v=>vo2Map[v.date]=v.value);
+    const vo2max=Object.keys(vo2Map).sort().map(d=>({date:d,value:vo2Map[d]}));
+    // effort par FC
+    acc.runs.forEach(r=>{ if(r.avg_hr==null){ r.effort=null; } else if(r.avg_hr<=152) r.effort="facile"; else if(r.avg_hr>=160) r.effort="intense"; else r.effort="modere";
+      if(r.distance_km&&r.duration_min) r.pace_min_km=+(r.duration_min/r.distance_km).toFixed(2); else r.pace_min_km=null; });
+    const runs=acc.runs.filter(r=>r.date&&r.distance_km>0).sort((a,b)=>a.datetime<b.datetime?-1:1);
+    const other_activities=Object.keys(acc.others).map(t=>({type:t,label:ACT[t]||t,count:acc.others[t].count,duration:Math.round(acc.others[t].duration)})).sort((a,b)=>b.count-a.count);
+    return {vo2max,rhr_daily,weight_daily,sleep_nightly,runs,other_activities};
+  }
+
+  async function findExportXml(buf){
+    const dv=new DataView(buf), bytes=new Uint8Array(buf);
+    // EOCD
+    let eocd=-1; for(let i=bytes.length-22;i>=Math.max(0,bytes.length-22-65536);i--){ if(dv.getUint32(i,true)===0x06054b50){ eocd=i; break; } }
+    if(eocd<0) throw new Error("ZIP illisible");
+    let cdOff=dv.getUint32(eocd+16,true), cdCount=dv.getUint16(eocd+10,true);
+    // ZIP64 ?
+    if(cdOff===0xffffffff){ throw new Error("Archive trop grande (ZIP64). Dézippe-la et choisis export.xml."); }
+    let p=cdOff, best=null;
+    for(let i=0;i<cdCount;i++){
+      if(dv.getUint32(p,true)!==0x02014b50) break;
+      const method=dv.getUint16(p+10,true), compSize=dv.getUint32(p+20,true);
+      const nameLen=dv.getUint16(p+28,true), extraLen=dv.getUint16(p+30,true), commLen=dv.getUint16(p+32,true);
+      const lho=dv.getUint32(p+42,true);
+      const name=new TextDecoder().decode(bytes.subarray(p+46,p+46+nameLen));
+      if(/(^|\\/)export\\.xml$/.test(name)){ best={name,method,compSize,lho}; }
+      p+=46+nameLen+extraLen+commLen;
+    }
+    if(!best) throw new Error("export.xml introuvable dans le zip");
+    // local header
+    const lNameLen=dv.getUint16(best.lho+26,true), lExtra=dv.getUint16(best.lho+28,true);
+    const dataStart=best.lho+30+lNameLen+lExtra;
+    const comp=bytes.subarray(dataStart,dataStart+best.compSize);
+    return {comp,method:best.method};
+  }
+
+  async function run(file){
+    const name=(file.name||"").toLowerCase();
+    let stream;
+    if(name.endsWith(".xml")){
+      postMessage({type:"progress",pct:8,msg:"Lecture de export.xml…"});
+      stream=file.stream();
+    } else {
+      postMessage({type:"progress",pct:6,msg:"Ouverture du zip…"});
+      const buf=await file.arrayBuffer();
+      const {comp,method}=await findExportXml(buf);
+      if(method===0){ stream=new Blob([comp]).stream(); }
+      else if(method===8){
+        if(typeof DecompressionStream==="undefined") throw new Error("Navigateur trop ancien pour dézipper — dézippe sur ordinateur et choisis export.xml");
+        stream=new Blob([comp]).stream().pipeThrough(new DecompressionStream("deflate-raw"));
+      } else throw new Error("Compression zip non supportée");
+    }
+    const reader=stream.getReader(), dec=new TextDecoder("utf-8");
+    let buf="", bytesRead=0;
+    while(true){
+      const {value,done}=await reader.read(); if(done) break;
+      bytesRead+=value.length;
+      buf+=dec.decode(value,{stream:true});
+      buf=processBuffer(buf);
+      if(acc.records%1===0){} // noop
+      postMessage({type:"progress",pct:10+Math.min(80,bytesRead/1500000),msg:acc.records.toLocaleString("fr")+" mesures lues · "+acc.runs.length+" courses…"});
+    }
+    buf+=dec.decode(); processBuffer(buf+">");
+    postMessage({type:"progress",pct:98,msg:"Agrégation…"});
+    postMessage({type:"done",data:finalize()});
+  }
+
+  onmessage=async e=>{ try{ await run(e.data.file); }catch(err){ postMessage({type:"error",msg:(err&&err.message)||"échec"}); } };
+  `;
+  const blob=new Blob([src],{type:"application/javascript"});
+  return new Worker(URL.createObjectURL(blob));
+}
+
+/* ---------- Toast ---------- */
+let toastT;
+function toast(msg){ const el=document.getElementById("toast"); el.textContent=msg; el.classList.add("show");
+  clearTimeout(toastT); toastT=setTimeout(()=>el.classList.remove("show"),2600); }
+
+/* ---------- Resize : redessine l'onglet courant ---------- */
+let rzT;
+window.addEventListener("resize",()=>{ clearTimeout(rzT); rzT=setTimeout(render,180); });
+
+/* ---------- Go ---------- */
+render();
+
+/* ---------- Service worker ---------- */
+if("serviceWorker" in navigator){ window.addEventListener("load",()=>{ navigator.serviceWorker.register("./sw.js").catch(()=>{}); }); }
+</script>
+</body>
+</html>

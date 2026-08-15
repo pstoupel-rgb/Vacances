@@ -24,6 +24,18 @@ On récupère automatiquement : VO2 max, FC de repos, poids, sommeil (avec phase
 
 > Le dézippage utilise `DecompressionStream`, intégré à Safari iOS (16.4+) et aux navigateurs récents — **aucune librairie externe, rien ne quitte l'appareil**. Si ton navigateur est trop ancien, dézippe l'archive sur ordinateur et choisis directement `export.xml`.
 
+## ☁️ Synchronisation automatique (optionnelle)
+
+Pour que l'app récupère tes données **toute seule à chaque ouverture**, sans refaire l'export à la main :
+
+1. **Déploie l'endpoint** (gratuit) — voir `sync-worker.js` : un Cloudflare Worker qui stocke ton dernier JSON Santé, protégé par un jeton. Tout est sur **ton** compte.
+2. **Configure l'app** — onglet **📥 Données → ☁️ Sync automatique** : colle l'URL du Worker + ton jeton.
+3. **Configure l'envoi depuis l'iPhone** — avec l'app **Health Auto Export** (App Store) → *Automations* → *REST API* : URL du Worker, méthode **POST**, header `Authorization: Bearer <jeton>`, format **JSON**, métriques `vo2_max`, `resting_heart_rate`, `weight_body_mass`, `sleep_analysis` + *Workouts*, fréquence **quotidienne**.
+
+L'app accepte le **format Health Auto Export** ou notre **schéma natif** (`{vo2max, rhr_daily, weight_daily, sleep_nightly, runs, other_activities}`) — tu peux donc aussi alimenter le Worker avec un Raccourci Apple qui poste ce schéma.
+
+> Compromis assumé : contrairement au reste de l'app, la sync fait transiter tes données par **ton** endpoint cloud. Il reste privé (jeton + ton compte), mais ce n'est plus « rien ne quitte l'appareil ». Sans sync configurée, l'app reste 100 % locale.
+
 ## ✍️ Saisir tes autres infos santé
 
 Onglet **📥 Données** :

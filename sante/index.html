@@ -1157,6 +1157,33 @@ function renderDonnees(wrap){
   imp.querySelector("#hkbtn").onclick=()=>imp.querySelector("#hkfile").click();
   imp.querySelector("#hkfile").onchange=e=>{ const f=e.target.files[0]; if(f) importHealth(f, imp); };
 
+  // --- Sync cloud automatique ---
+  const ls=STORE.manual.last_sync;
+  const cCard=h(`<div class="card" style="padding:18px;margin-bottom:16px">
+    ${sectionTitle("☁️ Sync automatique","Récupère tes données toutes seules à chaque ouverture, depuis ton endpoint")}
+    <div class="field" style="margin-top:8px"><label>URL de l'endpoint (Cloudflare Worker…)</label>
+      <input type="url" id="syurl" placeholder="https://ma-sante.xxx.workers.dev/data" value="${esc(STORE.manual.sync_url||'')}"></div>
+    <div class="field" style="margin-top:8px"><label>Jeton secret (optionnel)</label>
+      <input type="text" id="sytok" placeholder="mot de passe partagé" value="${esc(STORE.manual.sync_token||'')}"></div>
+    <div style="display:flex;gap:10px;margin-top:12px;flex-wrap:wrap">
+      <button class="btn btn-primary" id="sysave">Enregistrer</button>
+      <button class="btn" id="synow">Synchroniser maintenant</button>
+      ${STORE.manual.sync_url?`<button class="btn btn-ghost" id="syoff" style="color:${C.flame}">Désactiver</button>`:""}
+    </div>
+    <div class="info" style="margin-top:10px">${ls?`Dernière sync : ${new Date(ls).toLocaleString("fr-BE")}. `:""}Configure l'envoi depuis ton iPhone en suivant le guide (README de l'app). L'app accepte le format « Health Auto Export » ou notre schéma JSON.</div></div>`);
+  wrap.appendChild(cCard);
+  cCard.querySelector("#sysave").onclick=()=>{
+    STORE.manual.sync_url=cCard.querySelector("#syurl").value.trim()||null;
+    STORE.manual.sync_token=cCard.querySelector("#sytok").value.trim()||null;
+    saveStore(); toast("Réglages sync enregistrés"); render();
+  };
+  cCard.querySelector("#synow").onclick=()=>{
+    STORE.manual.sync_url=cCard.querySelector("#syurl").value.trim()||null;
+    STORE.manual.sync_token=cCard.querySelector("#sytok").value.trim()||null;
+    saveStore(); if(!STORE.manual.sync_url){ toast("Renseigne d'abord l'URL"); return; } toast("Synchronisation…"); cloudSync(false);
+  };
+  { const off=cCard.querySelector("#syoff"); if(off) off.onclick=()=>{ STORE.manual.sync_url=null; STORE.manual.sync_token=null; saveStore(); toast("Sync désactivée"); render(); }; }
+
   // --- Saisie poids ---
   const today=new Date().toISOString().slice(0,10);
   const wCard=h(`<div class="card" style="padding:18px;margin-bottom:16px">
@@ -1481,6 +1508,69 @@ function makeWorker(){
   return new Worker(URL.createObjectURL(blob));
 }
 
+/* ============================================================
+   SYNC CLOUD : récupère automatiquement les données Santé depuis
+   un endpoint (Cloudflare Worker) alimenté par ton iPhone.
+   Accepte notre schéma natif OU le format Health Auto Export.
+   ============================================================ */
+function cloudDate(s){ return (s||"").slice(0,10); }
+function normalizeCloud(data){
+  if(!data||typeof data!=="object") return null;
+  // 1) Schéma natif (celui de notre import Apple Santé)
+  if(Array.isArray(data.runs)||Array.isArray(data.vo2max)||Array.isArray(data.weight_daily)){
+    return { vo2max:data.vo2max||[], rhr_daily:data.rhr_daily||[], weight_daily:data.weight_daily||[],
+      sleep_nightly:data.sleep_nightly||[], runs:data.runs||[], other_activities:data.other_activities||[] };
+  }
+  // 2) Format « Health Auto Export » (best-effort)
+  const d=data.data||data, metrics=d.metrics;
+  if(Array.isArray(metrics)){
+    const by={}; metrics.forEach(m=>by[m.name]=m);
+    const num=v=>{ const n=parseFloat(v); return isNaN(n)?null:n; };
+    const series=n=>((by[n]&&by[n].data)||[]).map(p=>({date:cloudDate(p.date),value:num(p.qty!=null?p.qty:p.Avg)})).filter(p=>p.value!=null);
+    const vo2max=series("vo2_max");
+    const rhr_daily=series("resting_heart_rate");
+    const weight_daily=series("weight_body_mass");
+    const sleep_nightly=(((by["sleep_analysis"]||{}).data)||[]).map(p=>{
+      const deep=(num(p.deep)||0)*60, rem=(num(p.rem)||0)*60, core=(num(p.core!=null?p.core:p.light)||0)*60;
+      const total=(p.asleep!=null?(num(p.asleep)||0)*60:deep+rem+core);
+      return {date:cloudDate(p.date),deep:+deep.toFixed(1),rem:+rem.toFixed(1),core:+core.toFixed(1),total:+total.toFixed(1)};
+    }).filter(n=>n.total>60);
+    const runs=[], others={};
+    (d.workouts||[]).forEach(w=>{
+      const nm=(w.name||w.type||""), date=cloudDate(w.start||w.date);
+      const dur=num(w.duration)||0, dist=w.distance?num(w.distance.qty!=null?w.distance.qty:w.distance):null;
+      const hr=w.avgHeartRate?num(w.avgHeartRate.qty!=null?w.avgHeartRate.qty:w.avgHeartRate):null;
+      if(/run|cours/i.test(nm)) runs.push({type:"Running",date,datetime:(w.start||"").replace(" ","T").slice(0,19),
+        duration_min:+dur.toFixed(1),distance_km:dist!=null?+dist.toFixed(2):null,
+        pace_min_km:(dist?+(dur/dist).toFixed(2):null),energy_kcal:null,avg_hr:hr!=null?Math.round(hr):null,max_hr:null,effort:null});
+      else { const k=nm.replace(/\s/g,"")||"Autre"; if(!others[k])others[k]={count:0,duration:0}; others[k].count++; others[k].duration+=dur; }
+    });
+    runs.forEach(r=>{ r.effort=r.avg_hr==null?null:r.avg_hr<=152?"facile":r.avg_hr>=160?"intense":"modere"; });
+    const other_activities=Object.keys(others).map(t=>({type:t,label:ACTIVITY_LABELS[t]||t,count:others[t].count,duration:Math.round(others[t].duration)}));
+    return {vo2max,rhr_daily,weight_daily,sleep_nightly,runs,other_activities};
+  }
+  return null;
+}
+let cloudBusy=false;
+async function cloudSync(silent){
+  const url=STORE.manual&&STORE.manual.sync_url; if(!url||cloudBusy) return;
+  cloudBusy=true;
+  try{
+    const headers={}; if(STORE.manual.sync_token) headers["Authorization"]="Bearer "+STORE.manual.sync_token;
+    const res=await fetch(url,{headers,cache:"no-store"}); if(!res.ok) throw new Error("HTTP "+res.status);
+    const norm=normalizeCloud(await res.json());
+    if(!norm) throw new Error("format non reconnu");
+    const has=Object.keys(norm).some(k=>Array.isArray(norm[k])&&norm[k].length);
+    if(!has) throw new Error("aucune donnée");
+    const merged={...STORE.imported};
+    ["vo2max","rhr_daily","weight_daily","sleep_nightly","runs","other_activities"].forEach(k=>{ if(norm[k]&&norm[k].length) merged[k]=norm[k]; });
+    merged.meta={source:"Sync cloud",when:new Date().toLocaleString("fr-BE")};
+    STORE.imported=merged; STORE.manual.last_sync=Date.now(); saveStore();
+    if(!silent) toast("Sync réussie ✓"); render();
+  }catch(e){ if(!silent) toast("Sync impossible : "+((e&&e.message)||"erreur")); }
+  finally{ cloudBusy=false; }
+}
+
 /* ---------- Toast ---------- */
 let toastT;
 function toast(msg){ const el=document.getElementById("toast"); el.textContent=msg; el.classList.add("show");
@@ -1492,6 +1582,7 @@ window.addEventListener("resize",()=>{ clearTimeout(rzT); rzT=setTimeout(render,
 
 /* ---------- Go ---------- */
 render();
+cloudSync(true);   // récupération auto en arrière-plan si un endpoint est configuré
 
 /* ---------- Service worker ---------- */
 if("serviceWorker" in navigator){ window.addEventListener("load",()=>{ navigator.serviceWorker.register("./sw.js").catch(()=>{}); }); }

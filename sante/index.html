@@ -37,7 +37,12 @@
   ::-webkit-scrollbar-thumb{background:var(--line);border-radius:3px;}
 
   /* HERO */
-  .hero{padding:calc(24px + env(safe-area-inset-top)) 20px 18px;border-bottom:1px solid var(--line);}
+  .hero{padding:calc(24px + env(safe-area-inset-top)) 20px 18px;border-bottom:1px solid var(--line);position:relative;}
+  .gearbtn{position:absolute;top:calc(18px + env(safe-area-inset-top));right:16px;width:40px;height:40px;
+    display:flex;align-items:center;justify-content:center;background:var(--panel2);border:1px solid var(--line);
+    border-radius:11px;color:var(--fog);cursor:pointer;}
+  .gearbtn:active{transform:scale(.95);}
+  .gearbtn svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
   .kicker{font-size:11px;letter-spacing:.12em;color:var(--fog);text-transform:uppercase;margin-bottom:6px;}
   .hero-big{font-size:clamp(46px,13vw,84px);font-weight:800;line-height:.9;color:var(--bone);
     display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;}
@@ -528,6 +533,7 @@ const ICONS={
   activity:'<polyline points="3 12 7 12 10 5 14 19 17 12 21 12"/>',
   dumbbell:'<path d="M4 9v6M7 8v8M17 8v8M20 9v6M7 12h10"/>',
   cloud:'<path d="M17.5 17a3.5 3.5 0 0 0 .3-7 5.5 5.5 0 0 0-10.6-1.4A4 4 0 0 0 7 17Z"/><path d="M12 11v6"/><path d="m9.5 14.5 2.5 2.5 2.5-2.5"/>',
+  gear:'<circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1Z"/>',
 };
 function icon(n){ return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ICONS[n]||""}</svg>`; }
 const TABS=[
@@ -538,8 +544,6 @@ const TABS=[
   {id:"sommeil",label:"Sommeil",short:"Sommeil",ic:"moon"},
   {id:"poids",label:"Poids",short:"Poids",ic:"scale"},
   {id:"courses",label:"Courses",short:"Courses",ic:"activity"},
-  {id:"autres",label:"Autres sports",short:"Sports",ic:"dumbbell"},
-  {id:"donnees",label:"Données",short:"Données",ic:"cloud"},
 ];
 let TAB = "apercu";
 let D = compute();
@@ -567,6 +571,7 @@ function heroEl(){
   const delta = (s.vo2_now!=null&&s.vo2_start!=null)? (s.vo2_now-s.vo2_start):null;
   const pct = (delta!=null&&s.vo2_start)? Math.round(delta/s.vo2_start*100):null;
   const el=h(`<div class="hero">
+    <button class="gearbtn" aria-label="Données & réglages">${icon("gear")}</button>
     <div class="kicker mono">Ma santé · Apple Watch + bilans</div>
     <div class="hero-big display">${s.vo2_now!=null?s.vo2_now:"—"}<span class="hero-unit">mL/min/kg — VO2 max</span></div>
     <div style="margin-top:6px">${ratePill(rateVO2(s.vo2_now))}</div>
@@ -582,6 +587,7 @@ function heroEl(){
       ${statTile(sc.total_min?fmtHM(sc.total_min):"—","","Sommeil / nuit")}
     </div>
   </div>`);
+  const g=el.querySelector(".gearbtn"); if(g) g.onclick=()=>{ TAB="donnees"; window.scrollTo(0,0); render(); };
   return el;
 }
 function statTile(v,u,l){ return `<div><div class="stat-v mono display">${v}</div><div class="stat-l">${l} <span class="mono" style="opacity:.7">${u}</span></div></div>`; }

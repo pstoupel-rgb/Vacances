@@ -50,8 +50,11 @@
   .tabs{display:flex;gap:2px;padding:12px 12px 0;border-bottom:1px solid var(--line);
     overflow-x:auto;position:sticky;top:0;background:var(--ink);z-index:5;}
   .tab{background:none;border:none;padding:9px 13px 12px;font-size:13px;font-weight:600;
-    white-space:nowrap;color:var(--fog);border-bottom:2px solid transparent;margin-bottom:-1px;transition:color .15s;}
+    white-space:nowrap;color:var(--fog);border-bottom:2px solid transparent;margin-bottom:-1px;transition:color .15s;
+    display:inline-flex;align-items:center;gap:6px;}
   .tab.active{color:var(--ember);border-bottom-color:var(--ember);}
+  .tabic{display:inline-flex}
+  .tabic svg{width:16px;height:16px;display:block;}
 
   .wrap{padding:18px 16px 40px;max-width:920px;margin:0 auto;}
   .sect-t{font-size:14px;font-weight:600;color:var(--bone);}
@@ -510,16 +513,28 @@ function barChart(container, cfg){
 /* ============================================================
    Rendu de l'interface
    ============================================================ */
+const ICONS={
+  home:'<path d="M3 10.7 12 3l9 7.7"/><path d="M5 9.5V21h14V9.5"/>',
+  trend:'<polyline points="3 17 9 11 13 15 21 6"/><polyline points="15 6 21 6 21 12"/>',
+  heart:'<path d="M12 20C3 13 2 9.5 4 6.9A4.6 4.6 0 0 1 12 6a4.6 4.6 0 0 1 8-.9c2 2.6 1 6.1-8 14.9Z"/>',
+  drop:'<path d="M12 3s6 5.7 6 10a6 6 0 0 1-12 0c0-4.3 6-10 6-10Z"/>',
+  moon:'<path d="M21 12.8A8 8 0 1 1 11.2 3 6.3 6.3 0 0 0 21 12.8Z"/>',
+  scale:'<path d="M12 3v18"/><path d="M6 7h12"/><path d="M8 21h8"/><path d="M6 7 3 14a3 3 0 0 0 6 0Z"/><path d="M18 7l-3 7a3 3 0 0 0 6 0Z"/>',
+  activity:'<polyline points="3 12 7 12 10 5 14 19 17 12 21 12"/>',
+  dumbbell:'<path d="M4 9v6M7 8v8M17 8v8M20 9v6M7 12h10"/>',
+  cloud:'<path d="M17.5 17a3.5 3.5 0 0 0 .3-7 5.5 5.5 0 0 0-10.6-1.4A4 4 0 0 0 7 17Z"/><path d="M12 11v6"/><path d="m9.5 14.5 2.5 2.5 2.5-2.5"/>',
+};
+function icon(n){ return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ICONS[n]||""}</svg>`; }
 const TABS=[
-  {id:"apercu",label:"Aperçu",emoji:"🏠"},
-  {id:"progres",label:"Progrès",emoji:"📈"},
-  {id:"coach",label:"Coach",emoji:"🩺"},
-  {id:"sante",label:"Bilan sanguin",emoji:"🩸"},
-  {id:"sommeil",label:"Sommeil",emoji:"🌙"},
-  {id:"poids",label:"Poids",emoji:"⚖️"},
-  {id:"courses",label:"Courses",emoji:"🏃"},
-  {id:"autres",label:"Autres sports",emoji:"🏒"},
-  {id:"donnees",label:"Données",emoji:"📥"},
+  {id:"apercu",label:"Aperçu",ic:"home"},
+  {id:"progres",label:"Progrès",ic:"trend"},
+  {id:"coach",label:"Coach",ic:"heart"},
+  {id:"sante",label:"Bilan sanguin",ic:"drop"},
+  {id:"sommeil",label:"Sommeil",ic:"moon"},
+  {id:"poids",label:"Poids",ic:"scale"},
+  {id:"courses",label:"Courses",ic:"activity"},
+  {id:"autres",label:"Autres sports",ic:"dumbbell"},
+  {id:"donnees",label:"Données",ic:"cloud"},
 ];
 let TAB = "apercu";
 let D = compute();
@@ -532,7 +547,7 @@ function render(){
   if(smokeTimer){ clearInterval(smokeTimer); smokeTimer=null; }
   const app=document.getElementById("app");
   app.innerHTML="";
-  app.appendChild(heroEl());
+  if(TAB==="apercu") app.appendChild(heroEl());
   app.appendChild(tabsEl());
   const wrap=h(`<div class="wrap"></div>`);
   app.appendChild(wrap);
@@ -568,7 +583,7 @@ function statTile(v,u,l){ return `<div><div class="stat-v mono display">${v}</di
 
 function tabsEl(){
   const el=h(`<div class="tabs"></div>`);
-  TABS.forEach(t=>{ const b=h(`<button class="tab ${TAB===t.id?"active":""}">${t.emoji} ${t.label}</button>`);
+  TABS.forEach(t=>{ const b=h(`<button class="tab ${TAB===t.id?"active":""}"><span class="tabic">${icon(t.ic)}</span>${t.label}</button>`);
     b.onclick=()=>{ TAB=t.id; render(); document.querySelector(".wrap").scrollIntoView({block:"start"}); };
     el.appendChild(b); });
   return el;

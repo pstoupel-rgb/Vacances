@@ -124,7 +124,7 @@ const STORE_KEY = "sante_store_v1";
 
 /* ---------- Référentiels bilan sanguin ---------- */
 const MARKERS = [
-  { key:"crp", label:"CRP (inflammation)", unit:"mg/L", range:[0,3.0], color:C.flame, dir:"high" },
+  { key:"crp", label:"CRP (inflammation)", unit:"mg/L", range:[0,10], color:C.flame, dir:"high" },
   { key:"cholesterol_total", label:"Cholestérol total", unit:"mg/dL", range:[0,190], color:C.signal, dir:"high" },
   { key:"hdl", label:"HDL (bon cholestérol)", unit:"mg/dL", range:[40,999], color:C.moss, dir:"low" },
   { key:"ldl", label:"LDL (mauvais cholestérol)", unit:"mg/dL", range:[0,115], color:C.flame, dir:"high" },
@@ -372,6 +372,7 @@ function rateRHR(v){ if(v==null)return null; if(v<58)return{l:"Excellent",t:"gre
 function patientAge(){ const f=D&&D.labs&&D.labs.fidage; return f&&f.chronological_age?f.chronological_age:null; }
 function psaMax(age){ if(age==null)return 4.0; if(age<50)return 2.5; if(age<60)return 3.5; if(age<70)return 4.5; return 6.5; }
 function rateLab(v,m){ if(v==null||!m)return null; const lo=m.range[0]; let hi=m.range[1];
+  if(m.key==="crp"){ if(v>10)return{l:"Élevée",t:"bad"}; if(v>3)return{l:"Limite (hs-CRP)",t:"warn"}; if(v>1)return{l:"Bon",t:"good"}; return{l:"Excellent",t:"great"}; }
   if(m.key==="psa") hi=psaMax(patientAge());
   if(m.dir==="high"){ if(v>hi)return{l:"Hors norme",t:"bad"}; const p=hi>0?v/hi:0; if(p<=0.5)return{l:"Excellent",t:"great"}; if(p<=0.8)return{l:"Bon",t:"good"}; return{l:"Limite",t:"warn"}; }
   if(m.dir==="low"){ if(v<lo)return{l:"Hors norme",t:"bad"}; if(v>=lo*1.5)return{l:"Excellent",t:"great"}; if(v>=lo*1.2)return{l:"Bon",t:"good"}; return{l:"Correct",t:"warn"}; }
@@ -379,7 +380,7 @@ function rateLab(v,m){ if(v==null||!m)return null; const lo=m.range[0]; let hi=m
 
 /* Repères cliniques par marqueur (norme labo + cibles utiles, adaptées à l'âge quand pertinent) */
 const REF={
-  crp:"hs-CRP cardio : &lt;1 risque faible · 1–3 moyen · &gt;3 élevé",
+  crp:"hs-CRP cardio : &lt;1 faible · 1–3 moyen · &gt;3 élevé · à recontrôler à froid (48 h sans sport, hors infection)",
   cholesterol_total:"Souhaitable &lt; 200 mg/dL",
   hdl:"≥ 40 correct · ≥ 60 protecteur",
   ldl:"Optimal &lt; 100 · &lt; 70 si risque cardio",

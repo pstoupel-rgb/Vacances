@@ -26,7 +26,7 @@
   *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
   html,body{background:var(--ink);color:var(--bone);}
   body{font-family:'IBM Plex Sans',-apple-system,BlinkMacSystemFont,sans-serif;min-height:100vh;
-    padding-bottom:env(safe-area-inset-bottom);-webkit-text-size-adjust:100%;}
+    padding-bottom:calc(60px + env(safe-area-inset-bottom));-webkit-text-size-adjust:100%;}
   .display{font-family:'Big Shoulders Display','IBM Plex Sans',sans-serif;}
   .mono{font-family:'IBM Plex Mono',ui-monospace,monospace;}
   .card{background:var(--panel);border:1px solid var(--line);border-radius:6px;}
@@ -47,14 +47,19 @@
   .stat-l{font-size:11px;color:var(--fog);margin-top:2px;}
 
   /* TABS */
-  .tabs{display:flex;gap:2px;padding:12px 12px 0;border-bottom:1px solid var(--line);
-    overflow-x:auto;position:sticky;top:0;background:var(--ink);z-index:5;}
-  .tab{background:none;border:none;padding:9px 13px 12px;font-size:13px;font-weight:600;
-    white-space:nowrap;color:var(--fog);border-bottom:2px solid transparent;margin-bottom:-1px;transition:color .15s;
-    display:inline-flex;align-items:center;gap:6px;}
-  .tab.active{color:var(--ember);border-bottom-color:var(--ember);}
+  /* Barre d'onglets fixée en bas, façon app native */
+  .tabs{position:fixed;left:0;right:0;bottom:0;z-index:20;display:flex;
+    padding:6px 2px calc(4px + env(safe-area-inset-bottom));
+    background:rgba(18,32,28,.94);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);
+    border-top:1px solid var(--line);overflow-x:auto;box-shadow:0 -6px 20px rgba(0,0,0,.35);}
+  .tabs::-webkit-scrollbar{display:none;}
+  .tab{flex:1 0 auto;min-width:44px;background:none;border:none;cursor:pointer;
+    display:flex;flex-direction:column;align-items:center;gap:3px;padding:4px 5px;
+    font-size:9.5px;font-weight:600;white-space:nowrap;color:var(--fog);transition:color .15s;}
+  .tab.active{color:var(--ember);}
   .tabic{display:inline-flex}
-  .tabic svg{width:16px;height:16px;display:block;}
+  .tabic svg{width:23px;height:23px;display:block;stroke-width:1.9;}
+  .tab.active .tabic svg{stroke-width:2.3;}
 
   .wrap{padding:18px 16px 40px;max-width:920px;margin:0 auto;}
   .sect-t{font-size:14px;font-weight:600;color:var(--bone);}
@@ -526,15 +531,15 @@ const ICONS={
 };
 function icon(n){ return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ICONS[n]||""}</svg>`; }
 const TABS=[
-  {id:"apercu",label:"Aperçu",ic:"home"},
-  {id:"progres",label:"Progrès",ic:"trend"},
-  {id:"coach",label:"Coach",ic:"heart"},
-  {id:"sante",label:"Bilan sanguin",ic:"drop"},
-  {id:"sommeil",label:"Sommeil",ic:"moon"},
-  {id:"poids",label:"Poids",ic:"scale"},
-  {id:"courses",label:"Courses",ic:"activity"},
-  {id:"autres",label:"Autres sports",ic:"dumbbell"},
-  {id:"donnees",label:"Données",ic:"cloud"},
+  {id:"apercu",label:"Aperçu",short:"Accueil",ic:"home"},
+  {id:"progres",label:"Progrès",short:"Progrès",ic:"trend"},
+  {id:"coach",label:"Coach",short:"Coach",ic:"heart"},
+  {id:"sante",label:"Bilan sanguin",short:"Bilan",ic:"drop"},
+  {id:"sommeil",label:"Sommeil",short:"Sommeil",ic:"moon"},
+  {id:"poids",label:"Poids",short:"Poids",ic:"scale"},
+  {id:"courses",label:"Courses",short:"Courses",ic:"activity"},
+  {id:"autres",label:"Autres sports",short:"Sports",ic:"dumbbell"},
+  {id:"donnees",label:"Données",short:"Données",ic:"cloud"},
 ];
 let TAB = "apercu";
 let D = compute();
@@ -583,9 +588,10 @@ function statTile(v,u,l){ return `<div><div class="stat-v mono display">${v}</di
 
 function tabsEl(){
   const el=h(`<div class="tabs"></div>`);
-  TABS.forEach(t=>{ const b=h(`<button class="tab ${TAB===t.id?"active":""}"><span class="tabic">${icon(t.ic)}</span>${t.label}</button>`);
-    b.onclick=()=>{ TAB=t.id; render(); document.querySelector(".wrap").scrollIntoView({block:"start"}); };
+  TABS.forEach(t=>{ const b=h(`<button class="tab ${TAB===t.id?"active":""}"><span class="tabic">${icon(t.ic)}</span>${t.short||t.label}</button>`);
+    b.onclick=()=>{ TAB=t.id; window.scrollTo(0,0); render(); };
     el.appendChild(b); });
+  setTimeout(()=>{ const a=el.querySelector(".tab.active"); if(a) a.scrollIntoView({inline:"center",block:"nearest"}); },0);
   return el;
 }
 

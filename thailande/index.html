@@ -435,7 +435,7 @@
   <div style="padding:16px 16px 0"><button class="assur-edit" style="margin:0" onclick="relock()">🔒 Verrouiller l'app</button></div>
 
   <div class="disclaimer">Les informations ci-dessus (visa, taux de change, prises) sont données à titre indicatif et peuvent changer — pense à les <b>vérifier avant le départ</b> (Affaires étrangères Belgique · diplomatie.belgium.be / consulat de Thaïlande).</div>
-  <div style="text-align:center;font-size:.62rem;color:var(--muted);padding:2px 0 18px">Thaïlande · <b>v8</b> · mise à jour auto</div>
+  <div style="text-align:center;font-size:.62rem;color:var(--muted);padding:2px 0 18px">Thaïlande · <b>v9</b> · mise à jour auto</div>
 </div>
 
 <!-- ============ MODALS ============ -->
@@ -563,7 +563,7 @@ const PLAN=[
     ]},
     {n:6,name:'Envol vers le sud',vibe:'✈️',date:'Mer 23 déc',items:[
       {time:'10h40',dot:'plane',ic:'✈️',t:'Vol Chiang Mai → Surat Thani',sub:'Thai AirAsia FD5420 · direct ~1h55',resa:'vol-cnx-urt',rl:'Vol Chiang Mai → Surat Thani',waze:'9.1326,99.1355'},
-      {time:'Aprem',dot:'boat',ic:'🚐',t:'Route vers le lac de Khao Sok',sub:'Direction 500 Rai Floating Resort'}
+      {time:'~13h',dot:'boat',ic:'🚐',t:'Transfert Surat Thani → 500 Rai',sub:'~1h15 de route → ponton Ratchaprapha, puis bateau du resort sur le lac',resa:'transfert-khaosok',rl:'Transfert Surat Thani → 500 Rai',waze:'8.9755,98.7930'}
     ]}
   ]},
   {step:'Khao Sok', days:[
@@ -630,6 +630,7 @@ const RESA=[
     {key:'hotel-kohyao',ic:'🏖️',name:'Santhiya Koh Yao Yai',desc:'29 déc → 1er janv · Nouvel An',mailq:'Santhiya Koh Yao Yai'}
   ]},
   {label:'Transferts',ic:'🚐',items:[
+    {key:'transfert-khaosok',ic:'🚐',name:'Surat Thani → 500 Rai',desc:'Aéroport → ponton → bateau · 23 déc',mailq:'500 Rai Floating Resort',info:['~1h15–1h30 de route jusqu\'au ponton de Ratchaprapha','puis bateau du resort sur le lac Cheow Lan (obligatoire)','À organiser avec le resort : reservations@500rai.com','Leur donner l\'heure d\'atterrissage à Surat Thani']},
     {key:'transfert-lanta',ic:'🚐',name:'Khao Sok → Koh Lanta',desc:'Voiture + ferry · 25 déc',mailq:'Nirvana transfer'},
     {key:'transfert-kohyao',ic:'⛵',name:'Koh Lanta → Koh Yao Yai',desc:'Speedboat Santhiya · 29 déc',mailq:'Santhiya'}
   ]},

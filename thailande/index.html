@@ -399,7 +399,7 @@
 <!-- ============ RESA ============ -->
 <div class="page page-content" id="page-resa">
   <div class="page-hero"><h2>Réservations</h2><p>Billets & confirmations · stockés hors-ligne sur ton téléphone</p></div>
-  <div style="padding:0 16px 4px"><a class="assur-edit" style="margin:0 0 8px;display:block;text-align:center;text-decoration:none;background:#c0392b;color:#fff" href="https://mail.google.com/mail/u/0/#label/thailande" target="_blank" rel="noopener">📧 Mes documents Gmail (libellé « thailande »)</a><button class="assur-edit" style="margin:0" onclick="importAll()">📥 Importer tous mes billets d'un coup</button></div>
+  <div style="padding:0 16px 4px"><a class="assur-edit" style="margin:0 0 8px;display:block;text-align:center;text-decoration:none;background:#c0392b;color:#fff" href="https://mail.google.com/mail/u/0/#label/thailande">📧 Mes documents Gmail (libellé « thailande »)</a><button class="assur-edit" style="margin:0" onclick="importAll()">📥 Importer tous mes billets d'un coup</button></div>
   <div id="resa-groups"></div>
   <div class="disclaimer">🔒 100 % privé : rien n'est envoyé sur internet. Les PDF/photos sont stockés localement (IndexedDB) et restent accessibles sans réseau. Change de téléphone = à ré-attacher.</div>
 </div>
@@ -435,7 +435,7 @@
   <div style="padding:16px 16px 0"><button class="assur-edit" style="margin:0" onclick="relock()">🔒 Verrouiller l'app</button></div>
 
   <div class="disclaimer">Les informations ci-dessus (visa, taux de change, prises) sont données à titre indicatif et peuvent changer — pense à les <b>vérifier avant le départ</b> (Affaires étrangères Belgique · diplomatie.belgium.be / consulat de Thaïlande).</div>
-  <div style="text-align:center;font-size:.62rem;color:var(--muted);padding:2px 0 18px">Thaïlande · <b>v13</b> · mise à jour auto</div>
+  <div style="text-align:center;font-size:.62rem;color:var(--muted);padding:2px 0 18px">Thaïlande · <b>v14</b> · mise à jour auto</div>
 </div>
 
 <!-- ============ MODALS ============ -->
@@ -911,7 +911,7 @@ async function openResa(key,label){
     head+='<div class="resa-detail"><b>'+it.name+'</b><br>'+it.desc+(it.info?('<br>'+it.info.map(x=>'· '+x).join('<br>')):'')+'</div>';
     if(it.tel)head+='<a class="mailbtn" style="background:var(--jade)" href="tel:'+it.tel.replace(/\s/g,'')+'">📞 Appeler '+(it.telName||'le contact')+'</a>';
     const mh=mailHrefFor(key,it);
-    if(mh)head+='<a class="mailbtn" href="'+mh+'" target="_blank" rel="noopener">📧 Ouvrir le mail (billet PDF) dans Gmail</a>';
+    if(mh)head+='<a class="mailbtn" href="'+mh+'">📧 Ouvrir le mail (billet PDF) dans Gmail</a>';
   }
   const rec=await FileDB.get(key).catch(()=>null);
   let body='';

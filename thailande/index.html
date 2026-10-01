@@ -289,6 +289,9 @@
   #resa-view .mailbtn{display:flex;align-items:center;justify-content:center;gap:7px;background:#c0392b;color:#fff;border-radius:11px;padding:13px 15px;font-weight:700;text-decoration:none;font-size:.9rem;margin-bottom:10px;}
   #resa-view .mailbtn:active{opacity:.9;}
   #resa-view a.doc-link{display:flex;align-items:center;gap:8px;background:var(--bg2);border:1px solid var(--border);border-radius:11px;padding:13px 15px;color:var(--brown);font-weight:700;text-decoration:none;font-size:.95rem;}
+  #resa-view .mb-copy{display:block;width:100%;background:var(--bg2);color:var(--brown);border:none;border-radius:11px;padding:11px;font-weight:700;font-size:.85rem;cursor:pointer;font-family:inherit;margin-bottom:10px;}
+  .toast{position:fixed;left:50%;bottom:92px;transform:translateX(-50%) translateY(18px);background:#231f1a;color:#fff;padding:11px 18px;border-radius:12px;font-size:.82rem;font-weight:600;opacity:0;pointer-events:none;transition:opacity .25s,transform .25s;z-index:1200;max-width:85%;text-align:center;box-shadow:0 6px 20px rgba(0,0,0,.3);}
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
   #resa-view img.doc-img{width:100%;border-radius:11px;margin-top:10px;display:block;}
 </style>
 </head>
@@ -310,6 +313,7 @@
 </div></div>
 
 <div id="navbar"><span id="navbar-title">Thaïlande</span></div>
+<div id="toast" class="toast"></div>
 
 <nav class="app-nav">
   <button class="app-nav-btn active" id="nav-home" onclick="showPage('home',this)"><span class="nav-icon">🏠</span><span class="nav-label">Accueil</span></button>
@@ -435,7 +439,7 @@
   <div style="padding:16px 16px 0"><button class="assur-edit" style="margin:0" onclick="relock()">🔒 Verrouiller l'app</button></div>
 
   <div class="disclaimer">Les informations ci-dessus (visa, taux de change, prises) sont données à titre indicatif et peuvent changer — pense à les <b>vérifier avant le départ</b> (Affaires étrangères Belgique · diplomatie.belgium.be / consulat de Thaïlande).</div>
-  <div style="text-align:center;font-size:.62rem;color:var(--muted);padding:2px 0 18px">Thaïlande · <b>v14</b> · mise à jour auto</div>
+  <div style="text-align:center;font-size:.62rem;color:var(--muted);padding:2px 0 18px">Thaïlande · <b>v15</b> · mise à jour auto</div>
 </div>
 
 <!-- ============ MODALS ============ -->
@@ -898,6 +902,13 @@ function mailHrefFor(key,it){
   if(it&&it.mailq)return 'https://mail.google.com/mail/u/0/#search/'+encodeURIComponent(it.mailq);
   return null;
 }
+let _toastT;
+function toast(msg){const t=document.getElementById('toast');if(!t)return;t.textContent=msg;t.classList.add('show');clearTimeout(_toastT);_toastT=setTimeout(()=>t.classList.remove('show'),2800);}
+function fallbackCopy(x){try{const ta=document.createElement('textarea');ta.value=x;ta.style.position='fixed';ta.style.opacity='0';document.body.appendChild(ta);ta.focus();ta.select();document.execCommand('copy');document.body.removeChild(ta);}catch(e){}}
+function copySearch(term){
+  const ok=()=>toast('🔎 « '+term+' » copié — colle-le dans la recherche Gmail');
+  try{if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(term).then(ok).catch(()=>{fallbackCopy(term);ok();});}else{fallbackCopy(term);ok();}}catch(e){fallbackCopy(term);ok();}
+}
 async function openResa(key,label){
   const modal=document.getElementById('resa-modal');
   document.getElementById('resa-modal-title').textContent='📄 '+label;
@@ -911,7 +922,8 @@ async function openResa(key,label){
     head+='<div class="resa-detail"><b>'+it.name+'</b><br>'+it.desc+(it.info?('<br>'+it.info.map(x=>'· '+x).join('<br>')):'')+'</div>';
     if(it.tel)head+='<a class="mailbtn" style="background:var(--jade)" href="tel:'+it.tel.replace(/\s/g,'')+'">📞 Appeler '+(it.telName||'le contact')+'</a>';
     const mh=mailHrefFor(key,it);
-    if(mh)head+='<a class="mailbtn" href="'+mh+'">📧 Ouvrir le mail (billet PDF) dans Gmail</a>';
+    if(mh)head+='<a class="mailbtn" href="'+mh+'">📧 Ouvrir Gmail</a>';
+    if(it&&it.mailq)head+='<button class="mb-copy" onclick="copySearch(\''+esc((it.mailq||'').replace(/^from:/,''))+'\')">🔎 Copier la recherche Gmail</button>';
   }
   const rec=await FileDB.get(key).catch(()=>null);
   let body='';

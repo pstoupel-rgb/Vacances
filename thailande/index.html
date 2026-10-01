@@ -435,7 +435,7 @@
   <div style="padding:16px 16px 0"><button class="assur-edit" style="margin:0" onclick="relock()">🔒 Verrouiller l'app</button></div>
 
   <div class="disclaimer">Les informations ci-dessus (visa, taux de change, prises) sont données à titre indicatif et peuvent changer — pense à les <b>vérifier avant le départ</b> (Affaires étrangères Belgique · diplomatie.belgium.be / consulat de Thaïlande).</div>
-  <div style="text-align:center;font-size:.62rem;color:var(--muted);padding:2px 0 18px">Thaïlande · <b>v11</b> · mise à jour auto</div>
+  <div style="text-align:center;font-size:.62rem;color:var(--muted);padding:2px 0 18px">Thaïlande · <b>v12</b> · mise à jour auto</div>
 </div>
 
 <!-- ============ MODALS ============ -->
@@ -513,6 +513,7 @@ const PLACES=[
   {n:'Wat Pho (Bouddha couché)',lat:13.7465,lng:100.4927,ic:'🛕',grp:'Bangkok',d:'À 5 min du Grand Palais'},
   {n:'Wat Arun (temple de l\'Aube)',lat:13.7437,lng:100.4889,ic:'🛕',grp:'Bangkok',d:'Traversée en bateau'},
   {n:'Marchés flottants de Thonburi',lat:13.7794,lng:100.4562,ic:'🛶',grp:'Bangkok',d:'Journée guidée · 19 déc'},
+  {n:'Tour à vélo — Co van Kessel',lat:13.7607,lng:100.4959,ic:'🚲',grp:'Bangkok',d:'18 déc · 13h–16h'},
   {n:'Wat Prayoon',lat:13.7386,lng:100.4908,ic:'🐢',grp:'Bangkok',d:'Tortues · 19 déc'},
   {n:'Gare Krung Thep Aphiwat',lat:13.8028,lng:100.5397,ic:'🚉',grp:'Bangkok',d:'Train de nuit · 20 déc 18h40'},
   {n:'Pingviman Hotel',lat:18.7855,lng:98.9855,ic:'🏨',grp:'Chiang Mai',stop:2,d:'Étape 2 · 21 → 23 déc'},
@@ -533,6 +534,7 @@ const PLAN=[
     {n:1,name:'Arrivée à Bangkok',vibe:'✈️',date:'Ven 18 déc',items:[
       {time:'Matin',dot:'plane',ic:'✈️',t:'Arrivée à Bangkok',sub:'Vol Thai Airways depuis Bruxelles',resa:'vol-aller',rl:'Vol Bruxelles → Bangkok'},
       {time:'',dot:'hotel',ic:'🏨',t:'Check-in — Sivatel Bangkok Hotel',sub:'2 nuits · récupération du décalage',resa:'hotel-bkk',rl:'Hôtel Bangkok — Sivatel',waze:'13.7407,100.5403'},
+      {time:'13h',dot:'activity',ic:'🚲',t:'Tour à vélo de Bangkok — Co van Kessel',sub:'13h–16h · ruelles, canaux & marchés cachés',resa:'velo-bangkok',rl:'Tour à vélo — Co van Kessel',waze:'13.7607,100.4959'},
       {time:'Soir',dot:'food',ic:'🍜',t:'Premier dîner thaï',sub:'Pad thaï, mango sticky rice…'}
     ]},
     {n:2,name:'Bangkok · marchés flottants',vibe:'🛶',date:'Sam 19 déc',items:[
@@ -562,8 +564,8 @@ const PLAN=[
       {time:'Aprem',dot:'temple',ic:'⛰️',t:'Doi Suthep (option)',sub:'Temple perché · vue sur la ville',waze:'18.8047,98.9217'}
     ]},
     {n:6,name:'Envol vers le sud',vibe:'✈️',date:'Mer 23 déc',items:[
-      {time:'10h40',dot:'plane',ic:'✈️',t:'Vol Chiang Mai → Surat Thani',sub:'Thai AirAsia FD5420 · direct ~1h55',resa:'vol-cnx-urt',rl:'Vol Chiang Mai → Surat Thani',waze:'9.1326,99.1355'},
-      {time:'~13h',dot:'boat',ic:'🚐',t:'Transfert Surat Thani → 500 Rai',sub:'~1h15 de route → ponton Ratchaprapha, puis bateau du resort sur le lac',resa:'transfert-khaosok',rl:'Transfert Surat Thani → 500 Rai',waze:'8.9755,98.7930'}
+      {time:'08h10',dot:'plane',ic:'✈️',t:'Vol Chiang Mai → Surat Thani',sub:'Thai AirAsia FD5420 · direct · arrivée 10h05',resa:'vol-cnx-urt',rl:'Vol Chiang Mai → Surat Thani',waze:'9.1326,99.1355'},
+      {time:'~10h30',dot:'boat',ic:'🚐',t:'Transfert Surat Thani → 500 Rai',sub:'Réservé via le resort · route ~1h15 → ponton, puis bateau sur le lac',resa:'transfert-khaosok',rl:'Transfert Surat Thani → 500 Rai',waze:'8.9755,98.7930'}
     ]}
   ]},
   {step:'Khao Sok', days:[
@@ -591,7 +593,7 @@ const PLAN=[
     ]},
     {n:12,name:'Vers Koh Yao Yai',vibe:'⛵',date:'Mar 29 déc',items:[
       {time:'Matin',dot:'free',ic:'🏊',t:'Dernière baignade à Koh Lanta',sub:''},
-      {time:'',dot:'boat',ic:'⛵',t:'Speedboat vers Koh Yao Yai',sub:'Transfert Santhiya',resa:'transfert-kohyao',rl:'Transfert Koh Lanta → Koh Yao Yai'}
+      {time:'',dot:'boat',ic:'⛵',t:'Speedboat vers Koh Yao Yai',sub:'Réservé via Santhiya (10 000 ฿) · point de ramassage à confirmer',resa:'transfert-kohyao',rl:'Transfert Koh Lanta → Koh Yao Yai'}
     ]}
   ]},
   {step:'Koh Yao Yai', days:[
@@ -615,7 +617,7 @@ const PLAN=[
 const RESA=[
   {label:'Vols',ic:'✈️',items:[
     {key:'vol-aller',ic:'✈️',name:'Vol aller — Thai Airways',desc:'Bruxelles → Bangkok · 18 déc',mailq:'THAI Electronic Ticket EMD'},
-    {key:'vol-cnx-urt',ic:'✈️',name:'Vol AirAsia FD5420',desc:'Chiang Mai → Surat Thani · 23 déc · 10h40',mailq:'Airpaz'},
+    {key:'vol-cnx-urt',ic:'✈️',name:'Vol AirAsia FD5420',desc:'Chiang Mai → Surat Thani · 23 déc · 08h10 → 10h05',mailq:'Airpaz'},
     {key:'vol-hkt-bkk',ic:'✈️',name:'Vol Phuket → Bangkok',desc:'Thai Airways · ~1er janv',mailq:'THAI Electronic Ticket EMD'},
     {key:'vol-retour',ic:'✈️',name:'Vol retour — Thai Airways',desc:'Bangkok → Bruxelles · ~1er janv',mailq:'THAI Electronic Ticket EMD'}
   ]},
@@ -630,11 +632,12 @@ const RESA=[
     {key:'hotel-kohyao',ic:'🏖️',name:'Santhiya Koh Yao Yai',desc:'29 déc → 1er janv · Nouvel An',mailq:'Santhiya Koh Yao Yai'}
   ]},
   {label:'Transferts',ic:'🚐',items:[
-    {key:'transfert-khaosok',ic:'🚐',name:'Surat Thani → 500 Rai',desc:'Aéroport → ponton → bateau · 23 déc',mailq:'500 Rai Floating Resort',info:['~1h15–1h30 de route jusqu\'au ponton de Ratchaprapha','puis bateau du resort sur le lac Cheow Lan (obligatoire)','À organiser avec le resort : reservations@500rai.com','Leur donner l\'heure d\'atterrissage à Surat Thani']},
+    {key:'transfert-khaosok',ic:'🚐',name:'Surat Thani → 500 Rai',desc:'✓ Réservé & payé · via le resort · 23 déc',mailq:'500 Rai Floating Resort',info:['✓ Réservé et payé via le resort 500 Rai','Le resort reconfirme 7 jours avant l\'arrivée','Van aéroport → ponton + bateau sur le lac Cheow Lan']},
     {key:'transfert-lanta',ic:'🚐',name:'Khao Sok → Koh Lanta',desc:'Bateau + voiture + ferry · 25 déc',mailq:'500 Rai Floating Resort',info:['500 Rai → ponton → route + ferry vers Koh Lanta','~4–5h · à organiser (Nirvana ne le fait pas)','Demander au resort 500 Rai : reservations@500rai.com']},
-    {key:'transfert-kohyao',ic:'⛵',name:'Koh Lanta → Koh Yao Yai',desc:'Speedboat Santhiya · 29 déc',mailq:'Santhiya'}
+    {key:'transfert-kohyao',ic:'⛵',name:'Koh Lanta → Koh Yao Yai',desc:'✓ Réservé · speedboat Santhiya · 29 déc',mailq:'Santhiya transfer',info:['✓ Transfert réservé via Santhiya (10 000 ฿)','Speedboat · point de ramassage à confirmer (probable Ao Nang)','Horaire précisé quand le planning de décembre sera fixé']}
   ]},
   {label:'Activités',ic:'🎟️',items:[
+    {key:'velo-bangkok',ic:'🚲',name:'Tour à vélo de Bangkok',desc:'18 déc · 13h–16h · Co van Kessel',mailq:'Co van Kessel',info:['Co van Kessel · 18 déc · 13h00–16h00','Réf. #6a90015400b6f','Présenter l\'e-ticket à l\'arrivée au bureau']},
     {key:'guide-bangkok',ic:'🧭',name:'Visite guidée de Bangkok',desc:'19 déc · 9h · guide Kunrawee',mailq:'from:guidekunrawee@gmail.com',tel:'+66876591666',telName:'le guide Kunrawee',info:['Guide francophone — Kunrawee Sai (licence 1-025483)','RDV 9h00, prise en charge à l\'hôtel','Marchés flottants de Thonburi + balade en bateau privé','~6 500 ฿ pour 4 · à régler en cash sur place']},
     {key:'elephants',ic:'🐘',name:'Elephant Rescue Park',desc:'Chiang Mai · 22 déc (matin)',mailq:'Elephant Rescue Park'}
   ]},
@@ -979,6 +982,7 @@ const IMPORT_RULES=[
   [['allianz','insurance','assurance'],'assurance-doc'],
   [['passeport','passport'],'passeports'],
   [['guide','kunrawee'],'guide-bangkok'],
+  [['kessel','covankessel','velo','bike'],'velo-bangkok'],
   [['retour','return','bkkbru'],'vol-retour'],
   [['thai','eticket','emd','fctdtb','amadeus','ticket','aller','brubkk'],'vol-aller'],
   [['transfert','transfer'],'transfert-lanta']

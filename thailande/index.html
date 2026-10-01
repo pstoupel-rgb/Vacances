@@ -290,6 +290,8 @@
   #resa-view .mailbtn:active{opacity:.9;}
   #resa-view a.doc-link{display:flex;align-items:center;gap:8px;background:var(--bg2);border:1px solid var(--border);border-radius:11px;padding:13px 15px;color:var(--brown);font-weight:700;text-decoration:none;font-size:.95rem;}
   #resa-view .mb-copy{display:block;width:100%;background:var(--bg2);color:var(--brown);border:none;border-radius:11px;padding:11px;font-weight:700;font-size:.85rem;cursor:pointer;font-family:inherit;margin-bottom:10px;}
+  #resa-view .file-row{display:flex;align-items:center;gap:8px;margin-bottom:8px;}
+  #resa-view .file-del{background:none;border:none;font-size:1.15rem;cursor:pointer;color:#c0392b;padding:6px 4px;flex-shrink:0;}
   .toast{position:fixed;left:50%;bottom:92px;transform:translateX(-50%) translateY(18px);background:#231f1a;color:#fff;padding:11px 18px;border-radius:12px;font-size:.82rem;font-weight:600;opacity:0;pointer-events:none;transition:opacity .25s,transform .25s;z-index:1200;max-width:85%;text-align:center;box-shadow:0 6px 20px rgba(0,0,0,.3);}
   .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
   #resa-view img.doc-img{width:100%;border-radius:11px;margin-top:10px;display:block;}
@@ -439,7 +441,7 @@
   <div style="padding:16px 16px 0"><button class="assur-edit" style="margin:0" onclick="relock()">🔒 Verrouiller l'app</button></div>
 
   <div class="disclaimer">Les informations ci-dessus (visa, taux de change, prises) sont données à titre indicatif et peuvent changer — pense à les <b>vérifier avant le départ</b> (Affaires étrangères Belgique · diplomatie.belgium.be / consulat de Thaïlande).</div>
-  <div style="text-align:center;font-size:.62rem;color:var(--muted);padding:2px 0 18px">Thaïlande · <b>v15</b> · mise à jour auto</div>
+  <div style="text-align:center;font-size:.62rem;color:var(--muted);padding:2px 0 18px">Thaïlande · <b>v16</b> · mise à jour auto</div>
 </div>
 
 <!-- ============ MODALS ============ -->
@@ -505,6 +507,11 @@ const FileDB={
   async keys(){const db=await this.open();return new Promise((res)=>{const rq=db.transaction('files','readonly').objectStore('files').getAllKeys();rq.onsuccess=()=>res(rq.result||[]);rq.onerror=()=>res([]);});}
 };
 let RESA_KEYS=new Set();
+let ALL_FILE_IDS=[];
+function baseKey(id){return id.split('::')[0];}
+async function refreshFileIds(){ALL_FILE_IDS=await FileDB.keys().catch(()=>[]);RESA_KEYS=new Set(ALL_FILE_IDS.map(baseKey));}
+function fileIdsFor(key){return ALL_FILE_IDS.filter(id=>id===key||id.indexOf(key+'::')===0);}
+function newFileId(key){return key+'::'+Date.now()+'-'+Math.random().toString(36).slice(2,7);}
 
 /* ===================== DONNÉES VOYAGE ===================== */
 /* Lieux (coordonnées réelles) pour la carte */
@@ -874,7 +881,7 @@ function renderCarteList(){
 }
 
 /* ===================== RÉSA (coffre PDF hors-ligne) ===================== */
-let _resaUrl=null;
+let _resaUrls=[];
 function renderResaGroups(){
   const el=document.getElementById('resa-groups');
   el.innerHTML=RESA.map(g=>'<div class="resa-group"><div class="resa-glabel">'+g.ic+' '+g.label+'</div>'+g.items.map(it=>{
@@ -915,7 +922,7 @@ async function openResa(key,label){
   const view=document.getElementById('resa-view');
   view.innerHTML='<div style="color:var(--muted);font-size:.85rem;text-align:center;padding:6px">Chargement…</div>';
   modal.classList.add('open');
-  if(_resaUrl){URL.revokeObjectURL(_resaUrl);_resaUrl=null;}
+  if(_resaUrls.length){_resaUrls.forEach(u=>{try{URL.revokeObjectURL(u);}catch(e){}});_resaUrls=[];}
   const it=findResaItem(key);
   let head='';
   if(it){
@@ -925,32 +932,34 @@ async function openResa(key,label){
     if(mh)head+='<a class="mailbtn" href="'+mh+'">📧 Ouvrir Gmail</a>';
     if(it&&it.mailq)head+='<button class="mb-copy" onclick="copySearch(\''+esc((it.mailq||'').replace(/^from:/,''))+'\')">🔎 Copier la recherche Gmail</button>';
   }
-  const rec=await FileDB.get(key).catch(()=>null);
+  const ids=fileIdsFor(key);
   let body='';
-  if(rec&&rec.blob){
-    _resaUrl=URL.createObjectURL(rec.blob);
-    const isImg=(rec.blob.type||'').startsWith('image/');
-    body='<a class="doc-link" href="'+_resaUrl+'" target="_blank" rel="noopener">📄 Ouvrir le fichier attaché</a>'
-      +(isImg?'<img class="doc-img" src="'+_resaUrl+'" alt="">':'')
-      +'<button class="mb-danger" onclick="uploadResa(\''+key+'\',\''+esc(label)+'\')">Remplacer le fichier</button>'
-      +'<button class="mb-danger" onclick="deleteResa(\''+key+'\')">🗑️ Supprimer</button>';
+  if(ids.length){
+    body+='<div style="font-size:.72rem;color:var(--muted);font-weight:700;margin:4px 0 7px">📎 '+ids.length+' fichier'+(ids.length>1?'s':'')+' attaché'+(ids.length>1?'s':'')+'</div>';
+    for(const id of ids){
+      const rec=await FileDB.get(id).catch(()=>null);
+      if(!rec||!rec.blob)continue;
+      const u=URL.createObjectURL(rec.blob);_resaUrls.push(u);
+      body+='<div class="file-row"><a class="doc-link" style="flex:1;min-width:0" href="'+u+'" target="_blank" rel="noopener">📄 '+escH(rec.name||'document')+'</a><button class="file-del" onclick="deleteResaFile(\''+esc(id)+'\',\''+esc(key)+'\',\''+esc(label)+'\')">🗑️</button></div>';
+    }
+    body+='<button class="assur-edit" style="margin:6px 0 0" onclick="uploadResa(\''+key+'\',\''+esc(label)+'\')">➕ Ajouter un fichier</button>';
   }else{
-    body='<button class="assur-edit" style="margin:0" onclick="uploadResa(\''+key+'\',\''+esc(label)+'\')">📎 Attacher le PDF pour le hors-ligne</button>';
+    body='<button class="assur-edit" style="margin:0" onclick="uploadResa(\''+key+'\',\''+esc(label)+'\')">📎 Attacher un ou plusieurs PDF (hors-ligne)</button>';
   }
   view.innerHTML=head+body;
 }
 function uploadResa(key,label){
-  const inp=document.createElement('input');inp.type='file';inp.accept='application/pdf,image/*';
+  const inp=document.createElement('input');inp.type='file';inp.accept='application/pdf,image/*';inp.multiple=true;
   inp.onchange=async e=>{
-    const f=e.target.files[0];if(!f)return;
+    const files=[...e.target.files];if(!files.length)return;
     document.getElementById('resa-view').innerHTML='<div style="color:var(--muted);font-size:.85rem;text-align:center;padding:10px">Enregistrement…</div>';
-    try{await FileDB.put(key,f,f.name);RESA_KEYS.add(key);}catch(err){document.getElementById('resa-view').innerHTML='<div style="color:#c0392b">Erreur : '+err.message+'</div>';return;}
-    refreshResaMarks();openResa(key,label);
+    try{for(const f of files){await FileDB.put(newFileId(key),f,f.name);}}catch(err){document.getElementById('resa-view').innerHTML='<div style="color:#c0392b">Erreur : '+err.message+'</div>';return;}
+    await refreshFileIds();refreshResaMarks();openResa(key,label);
   };
   inp.click();
 }
-async function deleteResa(key){
-  await FileDB.del(key);RESA_KEYS.delete(key);refreshResaMarks();closeModal('resa-modal');
+async function deleteResaFile(id,key,label){
+  await FileDB.del(id);await refreshFileIds();refreshResaMarks();openResa(key,label);
 }
 function refreshResaMarks(){
   renderResaGroups();
@@ -970,7 +979,7 @@ function openAssur(){document.getElementById('am-comp').value=ASSUR.comp;documen
 function saveAssur(){ASSUR={comp:document.getElementById('am-comp').value.trim(),num:document.getElementById('am-num').value.trim(),tel:document.getElementById('am-tel').value.trim()};lset('assur',ASSUR);renderAssur();closeModal('assur-modal');}
 
 /* ===================== UTIL MODAL ===================== */
-function closeModal(id){document.getElementById(id).classList.remove('open');if(id==='resa-modal'&&_resaUrl){URL.revokeObjectURL(_resaUrl);_resaUrl=null;}}
+function closeModal(id){document.getElementById(id).classList.remove('open');if(id==='resa-modal'&&_resaUrls.length){_resaUrls.forEach(u=>{try{URL.revokeObjectURL(u);}catch(e){}});_resaUrls=[];}}
 
 /* ===================== VERROU (code d'accès) ===================== */
 const PIN_H=2088295126;
@@ -1035,9 +1044,10 @@ function importAll(){
     const done=[];_pending=[];
     for(const f of files){
       const key=matchKey(f.name);
-      if(key){try{await FileDB.put(key,f,f.name);RESA_KEYS.add(key);done.push(f.name+' → '+resaLabel(key));}catch(_){_pending.push(f);}}
+      if(key){try{await FileDB.put(newFileId(key),f,f.name);done.push(f.name+' → '+resaLabel(key));}catch(_){_pending.push(f);}}
       else _pending.push(f);
     }
+    await refreshFileIds();
     refreshResaMarks();
     const modal=document.getElementById('resa-modal');
     document.getElementById('resa-modal-title').textContent='📥 Import des billets';
@@ -1056,15 +1066,15 @@ function importAll(){
 async function assignPending(i,key){
   if(!key||!_pending[i])return;
   const f=_pending[i];
-  try{await FileDB.put(key,f,f.name);RESA_KEYS.add(key);}catch(e){return;}
-  refreshResaMarks();
+  try{await FileDB.put(newFileId(key),f,f.name);}catch(e){return;}
+  await refreshFileIds();refreshResaMarks();
   const row=document.getElementById('pi-'+i);
   if(row)row.innerHTML='<div style="font-size:.78rem;color:#1f7a45;font-weight:700">✓ '+escH(f.name)+' → '+escH(resaLabel(key))+'</div>';
 }
 
 /* ===================== INIT ===================== */
 async function init(){
-  RESA_KEYS=new Set(await FileDB.keys().catch(()=>[]));
+  await refreshFileIds();
   renderDates();
   planningFocus();renderJourney();renderBanner();renderDays();
   renderCarteList();

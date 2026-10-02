@@ -1,10 +1,11 @@
 /* Service worker — Thaïlande */
-const CACHE = 'thai-v37';
+const CACHE = 'thai-v38';
 const ASSETS = [
   './', './index.html', './manifest.webmanifest', './icon.svg',
   './docs/airasia.html', './docs/santhiya-hotel.html', './docs/transfert-500rai.html',
   './docs/transfert-santhiya.html', './docs/covankessel.html', './docs/elephant.html',
-  './docs/excursion-lanta.html'
+  './docs/excursion-lanta.html', './docs/500rai-spa.html', './docs/santhiya-spa.html',
+  './docs/santhiya-ayurvana.html'
 ];
 
 self.addEventListener('install', (e) => {

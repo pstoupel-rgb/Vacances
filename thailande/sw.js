@@ -1,6 +1,10 @@
 /* Service worker — Thaïlande */
-const CACHE = 'thai-v27';
-const ASSETS = ['./', './index.html', './manifest.webmanifest', './icon.svg'];
+const CACHE = 'thai-v28';
+const ASSETS = [
+  './', './index.html', './manifest.webmanifest', './icon.svg',
+  './docs/airasia.html', './docs/santhiya-hotel.html', './docs/transfert-500rai.html',
+  './docs/transfert-santhiya.html', './docs/covankessel.html', './docs/elephant.html'
+];
 
 self.addEventListener('install', (e) => {
   e.waitUntil(
@@ -24,15 +28,17 @@ self.addEventListener('fetch', (e) => {
   const isDoc = req.mode === 'navigate' || req.destination === 'document';
 
   if (isDoc) {
-    // Page HTML : réseau d'abord (dernière version), cache en repli hors-ligne
+    // Sous-pages (docs/*.html) : mises en cache sous leur propre URL.
+    // Page principale : réseau d'abord, repli index.html.
+    const isSub = req.url.indexOf('/docs/') !== -1;
     e.respondWith(
       fetch(req)
         .then((res) => {
           const copy = res.clone();
-          caches.open(CACHE).then((c) => c.put('./index.html', copy));
+          caches.open(CACHE).then((c) => c.put(isSub ? req : './index.html', copy));
           return res;
         })
-        .catch(() => caches.match('./index.html').then((h) => h || caches.match('./')))
+        .catch(() => caches.match(req).then((h) => h || caches.match('./index.html')).then((h) => h || caches.match('./')))
     );
     return;
   }

@@ -295,6 +295,18 @@
   /* MODAL */
   .modal{display:none;position:fixed;inset:0;z-index:1000;background:rgba(0,0,0,.6);align-items:center;justify-content:center;padding:24px;-webkit-transform:translateZ(0);transform:translateZ(0);}
   .modal.open{display:flex;}
+  #doc-modal{display:none;position:fixed;inset:0;z-index:9000;background:rgba(0,0,0,.45);align-items:flex-end;justify-content:center;}
+  #doc-modal.open{display:flex;}
+  .doc-box{background:var(--bg);width:100%;max-width:640px;height:92vh;border-radius:18px 18px 0 0;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 -6px 30px rgba(0,0,0,.25);padding-bottom:env(safe-area-inset-bottom);}
+  .doc-bar{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:11px 14px;background:var(--card);border-bottom:1px solid var(--border);}
+  .doc-bar b{font-weight:700;font-size:.92rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .doc-bar button{flex-shrink:0;background:var(--brown);color:#fff;border:none;border-radius:20px;padding:8px 15px;font-weight:700;font-size:.82rem;cursor:pointer;}
+  #doc-frame{flex:1;border:none;width:100%;background:var(--bg);}
+  .conv{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);margin:0 0 10px;padding:12px 14px;}
+  .conv-row{display:flex;align-items:center;gap:8px;margin:6px 0;}
+  .conv-row label{font-size:.82rem;font-weight:700;color:var(--brown);width:68px;}
+  .conv-row input{flex:1;min-width:0;border:1px solid var(--border);border-radius:10px;padding:9px 11px;font-size:1.05rem;font-weight:700;color:var(--text);background:var(--bg);font-family:inherit;}
+  .conv-note{font-size:.66rem;color:var(--muted);margin-top:4px;text-align:center;}
   .modal-box{background:var(--card);border-radius:18px;padding:20px;width:100%;max-width:400px;box-shadow:0 20px 60px rgba(0,0,0,.3);}
   .modal-title{font-weight:700;font-size:1.05rem;margin-bottom:14px;display:flex;align-items:center;gap:8px;}
   .modal-box label{display:block;font-size:.72rem;font-weight:700;color:var(--muted);margin:10px 0 4px;text-transform:uppercase;letter-spacing:.03em;}
@@ -465,22 +477,30 @@
 <!-- ============ SPA ============ -->
 <div class="page page-content" id="page-spa">
   <div class="section" style="padding-top:8px">
-    <div class="section-hdr">💆 Spa & Bien-être</div>
-    <a class="card" href="docs/500rai-spa.html" target="_blank" rel="noopener" style="border-left:4px solid #2e8b6f">
+    <div class="section-hdr">💱 Convertisseur € ↔ ฿</div>
+    <div class="conv">
+      <div class="conv-row"><label>€ Euro</label><input id="conv-eur" type="number" inputmode="decimal" value="1" oninput="convEur()"></div>
+      <div class="conv-row"><label>฿ Baht</label><input id="conv-thb" type="number" inputmode="decimal" oninput="convThb()"></div>
+      <div class="conv-note">Taux indicatif : 1 € ≈ 38 ฿</div>
+    </div>
+  </div>
+  <div class="section">
+    <div class="section-hdr">💆 Menus Spa</div>
+    <div class="card" onclick="openDoc('docs/500rai-spa.html','Spa — 500 Rai')" style="border-left:4px solid #2e8b6f">
       <div class="card-icon" style="background:#dff0ea">🛶</div>
       <div class="card-body"><div class="card-name">Spa — 500 Rai</div><div class="card-meta">Khao Sok · massages 990 → 2 000 ฿</div></div>
       <div class="tag green">Menu</div>
-    </a>
-    <a class="card" href="docs/santhiya-spa.html" target="_blank" rel="noopener" style="border-left:4px solid #7a5cae">
+    </div>
+    <div class="card" onclick="openDoc('docs/santhiya-spa.html','Massage plage — Santhiya')" style="border-left:4px solid #7a5cae">
       <div class="card-icon" style="background:#ece6f5">🏖️</div>
       <div class="card-body"><div class="card-name">Massage plage — Santhiya</div><div class="card-meta">Koh Yao Yai · beach massage 699 → 999 ฿</div></div>
       <div class="tag" style="background:#ece6f5;color:#7a5cae">Menu</div>
-    </a>
-    <a class="card" href="docs/santhiya-ayurvana.html" target="_blank" rel="noopener" style="border-left:4px solid #8a6a3f">
+    </div>
+    <div class="card" onclick="openDoc('docs/santhiya-ayurvana.html','Spa Ayurvana — Santhiya')" style="border-left:4px solid #8a6a3f">
       <div class="card-icon" style="background:#efe7d8">🌸</div>
       <div class="card-body"><div class="card-name">Spa Ayurvana — Santhiya</div><div class="card-meta">Menu complet · massages, soins, gommages…</div></div>
       <div class="tag">Menu</div>
-    </a>
+    </div>
   </div>
   <div class="disclaimer">💆 Menus consultables hors-ligne. Prix indicatifs en bahts (฿), hors taxes & service. À régler sur place.</div>
 </div>
@@ -521,10 +541,17 @@
   <div style="padding:16px 16px 0"><button class="assur-edit" style="margin:0" onclick="relock()">🔒 Verrouiller l'app</button></div>
 
   <div class="disclaimer">Les informations ci-dessus (visa, taux de change, prises) sont données à titre indicatif et peuvent changer — pense à les <b>vérifier avant le départ</b> (Affaires étrangères Belgique · diplomatie.belgium.be / consulat de Thaïlande).</div>
-  <div style="text-align:center;font-size:.62rem;color:var(--muted);padding:2px 0 18px">Thaïlande · <b>v40</b> · mise à jour auto</div>
+  <div style="text-align:center;font-size:.62rem;color:var(--muted);padding:2px 0 18px">Thaïlande · <b>v41</b> · mise à jour auto</div>
 </div>
 
 <!-- ============ MODALS ============ -->
+<div id="doc-modal" onclick="if(event.target===this)closeDoc()">
+  <div class="doc-box">
+    <div class="doc-bar"><b id="doc-title">Document</b><button onclick="closeDoc()">✕ Fermer</button></div>
+    <iframe id="doc-frame" title="Document"></iframe>
+  </div>
+</div>
+
 <div class="modal" id="resa-modal" onclick="if(event.target===this)closeModal('resa-modal')">
   <div class="modal-box">
     <div class="modal-title" id="resa-modal-title">📄 Réservation</div>
@@ -1002,6 +1029,20 @@ function renderResaGroups(){
   const withDoc=RESA.reduce((a,g)=>a+g.items.filter(it=>RESA_KEYS.has(it.key)||(it.drive&&it.drive.length)||(it.local&&it.local.length)).length,0);
   document.getElementById('resa-count').textContent=withDoc+' / '+total+' réservations avec document';
 }
+/* ===================== VISIONNEUSE DE DOCUMENT (dans l'app) ===================== */
+function openDoc(url,title){
+  document.getElementById('doc-title').textContent=title||'Document';
+  document.getElementById('doc-frame').src=url;
+  document.getElementById('doc-modal').classList.add('open');
+}
+function closeDoc(){
+  document.getElementById('doc-modal').classList.remove('open');
+  try{document.getElementById('doc-frame').src='about:blank';}catch(e){}
+}
+/* ===================== CONVERTISSEUR € ↔ ฿ ===================== */
+const CONV_RATE=38; /* 1 € ≈ 38 ฿ (indicatif) */
+function convEur(){const e=parseFloat((document.getElementById('conv-eur').value||'').replace(',','.'));document.getElementById('conv-thb').value=isNaN(e)?'':Math.round(e*CONV_RATE);}
+function convThb(){const t=parseFloat((document.getElementById('conv-thb').value||'').replace(',','.'));document.getElementById('conv-eur').value=isNaN(t)?'':(t/CONV_RATE).toFixed(2);}
 /* Liens directs vers le fil d'e-mail exact (plus fiable qu'une recherche) */
 const MAIL_THREADS={
   'velo-bangkok':'1874667871333758259',
@@ -1041,7 +1082,7 @@ async function openResa(key,label){
     if(PAY[key])head+='<div style="margin:0 0 9px">'+payPill(key)+'</div>';
     if(it.local&&it.local.length){
       head+='<div style="font-size:.72rem;color:var(--muted);font-weight:700;margin:6px 0 6px">📄 Document'+(it.local.length>1?'s':'')+' (dans l\'app · hors-ligne)</div>';
-      for(const d of it.local)head+='<a class="mailbtn" style="background:var(--brown)" href="'+d.u+'" target="_blank" rel="noopener">📄 '+escH(d.n)+'</a>';
+      for(const d of it.local)head+='<a class="mailbtn" style="background:var(--brown)" href="javascript:void(0)" onclick="openDoc(\''+d.u+'\',\''+escH(d.n)+'\')">📄 '+escH(d.n)+'</a>';
     }
     if(it.drive&&it.drive.length){
       head+='<div style="font-size:.72rem;color:var(--muted);font-weight:700;margin:6px 0 6px">☁️ Document'+(it.drive.length>1?'s':'')+' complet'+(it.drive.length>1?'s':'')+' — Drive (en ligne)</div>';
@@ -1200,6 +1241,7 @@ async function init(){
   renderResaGroups();
   renderAssur();
   renderPhrases();
+  try{convEur();}catch(e){}
   setInterval(renderCountdown,30000);
 }
 /* ===================== PHRASES THAÏ (audio) ===================== */

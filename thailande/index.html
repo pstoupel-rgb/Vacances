@@ -441,7 +441,7 @@
   <div style="padding:16px 16px 0"><button class="assur-edit" style="margin:0" onclick="relock()">🔒 Verrouiller l'app</button></div>
 
   <div class="disclaimer">Les informations ci-dessus (visa, taux de change, prises) sont données à titre indicatif et peuvent changer — pense à les <b>vérifier avant le départ</b> (Affaires étrangères Belgique · diplomatie.belgium.be / consulat de Thaïlande).</div>
-  <div style="text-align:center;font-size:.62rem;color:var(--muted);padding:2px 0 18px">Thaïlande · <b>v16</b> · mise à jour auto</div>
+  <div style="text-align:center;font-size:.62rem;color:var(--muted);padding:2px 0 18px">Thaïlande · <b>v17</b> · mise à jour auto</div>
 </div>
 
 <!-- ============ MODALS ============ -->
@@ -501,11 +501,16 @@ const FileDB={
     r.onsuccess=e=>{this._db=e.target.result;res(this._db);};
     r.onerror=()=>rej(r.error);
   });},
-  async put(id,blob,name){const db=await this.open();return new Promise((res,rej)=>{const tx=db.transaction('files','readwrite');tx.objectStore('files').put({id,blob,name});tx.oncomplete=res;tx.onerror=()=>rej(tx.error);});},
+  async put(id,file,name){const db=await this.open();
+    let buf=file,type='';
+    if(file&&typeof file.arrayBuffer==='function'){buf=await file.arrayBuffer();type=file.type||'';}
+    return new Promise((res,rej)=>{const tx=db.transaction('files','readwrite');tx.objectStore('files').put({id,buf,type,name});tx.oncomplete=res;tx.onerror=()=>rej(tx.error);});},
   async get(id){const db=await this.open();return new Promise((res,rej)=>{const rq=db.transaction('files','readonly').objectStore('files').get(id);rq.onsuccess=()=>res(rq.result||null);rq.onerror=()=>rej(rq.error);});},
   async del(id){const db=await this.open();return new Promise((res)=>{const tx=db.transaction('files','readwrite');tx.objectStore('files').delete(id);tx.oncomplete=res;});},
   async keys(){const db=await this.open();return new Promise((res)=>{const rq=db.transaction('files','readonly').objectStore('files').getAllKeys();rq.onsuccess=()=>res(rq.result||[]);rq.onerror=()=>res([]);});}
 };
+/* Reconstruit un Blob depuis l'enregistrement (ArrayBuffer fiable sur iOS, ou ancien Blob) */
+function recBlob(rec){if(!rec)return null;if(rec.buf)return new Blob([rec.buf],{type:rec.type||'application/octet-stream'});if(rec.blob)return rec.blob;return null;}
 let RESA_KEYS=new Set();
 let ALL_FILE_IDS=[];
 function baseKey(id){return id.split('::')[0];}
@@ -703,7 +708,7 @@ async function renderFam(){
     const rec=await FileDB.get('fam-'+m.id).catch(()=>null);
     let inner=(m.name||'?').charAt(0).toUpperCase();
     let style='background:'+(FAM_COLOR[m.id]||'#8a6a3f');
-    if(rec&&rec.blob){inner='<img src="'+URL.createObjectURL(rec.blob)+'" alt="">';style='';}
+    const _fb=recBlob(rec);if(_fb){inner='<img src="'+URL.createObjectURL(_fb)+'" alt="">';style='';}
     const cell=document.createElement('div');cell.className='fam-cell';cell.onclick=()=>editFam(m.id);
     cell.innerHTML='<div class="fam-ava" style="'+style+'">'+inner+'<span class="cam">📷</span></div><div class="fam-name">'+m.name+'</div>';
     g.appendChild(cell);
@@ -938,9 +943,9 @@ async function openResa(key,label){
     body+='<div style="font-size:.72rem;color:var(--muted);font-weight:700;margin:4px 0 7px">📎 '+ids.length+' fichier'+(ids.length>1?'s':'')+' attaché'+(ids.length>1?'s':'')+'</div>';
     for(const id of ids){
       const rec=await FileDB.get(id).catch(()=>null);
-      if(!rec||!rec.blob)continue;
-      const u=URL.createObjectURL(rec.blob);_resaUrls.push(u);
-      body+='<div class="file-row"><a class="doc-link" style="flex:1;min-width:0" href="'+u+'" target="_blank" rel="noopener">📄 '+escH(rec.name||'document')+'</a><button class="file-del" onclick="deleteResaFile(\''+esc(id)+'\',\''+esc(key)+'\',\''+esc(label)+'\')">🗑️</button></div>';
+      const bl=recBlob(rec);if(!bl)continue;
+      const u=URL.createObjectURL(bl);_resaUrls.push(u);
+      body+='<div class="file-row"><a class="doc-link" style="flex:1;min-width:0" href="'+u+'" target="_blank" rel="noopener">📄 '+escH((rec&&rec.name)||'document')+'</a><button class="file-del" onclick="deleteResaFile(\''+esc(id)+'\',\''+esc(key)+'\',\''+esc(label)+'\')">🗑️</button></div>';
     }
     body+='<button class="assur-edit" style="margin:6px 0 0" onclick="uploadResa(\''+key+'\',\''+esc(label)+'\')">➕ Ajouter un fichier</button>';
   }else{
@@ -1074,6 +1079,7 @@ async function assignPending(i,key){
 
 /* ===================== INIT ===================== */
 async function init(){
+  try{if(navigator.storage&&navigator.storage.persist)navigator.storage.persist();}catch(e){}
   await refreshFileIds();
   renderDates();
   planningFocus();renderJourney();renderBanner();renderDays();

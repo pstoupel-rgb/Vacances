@@ -477,7 +477,7 @@
   <div style="padding:16px 16px 0"><button class="assur-edit" style="margin:0" onclick="relock()">🔒 Verrouiller l'app</button></div>
 
   <div class="disclaimer">Les informations ci-dessus (visa, taux de change, prises) sont données à titre indicatif et peuvent changer — pense à les <b>vérifier avant le départ</b> (Affaires étrangères Belgique · diplomatie.belgium.be / consulat de Thaïlande).</div>
-  <div style="text-align:center;font-size:.62rem;color:var(--muted);padding:2px 0 18px">Thaïlande · <b>v26</b> · mise à jour auto</div>
+  <div style="text-align:center;font-size:.62rem;color:var(--muted);padding:2px 0 18px">Thaïlande · <b>v27</b> · mise à jour auto</div>
 </div>
 
 <!-- ============ MODALS ============ -->
@@ -577,6 +577,8 @@ const PLACES=[
   {n:'500 Rai Floating Resort',lat:8.9760,lng:98.6870,ic:'🛶',grp:'Khao Sok',stop:3,d:'Étape 3 · 23 → 25 déc · lac Cheow Lan'},
   {n:'Lac Cheow Lan (Ratchaprapha)',lat:8.9755,lng:98.7930,ic:'🏞️',grp:'Khao Sok',d:'Kayak, longtail, jungle'},
   {n:'Nirvana Beach Resort',lat:7.5450,lng:99.0450,ic:'🏝️',grp:'Koh Lanta',stop:4,d:'Étape 4 · 25 → 29 déc · villa piscine'},
+  {n:'Koh Rok',lat:7.2130,lng:99.0730,ic:'🤿',grp:'Koh Lanta',d:'Excursion speedboat · 27 déc · snorkeling'},
+  {n:'Koh Haa',lat:7.4350,lng:99.0200,ic:'🐠',grp:'Koh Lanta',d:'Excursion speedboat · 27 déc · récifs'},
   {n:'Santhiya Koh Yao Yai Resort & Spa',lat:8.0600,lng:98.5800,ic:'🏖️',grp:'Koh Yao Yai',stop:5,d:'Étape 5 · 29 déc → 1 janv · Nouvel An'}
 ];
 
@@ -639,9 +641,9 @@ const PLAN=[
       {time:'',dot:'hotel',ic:'🏝️',t:'Check-in — Nirvana Beach Resort',sub:'4 nuits · villa piscine front de mer',resa:'hotel-lanta',rl:'Nirvana Beach Resort (Koh Lanta)',waze:'7.5450,99.0450'},
       {time:'Soir',dot:'food',ic:'🌅',t:'Coucher de soleil sur la plage',sub:'Dîner pieds dans le sable'}
     ]},
-    {n:11,name:'Farniente & plages',vibe:'😎',date:'Sam 26 → Lun 28 déc',items:[
+    {n:11,name:'Plages & excursion Koh Rok',vibe:'🤿',date:'Sam 26 → Lun 28 déc',items:[
       {time:'Libre',dot:'free',ic:'🏖️',t:'Plages de Koh Lanta',sub:'Baignade, piscine, massage thaï'},
-      {time:'Option',dot:'boat',ic:'🤿',t:'Excursion snorkeling',sub:'Koh Rok / 4 îles (à réserver sur place)'}
+      {time:'27 déc · 8h',dot:'boat',ic:'⚡',t:'Excursion privée — Koh Rok & Koh Haa',sub:'Speedboat privé · pick-up 8h à la réception du Nirvana · Lanta GZ',resa:'excursion-lanta',rl:'Excursion Koh Rok & Koh Haa',waze:'7.2130,99.0730'}
     ]},
     {n:12,name:'Vers Koh Yao Yai',vibe:'⛵',date:'Mar 29 déc',items:[
       {time:'Matin',dot:'free',ic:'🏊',t:'Dernière baignade à Koh Lanta',sub:''},
@@ -691,7 +693,8 @@ const RESA=[
   {label:'Activités',ic:'🎟️',items:[
     {key:'velo-bangkok',ic:'🚲',name:'Tour à vélo de Bangkok',desc:'18 déc · 13h–16h · Co van Kessel',mailq:'Co van Kessel',info:['Co van Kessel · 18 déc · 13h00–16h00','Réf. #6a90015400b6f','Présenter cette réf. (ou l\'e-ticket) au bureau à l\'arrivée','Ruelles, canaux & marchés cachés de Bangkok']},
     {key:'guide-bangkok',ic:'🧭',name:'Visite guidée de Bangkok',desc:'19 déc · 9h · guide Kunrawee',mailq:'from:guidekunrawee@gmail.com',tel:'+66876591666',telName:'le guide Kunrawee',info:['Guide francophone — Kunrawee Sai (licence 1-025483)','RDV 9h00, prise en charge à l\'hôtel','Marchés flottants de Thonburi + balade en bateau privé','~6 500 ฿ pour 4 · à régler en cash sur place'],drive:[{n:'Programme guide 19 déc',u:'https://drive.google.com/file/d/1Bf7NzG_xUvEVOyX5eEqHpSCDNnj06EzE/view'},{n:'Photo du guide',u:'https://drive.google.com/file/d/1brVoB13RQs1-QmAwEV8N4rABn047xOma/view'},{n:'Carte pro du guide',u:'https://drive.google.com/file/d/1IbPCZWVvgXG_kRIgOXqtKkctGbY78fHe/view'}]},
-    {key:'elephants',ic:'🐘',name:'Elephant Rescue Park',desc:'Chiang Mai · 22 déc (matin)',mailq:'Elephant Rescue Park',info:['Elephant Rescue Park · Chiang Mai','Programme A — Serene Boutique Elephant Care','22 déc (matin)','Formulaire à compléter avant la visite']}
+    {key:'elephants',ic:'🐘',name:'Elephant Rescue Park',desc:'Chiang Mai · 22 déc (matin)',mailq:'Elephant Rescue Park',info:['Elephant Rescue Park · Chiang Mai','Programme A — Serene Boutique Elephant Care','22 déc (matin)','Formulaire à compléter avant la visite']},
+    {key:'excursion-lanta',ic:'⚡',name:'Excursion Koh Rok & Koh Haa',desc:'27 déc · speedboat privé · Lanta GZ',mailq:'Lanta GZ',tel:'+66855924778',telName:'Lanta GZ Tour & Travel',info:['✓ Réservé & payé · speedboat PRIVÉ','Koh Rok & Koh Haa · 27 déc','Pick-up 08h00 à la réception du Nirvana','4 personnes · Lanta GZ Tour & Travel (licence 34/03351)','⚠️ Frais parc national ~400฿/pers en plus (non inclus)','Tél / WhatsApp +66 85 592 4778']}
   ]},
   {label:'Documents',ic:'🪪',items:[
     {key:'passeports',ic:'🛂',name:'Passeports',desc:'Scans de la famille'},

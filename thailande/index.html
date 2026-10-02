@@ -83,7 +83,7 @@
   .hero-wrap{position:relative;}
   .hero-img{width:100%;height:210px;object-fit:cover;display:block;background:var(--bg2);}
   .hero-overlay{position:absolute;inset:0;background:linear-gradient(to bottom,rgba(246,243,236,.05) 0%,rgba(246,243,236,0) 32%,rgba(246,243,236,.55) 74%,var(--bg) 100%);}
-  .hero-title{position:absolute;bottom:44px;left:20px;right:20px;text-align:center;}
+  .hero-title{position:absolute;bottom:78px;left:20px;right:20px;text-align:center;}
   .hero-title h1{font-family:'Cormorant Garamond',serif;font-size:3rem;font-weight:700;font-style:italic;color:var(--text);line-height:1;letter-spacing:.02em;text-shadow:0 2px 16px rgba(246,243,236,.7);}
   .hero-title p{font-size:.82rem;color:#5a5249;margin-top:4px;font-weight:600;}
 
@@ -384,7 +384,7 @@
       </g>
     </svg>
     <div class="hero-overlay"></div>
-    <div class="hero-title"><h1>Thaïlande</h1><p id="hero-dates">— · à nous 4 —</p></div>
+    <div class="hero-title"><h1>Thaïlande</h1></div>
   </div>
 
   <div class="countdown-card">
@@ -497,7 +497,7 @@
   <div style="padding:16px 16px 0"><button class="assur-edit" style="margin:0" onclick="relock()">🔒 Verrouiller l'app</button></div>
 
   <div class="disclaimer">Les informations ci-dessus (visa, taux de change, prises) sont données à titre indicatif et peuvent changer — pense à les <b>vérifier avant le départ</b> (Affaires étrangères Belgique · diplomatie.belgium.be / consulat de Thaïlande).</div>
-  <div style="text-align:center;font-size:.62rem;color:var(--muted);padding:2px 0 18px">Thaïlande · <b>v33</b> · mise à jour auto</div>
+  <div style="text-align:center;font-size:.62rem;color:var(--muted);padding:2px 0 18px">Thaïlande · <b>v34</b> · mise à jour auto</div>
 </div>
 
 <!-- ============ MODALS ============ -->
@@ -754,7 +754,7 @@ const MOIS=['janv.','févr.','mars','avr.','mai','juin','juil.','août','sept.',
 function fmtDate(iso){const d=new Date(iso+'T00:00:00');return d.getDate()+' '+MOIS[d.getMonth()]+' '+d.getFullYear();}
 function fmtShort(iso){const d=new Date(iso+'T00:00:00');return d.getDate()+' '+MOIS[d.getMonth()];}
 function renderDates(){
-  document.getElementById('hero-dates').textContent='— '+fmtShort(DATES.start)+' au '+fmtShort(DATES.end)+' · à nous 4 —';
+  const hd=document.getElementById('hero-dates');if(hd)hd.textContent='— '+fmtShort(DATES.start)+' au '+fmtShort(DATES.end)+' · à nous 4 —';
   renderCountdown();
 }
 function renderCountdown(){

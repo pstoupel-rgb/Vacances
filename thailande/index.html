@@ -441,7 +441,7 @@
   <div style="padding:16px 16px 0"><button class="assur-edit" style="margin:0" onclick="relock()">🔒 Verrouiller l'app</button></div>
 
   <div class="disclaimer">Les informations ci-dessus (visa, taux de change, prises) sont données à titre indicatif et peuvent changer — pense à les <b>vérifier avant le départ</b> (Affaires étrangères Belgique · diplomatie.belgium.be / consulat de Thaïlande).</div>
-  <div style="text-align:center;font-size:.62rem;color:var(--muted);padding:2px 0 18px">Thaïlande · <b>v17</b> · mise à jour auto</div>
+  <div style="text-align:center;font-size:.62rem;color:var(--muted);padding:2px 0 18px">Thaïlande · <b>v18</b> · mise à jour auto</div>
 </div>
 
 <!-- ============ MODALS ============ -->
@@ -933,9 +933,6 @@ async function openResa(key,label){
   if(it){
     head+='<div class="resa-detail"><b>'+it.name+'</b><br>'+it.desc+(it.info?('<br>'+it.info.map(x=>'· '+x).join('<br>')):'')+'</div>';
     if(it.tel)head+='<a class="mailbtn" style="background:var(--jade)" href="tel:'+it.tel.replace(/\s/g,'')+'">📞 Appeler '+(it.telName||'le contact')+'</a>';
-    const mh=mailHrefFor(key,it);
-    if(mh)head+='<a class="mailbtn" href="'+mh+'">📧 Ouvrir Gmail</a>';
-    if(it&&it.mailq)head+='<button class="mb-copy" onclick="copySearch(\''+esc((it.mailq||'').replace(/^from:/,''))+'\')">🔎 Copier la recherche Gmail</button>';
   }
   const ids=fileIdsFor(key);
   let body='';

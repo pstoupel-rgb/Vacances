@@ -441,7 +441,7 @@
   <div style="padding:16px 16px 0"><button class="assur-edit" style="margin:0" onclick="relock()">🔒 Verrouiller l'app</button></div>
 
   <div class="disclaimer">Les informations ci-dessus (visa, taux de change, prises) sont données à titre indicatif et peuvent changer — pense à les <b>vérifier avant le départ</b> (Affaires étrangères Belgique · diplomatie.belgium.be / consulat de Thaïlande).</div>
-  <div style="text-align:center;font-size:.62rem;color:var(--muted);padding:2px 0 18px">Thaïlande · <b>v19</b> · mise à jour auto</div>
+  <div style="text-align:center;font-size:.62rem;color:var(--muted);padding:2px 0 18px">Thaïlande · <b>v20</b> · mise à jour auto</div>
 </div>
 
 <!-- ============ MODALS ============ -->
@@ -632,10 +632,10 @@ const PLAN=[
 /* Réservations (coffre) — groupées */
 const RESA=[
   {label:'Vols',ic:'✈️',items:[
-    {key:'vol-aller',ic:'✈️',name:'Vol aller — Thai Airways',desc:'Bruxelles → Bangkok · 18 déc',mailq:'THAI Electronic Ticket EMD'},
+    {key:'vol-aller',ic:'✈️',name:'Vol aller — Thai Airways',desc:'Bruxelles → Bangkok · TG935 · 17 déc 13h10 → 18 déc 06h10',mailq:'THAI Electronic Ticket EMD',drive:[{n:'Billet A/R 1',u:'https://drive.google.com/file/d/1etmMmRQKFLsTb_qCY5r8OACymUxX8cAf/view'},{n:'Billet A/R 2',u:'https://drive.google.com/file/d/1zSXEh2vtMbcXluEtADNgWvktsL66tbRa/view'},{n:'Billet A/R 3',u:'https://drive.google.com/file/d/1f9d7Gx7gEKENfvBkZgInVU-fvdne2XN6/view'},{n:'Billet A/R 4',u:'https://drive.google.com/file/d/1rz6UTmXQmikJ4P0jSD4n5J_w3ClyDPJ6/view'}]},
     {key:'vol-cnx-urt',ic:'✈️',name:'Vol AirAsia FD5420',desc:'Chiang Mai → Surat Thani · 23 déc · 08h10 → 10h05',mailq:'Airpaz'},
     {key:'vol-hkt-bkk',ic:'✈️',name:'Vol Phuket → Bangkok',desc:'Thai Airways · ~1er janv',mailq:'THAI Electronic Ticket EMD'},
-    {key:'vol-retour',ic:'✈️',name:'Vol retour — Thai Airways',desc:'Bangkok → Bruxelles · ~1er janv',mailq:'THAI Electronic Ticket EMD'}
+    {key:'vol-retour',ic:'✈️',name:'Vol retour — Thai Airways',desc:'Bangkok → Bruxelles · TG934 · 2 janv 00h30 → 07h05',mailq:'THAI Electronic Ticket EMD',drive:[{n:'Billet A/R 1',u:'https://drive.google.com/file/d/1etmMmRQKFLsTb_qCY5r8OACymUxX8cAf/view'},{n:'Billet A/R 2',u:'https://drive.google.com/file/d/1zSXEh2vtMbcXluEtADNgWvktsL66tbRa/view'},{n:'Billet A/R 3',u:'https://drive.google.com/file/d/1f9d7Gx7gEKENfvBkZgInVU-fvdne2XN6/view'},{n:'Billet A/R 4',u:'https://drive.google.com/file/d/1rz6UTmXQmikJ4P0jSD4n5J_w3ClyDPJ6/view'}]}
   ]},
   {label:'Train',ic:'🚂',items:[
     {key:'train-cnx',ic:'🚂',name:'Train de nuit 1re classe',desc:'Bangkok → Chiang Mai · 20 déc 18h40 → 21 déc 07h15',mailq:'Thailand Railways confirmation'}
@@ -932,6 +932,10 @@ async function openResa(key,label){
   let head='';
   if(it){
     head+='<div class="resa-detail"><b>'+it.name+'</b><br>'+it.desc+(it.info?('<br>'+it.info.map(x=>'· '+x).join('<br>')):'')+'</div>';
+    if(it.drive&&it.drive.length){
+      head+='<div style="font-size:.72rem;color:var(--muted);font-weight:700;margin:2px 0 6px">☁️ Document'+(it.drive.length>1?'s':'')+' partagé'+(it.drive.length>1?'s':'')+' (Drive)</div>';
+      for(const d of it.drive)head+='<a class="mailbtn" style="background:#2a7d9f" href="'+d.u+'" target="_blank" rel="noopener">☁️ '+escH(d.n)+'</a>';
+    }
     if(it.tel)head+='<a class="mailbtn" style="background:var(--jade)" href="tel:'+it.tel.replace(/\s/g,'')+'">📞 Appeler '+(it.telName||'le contact')+'</a>';
   }
   const ids=fileIdsFor(key);

@@ -1,5 +1,5 @@
 /* Service worker — Thaïlande */
-const CACHE = 'thai-v18';
+const CACHE = 'thai-v19';
 const ASSETS = ['./', './index.html', './manifest.webmanifest', './icon.svg'];
 
 self.addEventListener('install', (e) => {

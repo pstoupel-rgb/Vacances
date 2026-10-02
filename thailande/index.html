@@ -248,6 +248,15 @@
   .resa-row.hasdoc{border-color:#cfe3d8;}
   .resa-clip{position:absolute;bottom:-3px;right:-3px;font-size:.62rem;font-weight:800;line-height:1;background:var(--jade);color:#fff;border-radius:50%;width:17px;height:17px;display:grid;place-items:center;box-shadow:0 1px 3px rgba(0,0,0,.28);}
   .pay-pill{display:inline-block;margin-top:6px;font-size:.62rem;font-weight:700;padding:3px 9px;border-radius:20px;}
+  .phrase{background:var(--card);border:1px solid var(--border);border-radius:13px;padding:10px 14px;margin-bottom:8px;display:flex;align-items:center;gap:12px;box-shadow:var(--shadow);}
+  .ph-body{flex:1;min-width:0;}
+  .ph-fr{font-weight:700;font-size:.88rem;}
+  .ph-th{font-size:1rem;color:var(--brown);margin-top:1px;}
+  .ph-tr{font-size:.72rem;color:var(--muted);font-style:italic;}
+  .ph-say{flex-shrink:0;width:46px;height:46px;border-radius:50%;border:none;background:var(--jade);color:#fff;font-size:1.25rem;cursor:pointer;display:grid;place-items:center;box-shadow:var(--shadow);}
+  .ph-say:active{transform:scale(.9);}
+  .ph-say.on{background:var(--gold);animation:phpulse .7s infinite;}
+  @keyframes phpulse{0%,100%{transform:scale(1)}50%{transform:scale(1.08)}}
   .pay-sum{margin:2px 16px 0;display:flex;gap:7px;flex-wrap:wrap;}
   .pay-sum .ps{flex:1;min-width:88px;text-align:center;background:var(--card);border:1px solid var(--border);border-radius:11px;padding:8px 6px;box-shadow:var(--shadow);}
   .pay-sum .ps b{display:block;font-size:1.1rem;font-weight:800;}
@@ -463,6 +472,12 @@
     <div class="info-tile"><div class="it-ic">💧</div><div class="it-k">Eau</div><div class="it-v">En bouteille</div><div class="it-note">Éviter l'eau du robinet</div></div>
   </div>
 
+  <div class="section" style="padding:16px 16px 0">
+    <div class="section-hdr">🗣️ Phrases utiles</div>
+    <div style="font-size:.7rem;color:var(--muted);margin:-4px 2px 10px">Touche 🔊 pour écouter la prononciation · ajoute « ครับ <i>kráp</i> » (homme) / « ค่ะ <i>kâ</i> » (femme) pour être poli.</div>
+    <div id="phrases-list"></div>
+  </div>
+
   <div class="urg-card">
     <div class="urg-title">🚨 Numéros d'urgence</div>
     <div class="urg-row"><span class="urg-k">Police touristique</span><a class="urg-num" href="tel:1155">1155</a></div>
@@ -482,7 +497,7 @@
   <div style="padding:16px 16px 0"><button class="assur-edit" style="margin:0" onclick="relock()">🔒 Verrouiller l'app</button></div>
 
   <div class="disclaimer">Les informations ci-dessus (visa, taux de change, prises) sont données à titre indicatif et peuvent changer — pense à les <b>vérifier avant le départ</b> (Affaires étrangères Belgique · diplomatie.belgium.be / consulat de Thaïlande).</div>
-  <div style="text-align:center;font-size:.62rem;color:var(--muted);padding:2px 0 18px">Thaïlande · <b>v28</b> · mise à jour auto</div>
+  <div style="text-align:center;font-size:.62rem;color:var(--muted);padding:2px 0 18px">Thaïlande · <b>v29</b> · mise à jour auto</div>
 </div>
 
 <!-- ============ MODALS ============ -->
@@ -1159,7 +1174,45 @@ async function init(){
   renderCarteList();
   renderResaGroups();
   renderAssur();
+  renderPhrases();
   setInterval(renderCountdown,30000);
+}
+/* ===================== PHRASES THAÏ (audio) ===================== */
+const THAI_PHRASES=[
+  {fr:'Bonjour / Au revoir',th:'สวัสดี',tr:'sa-wat-dii'},
+  {fr:'Merci',th:'ขอบคุณ',tr:'khop-khun'},
+  {fr:'Oui',th:'ใช่',tr:'châi'},
+  {fr:'Non',th:'ไม่',tr:'mâi'},
+  {fr:'S\'il vous plaît',th:'ขอ',tr:'khǎw'},
+  {fr:'Pardon / Excusez-moi',th:'ขอโทษ',tr:'khǎw-thôot'},
+  {fr:'Ça coûte combien ?',th:'เท่าไหร่',tr:'thâo-rài'},
+  {fr:'C\'est délicieux',th:'อร่อย',tr:'a-ròi'},
+  {fr:'Pas épicé, s\'il vous plaît',th:'ไม่เผ็ด',tr:'mâi phèt'},
+  {fr:'L\'addition, s\'il vous plaît',th:'เช็คบิล',tr:'chék bin'},
+  {fr:'Où sont les toilettes ?',th:'ห้องน้ำอยู่ที่ไหน',tr:'hông-nám yùu thîi-nǎi'},
+  {fr:'Je ne comprends pas',th:'ไม่เข้าใจ',tr:'mâi khâo-jai'},
+  {fr:'Au secours !',th:'ช่วยด้วย',tr:'chûay dûay'},
+  {fr:'Santé ! (trinquer)',th:'ไชโย',tr:'chai-yoo'}
+];
+function renderPhrases(){
+  const el=document.getElementById('phrases-list');if(!el)return;
+  el.innerHTML=THAI_PHRASES.map((p,i)=>'<div class="phrase"><div class="ph-body"><div class="ph-fr">'+p.fr+'</div><div class="ph-th">'+p.th+'</div><div class="ph-tr">'+p.tr+'</div></div><button class="ph-say" aria-label="Écouter en thaï" onclick="speakThai('+i+',this)">🔊</button></div>').join('');
+  try{if('speechSynthesis'in window)window.speechSynthesis.getVoices();}catch(e){}
+}
+function speakThai(i,btn){
+  const p=THAI_PHRASES[i];if(!p)return;
+  if(!('speechSynthesis'in window)){toast('🔇 Audio non disponible sur cet appareil');return;}
+  try{
+    window.speechSynthesis.cancel();
+    const u=new SpeechSynthesisUtterance(p.th);
+    u.lang='th-TH';u.rate=.8;
+    const vs=window.speechSynthesis.getVoices()||[];
+    const v=vs.find(x=>/^th(-|_)/i.test(x.lang))||vs.find(x=>/thai/i.test(x.name));
+    if(v)u.voice=v;
+    if(btn){btn.classList.add('on');const off=()=>btn.classList.remove('on');u.onend=off;u.onerror=off;setTimeout(off,4000);}
+    window.speechSynthesis.speak(u);
+    if(!v)toast('🔊 Voix thaïe non installée — prononciation approximative');
+  }catch(e){}
 }
 initLock();
 init();

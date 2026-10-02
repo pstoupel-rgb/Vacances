@@ -76,7 +76,7 @@
   .page-content{padding-bottom:calc(80px + env(safe-area-inset-bottom));}
   .page{display:none;}
   .page.active{display:block;animation:fade .25s ease;overflow-y:auto;height:100vh;-webkit-overflow-scrolling:touch;padding-top:env(safe-area-inset-top);}
-  #page-planning.active,#page-carte.active,#page-resa.active,#page-infos.active{padding-top:calc(50px + env(safe-area-inset-top));}
+  #page-planning.active,#page-carte.active,#page-resa.active,#page-spa.active,#page-infos.active{padding-top:calc(50px + env(safe-area-inset-top));}
   @keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
 
   /* HERO */
@@ -342,6 +342,7 @@
   <button class="app-nav-btn" id="nav-planning" onclick="showPage('planning',this)"><span class="nav-icon">📅</span><span class="nav-label">Planning</span></button>
   <button class="app-nav-btn" id="nav-carte" onclick="showPage('carte',this)"><span class="nav-icon">📍</span><span class="nav-label">Carte</span></button>
   <button class="app-nav-btn" id="nav-resa" onclick="showPage('resa',this)"><span class="nav-icon">🎫</span><span class="nav-label">Résa</span></button>
+  <button class="app-nav-btn" id="nav-spa" onclick="showPage('spa',this)"><span class="nav-icon">💆</span><span class="nav-label">Spa</span></button>
   <button class="app-nav-btn" id="nav-infos" onclick="showPage('infos',this)"><span class="nav-icon">ℹ️</span><span class="nav-label">Infos</span></button>
 </nav>
 
@@ -461,6 +462,29 @@
   <div class="disclaimer">☁️ Les documents du dossier <b>Drive</b> sont partagés : toute la famille les voit, sur n'importe quel appareil, sans mot de passe. Les fichiers attachés ligne par ligne ci-dessus restent, eux, stockés localement sur cet appareil uniquement.</div>
 </div>
 
+<!-- ============ SPA ============ -->
+<div class="page page-content" id="page-spa">
+  <div class="section" style="padding-top:8px">
+    <div class="section-hdr">💆 Spa & Bien-être</div>
+    <a class="card" href="docs/500rai-spa.html" target="_blank" rel="noopener" style="border-left:4px solid #2e8b6f">
+      <div class="card-icon" style="background:#dff0ea">🛶</div>
+      <div class="card-body"><div class="card-name">Spa — 500 Rai</div><div class="card-meta">Khao Sok · massages 990 → 2 000 ฿</div></div>
+      <div class="tag green">Menu</div>
+    </a>
+    <a class="card" href="docs/santhiya-spa.html" target="_blank" rel="noopener" style="border-left:4px solid #7a5cae">
+      <div class="card-icon" style="background:#ece6f5">🏖️</div>
+      <div class="card-body"><div class="card-name">Massage plage — Santhiya</div><div class="card-meta">Koh Yao Yai · beach massage 699 → 999 ฿</div></div>
+      <div class="tag" style="background:#ece6f5;color:#7a5cae">Menu</div>
+    </a>
+    <a class="card" href="docs/santhiya-ayurvana.html" target="_blank" rel="noopener" style="border-left:4px solid #8a6a3f">
+      <div class="card-icon" style="background:#efe7d8">🌸</div>
+      <div class="card-body"><div class="card-name">Spa Ayurvana — Santhiya</div><div class="card-meta">Menu complet · massages, soins, gommages…</div></div>
+      <div class="tag">Menu</div>
+    </a>
+  </div>
+  <div class="disclaimer">💆 Menus consultables hors-ligne. Prix indicatifs en bahts (฿), hors taxes & service. À régler sur place.</div>
+</div>
+
 <!-- ============ INFOS ============ -->
 <div class="page page-content" id="page-infos">
   <div class="info-grid">
@@ -497,7 +521,7 @@
   <div style="padding:16px 16px 0"><button class="assur-edit" style="margin:0" onclick="relock()">🔒 Verrouiller l'app</button></div>
 
   <div class="disclaimer">Les informations ci-dessus (visa, taux de change, prises) sont données à titre indicatif et peuvent changer — pense à les <b>vérifier avant le départ</b> (Affaires étrangères Belgique · diplomatie.belgium.be / consulat de Thaïlande).</div>
-  <div style="text-align:center;font-size:.62rem;color:var(--muted);padding:2px 0 18px">Thaïlande · <b>v39</b> · mise à jour auto</div>
+  <div style="text-align:center;font-size:.62rem;color:var(--muted);padding:2px 0 18px">Thaïlande · <b>v40</b> · mise à jour auto</div>
 </div>
 
 <!-- ============ MODALS ============ -->
@@ -716,11 +740,6 @@ const RESA=[
     {key:'elephants',ic:'🐘',name:'Elephant Rescue Park',desc:'Chiang Mai · 22 déc (matin)',mailq:'Elephant Rescue Park',info:['Elephant Rescue Park · Chiang Mai','Programme A — Serene Boutique Elephant Care','22 déc (matin)','Formulaire à compléter avant la visite'],local:[{n:'Infos Elephant Park',u:'docs/elephant.html'}]},
     {key:'excursion-lanta',ic:'⚡',name:'Excursion Koh Rok & Koh Haa',desc:'27 déc · speedboat privé · Lanta GZ',mailq:'Lanta GZ',tel:'+66855924778',telName:'Lanta GZ Tour & Travel',info:['✓ Réservé & payé · speedboat PRIVÉ','Koh Rok & Koh Haa · 27 déc','Pick-up 08h00 à la réception du Nirvana','4 personnes · Lanta GZ Tour & Travel (licence 34/03351)','⚠️ Frais parc national ~400฿/pers en plus (non inclus)','Tél / WhatsApp +66 85 592 4778'],local:[{n:'Reçu Lanta GZ',u:'docs/excursion-lanta.html'}],web:'https://www.lantagztourtravel.com',webLabel:'Site Lanta GZ'}
   ]},
-  {label:'Spa & Bien-être',ic:'💆',items:[
-    {key:'spa-500rai',ic:'🛶',name:'Spa — 500 Rai',desc:'Menu massages · Khao Sok',info:['Massages 60 min · de 990 à 2 000 ฿','+ 7 % TVA & 10 % service'],local:[{n:'Menu Spa 500 Rai',u:'docs/500rai-spa.html'}]},
-    {key:'spa-santhiya-plage',ic:'🏖️',name:'Massage plage — Santhiya',desc:'Beach massage · Koh Yao Yai',info:['Massages 60–90 min · de 699 à 999 ฿','Prix nets'],local:[{n:'Menu massage plage',u:'docs/santhiya-spa.html'}]},
-    {key:'spa-santhiya-ayurvana',ic:'🌸',name:'Spa Ayurvana — Santhiya',desc:'Menu complet · Koh Yao Yai',info:['Massages, gommages, enveloppements, soins visage, manucure','Ouvert 10h–19h · « ++ » = +10 % service & 7 % taxe'],local:[{n:'Menu Spa Ayurvana',u:'docs/santhiya-ayurvana.html'}]}
-  ]},
   {label:'Documents',ic:'🪪',items:[
     {key:'passeports',ic:'🛂',name:'Passeports',desc:'Scans de la famille'},
     {key:'assurance-doc',ic:'🛡️',name:'Assurance Allianz',desc:'Attestation voyage',mailq:'Allianz travel insurance'}
@@ -739,7 +758,7 @@ const PAY_META={ok:{t:'Payé',c:'#1f7a45',b:'#e6f2ea',i:'✓'},hotel:{t:'À rég
 function payPill(key){const p=PAY[key];if(!p)return'';const m=PAY_META[p.s];return'<span class="pay-pill" style="background:'+m.b+';color:'+m.c+'">'+m.i+' '+m.t+(p.t?(' · '+p.t):'')+'</span>';}
 
 /* ===================== NAVIGATION ===================== */
-const NAV_TITLES={home:'Thaïlande',planning:'Planning',carte:'Carte',resa:'Réservations',infos:'Infos pratiques'};
+const NAV_TITLES={home:'Thaïlande',planning:'Planning',carte:'Carte',resa:'Réservations',spa:'Spa & Bien-être',infos:'Infos pratiques'};
 let _mapInit=false,_map=null,_markers=[],_allPts=[];
 function showPage(name,btn){
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));

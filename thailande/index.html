@@ -16,7 +16,6 @@
 <link rel="apple-touch-icon" href="icon.svg">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="preconnect" href="https://images.unsplash.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;700&family=Cormorant+Garamond:ital,wght@1,600;1,700&family=Inter:wght@400;500;600;700&display=swap">
 <style>
   *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
@@ -328,7 +327,41 @@
 <!-- ============ HOME ============ -->
 <div class="page page-content active" id="page-home">
   <div class="hero-wrap">
-    <img class="hero-img" src="https://images.unsplash.com/photo-1528181304800-259b08848526?w=900&q=80&fm=webp" alt="Thaïlande" onerror="this.style.display='none'">
+    <svg class="hero-img" viewBox="0 0 900 260" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Coucher de soleil en Thaïlande">
+      <defs>
+        <linearGradient id="hsky" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stop-color="#f6f3ec"/><stop offset=".42" stop-color="#f4e8d4"/>
+          <stop offset=".78" stop-color="#e9c9a1"/><stop offset="1" stop-color="#dcae86"/>
+        </linearGradient>
+        <linearGradient id="hsea" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stop-color="#cdb48f"/><stop offset=".5" stop-color="#9fb6a9"/><stop offset="1" stop-color="#6f9589"/>
+        </linearGradient>
+        <radialGradient id="hsun" cx="50%" cy="50%" r="50%">
+          <stop offset="0" stop-color="#f8e6c4"/><stop offset=".55" stop-color="#ecc98f"/><stop offset="1" stop-color="#ecc98f" stop-opacity="0"/>
+        </radialGradient>
+      </defs>
+      <rect width="900" height="260" fill="url(#hsky)"/>
+      <circle cx="630" cy="150" r="125" fill="url(#hsun)" opacity=".9"/>
+      <circle cx="630" cy="150" r="44" fill="#f5deb0"/>
+      <path d="M0 170 q44 -36 86 -10 q32 20 74 6 q22 -8 42 4 l0 42 l-202 0 z" fill="#b79a74" opacity=".45"/>
+      <path d="M300 178 q52 -50 112 -18 q52 26 124 8 l0 34 l-248 0 z" fill="#b89b75" opacity=".4"/>
+      <path d="M690 172 q32 -42 74 -20 q42 22 136 2 l0 38 l-242 0 z" fill="#a98c68" opacity=".5"/>
+      <rect y="176" width="900" height="84" fill="url(#hsea)"/>
+      <rect x="612" y="176" width="34" height="84" fill="#f5deb0" opacity=".22"/>
+      <g transform="translate(185 205)" fill="#5c4a33">
+        <path d="M-48 8 q48 22 96 0 l-11 13 q-37 11 -74 0 z"/>
+        <rect x="-1" y="-32" width="3" height="40"/>
+        <path d="M1 -32 l42 27 -42 5 z" fill="#8a6a3f" opacity=".85"/>
+      </g>
+      <g transform="translate(842 146)" fill="#4f6b5e">
+        <rect x="-3" y="0" width="5" height="96"/>
+        <path d="M0 2 q-42 -15 -66 3 q36 -6 66 11 z"/>
+        <path d="M0 2 q42 -15 66 3 q-36 -6 -66 11 z"/>
+        <path d="M0 0 q-22 -38 -52 -46 q24 23 52 55 z"/>
+        <path d="M0 0 q22 -38 52 -46 q-24 23 -52 55 z"/>
+        <path d="M0 -2 q-7 -42 7 -66 q10 29 -7 66 z"/>
+      </g>
+    </svg>
     <div class="hero-overlay"></div>
     <div class="hero-title"><h1>Thaïlande</h1><p id="hero-dates">— · à nous 4 —</p></div>
   </div>
@@ -441,7 +474,7 @@
   <div style="padding:16px 16px 0"><button class="assur-edit" style="margin:0" onclick="relock()">🔒 Verrouiller l'app</button></div>
 
   <div class="disclaimer">Les informations ci-dessus (visa, taux de change, prises) sont données à titre indicatif et peuvent changer — pense à les <b>vérifier avant le départ</b> (Affaires étrangères Belgique · diplomatie.belgium.be / consulat de Thaïlande).</div>
-  <div style="text-align:center;font-size:.62rem;color:var(--muted);padding:2px 0 18px">Thaïlande · <b>v24</b> · mise à jour auto</div>
+  <div style="text-align:center;font-size:.62rem;color:var(--muted);padding:2px 0 18px">Thaïlande · <b>v25</b> · mise à jour auto</div>
 </div>
 
 <!-- ============ MODALS ============ -->

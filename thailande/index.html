@@ -86,7 +86,10 @@
   .hero-title h1{font-family:'Cormorant Garamond',serif;font-size:3rem;font-weight:700;font-style:italic;color:var(--text);line-height:1;letter-spacing:.02em;text-shadow:0 2px 16px rgba(246,243,236,.7);}
   .hero-title p{font-size:.82rem;color:#5a5249;margin-top:4px;font-weight:600;}
 
-  .countdown-card{margin:-34px 16px 0;position:relative;z-index:10;background:var(--bg2);border-radius:var(--radius);padding:9px 16px;box-shadow:0 10px 28px rgba(0,0,0,.12);}
+  .countdown-card{margin:-34px 16px 0;position:relative;z-index:10;background:linear-gradient(135deg,#efe7d8,#e5dac7);border:1px solid rgba(255,255,255,.5);border-radius:var(--radius);padding:11px 16px;box-shadow:0 12px 30px rgba(138,106,63,.18);}
+  .step-badge{width:28px;height:28px;border-radius:50%;color:#fff;font-weight:800;font-size:.86rem;display:grid;place-items:center;flex-shrink:0;box-shadow:0 2px 6px rgba(0,0,0,.2);}
+  .card.itin{transition:transform .12s;}
+  .card.itin:active{transform:scale(.985);}
   .cd-label{font-size:.68rem;color:var(--muted);text-align:center;margin-bottom:4px;}
   .cd-label b{color:var(--brown);}
   .cd-nums{display:flex;justify-content:space-around;}
@@ -391,30 +394,30 @@
 
   <div class="section">
     <div class="section-hdr">🗺️ L'itinéraire</div>
-    <div class="card" onclick="showPage('planning',document.getElementById('nav-planning'))">
-      <div class="card-icon">🏙️</div>
+    <div class="card itin" style="border-left:4px solid #c0392b" onclick="showPage('planning',document.getElementById('nav-planning'))">
+      <div class="card-icon" style="background:#f6e3e0">🏙️</div>
       <div class="card-body"><div class="card-name">Bangkok</div><div class="card-meta">Temples & rivière · 18 → 20 déc</div></div>
-      <div class="tag jade">Étape 1</div>
+      <div class="step-badge" style="background:#c0392b">1</div>
     </div>
-    <div class="card" onclick="showPage('planning',document.getElementById('nav-planning'))">
-      <div class="card-icon">🐘</div>
+    <div class="card itin" style="border-left:4px solid #c98a2e" onclick="showPage('planning',document.getElementById('nav-planning'))">
+      <div class="card-icon" style="background:#f7ecd8">🐘</div>
       <div class="card-body"><div class="card-name">Chiang Mai</div><div class="card-meta">Train de nuit, éléphants · 21 → 23 déc</div></div>
-      <div class="tag jade">Étape 2</div>
+      <div class="step-badge" style="background:#c98a2e">2</div>
     </div>
-    <div class="card" onclick="showPage('planning',document.getElementById('nav-planning'))">
-      <div class="card-icon">🛶</div>
+    <div class="card itin" style="border-left:4px solid #2e8b6f" onclick="showPage('planning',document.getElementById('nav-planning'))">
+      <div class="card-icon" style="background:#dff0ea">🛶</div>
       <div class="card-body"><div class="card-name">Khao Sok</div><div class="card-meta">Lac Cheow Lan, bungalow flottant · 23 → 25 déc</div></div>
-      <div class="tag jade">Étape 3</div>
+      <div class="step-badge" style="background:#2e8b6f">3</div>
     </div>
-    <div class="card" onclick="showPage('planning',document.getElementById('nav-planning'))">
-      <div class="card-icon">🏝️</div>
+    <div class="card itin" style="border-left:4px solid #2a7d9f" onclick="showPage('planning',document.getElementById('nav-planning'))">
+      <div class="card-icon" style="background:#dcecf3">🏝️</div>
       <div class="card-body"><div class="card-name">Koh Lanta</div><div class="card-meta">Villa piscine front de mer · 25 → 29 déc</div></div>
-      <div class="tag jade">Étape 4</div>
+      <div class="step-badge" style="background:#2a7d9f">4</div>
     </div>
-    <div class="card" onclick="showPage('planning',document.getElementById('nav-planning'))">
-      <div class="card-icon">🎆</div>
+    <div class="card itin" style="border-left:4px solid #7a5cae" onclick="showPage('planning',document.getElementById('nav-planning'))">
+      <div class="card-icon" style="background:#ece6f5">🎆</div>
       <div class="card-body"><div class="card-name">Koh Yao Yai</div><div class="card-meta">Santhiya · Nouvel An · 29 déc → 1er janv</div></div>
-      <div class="tag jade">Étape 5</div>
+      <div class="step-badge" style="background:#7a5cae">5</div>
     </div>
   </div>
 
@@ -497,7 +500,7 @@
   <div style="padding:16px 16px 0"><button class="assur-edit" style="margin:0" onclick="relock()">🔒 Verrouiller l'app</button></div>
 
   <div class="disclaimer">Les informations ci-dessus (visa, taux de change, prises) sont données à titre indicatif et peuvent changer — pense à les <b>vérifier avant le départ</b> (Affaires étrangères Belgique · diplomatie.belgium.be / consulat de Thaïlande).</div>
-  <div style="text-align:center;font-size:.62rem;color:var(--muted);padding:2px 0 18px">Thaïlande · <b>v30</b> · mise à jour auto</div>
+  <div style="text-align:center;font-size:.62rem;color:var(--muted);padding:2px 0 18px">Thaïlande · <b>v31</b> · mise à jour auto</div>
 </div>
 
 <!-- ============ MODALS ============ -->
@@ -728,7 +731,7 @@ const PAY={
   'train-cnx':{s:'ok'},
   'hotel-bkk':{s:'hotel'},'hotel-cnx':{s:'hotel'},'hotel-khaosok':{s:'ok'},'hotel-lanta':{s:'ok'},'hotel-kohyao':{s:'ok'},
   'transfert-khaosok':{s:'ok'},'transfert-lanta':{s:'due'},'transfert-kohyao':{s:'ok'},
-  'velo-bangkok':{s:'ok'},'guide-bangkok':{s:'onsite',t:'~6 500 ฿ cash'},'elephants':{s:'check'},'excursion-lanta':{s:'ok',t:'+ parc ~400฿/pers'}
+  'velo-bangkok':{s:'ok'},'guide-bangkok':{s:'onsite',t:'~6 500 ฿ cash'},'elephants':{s:'due'},'excursion-lanta':{s:'ok',t:'+ parc ~400฿/pers'}
 };
 const PAY_META={ok:{t:'Payé',c:'#1f7a45',b:'#e6f2ea',i:'✓'},hotel:{t:'À régler à l\'hôtel',c:'#a05c00',b:'#fbeede',i:'🏨'},onsite:{t:'Sur place',c:'#a05c00',b:'#fbeede',i:'💵'},due:{t:'À payer',c:'#b23b3b',b:'#fbe5e3',i:'⏳'},check:{t:'À vérifier',c:'#7a6a4a',b:'#efe7d8',i:'？'}};
 function payPill(key){const p=PAY[key];if(!p)return'';const m=PAY_META[p.s];return'<span class="pay-pill" style="background:'+m.b+';color:'+m.c+'">'+m.i+' '+m.t+(p.t?(' · '+p.t):'')+'</span>';}

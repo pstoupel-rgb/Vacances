@@ -1,5 +1,5 @@
 /* Service worker — Thaïlande */
-const CACHE = 'thai-v43';
+const CACHE = 'thai-v44';
 const ASSETS = [
   './', './index.html', './manifest.webmanifest', './icon.svg',
   './docs/airasia.html', './docs/santhiya-hotel.html', './docs/transfert-500rai.html',
@@ -42,7 +42,10 @@ self.addEventListener('fetch', (e) => {
           caches.open(CACHE).then((c) => c.put(isSub ? req : './index.html', copy));
           return res;
         })
-        .catch(() => caches.match(req).then((h) => h || caches.match('./index.html')).then((h) => h || caches.match('./')))
+        .catch(() => caches.match(req)
+          .then((h) => h || (isSub ? caches.match(req.url.split('?')[0]) : undefined))
+          .then((h) => h || caches.match('./index.html'))
+          .then((h) => h || caches.match('./')))
     );
     return;
   }

@@ -1,5 +1,5 @@
 /* Service worker — Thaïlande */
-const CACHE = 'thai-v44';
+const CACHE = 'thai-v45';
 const ASSETS = [
   './', './index.html', './manifest.webmanifest', './icon.svg',
   './docs/airasia.html', './docs/santhiya-hotel.html', './docs/transfert-500rai.html',
@@ -13,7 +13,7 @@ const ASSETS = [
 self.addEventListener('install', (e) => {
   e.waitUntil(
     caches.open(CACHE)
-      .then((c) => Promise.allSettled(ASSETS.map((a) => c.add(a))))
+      .then((c) => Promise.allSettled(ASSETS.map((a) => c.add(new Request(a, { cache: 'reload' })))))
       .then(() => self.skipWaiting())
   );
 });
@@ -36,7 +36,7 @@ self.addEventListener('fetch', (e) => {
     // Page principale : réseau d'abord, repli index.html.
     const isSub = req.url.indexOf('/docs/') !== -1;
     e.respondWith(
-      fetch(req)
+      fetch(req, { cache: 'reload' })
         .then((res) => {
           const copy = res.clone();
           caches.open(CACHE).then((c) => c.put(isSub ? req : './index.html', copy));

@@ -16,6 +16,8 @@
 <link rel="apple-touch-icon" href="icon.svg">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
+<link rel="preconnect" href="https://a.basemaps.cartocdn.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;700&family=Cormorant+Garamond:ital,wght@1,600;1,700&family=Inter:wght@400;500;600;700&display=swap">
 <style>
   *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
@@ -541,7 +543,7 @@
   <div style="padding:16px 16px 0"><button class="assur-edit" style="margin:0" onclick="relock()">🔒 Verrouiller l'app</button></div>
 
   <div class="disclaimer">Les informations ci-dessus (visa, taux de change, prises) sont données à titre indicatif et peuvent changer — pense à les <b>vérifier avant le départ</b> (Affaires étrangères Belgique · diplomatie.belgium.be / consulat de Thaïlande).</div>
-  <div style="text-align:center;font-size:.62rem;color:var(--muted);padding:2px 0 18px">Thaïlande · <b>v41</b> · mise à jour auto</div>
+  <div style="text-align:center;font-size:.62rem;color:var(--muted);padding:2px 0 18px">Thaïlande · <b>v42</b> · mise à jour auto</div>
 </div>
 
 <!-- ============ MODALS ============ -->
@@ -904,8 +906,9 @@ async function initMap(){
   if(_mapInit){if(_map)setTimeout(()=>_map.invalidateSize(),150);return;}
   _mapInit=true;
   try{
-    await loadCSS('https://unpkg.com/leaflet@1.9.4/dist/leaflet.css');
-    await loadScript('https://unpkg.com/leaflet@1.9.4/dist/leaflet.js');
+    await loadCSS('https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css');
+    await loadScript('https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js');
+    if(typeof L==='undefined'){await loadScript('https://unpkg.com/leaflet@1.9.4/dist/leaflet.js');}
     if(typeof L==='undefined')throw new Error('leaflet');
     const map=L.map('map',{zoomControl:true,attributionControl:false,scrollWheelZoom:false,tap:true});
     L.control.attribution({prefix:false}).addAttribution('© OpenStreetMap · © CARTO').addTo(map);
@@ -934,7 +937,8 @@ async function initMap(){
     _map=map;setTimeout(()=>map.invalidateSize(),200);
     setRegionActive('Tout');
   }catch(e){
-    document.getElementById('map').innerHTML='<div style="display:grid;place-items:center;height:100%;color:#888;font-size:.82rem;text-align:center;padding:16px">🌐 Carte indisponible hors-ligne.<br>Les lieux ci-dessous restent accessibles.</div>';
+    _mapInit=false;
+    document.getElementById('map').innerHTML='<div style="display:grid;place-items:center;height:100%;color:#888;font-size:.82rem;text-align:center;padding:16px">🌐 La carte a besoin d\'une connexion internet.<br>Tous les lieux ci-dessous restent accessibles<br>(bouton « 🗺️ Maps » pour y aller).</div>';
   }
   renderLegend();
 }

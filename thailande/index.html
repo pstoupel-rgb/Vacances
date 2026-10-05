@@ -675,7 +675,7 @@
   <div style="padding:16px 16px 0"><button class="assur-edit" style="margin:0" onclick="relock()">🔒 Verrouiller l'app</button></div>
 
   <div class="disclaimer">Les informations ci-dessus (visa, taux de change, prises) sont données à titre indicatif et peuvent changer — pense à les <b>vérifier avant le départ</b> (Affaires étrangères Belgique · diplomatie.belgium.be / consulat de Thaïlande).</div>
-  <div style="text-align:center;font-size:.62rem;color:var(--muted);padding:2px 0 18px">Thaïlande · <b>v52</b> · mise à jour auto</div>
+  <div style="text-align:center;font-size:.62rem;color:var(--muted);padding:2px 0 18px">Thaïlande · <b>v53</b> · mise à jour auto</div>
 </div>
 
 <!-- ============ MODALS ============ -->
@@ -839,7 +839,7 @@ const PLAN=[
     ]},
     {n:9,name:'Cap sur Koh Lanta',vibe:'🎁',date:'Ven 25 déc',items:[
       {time:'Matin',dot:'free',ic:'🎁',t:'Matin de Noël sur le lac',sub:''},
-      {time:'10h',dot:'boat',ic:'🚐',t:'Transfert vers Koh Lanta',sub:'✓ Payé · bateau 500 Rai 10h → van → Nopparat Thara Pier (Ao Nang) ~14h30, puis bateau Nirvana',resa:'transfert-lanta',rl:'Transfert Khao Sok → Koh Lanta'}
+      {time:'10h',dot:'boat',ic:'🚐',t:'Transfert vers Koh Lanta',sub:'✓ 500 Rai → Saladan Pier ~14h30, puis voiture privée Nirvana (1 500 ฿) jusqu\'au resort',resa:'transfert-lanta',rl:'Transfert Khao Sok → Koh Lanta'}
     ]}
   ]},
   {step:'Koh Lanta', days:[
@@ -893,7 +893,7 @@ const RESA=[
   ]},
   {label:'Transferts',ic:'🚐',items:[
     {key:'transfert-khaosok',ic:'🚐',name:'Surat Thani → 500 Rai',desc:'✓ Réservé & payé · via le resort · 23 déc',mailq:'500 Rai Floating Resort',info:['✓ Réservé et payé via le resort 500 Rai','Surat Thani (aéroport) → ponton → bateau lac Cheow Lan','23 déc · le resort reconfirme 7 jours avant','Lié à la réservation 500 Rai 6325031288'],local:[{n:'Détail du transfert',u:'docs/transfert-500rai.html'}]},
-    {key:'transfert-lanta',ic:'🚐',name:'Khao Sok → Koh Lanta',desc:'✓ Payé · 500 Rai · 25 déc',mailq:'500 Rai Floating Resort',info:['✓ Réservé & payé via 500 Rai (inclus dans le total 13 000 ฿, payé le 4 sept)','25 déc : bateau 500 Rai 10h00 → Chiew Larn Pier ~11h15','Puis van privé → Nopparat Thara Pier (Ao Nang, Krabi) · arrivée ~14h30','Dernier tronçon port → Nirvana : bateau de l\'hôtel Nirvana (à reconfirmer avec eux)','Lié à la réservation 500 Rai 6325031288']},
+    {key:'transfert-lanta',ic:'🚐',name:'Khao Sok → Koh Lanta',desc:'✓ Payé · 500 Rai → Saladan · 25 déc',mailq:'Nirvana Koh Lanta',info:['✓ Trajet 500 Rai réservé & payé (inclus dans le total 13 000 ฿)','25 déc : bateau 500 Rai 10h00 → Chiew Larn Pier ~11h15, puis van → Saladan Pier (Koh Lanta) ~14h30','Dernier tronçon Saladan Pier → Nirvana : voiture privée Nirvana (confirmée) · 1 500 ฿/voiture · ~30–40 min','Chauffeur Nirvana avec pancarte à votre nom à Saladan Pier','Réf. 500 Rai 6325031288']},
     {key:'transfert-arr-kohyao',ic:'⛵',name:'Koh Lanta → Koh Yao Yai',desc:'⏳ À organiser · arrivée Santhiya · 29 déc',mailq:'Koh Yao Yai transfer',info:['⚠️ Transfert d\'ARRIVÉE à organiser — aucune réservation trouvée','Koh Lanta → Koh Yao Yai (Santhiya) · 29 déc','Options : speedboat direct, ou via Krabi/Ao Nang + ferry','À demander à Santhiya (reservation@santhiya.com) ou un opérateur local']},
     {key:'transfert-kohyao',ic:'✈️',name:'Koh Yao Yai → aéroport Phuket',desc:'✓ Payé · 1er janv · van + speedboat Santhiya',mailq:'Santhiya transfer',info:['✓ Réservé & payé via Santhiya (10 000 ฿)','Santhiya Koh Yao Yai → aéroport de Phuket · 1er janv','Prise en charge au resort 15h00 (pour le vol TG218 · 19h25)','Speedboat ~20 min + van ~30 min','Point de rencontre : Ao Po Grand Marina','Réf. 200425950073'],local:[{n:'Détail du transfert',u:'docs/transfert-santhiya.html'}]}
   ]},
@@ -1254,7 +1254,7 @@ function renderResaGroups(){
   document.getElementById('resa-count').textContent=withDoc+' / '+total+' réservations avec document';
 }
 /* ===================== VISIONNEUSE DE DOCUMENT (dans l'app) ===================== */
-const APP_V='52'; /* bump à chaque changement de contenu des docs/ */
+const APP_V='53'; /* bump à chaque changement de contenu des docs/ */
 function openDoc(url,title){
   document.getElementById('doc-title').textContent=title||'Document';
   document.getElementById('doc-frame').src=url+(url.indexOf('?')<0?('?v='+APP_V):'');

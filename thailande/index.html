@@ -70,7 +70,7 @@
 
   /* BOTTOM NAV */
   .app-nav{position:fixed;bottom:0;left:0;right:0;height:calc(60px + env(safe-area-inset-bottom));background:rgba(246,243,236,.82);-webkit-backdrop-filter:saturate(180%) blur(20px);backdrop-filter:saturate(180%) blur(20px);border-top:1px solid rgba(0,0,0,.08);display:flex;justify-content:space-around;align-items:flex-start;z-index:200;padding:12px 0 env(safe-area-inset-bottom);-webkit-transform:translateZ(0);transform:translateZ(0);}
-  .app-nav-btn{background:none;border:none;cursor:pointer;text-align:center;color:var(--muted);display:flex;flex-direction:column;align-items:center;gap:3px;transition:transform .15s,color .15s;}
+  .app-nav-btn{position:relative;background:none;border:none;cursor:pointer;text-align:center;color:var(--muted);display:flex;flex-direction:column;align-items:center;gap:3px;transition:transform .15s,color .15s;}
   .app-nav-btn:active{transform:scale(.88);}
   .app-nav-btn .nav-icon{font-size:1.15rem;line-height:1;}
   .app-nav-btn .nav-label{font-size:.58rem;font-weight:600;}
@@ -329,6 +329,49 @@
   .toast{position:fixed;left:50%;bottom:92px;transform:translateX(-50%) translateY(18px);background:#231f1a;color:#fff;padding:11px 18px;border-radius:12px;font-size:.82rem;font-weight:600;opacity:0;pointer-events:none;transition:opacity .25s,transform .25s;z-index:1200;max-width:85%;text-align:center;box-shadow:0 6px 20px rgba(0,0,0,.3);}
   .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
   #resa-view img.doc-img{width:100%;border-radius:11px;margin-top:10px;display:block;}
+
+  /* ===== DASHBOARD ACCUEIL (vraie app voyage) ===== */
+  .trip-stats{display:flex;gap:8px;margin:14px 16px 0;}
+  .trip-stats .st{flex:1;background:var(--card);border:1px solid var(--border);border-radius:14px;padding:10px 4px 9px;text-align:center;box-shadow:var(--shadow);}
+  .trip-stats .st b{display:block;font-family:'Playfair Display',serif;font-size:1.4rem;font-weight:700;color:var(--brown);line-height:1;font-variant-numeric:tabular-nums;}
+  .trip-stats .st span{display:block;font-size:.56rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.03em;margin-top:6px;}
+  .next-card{display:block;position:relative;overflow:hidden;margin:16px 16px 0;border-radius:18px;padding:15px 44px 15px 17px;color:#fff;box-shadow:0 10px 26px rgba(0,0,0,.17);cursor:pointer;-webkit-tap-highlight-color:transparent;}
+  .next-card:active{transform:scale(.99);}
+  .next-card::after{content:'';position:absolute;right:-30px;top:-30px;width:120px;height:120px;border-radius:50%;background:rgba(255,255,255,.1);}
+  .next-card .nc-k{font-size:.6rem;font-weight:800;letter-spacing:.11em;text-transform:uppercase;opacity:.9;position:relative;}
+  .next-card .nc-row{display:flex;align-items:center;gap:13px;margin-top:8px;position:relative;}
+  .next-card .nc-emoji{font-size:2.3rem;line-height:1;flex-shrink:0;}
+  .next-card .nc-name{font-family:'Playfair Display',serif;font-size:1.45rem;font-weight:700;line-height:1.05;}
+  .next-card .nc-meta{font-size:.74rem;opacity:.93;margin-top:3px;font-weight:600;line-height:1.3;}
+  .next-card .nc-go{position:absolute;top:50%;right:16px;transform:translateY(-50%);font-size:1.3rem;opacity:.85;}
+
+  /* Itinéraire connecté (route) */
+  .itin-list{position:relative;}
+  .itin-list .card.itin{position:relative;z-index:1;}
+  .itin-list .card.itin:not(:last-child)::before{content:'';position:absolute;left:39px;top:60px;height:calc(100% - 42px);width:2px;background:var(--border);z-index:0;}
+  .card.itin .card-meta{margin-top:3px;}
+
+  /* ===== CARTE D'EMBARQUEMENT (vols / train) ===== */
+  .bpass{background:var(--card);border:1px solid var(--border);border-radius:16px;box-shadow:var(--shadow);margin-bottom:9px;overflow:hidden;cursor:pointer;}
+  .bpass:active{transform:scale(.99);}
+  .bpass-top{display:flex;align-items:center;padding:14px 14px 12px;}
+  .bp-col{text-align:center;min-width:62px;}
+  .bp-code{font-family:'Playfair Display',serif;font-size:1.55rem;font-weight:700;color:var(--text);line-height:1;letter-spacing:.01em;}
+  .bp-city{font-size:.56rem;color:var(--muted);font-weight:700;margin-top:4px;text-transform:uppercase;letter-spacing:.03em;}
+  .bp-time{font-size:.74rem;color:var(--brown);font-weight:700;margin-top:5px;font-variant-numeric:tabular-nums;}
+  .bp-mid{flex:1;display:flex;flex-direction:column;align-items:center;padding:0 8px;}
+  .bp-plane{font-size:1rem;}
+  .bp-line{width:100%;height:2px;margin-top:4px;background:repeating-linear-gradient(90deg,var(--caramel) 0 5px,transparent 5px 11px);opacity:.7;}
+  .bp-dur{font-size:.55rem;color:var(--muted);margin-top:5px;font-weight:700;text-transform:uppercase;letter-spacing:.03em;}
+  .bpass-bot{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:9px 14px;border-top:1px dashed var(--border);background:var(--bg);}
+  .bp-flight{font-size:.72rem;font-weight:700;color:var(--text);letter-spacing:.02em;}
+  .bp-right{display:flex;align-items:center;gap:7px;}
+  .bp-right .pay-pill{margin-top:0;}
+  .bp-doc{font-size:.64rem;font-weight:700;color:var(--jade);}
+
+  /* Barre de navigation — indicateur actif */
+  .app-nav-btn::before{content:'';position:absolute;top:-10px;left:50%;transform:translateX(-50%) scaleX(0);width:18px;height:3px;border-radius:3px;background:var(--brown);transition:transform .18s;}
+  .app-nav-btn.active::before{transform:translateX(-50%) scaleX(1);}
 </style>
 </head>
 <body>
@@ -408,8 +451,13 @@
     <button class="cd-edit" onclick="openDates()">✏️ Modifier les dates</button>
   </div>
 
+  <div class="trip-stats" id="trip-stats"></div>
+
+  <div class="next-card" id="next-up"></div>
+
   <div class="section">
     <div class="section-hdr">🗺️ L'itinéraire</div>
+    <div class="itin-list">
     <div class="card itin" style="border-left:4px solid #c0392b" onclick="showPage('planning',document.getElementById('nav-planning'))">
       <div class="card-icon" style="background:#f6e3e0">🏙️</div>
       <div class="card-body"><div class="card-name">Bangkok</div><div class="card-meta">Temples & rivière · 18 → 20 déc</div></div>
@@ -434,6 +482,7 @@
       <div class="card-icon" style="background:#ece6f5">🎆</div>
       <div class="card-body"><div class="card-name">Koh Yao Yai</div><div class="card-meta">Santhiya · Nouvel An · 29 déc → 1er janv</div></div>
       <div class="step-badge" style="background:#7a5cae">5</div>
+    </div>
     </div>
   </div>
 
@@ -543,7 +592,7 @@
   <div style="padding:16px 16px 0"><button class="assur-edit" style="margin:0" onclick="relock()">🔒 Verrouiller l'app</button></div>
 
   <div class="disclaimer">Les informations ci-dessus (visa, taux de change, prises) sont données à titre indicatif et peuvent changer — pense à les <b>vérifier avant le départ</b> (Affaires étrangères Belgique · diplomatie.belgium.be / consulat de Thaïlande).</div>
-  <div style="text-align:center;font-size:.62rem;color:var(--muted);padding:2px 0 18px">Thaïlande · <b>v46</b> · mise à jour auto</div>
+  <div style="text-align:center;font-size:.62rem;color:var(--muted);padding:2px 0 18px">Thaïlande · <b>v47</b> · mise à jour auto</div>
 </div>
 
 <!-- ============ MODALS ============ -->
@@ -743,13 +792,13 @@ const PLAN=[
 /* Réservations (coffre) — groupées */
 const RESA=[
   {label:'Vols',ic:'✈️',items:[
-    {key:'vol-aller',ic:'✈️',name:'Vol aller — Thai Airways',desc:'Bruxelles → Bangkok · TG935 · 17 déc 13h10 → 18 déc 06h10',mailq:'THAI Electronic Ticket EMD',info:['Thai Airways TG935 · Bruxelles → Bangkok','Départ 17 déc 13h10 · arrivée 18 déc 06h10','Durée ~11h · 1 bagage en soute / pers','Réf. réservation FCTDTB','Billets des 4 passagers → boutons ☁️'],drive:[{n:'Billet A/R 1',u:'https://drive.google.com/file/d/1etmMmRQKFLsTb_qCY5r8OACymUxX8cAf/view'},{n:'Billet A/R 2',u:'https://drive.google.com/file/d/1zSXEh2vtMbcXluEtADNgWvktsL66tbRa/view'},{n:'Billet A/R 3',u:'https://drive.google.com/file/d/1f9d7Gx7gEKENfvBkZgInVU-fvdne2XN6/view'},{n:'Billet A/R 4',u:'https://drive.google.com/file/d/1rz6UTmXQmikJ4P0jSD4n5J_w3ClyDPJ6/view'}]},
-    {key:'vol-cnx-urt',ic:'✈️',name:'Vol AirAsia FD5420',desc:'Chiang Mai → Surat Thani · 23 déc · 08h10 → 10h05',mailq:'Airpaz',info:['AirAsia FD5420 · Chiang Mai (CNX) → Surat Thani (URT)','23 déc · 08h10 → 10h05','Agence Airpaz · commande 1035954768 · PNR N7QBQL','Enregistrement en ligne via l\'appli AirAsia'],local:[{n:'Confirmation AirAsia',u:'docs/airasia.html'}]},
-    {key:'vol-hkt-bkk',ic:'✈️',name:'Vol Phuket → Bangkok',desc:'Thai Airways · TG218 · 1er janv 19h25 → 21h00',mailq:'THAI Electronic Ticket EMD',info:['Thai Airways TG218 · Phuket (HKT) → Bangkok (BKK)','1er janv · 19h25 → 21h00 · durée ~1h35','Réf. FPR2BK','Correspondance avant le vol retour (2 janv 00h30)','Billets des 4 passagers → boutons ☁️'],drive:[{n:'Billet 1',u:'https://drive.google.com/file/d/1hownzDmiSIUlqO58vFi5_YDQqO6LgG8i/view'},{n:'Billet 2',u:'https://drive.google.com/file/d/17yoMbf0HLHEHcPkZxm_M-OKL0lGMUzDX/view'},{n:'Billet 3',u:'https://drive.google.com/file/d/1anReYwmsHzgAWyumSVtnPUXRVQH5nurJ/view'},{n:'Billet 4',u:'https://drive.google.com/file/d/1pph1-88mRD3sICV8yyyqaCeLpyQ1leV1/view'}]},
-    {key:'vol-retour',ic:'✈️',name:'Vol retour — Thai Airways',desc:'Bangkok → Bruxelles · TG934 · 2 janv 00h30 → 07h05',mailq:'THAI Electronic Ticket EMD',info:['Thai Airways TG934 · Bangkok → Bruxelles','Départ 2 janv 00h30 · arrivée 07h05','Réf. réservation FCTDTB','Billets des 4 passagers → boutons ☁️'],drive:[{n:'Billet A/R 1',u:'https://drive.google.com/file/d/1etmMmRQKFLsTb_qCY5r8OACymUxX8cAf/view'},{n:'Billet A/R 2',u:'https://drive.google.com/file/d/1zSXEh2vtMbcXluEtADNgWvktsL66tbRa/view'},{n:'Billet A/R 3',u:'https://drive.google.com/file/d/1f9d7Gx7gEKENfvBkZgInVU-fvdne2XN6/view'},{n:'Billet A/R 4',u:'https://drive.google.com/file/d/1rz6UTmXQmikJ4P0jSD4n5J_w3ClyDPJ6/view'}]}
+    {key:'vol-aller',ic:'✈️',name:'Vol aller — Thai Airways',desc:'Bruxelles → Bangkok · TG935 · 17 déc 13h10 → 18 déc 06h10',route:{from:'BRU',cityFrom:'Bruxelles',to:'BKK',cityTo:'Bangkok',dep:'13:10',arr:'06:10',date:'17→18 déc',no:'TG935',dur:'~11h'},mailq:'THAI Electronic Ticket EMD',info:['Thai Airways TG935 · Bruxelles → Bangkok','Départ 17 déc 13h10 · arrivée 18 déc 06h10','Durée ~11h · 1 bagage en soute / pers','Réf. réservation FCTDTB','Billets des 4 passagers → boutons ☁️'],drive:[{n:'Billet A/R 1',u:'https://drive.google.com/file/d/1etmMmRQKFLsTb_qCY5r8OACymUxX8cAf/view'},{n:'Billet A/R 2',u:'https://drive.google.com/file/d/1zSXEh2vtMbcXluEtADNgWvktsL66tbRa/view'},{n:'Billet A/R 3',u:'https://drive.google.com/file/d/1f9d7Gx7gEKENfvBkZgInVU-fvdne2XN6/view'},{n:'Billet A/R 4',u:'https://drive.google.com/file/d/1rz6UTmXQmikJ4P0jSD4n5J_w3ClyDPJ6/view'}]},
+    {key:'vol-cnx-urt',ic:'✈️',name:'Vol AirAsia FD5420',desc:'Chiang Mai → Surat Thani · 23 déc · 08h10 → 10h05',route:{from:'CNX',cityFrom:'Chiang Mai',to:'URT',cityTo:'Surat Thani',dep:'08:10',arr:'10:05',date:'23 déc',no:'FD5420',dur:'~2h'},mailq:'Airpaz',info:['AirAsia FD5420 · Chiang Mai (CNX) → Surat Thani (URT)','23 déc · 08h10 → 10h05','Agence Airpaz · commande 1035954768 · PNR N7QBQL','Enregistrement en ligne via l\'appli AirAsia'],local:[{n:'Confirmation AirAsia',u:'docs/airasia.html'}]},
+    {key:'vol-hkt-bkk',ic:'✈️',name:'Vol Phuket → Bangkok',desc:'Thai Airways · TG218 · 1er janv 19h25 → 21h00',route:{from:'HKT',cityFrom:'Phuket',to:'BKK',cityTo:'Bangkok',dep:'19:25',arr:'21:00',date:'1 janv',no:'TG218',dur:'~1h35'},mailq:'THAI Electronic Ticket EMD',info:['Thai Airways TG218 · Phuket (HKT) → Bangkok (BKK)','1er janv · 19h25 → 21h00 · durée ~1h35','Réf. FPR2BK','Correspondance avant le vol retour (2 janv 00h30)','Billets des 4 passagers → boutons ☁️'],drive:[{n:'Billet 1',u:'https://drive.google.com/file/d/1hownzDmiSIUlqO58vFi5_YDQqO6LgG8i/view'},{n:'Billet 2',u:'https://drive.google.com/file/d/17yoMbf0HLHEHcPkZxm_M-OKL0lGMUzDX/view'},{n:'Billet 3',u:'https://drive.google.com/file/d/1anReYwmsHzgAWyumSVtnPUXRVQH5nurJ/view'},{n:'Billet 4',u:'https://drive.google.com/file/d/1pph1-88mRD3sICV8yyyqaCeLpyQ1leV1/view'}]},
+    {key:'vol-retour',ic:'✈️',name:'Vol retour — Thai Airways',desc:'Bangkok → Bruxelles · TG934 · 2 janv 00h30 → 07h05',route:{from:'BKK',cityFrom:'Bangkok',to:'BRU',cityTo:'Bruxelles',dep:'00:30',arr:'07:05',date:'2 janv',no:'TG934',dur:'~12h'},mailq:'THAI Electronic Ticket EMD',info:['Thai Airways TG934 · Bangkok → Bruxelles','Départ 2 janv 00h30 · arrivée 07h05','Réf. réservation FCTDTB','Billets des 4 passagers → boutons ☁️'],drive:[{n:'Billet A/R 1',u:'https://drive.google.com/file/d/1etmMmRQKFLsTb_qCY5r8OACymUxX8cAf/view'},{n:'Billet A/R 2',u:'https://drive.google.com/file/d/1zSXEh2vtMbcXluEtADNgWvktsL66tbRa/view'},{n:'Billet A/R 3',u:'https://drive.google.com/file/d/1f9d7Gx7gEKENfvBkZgInVU-fvdne2XN6/view'},{n:'Billet A/R 4',u:'https://drive.google.com/file/d/1rz6UTmXQmikJ4P0jSD4n5J_w3ClyDPJ6/view'}]}
   ]},
   {label:'Train',ic:'🚂',items:[
-    {key:'train-cnx',ic:'🚂',name:'Train de nuit 1re classe',desc:'Bangkok → Chiang Mai · 20 déc 18h40 → 21 déc 07h15',mailq:'Thailand Railways confirmation',info:['Special Express n°9 · 1re classe couchette (clim)','Gare Bangkok Krung Thep Aphiwat → Chiang Mai','Départ 20 déc 18h40 · arrivée 21 déc 07h15','Réservation 68838739','Arriver ~30 min avant · QR dans les billets ☁️'],drive:[{n:'Billet train 1',u:'https://drive.google.com/file/d/13GjQ6AlZiZcIbR7MztGSD7mbTuDMgP97/view'},{n:'Billet train 2',u:'https://drive.google.com/file/d/16Z8liOL4irjvV6X8jSOnaQ6NJ351QaMj/view'},{n:'Billet train 3',u:'https://drive.google.com/file/d/1365n34h7-tkZgkSQnxpext63OhGzNkMn/view'},{n:'Billet train 4',u:'https://drive.google.com/file/d/19rBvN_E2PnfEimIyQ2-qmtiXx_sy1jAP/view'}]}
+    {key:'train-cnx',ic:'🚂',name:'Train de nuit 1re classe',desc:'Bangkok → Chiang Mai · 20 déc 18h40 → 21 déc 07h15',route:{from:'BKK',cityFrom:'Bangkok',to:'CNX',cityTo:'Chiang Mai',dep:'18:40',arr:'07:15',date:'20→21 déc',no:'Exp. #9',dur:'nuit',mode:'train'},mailq:'Thailand Railways confirmation',info:['Special Express n°9 · 1re classe couchette (clim)','Gare Bangkok Krung Thep Aphiwat → Chiang Mai','Départ 20 déc 18h40 · arrivée 21 déc 07h15','Réservation 68838739','Arriver ~30 min avant · QR dans les billets ☁️'],drive:[{n:'Billet train 1',u:'https://drive.google.com/file/d/13GjQ6AlZiZcIbR7MztGSD7mbTuDMgP97/view'},{n:'Billet train 2',u:'https://drive.google.com/file/d/16Z8liOL4irjvV6X8jSOnaQ6NJ351QaMj/view'},{n:'Billet train 3',u:'https://drive.google.com/file/d/1365n34h7-tkZgkSQnxpext63OhGzNkMn/view'},{n:'Billet train 4',u:'https://drive.google.com/file/d/19rBvN_E2PnfEimIyQ2-qmtiXx_sy1jAP/view'}]}
   ]},
   {label:'Hôtels',ic:'🏨',items:[
     {key:'hotel-bkk',ic:'🏨',name:'Sivatel Bangkok Hotel',desc:'18 → 20 déc · 2 nuits',mailq:'Sivatel Bangkok',info:['Sivatel Bangkok · 53 Wittayu Rd, Lumpini, Pathumwan','Check-in 18 déc (dès 14h) · check-out 20 déc (12h)','2 Bedroom Family Suite · petit-déjeuner inclus','Tél +66 2 309 5000 · conf. 6764.515.008','Parking & WiFi gratuits'],drive:[{n:'Confirmation Sivatel',u:'https://drive.google.com/file/d/1NPgY9bof7cuI0xOlTka-h-JOaIYzd9de/view'}]},
@@ -821,7 +870,27 @@ function renderCountdown(){
   el.innerHTML=[[days,'jours'],[h,'heures'],[m,'min']].map(x=>'<div class="cd-block"><strong>'+x[0]+'</strong><span>'+x[1]+'</span></div>').join('');
 }
 function openDates(){document.getElementById('d-start').value=DATES.start;document.getElementById('d-end').value=DATES.end;document.getElementById('dates-modal').classList.add('open');}
-function saveDates(){const s=document.getElementById('d-start').value,e=document.getElementById('d-end').value;if(s)DATES.start=s;if(e)DATES.end=e;lset('dates',DATES);renderDates();closeModal('dates-modal');}
+function saveDates(){const s=document.getElementById('d-start').value,e=document.getElementById('d-end').value;if(s)DATES.start=s;if(e)DATES.end=e;lset('dates',DATES);renderDates();renderHome();closeModal('dates-modal');}
+
+/* ===================== DASHBOARD ACCUEIL ===================== */
+function tripDays(){const s=new Date(DATES.start+'T00:00:00'),e=new Date(DATES.end+'T00:00:00');return Math.max(1,Math.round((e-s)/864e5)+1);}
+function countFlights(){const g=RESA.find(x=>x.label==='Vols');return g?g.items.length:0;}
+function countNights(){let n=0;Object.values(STEP_META).forEach(m=>{const x=parseInt(m.nights,10);if(!isNaN(x))n+=x;});return n;}
+function currentStepIdx(){if(tripPhase()==='after')return PLAN.length-1;const i=PLAN.findIndex(stepHasToday);return i>=0?i:0;}
+function renderHome(){
+  const se=document.getElementById('trip-stats');
+  if(se){const stats=[['📅',tripDays(),'jours'],['📍',PLAN.length,'étapes'],['✈️',countFlights(),'vols'],['🌙',countNights(),'nuits']];
+    se.innerHTML=stats.map(s=>'<div class="st"><b>'+s[1]+'</b><span>'+s[0]+' '+s[2]+'</span></div>').join('');}
+  const nu=document.getElementById('next-up');if(!nu)return;
+  const ph=tripPhase();const i=currentStepIdx();const s=PLAN[i];const c=GRP_COLORS[s.step]||'#8a6a3f';const m=STEP_META[s.step]||{};
+  let k,meta;
+  if(ph==='before'){const d=daysToStart();k=(d<=0?'Première étape':'Première étape · J-'+d);meta=(m.dates||'')+(m.sub?' · '+m.sub:'');}
+  else if(ph==='during'){k='En ce moment · étape '+(i+1)+'/'+PLAN.length;meta=(m.dates||'')+(m.sub?' · '+m.sub:'');}
+  else{k='Voyage terminé';meta='Quels souvenirs ✨';}
+  nu.style.background='linear-gradient(135deg,'+c+' 0%,'+shade(c,-34)+' 100%)';
+  nu.onclick=function(){_stepIdx=i;showPage('planning',document.getElementById('nav-planning'));};
+  nu.innerHTML='<div class="nc-k">'+k+'</div><div class="nc-row"><div class="nc-emoji">'+(GRP_ICON[s.step]||'📍')+'</div><div><div class="nc-name">'+s.step+'</div><div class="nc-meta">'+meta+'</div></div></div><span class="nc-go">→</span>';
+}
 
 /* ===================== FAMILLE ===================== */
 let _famEdit=null;
@@ -1012,30 +1081,47 @@ function renderCarteList(){
 
 /* ===================== RÉSA (coffre PDF hors-ligne) ===================== */
 let _resaUrls=[];
+function docCount(it){return ((it.drive&&it.drive.length)||0)+((it.local&&it.local.length)||0)+(RESA_KEYS.has(it.key)?1:0);}
+function resaRow(it){
+  const nDocs=docCount(it);
+  const hasDoc=nDocs>0;
+  let state;
+  if(nDocs>1)state='📄 '+nDocs+' docs';
+  else if(nDocs===1)state='📄 Document';
+  else state='À attacher';
+  const clip=hasDoc?'<span class="resa-clip">✓</span>':'';
+  return '<div class="resa-row'+(hasDoc?' hasdoc':'')+'" onclick="openResa(\''+it.key+'\',\''+esc(it.name+' — '+it.desc)+'\')"><div class="resa-ic">'+it.ic+clip+'</div><div class="resa-info"><div class="resa-name">'+it.name+'</div><div class="resa-desc">'+it.desc+'</div>'+payPill(it.key)+'</div><div class="resa-state'+(hasDoc?' ok':'')+'">'+state+'</div></div>';
+}
+function boardingCard(it){
+  const r=it.route;if(!r)return resaRow(it);
+  const nDocs=docCount(it);
+  const doc=nDocs?'<span class="bp-doc">📄 '+nDocs+'</span>':'';
+  const glyph=r.mode==='train'?'🚂':'✈️';
+  return '<div class="bpass" onclick="openResa(\''+it.key+'\',\''+esc(it.name+' — '+it.desc)+'\')">'
+    +'<div class="bpass-top">'
+      +'<div class="bp-col"><div class="bp-code">'+r.from+'</div><div class="bp-city">'+r.cityFrom+'</div><div class="bp-time">'+r.dep+'</div></div>'
+      +'<div class="bp-mid"><div class="bp-plane">'+glyph+'</div><div class="bp-line"></div><div class="bp-dur">'+(r.dur||'')+'</div></div>'
+      +'<div class="bp-col"><div class="bp-code">'+r.to+'</div><div class="bp-city">'+r.cityTo+'</div><div class="bp-time">'+r.arr+'</div></div>'
+    +'</div>'
+    +'<div class="bpass-bot"><span class="bp-flight">'+r.no+' · '+r.date+'</span><span class="bp-right">'+payPill(it.key)+doc+'</span></div>'
+  +'</div>';
+}
 function renderResaGroups(){
   const el=document.getElementById('resa-groups');
   let nPaid=0,nSite=0,nDue=0,nCheck=0;
   RESA.forEach(g=>g.items.forEach(it=>{const p=PAY[it.key];if(!p)return;if(p.s==='ok')nPaid++;else if(p.s==='due')nDue++;else if(p.s==='check')nCheck++;else nSite++;}));
   const sum='<div class="pay-sum"><div class="ps"><b style="color:#1f7a45">'+nPaid+'</b><span>✓ Payé</span></div><div class="ps"><b style="color:#a05c00">'+nSite+'</b><span>Hôtel / sur place</span></div><div class="ps"><b style="color:#7a6a4a">'+nCheck+'</b><span>À vérifier</span></div><div class="ps"><b style="color:#b23b3b">'+nDue+'</b><span>À payer</span></div></div>';
-  el.innerHTML=sum+RESA.map(g=>'<div class="resa-group"><div class="resa-glabel">'+g.ic+' '+g.label+'</div>'+g.items.map(it=>{
-    const hasFile=RESA_KEYS.has(it.key);
-    const nDrive=(it.drive&&it.drive.length)||0;
-    const nLoc=(it.local&&it.local.length)||0;
-    const nDocs=nDrive+nLoc+(hasFile?1:0);
-    const hasDoc=nDocs>0;
-    let state;
-    if(nDocs>1)state='📄 '+nDocs+' docs';
-    else if(nDocs===1)state='📄 Document';
-    else state='À attacher';
-    const clip=hasDoc?'<span class="resa-clip">✓</span>':'';
-    return '<div class="resa-row'+(hasDoc?' hasdoc':'')+'" onclick="openResa(\''+it.key+'\',\''+esc(it.name+' — '+it.desc)+'\')"><div class="resa-ic">'+it.ic+clip+'</div><div class="resa-info"><div class="resa-name">'+it.name+'</div><div class="resa-desc">'+it.desc+'</div>'+payPill(it.key)+'</div><div class="resa-state'+(hasDoc?' ok':'')+'">'+state+'</div></div>';
-  }).join('')+'</div>').join('');
+  el.innerHTML=sum+RESA.map(g=>{
+    const useBoard=(g.label==='Vols'||g.label==='Train');
+    const rows=g.items.map(it=>(useBoard&&it.route)?boardingCard(it):resaRow(it)).join('');
+    return '<div class="resa-group"><div class="resa-glabel">'+g.ic+' '+g.label+'</div>'+rows+'</div>';
+  }).join('');
   const total=RESA.reduce((a,g)=>a+g.items.length,0);
   const withDoc=RESA.reduce((a,g)=>a+g.items.filter(it=>RESA_KEYS.has(it.key)||(it.drive&&it.drive.length)||(it.local&&it.local.length)).length,0);
   document.getElementById('resa-count').textContent=withDoc+' / '+total+' réservations avec document';
 }
 /* ===================== VISIONNEUSE DE DOCUMENT (dans l'app) ===================== */
-const APP_V='46'; /* bump à chaque changement de contenu des docs/ */
+const APP_V='47'; /* bump à chaque changement de contenu des docs/ */
 function openDoc(url,title){
   document.getElementById('doc-title').textContent=title||'Document';
   document.getElementById('doc-frame').src=url+(url.indexOf('?')<0?('?v='+APP_V):'');
@@ -1242,6 +1328,7 @@ async function init(){
   try{if(navigator.storage&&navigator.storage.persist)navigator.storage.persist();}catch(e){}
   await refreshFileIds();
   renderDates();
+  renderHome();
   planningFocus();renderJourney();renderBanner();renderDays();
   renderCarteList();
   renderResaGroups();

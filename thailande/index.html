@@ -405,15 +405,54 @@
   .tc-foot{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:9px;padding-top:9px;border-top:1px dashed var(--border);}
   .tc-date{font-size:.72rem;color:var(--muted);font-weight:600;min-width:0;}
   .tc-foot .pay-pill{margin-top:0;}
+
+  /* ===== BILLET (activités) ===== */
+  .ticket{display:flex;background:var(--card);border:1px solid var(--border);border-radius:14px;box-shadow:var(--shadow);margin-bottom:8px;overflow:hidden;cursor:pointer;}
+  .ticket:active{transform:scale(.99);}
+  .tk-stub{width:56px;flex-shrink:0;background:var(--bg2);display:grid;place-items:center;position:relative;border-right:2px dashed var(--border);}
+  .tk-stub .tk-ic{font-size:1.6rem;}
+  .tk-stub::before,.tk-stub::after{content:'';position:absolute;right:-8px;width:14px;height:14px;border-radius:50%;background:var(--bg);}
+  .tk-stub::before{top:-8px;}
+  .tk-stub::after{bottom:-8px;}
+  .tk-body{flex:1;min-width:0;padding:12px 15px;}
+  .tk-name{font-weight:700;font-size:.9rem;line-height:1.25;}
+  .tk-meta{font-size:.72rem;color:var(--muted);margin-top:3px;line-height:1.35;}
+  .tk-foot{display:flex;align-items:center;gap:8px;margin-top:8px;flex-wrap:wrap;}
+  .tk-foot .pay-pill{margin-top:0;}
+  .tk-doc{font-size:.64rem;font-weight:700;color:var(--jade);}
+
+  /* ===== FICHE DÉTAIL — feuille plein écran ===== */
+  #resa-modal{align-items:flex-end;padding:0;}
+  #resa-modal .modal-box{max-width:640px;width:100%;height:90vh;max-height:90vh;border-radius:22px 22px 0 0;display:flex;flex-direction:column;padding:0;overflow:hidden;animation:sheetup .32s cubic-bezier(.2,.8,.2,1);}
+  @keyframes sheetup{from{transform:translateY(100%)}to{transform:none}}
+  #resa-modal .modal-title{margin:0;padding:18px 18px 14px;border-bottom:1px solid var(--border);background:var(--card);font-size:1.02rem;position:relative;}
+  #resa-modal .modal-title::before{content:'';position:absolute;top:7px;left:50%;transform:translateX(-50%);width:38px;height:4px;border-radius:4px;background:var(--border);}
+  #resa-modal #resa-view{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:16px 18px 10px;}
+  #resa-modal .modal-btns{margin:0;padding:12px 18px;padding-bottom:calc(12px + env(safe-area-inset-bottom));border-top:1px solid var(--border);background:var(--card);}
+  #resa-view .resa-detail{background:linear-gradient(135deg,var(--bg2),#efe6d4);border:1px solid var(--border);}
+
+  /* ===== SPLASH premium ===== */
+  #splash{background:linear-gradient(160deg,#f6f3ec 0%,#efe3cf 100%);}
+  .splash-badge{width:104px;height:104px;margin:0 auto 4px;border-radius:50%;display:grid;place-items:center;background:radial-gradient(circle at 50% 42%,#fff 0%,#f3e8d3 72%);box-shadow:0 14px 38px rgba(138,106,63,.24),inset 0 0 0 1px rgba(255,255,255,.6);animation:splashpop .6s cubic-bezier(.2,.8,.2,1);}
+  .splash-badge .splash-icon{font-size:3.4rem;animation:none;}
+  .splash-bar{width:150px;height:4px;border-radius:4px;background:rgba(138,106,63,.16);margin:22px auto 0;overflow:hidden;}
+  .splash-bar span{display:block;height:100%;width:45%;border-radius:4px;background:linear-gradient(90deg,var(--caramel),var(--brown));animation:splashbar 1.3s ease-in-out infinite;}
+  @keyframes splashbar{0%{transform:translateX(-130%)}100%{transform:translateX(330%)}}
+
+  /* ===== SPA / INFOS harmonisés ===== */
+  .card.spa-card{transition:transform .12s;}
+  .card.spa-card:active{transform:scale(.985);}
+  .info-grid .info-tile{position:relative;overflow:hidden;}
+  .info-grid .info-tile::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:var(--caramel);opacity:.5;}
 </style>
 </head>
 <body>
 
 <div id="splash"><div class="splash-inner">
-  <div class="splash-icon">🐘</div>
+  <div class="splash-badge"><div class="splash-icon">🐘</div></div>
   <div class="splash-name">Thaïlande</div>
-  <div class="splash-sub">Noël en famille 🎄</div>
-  <div class="splash-dots"><span></span><span></span><span></span></div>
+  <div class="splash-sub">Noël en famille · 18 déc → 1 janv</div>
+  <div class="splash-bar"><span></span></div>
 </div></div>
 
 <div id="lock"><div class="lock-inner">
@@ -570,17 +609,17 @@
   </div>
   <div class="section">
     <div class="section-hdr">💆 Menus Spa</div>
-    <div class="card" onclick="openDoc('docs/500rai-spa.html','Spa — 500 Rai')" style="border-left:4px solid #2e8b6f">
+    <div class="card spa-card" onclick="openDoc('docs/500rai-spa.html','Spa — 500 Rai')" style="border-left:4px solid #2e8b6f">
       <div class="card-icon" style="background:#dff0ea">🛶</div>
       <div class="card-body"><div class="card-name">Spa — 500 Rai</div><div class="card-meta">Khao Sok · massages 990 → 2 000 ฿</div></div>
       <div class="tag green">Menu</div>
     </div>
-    <div class="card" onclick="openDoc('docs/santhiya-spa.html','Massage plage — Santhiya')" style="border-left:4px solid #7a5cae">
+    <div class="card spa-card" onclick="openDoc('docs/santhiya-spa.html','Massage plage — Santhiya')" style="border-left:4px solid #7a5cae">
       <div class="card-icon" style="background:#ece6f5">🏖️</div>
       <div class="card-body"><div class="card-name">Massage plage — Santhiya</div><div class="card-meta">Koh Yao Yai · beach massage 699 → 999 ฿</div></div>
       <div class="tag" style="background:#ece6f5;color:#7a5cae">Menu</div>
     </div>
-    <div class="card" onclick="openDoc('docs/santhiya-ayurvana.html','Spa Ayurvana — Santhiya')" style="border-left:4px solid #8a6a3f">
+    <div class="card spa-card" onclick="openDoc('docs/santhiya-ayurvana.html','Spa Ayurvana — Santhiya')" style="border-left:4px solid #8a6a3f">
       <div class="card-icon" style="background:#efe7d8">🌸</div>
       <div class="card-body"><div class="card-name">Spa Ayurvana — Santhiya</div><div class="card-meta">Menu complet · massages, soins, gommages…</div></div>
       <div class="tag">Menu</div>
@@ -625,7 +664,7 @@
   <div style="padding:16px 16px 0"><button class="assur-edit" style="margin:0" onclick="relock()">🔒 Verrouiller l'app</button></div>
 
   <div class="disclaimer">Les informations ci-dessus (visa, taux de change, prises) sont données à titre indicatif et peuvent changer — pense à les <b>vérifier avant le départ</b> (Affaires étrangères Belgique · diplomatie.belgium.be / consulat de Thaïlande).</div>
-  <div style="text-align:center;font-size:.62rem;color:var(--muted);padding:2px 0 18px">Thaïlande · <b>v50</b> · mise à jour auto</div>
+  <div style="text-align:center;font-size:.62rem;color:var(--muted);padding:2px 0 18px">Thaïlande · <b>v51</b> · mise à jour auto</div>
 </div>
 
 <!-- ============ MODALS ============ -->
@@ -1166,6 +1205,15 @@ function transferCard(it){
     +'<div class="tc-foot"><span class="tc-date">'+meta+'</span><span class="bp-right">'+payPill(it.key)+doc+'</span></div>'
   +'</div>';
 }
+function activityCard(it){
+  const nDocs=docCount(it);
+  const doc=nDocs?'<span class="tk-doc">📄 '+nDocs+(nDocs>1?' docs':' doc')+'</span>':'<span class="tk-doc" style="color:var(--muted)">À attacher</span>';
+  return '<div class="ticket" onclick="openResa(\''+it.key+'\',\''+esc(it.name+' — '+it.desc)+'\')">'
+    +'<div class="tk-stub"><span class="tk-ic">'+it.ic+'</span></div>'
+    +'<div class="tk-body"><div class="tk-name">'+it.name+'</div><div class="tk-meta">'+it.desc+'</div>'
+      +'<div class="tk-foot">'+payPill(it.key)+doc+'</div></div>'
+  +'</div>';
+}
 function renderResaGroups(){
   const el=document.getElementById('resa-groups');
   let nPaid=0,nSite=0,nDue=0,nCheck=0;
@@ -1176,6 +1224,7 @@ function renderResaGroups(){
       if((g.label==='Vols'||g.label==='Train')&&it.route)return boardingCard(it);
       if(g.label==='Hôtels'&&it.stay)return stayCard(it);
       if(g.label==='Transferts')return transferCard(it);
+      if(g.label==='Activités')return activityCard(it);
       return resaRow(it);
     }).join('');
     return '<div class="resa-group"><div class="resa-glabel">'+g.ic+' '+g.label+'</div>'+rows+'</div>';
@@ -1185,7 +1234,7 @@ function renderResaGroups(){
   document.getElementById('resa-count').textContent=withDoc+' / '+total+' réservations avec document';
 }
 /* ===================== VISIONNEUSE DE DOCUMENT (dans l'app) ===================== */
-const APP_V='50'; /* bump à chaque changement de contenu des docs/ */
+const APP_V='51'; /* bump à chaque changement de contenu des docs/ */
 function openDoc(url,title){
   document.getElementById('doc-title').textContent=title||'Document';
   document.getElementById('doc-frame').src=url+(url.indexOf('?')<0?('?v='+APP_V):'');

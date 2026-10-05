@@ -395,6 +395,16 @@
 
   /* ===== PUCE ITINÉRAIRE (planning) ===== */
   .route-chip{display:inline-flex;align-items:center;gap:5px;background:var(--bg2);color:var(--brown);font-size:.68rem;font-weight:700;padding:4px 10px;border-radius:20px;font-variant-numeric:tabular-nums;}
+
+  /* ===== CARTE DE TRAJET (transferts) ===== */
+  .tcard{background:var(--card);border:1px solid var(--border);border-radius:14px;box-shadow:var(--shadow);margin-bottom:8px;padding:12px 14px;cursor:pointer;}
+  .tcard:active{transform:scale(.99);}
+  .tc-route{display:flex;align-items:center;gap:9px;font-size:.88rem;flex-wrap:wrap;line-height:1.35;}
+  .tc-route b{font-weight:700;color:var(--text);}
+  .tc-arrow{font-size:1.1rem;}
+  .tc-foot{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:9px;padding-top:9px;border-top:1px dashed var(--border);}
+  .tc-date{font-size:.72rem;color:var(--muted);font-weight:600;min-width:0;}
+  .tc-foot .pay-pill{margin-top:0;}
 </style>
 </head>
 <body>
@@ -615,7 +625,7 @@
   <div style="padding:16px 16px 0"><button class="assur-edit" style="margin:0" onclick="relock()">🔒 Verrouiller l'app</button></div>
 
   <div class="disclaimer">Les informations ci-dessus (visa, taux de change, prises) sont données à titre indicatif et peuvent changer — pense à les <b>vérifier avant le départ</b> (Affaires étrangères Belgique · diplomatie.belgium.be / consulat de Thaïlande).</div>
-  <div style="text-align:center;font-size:.62rem;color:var(--muted);padding:2px 0 18px">Thaïlande · <b>v49</b> · mise à jour auto</div>
+  <div style="text-align:center;font-size:.62rem;color:var(--muted);padding:2px 0 18px">Thaïlande · <b>v50</b> · mise à jour auto</div>
 </div>
 
 <!-- ============ MODALS ============ -->
@@ -1144,6 +1154,18 @@ function stayCard(it){
     +'<div class="stay-foot"><span class="stay-room">🛏 '+s.room+'</span><span class="bp-right">'+payPill(it.key)+doc+'</span></div>'
   +'</div>';
 }
+function transferCard(it){
+  const parts=(it.name||'').split('→');
+  const from=(parts[0]||it.name||'').trim();const to=(parts[1]||'').trim();
+  const meta=(it.desc||'').replace(/^[^·]*·\s*/,'');
+  const nDocs=docCount(it);
+  const doc=nDocs?'<span class="bp-doc">📄 '+nDocs+'</span>':'';
+  const route=to?('<b>'+from+'</b><span class="tc-arrow">'+it.ic+'</span><b>'+to+'</b>'):('<b>'+from+'</b>');
+  return '<div class="tcard" onclick="openResa(\''+it.key+'\',\''+esc(it.name+' — '+it.desc)+'\')">'
+    +'<div class="tc-route">'+route+'</div>'
+    +'<div class="tc-foot"><span class="tc-date">'+meta+'</span><span class="bp-right">'+payPill(it.key)+doc+'</span></div>'
+  +'</div>';
+}
 function renderResaGroups(){
   const el=document.getElementById('resa-groups');
   let nPaid=0,nSite=0,nDue=0,nCheck=0;
@@ -1153,6 +1175,7 @@ function renderResaGroups(){
     const rows=g.items.map(it=>{
       if((g.label==='Vols'||g.label==='Train')&&it.route)return boardingCard(it);
       if(g.label==='Hôtels'&&it.stay)return stayCard(it);
+      if(g.label==='Transferts')return transferCard(it);
       return resaRow(it);
     }).join('');
     return '<div class="resa-group"><div class="resa-glabel">'+g.ic+' '+g.label+'</div>'+rows+'</div>';
@@ -1162,7 +1185,7 @@ function renderResaGroups(){
   document.getElementById('resa-count').textContent=withDoc+' / '+total+' réservations avec document';
 }
 /* ===================== VISIONNEUSE DE DOCUMENT (dans l'app) ===================== */
-const APP_V='49'; /* bump à chaque changement de contenu des docs/ */
+const APP_V='50'; /* bump à chaque changement de contenu des docs/ */
 function openDoc(url,title){
   document.getElementById('doc-title').textContent=title||'Document';
   document.getElementById('doc-frame').src=url+(url.indexOf('?')<0?('?v='+APP_V):'');

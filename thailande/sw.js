@@ -1,5 +1,5 @@
 /* Service worker — Thaïlande */
-const CACHE = 'thai-v49';
+const CACHE = 'thai-v50';
 const ASSETS = [
   './', './index.html', './manifest.webmanifest', './icon.svg',
   './docs/airasia.html', './docs/santhiya-hotel.html', './docs/transfert-500rai.html',

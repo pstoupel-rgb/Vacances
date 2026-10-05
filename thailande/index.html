@@ -372,6 +372,29 @@
   /* Barre de navigation — indicateur actif */
   .app-nav-btn::before{content:'';position:absolute;top:-10px;left:50%;transform:translateX(-50%) scaleX(0);width:18px;height:3px;border-radius:3px;background:var(--brown);transition:transform .18s;}
   .app-nav-btn.active::before{transform:translateX(-50%) scaleX(1);}
+
+  /* ===== FICHE DE SÉJOUR (hôtels) ===== */
+  .stay{background:var(--card);border:1px solid var(--border);border-radius:16px;box-shadow:var(--shadow);margin-bottom:9px;overflow:hidden;cursor:pointer;border-left-width:4px;border-left-style:solid;}
+  .stay:active{transform:scale(.99);}
+  .stay-top{display:flex;align-items:center;gap:12px;padding:13px 15px 11px;}
+  .stay-ic{font-size:1.5rem;width:46px;height:46px;border-radius:13px;display:grid;place-items:center;flex-shrink:0;}
+  .stay-main{flex:1;min-width:0;}
+  .stay-name{font-weight:700;font-size:.95rem;line-height:1.2;}
+  .stay-place{font-size:.6rem;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.05em;margin-top:3px;}
+  .stay-nights{flex-shrink:0;text-align:center;background:var(--bg2);border-radius:12px;padding:6px 10px;min-width:44px;}
+  .stay-nights b{display:block;font-family:'Playfair Display',serif;font-size:1.2rem;color:var(--brown);line-height:1;}
+  .stay-nights span{font-size:.5rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;}
+  .stay-bot{display:flex;align-items:center;padding:10px 15px;border-top:1px dashed var(--border);background:var(--bg);}
+  .stay-leg{flex:1;min-width:0;}
+  .stay-leg .k{font-size:.52rem;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;}
+  .stay-leg .v{font-size:.84rem;font-weight:700;color:var(--text);margin-top:2px;}
+  .stay-arrow{color:var(--caramel);font-size:1rem;padding:0 14px;flex-shrink:0;}
+  .stay-foot{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:9px 15px 11px;}
+  .stay-room{font-size:.68rem;color:var(--muted);font-style:italic;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .stay-foot .bp-right{flex-shrink:0;}
+
+  /* ===== PUCE ITINÉRAIRE (planning) ===== */
+  .route-chip{display:inline-flex;align-items:center;gap:5px;background:var(--bg2);color:var(--brown);font-size:.68rem;font-weight:700;padding:4px 10px;border-radius:20px;font-variant-numeric:tabular-nums;}
 </style>
 </head>
 <body>
@@ -592,7 +615,7 @@
   <div style="padding:16px 16px 0"><button class="assur-edit" style="margin:0" onclick="relock()">🔒 Verrouiller l'app</button></div>
 
   <div class="disclaimer">Les informations ci-dessus (visa, taux de change, prises) sont données à titre indicatif et peuvent changer — pense à les <b>vérifier avant le départ</b> (Affaires étrangères Belgique · diplomatie.belgium.be / consulat de Thaïlande).</div>
-  <div style="text-align:center;font-size:.62rem;color:var(--muted);padding:2px 0 18px">Thaïlande · <b>v47</b> · mise à jour auto</div>
+  <div style="text-align:center;font-size:.62rem;color:var(--muted);padding:2px 0 18px">Thaïlande · <b>v48</b> · mise à jour auto</div>
 </div>
 
 <!-- ============ MODALS ============ -->
@@ -680,6 +703,7 @@ function newFileId(key){return key+'::'+Date.now()+'-'+Math.random().toString(36
 /* Lieux (coordonnées réelles) pour la carte */
 const GRP_COLORS={'Bangkok':'#c0392b','Chiang Mai':'#c98a2e','Khao Sok':'#2e8b6f','Koh Lanta':'#2a7d9f','Koh Yao Yai':'#7a5cae','Transport':'#9a9384'};
 const GRP_ICON={'Bangkok':'🏙️','Chiang Mai':'🐘','Khao Sok':'🛶','Koh Lanta':'🏝️','Koh Yao Yai':'🎆'};
+const GRP_TINT={'Bangkok':'#f6e3e0','Chiang Mai':'#f7ecd8','Khao Sok':'#dff0ea','Koh Lanta':'#dcecf3','Koh Yao Yai':'#ece6f5'};
 const PLACES=[
   {n:'Aéroport Bangkok (Suvarnabhumi)',lat:13.6900,lng:100.7501,ic:'✈️',grp:'Transport',d:'Arrivée & départ internationaux'},
   {n:'Sivatel Bangkok Hotel',lat:13.7407,lng:100.5403,ic:'🏨',grp:'Bangkok',stop:1,d:'Étape 1 · 18 → 20 déc · 2 nuits'},
@@ -801,11 +825,11 @@ const RESA=[
     {key:'train-cnx',ic:'🚂',name:'Train de nuit 1re classe',desc:'Bangkok → Chiang Mai · 20 déc 18h40 → 21 déc 07h15',route:{from:'BKK',cityFrom:'Bangkok',to:'CNX',cityTo:'Chiang Mai',dep:'18:40',arr:'07:15',date:'20→21 déc',no:'Exp. #9',dur:'nuit',mode:'train'},mailq:'Thailand Railways confirmation',info:['Special Express n°9 · 1re classe couchette (clim)','Gare Bangkok Krung Thep Aphiwat → Chiang Mai','Départ 20 déc 18h40 · arrivée 21 déc 07h15','Réservation 68838739','Arriver ~30 min avant · QR dans les billets ☁️'],drive:[{n:'Billet train 1',u:'https://drive.google.com/file/d/13GjQ6AlZiZcIbR7MztGSD7mbTuDMgP97/view'},{n:'Billet train 2',u:'https://drive.google.com/file/d/16Z8liOL4irjvV6X8jSOnaQ6NJ351QaMj/view'},{n:'Billet train 3',u:'https://drive.google.com/file/d/1365n34h7-tkZgkSQnxpext63OhGzNkMn/view'},{n:'Billet train 4',u:'https://drive.google.com/file/d/19rBvN_E2PnfEimIyQ2-qmtiXx_sy1jAP/view'}]}
   ]},
   {label:'Hôtels',ic:'🏨',items:[
-    {key:'hotel-bkk',ic:'🏨',name:'Sivatel Bangkok Hotel',desc:'18 → 20 déc · 2 nuits',mailq:'Sivatel Bangkok',info:['Sivatel Bangkok · 53 Wittayu Rd, Lumpini, Pathumwan','Check-in 18 déc (dès 14h) · check-out 20 déc (12h)','2 Bedroom Family Suite · petit-déjeuner inclus','Tél +66 2 309 5000 · conf. 6764.515.008','Parking & WiFi gratuits'],drive:[{n:'Confirmation Sivatel',u:'https://drive.google.com/file/d/1NPgY9bof7cuI0xOlTka-h-JOaIYzd9de/view'}]},
-    {key:'hotel-cnx',ic:'🏨',name:'Pingviman Hotel',desc:'Chiang Mai · 21 → 23 déc',mailq:'Pingviman',info:['Pingviman Hotel · 92 Sam Lan Rd, Phra Sing, Chiang Mai','Check-in 21 déc (dès 14h) · check-out 23 déc (12h)','Presidential Suite · petit-déjeuner inclus','Tél +66 53 281 799 · conf. 5406.096.853'],drive:[{n:'Confirmation Pingviman',u:'https://drive.google.com/file/d/1SUkeF-rTUxBrlFtSlJtDzt7X0tgXBMUT/view'}]},
-    {key:'hotel-khaosok',ic:'🛶',name:'500 Rai Floating Resort',desc:'Khao Sok · 23 → 25 déc',mailq:'500 Rai Floating Resort',info:['500 Rai Floating Resort · lac Cheow Lan, Khao Sok','⚠️ Accès uniquement en bateau longtail','Check-in 23 déc (14h–18h) · check-out 25 déc (9h–10h)','Villa · petit-déjeuner inclus · tél +66 95 410 0088','Frais parc national ~300฿/pers · caution 2000฿ (cash)','Conf. 6325.031.288 · WiFi payant'],drive:[{n:'Confirmation 500 Rai',u:'https://drive.google.com/file/d/1bYNfKlGU9Ix_lz0heRUWLTRk2bC0VB2r/view'}],web:'https://www.500rai.com',webLabel:'Site du resort'},
-    {key:'hotel-lanta',ic:'🏝️',name:'Nirvana Beach Resort',desc:'Koh Lanta · 25 → 29 déc · villa piscine',mailq:'Nirvana Koh Lanta',info:['Nirvana Beach Resort & Spa · 9 M.6 Koh Lanta Yai, Krabi','Check-in 25 déc · check-out 29 déc · 4 nuits','Two Bed Beach Front Jacuzzi (surclassement) · ch. 601','Petit-déjeuner inclus · tél +66 75 855 299','Réf. 51914'],drive:[{n:'Confirmation Nirvana',u:'https://drive.google.com/file/d/1edd1Y5Rh1YclMKCD_4w1XXj-sxOb3_67/view'}],web:'https://www.nirvanalanta.com',webLabel:'Site du resort'},
-    {key:'hotel-kohyao',ic:'🏖️',name:'Santhiya Koh Yao Yai',desc:'29 déc → 1er janv · Nouvel An',mailq:'Santhiya Koh Yao Yai',info:['Santhiya Koh Yao Yai Resort & Spa','Check-in 29 déc · check-out 1er janv · Nouvel An','Famille 4 pers · 2 chambres','Réf. 900362810073','Transfert speedboat inclus (voir Transferts)'],local:[{n:'Confirmation Santhiya',u:'docs/santhiya-hotel.html'}],web:'https://www.santhiya.com',webLabel:'Site du resort'}
+    {key:'hotel-bkk',ic:'🏨',name:'Sivatel Bangkok Hotel',desc:'18 → 20 déc · 2 nuits',stay:{place:'Bangkok',grp:'Bangkok',ci:'18 déc',co:'20 déc',nights:2,room:'Family Suite · 2 ch.'},mailq:'Sivatel Bangkok',info:['Sivatel Bangkok · 53 Wittayu Rd, Lumpini, Pathumwan','Check-in 18 déc (dès 14h) · check-out 20 déc (12h)','2 Bedroom Family Suite · petit-déjeuner inclus','Tél +66 2 309 5000 · conf. 6764.515.008','Parking & WiFi gratuits'],drive:[{n:'Confirmation Sivatel',u:'https://drive.google.com/file/d/1NPgY9bof7cuI0xOlTka-h-JOaIYzd9de/view'}]},
+    {key:'hotel-cnx',ic:'🏨',name:'Pingviman Hotel',desc:'Chiang Mai · 21 → 23 déc',stay:{place:'Chiang Mai',grp:'Chiang Mai',ci:'21 déc',co:'23 déc',nights:2,room:'Presidential Suite'},mailq:'Pingviman',info:['Pingviman Hotel · 92 Sam Lan Rd, Phra Sing, Chiang Mai','Check-in 21 déc (dès 14h) · check-out 23 déc (12h)','Presidential Suite · petit-déjeuner inclus','Tél +66 53 281 799 · conf. 5406.096.853'],drive:[{n:'Confirmation Pingviman',u:'https://drive.google.com/file/d/1SUkeF-rTUxBrlFtSlJtDzt7X0tgXBMUT/view'}]},
+    {key:'hotel-khaosok',ic:'🛶',name:'500 Rai Floating Resort',desc:'Khao Sok · 23 → 25 déc',stay:{place:'Khao Sok',grp:'Khao Sok',ci:'23 déc',co:'25 déc',nights:2,room:'Villa flottante sur le lac'},mailq:'500 Rai Floating Resort',info:['500 Rai Floating Resort · lac Cheow Lan, Khao Sok','⚠️ Accès uniquement en bateau longtail','Check-in 23 déc (14h–18h) · check-out 25 déc (9h–10h)','Villa · petit-déjeuner inclus · tél +66 95 410 0088','Frais parc national ~300฿/pers · caution 2000฿ (cash)','Conf. 6325.031.288 · WiFi payant'],drive:[{n:'Confirmation 500 Rai',u:'https://drive.google.com/file/d/1bYNfKlGU9Ix_lz0heRUWLTRk2bC0VB2r/view'}],web:'https://www.500rai.com',webLabel:'Site du resort'},
+    {key:'hotel-lanta',ic:'🏝️',name:'Nirvana Beach Resort',desc:'Koh Lanta · 25 → 29 déc · villa piscine',stay:{place:'Koh Lanta',grp:'Koh Lanta',ci:'25 déc',co:'29 déc',nights:4,room:'Villa piscine front de mer'},mailq:'Nirvana Koh Lanta',info:['Nirvana Beach Resort & Spa · 9 M.6 Koh Lanta Yai, Krabi','Check-in 25 déc · check-out 29 déc · 4 nuits','Two Bed Beach Front Jacuzzi (surclassement) · ch. 601','Petit-déjeuner inclus · tél +66 75 855 299','Réf. 51914'],drive:[{n:'Confirmation Nirvana',u:'https://drive.google.com/file/d/1edd1Y5Rh1YclMKCD_4w1XXj-sxOb3_67/view'}],web:'https://www.nirvanalanta.com',webLabel:'Site du resort'},
+    {key:'hotel-kohyao',ic:'🏖️',name:'Santhiya Koh Yao Yai',desc:'29 déc → 1er janv · Nouvel An',stay:{place:'Koh Yao Yai',grp:'Koh Yao Yai',ci:'29 déc',co:'1 janv',nights:3,room:'Deluxe Sea View · 2 ch.'},mailq:'Santhiya Koh Yao Yai',info:['Santhiya Koh Yao Yai Resort & Spa','Check-in 29 déc · check-out 1er janv · Nouvel An','Famille 4 pers · 2 chambres','Réf. 900362810073','Transfert speedboat inclus (voir Transferts)'],local:[{n:'Confirmation Santhiya',u:'docs/santhiya-hotel.html'}],web:'https://www.santhiya.com',webLabel:'Site du resort'}
   ]},
   {label:'Transferts',ic:'🚐',items:[
     {key:'transfert-khaosok',ic:'🚐',name:'Surat Thani → 500 Rai',desc:'✓ Réservé & payé · via le resort · 23 déc',mailq:'500 Rai Floating Resort',info:['✓ Réservé et payé via le resort 500 Rai','Surat Thani (aéroport) → ponton → bateau lac Cheow Lan','23 déc · le resort reconfirme 7 jours avant','Lié à la réservation 500 Rai 6325031288'],local:[{n:'Détail du transfert',u:'docs/transfert-500rai.html'}]},
@@ -958,6 +982,7 @@ function renderDays(){
     const items=d.items.map((it,idx)=>{
       const last=idx===d.items.length-1;
       let row='';
+      if(it.resa){const ri=findResaItem(it.resa);if(ri&&ri.route){const r=ri.route;row+='<span class="route-chip">'+r.from+' '+(r.mode==='train'?'🚂':'✈')+' '+r.to+' · '+r.dep+'→'+r.arr+'</span>';}}
       if(it.waze)row+='<a class="waze-inline" href="https://www.google.com/maps/search/?api=1&query='+it.waze+'" target="_blank" rel="noopener">🗺️ Y aller</a>';
       if(it.resa)row+='<button class="resa-btn'+(RESA_KEYS.has(it.resa)?' set':'')+'" data-resa="'+it.resa+'" onclick="openResa(\''+it.resa+'\',\''+esc(it.rl||it.t)+'\')">📄 '+(RESA_KEYS.has(it.resa)?'Résa ✓':'Résa')+'</button>';
       return '<div class="tl-item"><div class="tl-time">'+(it.time||'')+'</div><div class="tl-dot dot-'+it.dot+'">'+it.ic+'</div><div class="tl-content"><div class="tl-title">'+it.t+'</div>'+(it.sub?'<div class="tl-sub">'+it.sub+'</div>':'')+(row?'<div class="tl-row">'+row+'</div>':'')+'</div></div>';
@@ -1106,14 +1131,30 @@ function boardingCard(it){
     +'<div class="bpass-bot"><span class="bp-flight">'+r.no+' · '+r.date+'</span><span class="bp-right">'+payPill(it.key)+doc+'</span></div>'
   +'</div>';
 }
+function stayCard(it){
+  const s=it.stay;if(!s)return resaRow(it);
+  const col=GRP_COLORS[s.grp]||'#8a6a3f';const tint=GRP_TINT[s.grp]||'#f0e9db';
+  const nDocs=docCount(it);
+  const doc=nDocs?'<span class="bp-doc">📄 '+nDocs+'</span>':'';
+  return '<div class="stay" style="border-left-color:'+col+'" onclick="openResa(\''+it.key+'\',\''+esc(it.name+' — '+it.desc)+'\')">'
+    +'<div class="stay-top"><div class="stay-ic" style="background:'+tint+'">'+it.ic+'</div>'
+      +'<div class="stay-main"><div class="stay-name">'+it.name+'</div><div class="stay-place">📍 '+s.place+'</div></div>'
+      +'<div class="stay-nights"><b>'+s.nights+'</b><span>nuit'+(s.nights>1?'s':'')+'</span></div></div>'
+    +'<div class="stay-bot"><div class="stay-leg"><div class="k">Arrivée</div><div class="v">'+s.ci+'</div></div><div class="stay-arrow">→</div><div class="stay-leg" style="text-align:right"><div class="k">Départ</div><div class="v">'+s.co+'</div></div></div>'
+    +'<div class="stay-foot"><span class="stay-room">🛏 '+s.room+'</span><span class="bp-right">'+payPill(it.key)+doc+'</span></div>'
+  +'</div>';
+}
 function renderResaGroups(){
   const el=document.getElementById('resa-groups');
   let nPaid=0,nSite=0,nDue=0,nCheck=0;
   RESA.forEach(g=>g.items.forEach(it=>{const p=PAY[it.key];if(!p)return;if(p.s==='ok')nPaid++;else if(p.s==='due')nDue++;else if(p.s==='check')nCheck++;else nSite++;}));
   const sum='<div class="pay-sum"><div class="ps"><b style="color:#1f7a45">'+nPaid+'</b><span>✓ Payé</span></div><div class="ps"><b style="color:#a05c00">'+nSite+'</b><span>Hôtel / sur place</span></div><div class="ps"><b style="color:#7a6a4a">'+nCheck+'</b><span>À vérifier</span></div><div class="ps"><b style="color:#b23b3b">'+nDue+'</b><span>À payer</span></div></div>';
   el.innerHTML=sum+RESA.map(g=>{
-    const useBoard=(g.label==='Vols'||g.label==='Train');
-    const rows=g.items.map(it=>(useBoard&&it.route)?boardingCard(it):resaRow(it)).join('');
+    const rows=g.items.map(it=>{
+      if((g.label==='Vols'||g.label==='Train')&&it.route)return boardingCard(it);
+      if(g.label==='Hôtels'&&it.stay)return stayCard(it);
+      return resaRow(it);
+    }).join('');
     return '<div class="resa-group"><div class="resa-glabel">'+g.ic+' '+g.label+'</div>'+rows+'</div>';
   }).join('');
   const total=RESA.reduce((a,g)=>a+g.items.length,0);
@@ -1121,7 +1162,7 @@ function renderResaGroups(){
   document.getElementById('resa-count').textContent=withDoc+' / '+total+' réservations avec document';
 }
 /* ===================== VISIONNEUSE DE DOCUMENT (dans l'app) ===================== */
-const APP_V='47'; /* bump à chaque changement de contenu des docs/ */
+const APP_V='48'; /* bump à chaque changement de contenu des docs/ */
 function openDoc(url,title){
   document.getElementById('doc-title').textContent=title||'Document';
   document.getElementById('doc-frame').src=url+(url.indexOf('?')<0?('?v='+APP_V):'');

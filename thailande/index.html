@@ -372,6 +372,15 @@
   /* Barre de navigation — indicateur actif */
   .app-nav-btn::before{content:'';position:absolute;top:-10px;left:50%;transform:translateX(-50%) scaleX(0);width:18px;height:3px;border-radius:3px;background:var(--brown);transition:transform .18s;}
   .app-nav-btn.active::before{transform:translateX(-50%) scaleX(1);}
+  .app-nav-btn.active .nav-icon{animation:navpop .32s cubic-bezier(.2,.8,.2,1);}
+  @keyframes navpop{0%{transform:scale(.8)}55%{transform:scale(1.18)}100%{transform:scale(1)}}
+
+  /* ===== BARRE DE PROGRESSION DU VOYAGE (accueil) ===== */
+  .trip-progress{margin:16px 16px 0;}
+  .tp-head{display:flex;justify-content:space-between;align-items:baseline;font-size:.62rem;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:7px;}
+  .tp-head .tp-right{color:var(--brown);}
+  .tp-bar{height:7px;border-radius:7px;background:var(--bg2);overflow:hidden;box-shadow:inset 0 1px 2px rgba(0,0,0,.05);}
+  .tp-bar span{display:block;height:100%;border-radius:7px;background:linear-gradient(90deg,var(--caramel),var(--brown));transition:width .7s cubic-bezier(.2,.8,.2,1);}
 
   /* ===== FICHE DE SÉJOUR (hôtels) ===== */
   .stay{background:var(--card);border:1px solid var(--border);border-radius:16px;box-shadow:var(--shadow);margin-bottom:9px;overflow:hidden;cursor:pointer;border-left-width:4px;border-left-style:solid;}
@@ -527,6 +536,8 @@
 
   <div class="next-card" id="next-up"></div>
 
+  <div class="trip-progress" id="trip-progress"></div>
+
   <div class="section">
     <div class="section-hdr">🗺️ L'itinéraire</div>
     <div class="itin-list">
@@ -664,7 +675,7 @@
   <div style="padding:16px 16px 0"><button class="assur-edit" style="margin:0" onclick="relock()">🔒 Verrouiller l'app</button></div>
 
   <div class="disclaimer">Les informations ci-dessus (visa, taux de change, prises) sont données à titre indicatif et peuvent changer — pense à les <b>vérifier avant le départ</b> (Affaires étrangères Belgique · diplomatie.belgium.be / consulat de Thaïlande).</div>
-  <div style="text-align:center;font-size:.62rem;color:var(--muted);padding:2px 0 18px">Thaïlande · <b>v51</b> · mise à jour auto</div>
+  <div style="text-align:center;font-size:.62rem;color:var(--muted);padding:2px 0 18px">Thaïlande · <b>v52</b> · mise à jour auto</div>
 </div>
 
 <!-- ============ MODALS ============ -->
@@ -913,13 +924,14 @@ function payPill(key){const p=PAY[key];if(!p)return'';const m=PAY_META[p.s];retu
 const NAV_TITLES={home:'Thaïlande',planning:'Planning',carte:'Carte',resa:'Réservations',spa:'Spa & Bien-être',infos:'Infos pratiques'};
 let _mapInit=false,_map=null,_markers=[],_allPts=[];
 function showPage(name,btn){
+  try{if(navigator.vibrate)navigator.vibrate(6);}catch(e){}
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
   document.getElementById('page-'+name).classList.add('active');
   document.querySelectorAll('.app-nav-btn').forEach(b=>b.classList.remove('active'));
   if(btn)btn.classList.add('active');
   const nb=document.getElementById('navbar');
   document.getElementById('navbar-title').textContent=NAV_TITLES[name]||'Thaïlande';
-  if(name==='home'){nb.classList.remove('show');}else{nb.classList.add('show');}
+  if(name==='home'){nb.classList.remove('show');renderHome();}else{nb.classList.add('show');}
   document.getElementById('page-'+name).scrollTop=0;
   if(name==='carte')initMap();
   if(name==='planning'){planningFocus();renderJourney();renderBanner();renderDays();scrollToToday();}
@@ -963,6 +975,14 @@ function renderHome(){
   nu.style.background='linear-gradient(135deg,'+c+' 0%,'+shade(c,-34)+' 100%)';
   nu.onclick=function(){_stepIdx=i;showPage('planning',document.getElementById('nav-planning'));};
   nu.innerHTML='<div class="nc-k">'+k+'</div><div class="nc-row"><div class="nc-emoji">'+(GRP_ICON[s.step]||'📍')+'</div><div><div class="nc-name">'+s.step+'</div><div class="nc-meta">'+meta+'</div></div></div><span class="nc-go">→</span>';
+  const tp=document.getElementById('trip-progress');
+  if(tp){
+    const N=tripDays();let pct,left,right;
+    if(ph==='before'){pct=0;left='Avant le départ';right='J-'+daysToStart();}
+    else if(ph==='during'){const dn=Math.min(N,Math.max(1,Math.round((new Date(todayISO()+'T00:00:00')-new Date(DATES.start+'T00:00:00'))/864e5)+1));pct=Math.round(dn/N*100);left='Jour '+dn+' sur '+N;right=pct+'%';}
+    else{pct=100;left='Voyage terminé';right='100%';}
+    tp.innerHTML='<div class="tp-head"><span>'+left+'</span><span class="tp-right">'+right+'</span></div><div class="tp-bar"><span style="width:'+pct+'%"></span></div>';
+  }
 }
 
 /* ===================== FAMILLE ===================== */
@@ -1234,7 +1254,7 @@ function renderResaGroups(){
   document.getElementById('resa-count').textContent=withDoc+' / '+total+' réservations avec document';
 }
 /* ===================== VISIONNEUSE DE DOCUMENT (dans l'app) ===================== */
-const APP_V='51'; /* bump à chaque changement de contenu des docs/ */
+const APP_V='52'; /* bump à chaque changement de contenu des docs/ */
 function openDoc(url,title){
   document.getElementById('doc-title').textContent=title||'Document';
   document.getElementById('doc-frame').src=url+(url.indexOf('?')<0?('?v='+APP_V):'');

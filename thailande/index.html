@@ -453,6 +453,31 @@
   .card.spa-card:active{transform:scale(.985);}
   .info-grid .info-tile{position:relative;overflow:hidden;}
   .info-grid .info-tile::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:var(--caramel);opacity:.5;}
+
+  /* ===== ÉCRAN PAIEMENTS (feuille) ===== */
+  #pay-modal{align-items:flex-end;padding:0;}
+  #pay-modal .modal-box{max-width:640px;width:100%;height:88vh;max-height:88vh;border-radius:22px 22px 0 0;display:flex;flex-direction:column;padding:0;overflow:hidden;animation:sheetup .32s cubic-bezier(.2,.8,.2,1);}
+  #pay-modal .modal-title{margin:0;padding:18px 18px 14px;border-bottom:1px solid var(--border);background:var(--card);font-size:1.02rem;position:relative;}
+  #pay-modal .modal-title::before{content:'';position:absolute;top:7px;left:50%;transform:translateX(-50%);width:38px;height:4px;border-radius:4px;background:var(--border);}
+  #pay-modal #pay-view{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:15px 16px 10px;}
+  #pay-modal .modal-btns{margin:0;padding:12px 18px;padding-bottom:calc(12px + env(safe-area-inset-bottom));border-top:1px solid var(--border);background:var(--card);}
+  .pay-hero{display:flex;gap:8px;}
+  .pay-hero .ph{flex:1;border-radius:14px;padding:12px 8px;text-align:center;border:1px solid var(--border);}
+  .pay-hero .ph.due{background:#fbe5e3;border-color:#f3cfca;}
+  .pay-hero .ph b{display:block;font-family:'Playfair Display',serif;font-size:1.35rem;line-height:1.05;color:#b23b3b;}
+  .pay-hero .ph span{font-size:.56rem;font-weight:800;text-transform:uppercase;letter-spacing:.03em;color:var(--muted);display:block;margin-top:5px;}
+  .pay-paidnote{font-size:.72rem;color:var(--muted);margin:10px 2px 2px;line-height:1.4;}
+  .pay-sec2{font-size:.72rem;font-weight:800;text-transform:uppercase;letter-spacing:.05em;color:var(--brown);margin:16px 2px 8px;border-bottom:1px solid var(--border);padding-bottom:5px;}
+  .pay-item{display:flex;align-items:center;gap:10px;background:var(--card);border:1px solid var(--border);border-radius:12px;padding:10px 12px;margin-bottom:7px;box-shadow:var(--shadow);}
+  .pay-item .pi-n{flex:1;min-width:0;}
+  .pay-item .pi-n b{font-size:.85rem;font-weight:700;display:block;line-height:1.25;}
+  .pay-item .pi-n span{font-size:.67rem;color:var(--muted);}
+  .pay-item .pi-a{text-align:right;flex-shrink:0;}
+  .pay-item .pi-a b{font-size:.9rem;font-weight:800;color:#b23b3b;white-space:nowrap;}
+  .pay-item .pi-a span{display:block;font-size:.65rem;color:var(--muted);margin-top:1px;}
+  .pay-item.dep .pi-a b{color:#7a6a4a;}
+  .pay-paid-row{display:flex;align-items:center;gap:8px;font-size:.82rem;padding:5px 2px;}
+  .pay-paid-row .ck{color:#1f7a45;font-weight:800;flex-shrink:0;}
 </style>
 </head>
 <body>
@@ -604,6 +629,7 @@
 <!-- ============ RESA ============ -->
 <div class="page page-content" id="page-resa">
   <div style="padding:0 16px 4px"><a class="assur-edit" style="margin:0 0 8px;display:block;text-align:center;text-decoration:none;background:#2a7d9f;color:#fff;font-weight:700" href="https://drive.google.com/drive/folders/1jRL8ura7cWz0DOfbyEa1wmOhu4ZZ-jCx" target="_blank" rel="noopener">☁️ Ouvrir tous les documents (Drive)</a><div style="font-size:.7rem;color:var(--muted);text-align:center;margin:0 0 4px">Un seul dossier partagé — visible sur tous les appareils</div></div>
+  <div style="padding:0 16px 6px"><button class="assur-edit" style="margin:0;background:var(--brown);color:#fff;font-weight:700" onclick="openPayments()">💳 Mes paiements — payé / à régler</button></div>
   <div id="resa-groups"></div>
   <div class="disclaimer">☁️ Les documents du dossier <b>Drive</b> sont partagés : toute la famille les voit, sur n'importe quel appareil, sans mot de passe. Les fichiers attachés ligne par ligne ci-dessus restent, eux, stockés localement sur cet appareil uniquement.</div>
 </div>
@@ -675,7 +701,7 @@
   <div style="padding:16px 16px 0"><button class="assur-edit" style="margin:0" onclick="relock()">🔒 Verrouiller l'app</button></div>
 
   <div class="disclaimer">Les informations ci-dessus (visa, taux de change, prises) sont données à titre indicatif et peuvent changer — pense à les <b>vérifier avant le départ</b> (Affaires étrangères Belgique · diplomatie.belgium.be / consulat de Thaïlande).</div>
-  <div style="text-align:center;font-size:.62rem;color:var(--muted);padding:2px 0 18px">Thaïlande · <b>v58</b> · mise à jour auto</div>
+  <div style="text-align:center;font-size:.62rem;color:var(--muted);padding:2px 0 18px">Thaïlande · <b>v59</b> · mise à jour auto</div>
 </div>
 
 <!-- ============ MODALS ============ -->
@@ -691,6 +717,14 @@
     <div class="modal-title" id="resa-modal-title">📄 Réservation</div>
     <div id="resa-view"></div>
     <div class="modal-btns"><button class="mb-cancel" onclick="closeModal('resa-modal')">Fermer</button></div>
+  </div>
+</div>
+
+<div class="modal" id="pay-modal" onclick="if(event.target===this)closeModal('pay-modal')">
+  <div class="modal-box">
+    <div class="modal-title">💳 Mes paiements</div>
+    <div id="pay-view"></div>
+    <div class="modal-btns"><button class="mb-cancel" onclick="closeModal('pay-modal')">Fermer</button></div>
   </div>
 </div>
 
@@ -919,6 +953,34 @@ const PAY={
 };
 const PAY_META={ok:{t:'Payé',c:'#1f7a45',b:'#e6f2ea',i:'✓'},hotel:{t:'À régler à l\'hôtel',c:'#a05c00',b:'#fbeede',i:'🏨'},onsite:{t:'Sur place',c:'#a05c00',b:'#fbeede',i:'💵'},due:{t:'À payer',c:'#b23b3b',b:'#fbe5e3',i:'⏳'},check:{t:'À vérifier',c:'#7a6a4a',b:'#efe7d8',i:'？'}};
 function payPill(key){const p=PAY[key];if(!p)return'';const m=PAY_META[p.s];return'<span class="pay-pill" style="background:'+m.b+';color:'+m.c+'">'+m.i+' '+m.t+(p.t?(' · '+p.t):'')+'</span>';}
+
+/* ===================== ÉCRAN PAIEMENTS ===================== */
+const PAY_ONSITE=[
+  {n:'Hôtel Pingviman (Chiang Mai)',sub:'À régler à l\'hôtel · 21-23 déc',thb:11965},
+  {n:'Guide Bangkok (journée privée)',sub:'Cash · 19 déc',thb:6500},
+  {n:'Elephant Rescue Park',sub:'Cash au guide · 22 déc',thb:16600},
+  {n:'Transfert arrivée — speedboat Lanta GZ',sub:'25 déc · à confirmer',thb:18000},
+  {n:'Transfert départ — speedboat Lanta GZ',sub:'29 déc · à confirmer',thb:22000},
+  {n:'Frais parc national — 500 Rai',sub:'~300 ฿/pers · 23 déc',thb:1200},
+  {n:'Frais parc national — Koh Rok & Haa',sub:'~400 ฿/pers · 27 déc',thb:1600}
+];
+const PAY_DEPOSIT=[{n:'Caution 500 Rai',sub:'Cash · remboursable au départ',thb:2000}];
+const PAY_PAID=['Vols Thai Airways & AirAsia (A/R + internes)','Train de nuit Bangkok → Chiang Mai','Hôtel Sivatel (Bangkok)','Hôtel 500 Rai (Khao Sok)','Hôtel Nirvana (Koh Lanta)','Hôtel Santhiya (Koh Yao Yai)','Tour à vélo Bangkok','Excursion Koh Rok & Koh Haa','Transfert Surat Thani → 500 Rai','Transfert Santhiya → aéroport Phuket'];
+function eurOf(thb){return Math.round(thb/CONV_RATE);}
+function fmtBaht(n){return n.toLocaleString('fr-FR').replace(/ /g,' ');}
+function openPayments(){
+  const tot=PAY_ONSITE.reduce((a,x)=>a+x.thb,0);
+  let h='<div class="pay-hero"><div class="ph due"><b>~'+fmtBaht(tot)+' ฿</b><span>Reste à payer sur place</span></div><div class="ph due"><b>~'+fmtBaht(eurOf(tot))+' €</b><span>≈ en euros</span></div></div>';
+  h+='<div class="pay-paidnote">✅ <b style="color:#1f7a45">Déjà payés</b> : vols, train, 4 hôtels sur 5, excursions principales & transferts 500 Rai / Santhiya.</div>';
+  h+='<div class="pay-sec2">💵 À régler sur place</div>';
+  h+=PAY_ONSITE.map(x=>'<div class="pay-item"><div class="pi-n"><b>'+x.n+'</b><span>'+x.sub+'</span></div><div class="pi-a"><b>'+fmtBaht(x.thb)+' ฿</b><span>≈ '+fmtBaht(eurOf(x.thb))+' €</span></div></div>').join('');
+  h+=PAY_DEPOSIT.map(x=>'<div class="pay-item dep"><div class="pi-n"><b>'+x.n+'</b><span>'+x.sub+'</span></div><div class="pi-a"><b>'+fmtBaht(x.thb)+' ฿</b><span>remboursable</span></div></div>').join('');
+  h+='<div class="pay-sec2">✅ Déjà payé</div>';
+  h+=PAY_PAID.map(n=>'<div class="pay-paid-row"><span class="ck">✓</span><span>'+n+'</span></div>').join('');
+  h+='<div class="pay-paidnote" style="margin-top:14px">Montants indicatifs (1 € ≈ '+CONV_RATE+' ฿). Les 2 transferts Lanta GZ sont à confirmer. Hors repas, boissons, pourboires, taxis, SIM & extras. Caution 500 Rai remboursable au départ.</div>';
+  document.getElementById('pay-view').innerHTML=h;
+  document.getElementById('pay-modal').classList.add('open');
+}
 
 /* ===================== NAVIGATION ===================== */
 const NAV_TITLES={home:'Thaïlande',planning:'Planning',carte:'Carte',resa:'Réservations',spa:'Spa & Bien-être',infos:'Infos pratiques'};
@@ -1254,7 +1316,7 @@ function renderResaGroups(){
   document.getElementById('resa-count').textContent=withDoc+' / '+total+' réservations avec document';
 }
 /* ===================== VISIONNEUSE DE DOCUMENT (dans l'app) ===================== */
-const APP_V='58'; /* bump à chaque changement de contenu des docs/ */
+const APP_V='59'; /* bump à chaque changement de contenu des docs/ */
 function openDoc(url,title){
   document.getElementById('doc-title').textContent=title||'Document';
   document.getElementById('doc-frame').src=url+(url.indexOf('?')<0?('?v='+APP_V):'');

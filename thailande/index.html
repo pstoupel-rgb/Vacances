@@ -464,7 +464,14 @@
   .pay-hero{display:flex;gap:8px;}
   .pay-hero .ph{flex:1;border-radius:14px;padding:12px 8px;text-align:center;border:1px solid var(--border);}
   .pay-hero .ph.due{background:#fbe5e3;border-color:#f3cfca;}
-  .pay-hero .ph b{display:block;font-family:'Playfair Display',serif;font-size:1.35rem;line-height:1.05;color:#b23b3b;}
+  .pay-hero .ph.paid{background:#e6f2ea;border-color:#cfe6d8;}
+  .pay-hero .ph b{display:block;font-family:'Playfair Display',serif;font-size:1.35rem;line-height:1.05;color:var(--brown);}
+  .pay-hero .ph.due b{color:#b23b3b;}
+  .pay-hero .ph.paid b{color:#1f7a45;}
+  .pay-total{margin:12px 2px 2px;text-align:center;font-size:.92rem;color:var(--text);background:var(--bg2);border-radius:12px;padding:10px 12px;}
+  .pay-total b{font-family:'Playfair Display',serif;color:var(--brown);font-size:1.05rem;}
+  .pay-total span{display:block;font-size:.66rem;color:var(--muted);margin-top:2px;}
+  .pay-item.ok .pi-a b{color:#1f7a45;font-size:.82rem;}
   .pay-hero .ph span{font-size:.56rem;font-weight:800;text-transform:uppercase;letter-spacing:.03em;color:var(--muted);display:block;margin-top:5px;}
   .pay-paidnote{font-size:.72rem;color:var(--muted);margin:10px 2px 2px;line-height:1.4;}
   .pay-sec2{font-size:.72rem;font-weight:800;text-transform:uppercase;letter-spacing:.05em;color:var(--brown);margin:16px 2px 8px;border-bottom:1px solid var(--border);padding-bottom:5px;}
@@ -701,7 +708,7 @@
   <div style="padding:16px 16px 0"><button class="assur-edit" style="margin:0" onclick="relock()">🔒 Verrouiller l'app</button></div>
 
   <div class="disclaimer">Les informations ci-dessus (visa, taux de change, prises) sont données à titre indicatif et peuvent changer — pense à les <b>vérifier avant le départ</b> (Affaires étrangères Belgique · diplomatie.belgium.be / consulat de Thaïlande).</div>
-  <div style="text-align:center;font-size:.62rem;color:var(--muted);padding:2px 0 18px">Thaïlande · <b>v59</b> · mise à jour auto</div>
+  <div style="text-align:center;font-size:.62rem;color:var(--muted);padding:2px 0 18px">Thaïlande · <b>v60</b> · mise à jour auto</div>
 </div>
 
 <!-- ============ MODALS ============ -->
@@ -965,19 +972,35 @@ const PAY_ONSITE=[
   {n:'Frais parc national — Koh Rok & Haa',sub:'~400 ฿/pers · 27 déc',thb:1600}
 ];
 const PAY_DEPOSIT=[{n:'Caution 500 Rai',sub:'Cash · remboursable au départ',thb:2000}];
-const PAY_PAID=['Vols Thai Airways & AirAsia (A/R + internes)','Train de nuit Bangkok → Chiang Mai','Hôtel Sivatel (Bangkok)','Hôtel 500 Rai (Khao Sok)','Hôtel Nirvana (Koh Lanta)','Hôtel Santhiya (Koh Yao Yai)','Tour à vélo Bangkok','Excursion Koh Rok & Koh Haa','Transfert Surat Thani → 500 Rai','Transfert Santhiya → aéroport Phuket'];
+const PAY_PAID=[
+  {n:'Vols Thai A/R (Bruxelles ↔ Bangkok)',sub:'3 ad. 1 081,15 € + 1 enf. 895,15 €',eur:4139},
+  {n:'Vol Phuket → Bangkok (TG218)',sub:'4 380 ฿/pers × 4 = 17 520 ฿ · 1er janv',eur:461},
+  {n:'Vol AirAsia Chiang Mai → Surat Thani',sub:'23 déc · montant à confirmer',eur:null},
+  {n:'Train de nuit 1re classe (4 pers)',sub:'548 USD · 20 déc',eur:510},
+  {n:'Hôtel Sivatel (Bangkok)',sub:'22 947 ฿ · 2 nuits',eur:604},
+  {n:'Hôtel 500 Rai (villa, Khao Sok)',sub:'57 000 ฿ · 2 nuits',eur:1503},
+  {n:'Hôtel Nirvana (Koh Lanta)',sub:'34 000 ฿ · 4 nuits',eur:895},
+  {n:'Hôtel Santhiya (Koh Yao Yai)',sub:'71 400 ฿ · 3 nuits',eur:1879},
+  {n:'Transferts 500 Rai (arrivée + van)',sub:'13 000 ฿',eur:342},
+  {n:'Transfert Santhiya → Phuket',sub:'10 000 ฿ · 1er janv',eur:263},
+  {n:'Excursion Koh Rok & Haa (Lanta GZ)',sub:'19 000 ฿ · 27 déc',eur:500},
+  {n:'Tour à vélo Co van Kessel',sub:'4 370 ฿ · 18 déc',eur:115}
+];
 function eurOf(thb){return Math.round(thb/CONV_RATE);}
 function fmtBaht(n){return n.toLocaleString('fr-FR').replace(/ /g,' ');}
 function openPayments(){
   const tot=PAY_ONSITE.reduce((a,x)=>a+x.thb,0);
-  let h='<div class="pay-hero"><div class="ph due"><b>~'+fmtBaht(tot)+' ฿</b><span>Reste à payer sur place</span></div><div class="ph due"><b>~'+fmtBaht(eurOf(tot))+' €</b><span>≈ en euros</span></div></div>';
-  h+='<div class="pay-paidnote">✅ <b style="color:#1f7a45">Déjà payés</b> : vols, train, 4 hôtels sur 5, excursions principales & transferts 500 Rai / Santhiya.</div>';
-  h+='<div class="pay-sec2">💵 À régler sur place</div>';
+  const resteEur=eurOf(tot);
+  const paidEur=PAY_PAID.reduce((a,x)=>a+(x.eur||0),0);
+  const totalEur=paidEur+resteEur;
+  let h='<div class="pay-hero"><div class="ph paid"><b>~'+fmtBaht(paidEur)+' €</b><span>Déjà payé</span></div><div class="ph due"><b>~'+fmtBaht(resteEur)+' €</b><span>Reste sur place</span></div></div>';
+  h+='<div class="pay-total">Budget total du voyage ≈ <b>'+fmtBaht(totalEur)+' €</b><span>(+ vol AirAsia à confirmer · hors repas, extras & pourboires)</span></div>';
+  h+='<div class="pay-sec2">💵 À régler sur place ('+fmtBaht(tot)+' ฿)</div>';
   h+=PAY_ONSITE.map(x=>'<div class="pay-item"><div class="pi-n"><b>'+x.n+'</b><span>'+x.sub+'</span></div><div class="pi-a"><b>'+fmtBaht(x.thb)+' ฿</b><span>≈ '+fmtBaht(eurOf(x.thb))+' €</span></div></div>').join('');
   h+=PAY_DEPOSIT.map(x=>'<div class="pay-item dep"><div class="pi-n"><b>'+x.n+'</b><span>'+x.sub+'</span></div><div class="pi-a"><b>'+fmtBaht(x.thb)+' ฿</b><span>remboursable</span></div></div>').join('');
-  h+='<div class="pay-sec2">✅ Déjà payé</div>';
-  h+=PAY_PAID.map(n=>'<div class="pay-paid-row"><span class="ck">✓</span><span>'+n+'</span></div>').join('');
-  h+='<div class="pay-paidnote" style="margin-top:14px">Montants indicatifs (1 € ≈ '+CONV_RATE+' ฿). Les 2 transferts Lanta GZ sont à confirmer. Hors repas, boissons, pourboires, taxis, SIM & extras. Caution 500 Rai remboursable au départ.</div>';
+  h+='<div class="pay-sec2">✅ Déjà payé ('+fmtBaht(paidEur)+' €)</div>';
+  h+=PAY_PAID.map(x=>'<div class="pay-item ok"><div class="pi-n"><b>'+x.n+'</b><span>'+x.sub+'</span></div><div class="pi-a"><b>'+(x.eur?('~'+fmtBaht(x.eur)+' €'):'à confirmer')+'</b></div></div>').join('');
+  h+='<div class="pay-paidnote" style="margin-top:14px">Montants indicatifs (1 € ≈ '+CONV_RATE+' ฿ · train en USD). Les 2 transferts Lanta GZ (arrivée/départ) restent à confirmer. Hors repas, boissons, pourboires, taxis, SIM & extras. Caution 500 Rai remboursable au départ.</div>';
   document.getElementById('pay-view').innerHTML=h;
   document.getElementById('pay-modal').classList.add('open');
 }
@@ -1316,7 +1339,7 @@ function renderResaGroups(){
   document.getElementById('resa-count').textContent=withDoc+' / '+total+' réservations avec document';
 }
 /* ===================== VISIONNEUSE DE DOCUMENT (dans l'app) ===================== */
-const APP_V='59'; /* bump à chaque changement de contenu des docs/ */
+const APP_V='60'; /* bump à chaque changement de contenu des docs/ */
 function openDoc(url,title){
   document.getElementById('doc-title').textContent=title||'Document';
   document.getElementById('doc-frame').src=url+(url.indexOf('?')<0?('?v='+APP_V):'');

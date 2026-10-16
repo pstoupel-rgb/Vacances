@@ -708,7 +708,7 @@
   <div style="padding:16px 16px 0"><button class="assur-edit" style="margin:0" onclick="relock()">🔒 Verrouiller l'app</button></div>
 
   <div class="disclaimer">Les informations ci-dessus (visa, taux de change, prises) sont données à titre indicatif et peuvent changer — pense à les <b>vérifier avant le départ</b> (Affaires étrangères Belgique · diplomatie.belgium.be / consulat de Thaïlande).</div>
-  <div style="text-align:center;font-size:.62rem;color:var(--muted);padding:2px 0 18px">Thaïlande · <b>v60</b> · mise à jour auto</div>
+  <div style="text-align:center;font-size:.62rem;color:var(--muted);padding:2px 0 18px">Thaïlande · <b>v61</b> · mise à jour auto</div>
 </div>
 
 <!-- ============ MODALS ============ -->
@@ -975,7 +975,7 @@ const PAY_DEPOSIT=[{n:'Caution 500 Rai',sub:'Cash · remboursable au départ',th
 const PAY_PAID=[
   {n:'Vols Thai A/R (Bruxelles ↔ Bangkok)',sub:'3 ad. 1 081,15 € + 1 enf. 895,15 €',eur:4139},
   {n:'Vol Phuket → Bangkok (TG218)',sub:'4 380 ฿/pers × 4 = 17 520 ฿ · 1er janv',eur:461},
-  {n:'Vol AirAsia Chiang Mai → Surat Thani',sub:'23 déc · montant à confirmer',eur:null},
+  {n:'Vol AirAsia Chiang Mai → Surat Thani',sub:'715,25 € · 4 pers · Airpaz · 23 déc',eur:715},
   {n:'Train de nuit 1re classe (4 pers)',sub:'548 USD · 20 déc',eur:510},
   {n:'Hôtel Sivatel (Bangkok)',sub:'22 947 ฿ · 2 nuits',eur:604},
   {n:'Hôtel 500 Rai (villa, Khao Sok)',sub:'57 000 ฿ · 2 nuits',eur:1503},
@@ -994,7 +994,7 @@ function openPayments(){
   const paidEur=PAY_PAID.reduce((a,x)=>a+(x.eur||0),0);
   const totalEur=paidEur+resteEur;
   let h='<div class="pay-hero"><div class="ph paid"><b>~'+fmtBaht(paidEur)+' €</b><span>Déjà payé</span></div><div class="ph due"><b>~'+fmtBaht(resteEur)+' €</b><span>Reste sur place</span></div></div>';
-  h+='<div class="pay-total">Budget total du voyage ≈ <b>'+fmtBaht(totalEur)+' €</b><span>(+ vol AirAsia à confirmer · hors repas, extras & pourboires)</span></div>';
+  h+='<div class="pay-total">Budget total du voyage ≈ <b>'+fmtBaht(totalEur)+' €</b><span>hors repas, boissons, extras & pourboires</span></div>';
   h+='<div class="pay-sec2">💵 À régler sur place ('+fmtBaht(tot)+' ฿)</div>';
   h+=PAY_ONSITE.map(x=>'<div class="pay-item"><div class="pi-n"><b>'+x.n+'</b><span>'+x.sub+'</span></div><div class="pi-a"><b>'+fmtBaht(x.thb)+' ฿</b><span>≈ '+fmtBaht(eurOf(x.thb))+' €</span></div></div>').join('');
   h+=PAY_DEPOSIT.map(x=>'<div class="pay-item dep"><div class="pi-n"><b>'+x.n+'</b><span>'+x.sub+'</span></div><div class="pi-a"><b>'+fmtBaht(x.thb)+' ฿</b><span>remboursable</span></div></div>').join('');
@@ -1339,7 +1339,7 @@ function renderResaGroups(){
   document.getElementById('resa-count').textContent=withDoc+' / '+total+' réservations avec document';
 }
 /* ===================== VISIONNEUSE DE DOCUMENT (dans l'app) ===================== */
-const APP_V='60'; /* bump à chaque changement de contenu des docs/ */
+const APP_V='61'; /* bump à chaque changement de contenu des docs/ */
 function openDoc(url,title){
   document.getElementById('doc-title').textContent=title||'Document';
   document.getElementById('doc-frame').src=url+(url.indexOf('?')<0?('?v='+APP_V):'');

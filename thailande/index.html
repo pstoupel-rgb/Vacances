@@ -485,6 +485,19 @@
   .pay-item.dep .pi-a b{color:#7a6a4a;}
   .pay-paid-row{display:flex;align-items:center;gap:8px;font-size:.82rem;padding:5px 2px;}
   .pay-paid-row .ck{color:#1f7a45;font-weight:800;flex-shrink:0;}
+
+  /* ===== MENU ☰ (haut gauche) ===== */
+  #menu-btn{position:fixed;top:calc(env(safe-area-inset-top) + 8px);left:12px;z-index:300;width:40px;height:40px;border-radius:12px;border:none;background:rgba(246,243,236,.82);-webkit-backdrop-filter:saturate(180%) blur(14px);backdrop-filter:saturate(180%) blur(14px);box-shadow:var(--shadow);font-size:1.15rem;display:grid;place-items:center;cursor:pointer;color:var(--text);line-height:1;}
+  #menu-btn:active{transform:scale(.92);}
+  #menu-back{position:fixed;inset:0;z-index:299;display:none;}
+  #menu-back.open{display:block;}
+  #menu-drop{position:fixed;top:calc(env(safe-area-inset-top) + 54px);left:12px;z-index:300;background:var(--card);border:1px solid var(--border);border-radius:14px;box-shadow:0 12px 32px rgba(0,0,0,.2);padding:6px;min-width:214px;display:none;transform-origin:top left;}
+  #menu-drop.open{display:block;animation:menupop .18s cubic-bezier(.2,.8,.2,1);}
+  @keyframes menupop{from{opacity:0;transform:scale(.94) translateY(-4px)}to{opacity:1;transform:none}}
+  .menu-item{display:flex;align-items:center;gap:11px;padding:11px 12px;border-radius:10px;font-size:.9rem;font-weight:600;color:var(--text);cursor:pointer;background:none;border:none;width:100%;text-align:left;font-family:inherit;}
+  .menu-item:active{background:var(--bg2);}
+  .menu-item .mi-ic{font-size:1.15rem;width:24px;text-align:center;flex-shrink:0;}
+  .menu-sep{height:1px;background:var(--border);margin:4px 8px;}
 </style>
 </head>
 <body>
@@ -505,6 +518,15 @@
 </div></div>
 
 <div id="navbar"><span id="navbar-title">Thaïlande</span></div>
+<button id="menu-btn" onclick="toggleMenu(event)" aria-label="Menu">☰</button>
+<div id="menu-back" onclick="closeMenu()"></div>
+<div id="menu-drop">
+  <button class="menu-item" onclick="menuGo('payments')"><span class="mi-ic">💳</span>Mes paiements</button>
+  <button class="menu-item" onclick="menuGo('infos')"><span class="mi-ic">ℹ️</span>Infos pratiques</button>
+  <div class="menu-sep"></div>
+  <button class="menu-item" onclick="menuGo('drive')"><span class="mi-ic">☁️</span>Tous les documents</button>
+  <button class="menu-item" onclick="menuGo('lock')"><span class="mi-ic">🔒</span>Verrouiller l'app</button>
+</div>
 <div id="toast" class="toast"></div>
 
 <nav class="app-nav">
@@ -708,7 +730,7 @@
   <div style="padding:16px 16px 0"><button class="assur-edit" style="margin:0" onclick="relock()">🔒 Verrouiller l'app</button></div>
 
   <div class="disclaimer">Les informations ci-dessus (visa, taux de change, prises) sont données à titre indicatif et peuvent changer — pense à les <b>vérifier avant le départ</b> (Affaires étrangères Belgique · diplomatie.belgium.be / consulat de Thaïlande).</div>
-  <div style="text-align:center;font-size:.62rem;color:var(--muted);padding:2px 0 18px">Thaïlande · <b>v62</b> · mise à jour auto</div>
+  <div style="text-align:center;font-size:.62rem;color:var(--muted);padding:2px 0 18px">Thaïlande · <b>v63</b> · mise à jour auto</div>
 </div>
 
 <!-- ============ MODALS ============ -->
@@ -1008,6 +1030,17 @@ function openPayments(){
 /* ===================== NAVIGATION ===================== */
 const NAV_TITLES={home:'Thaïlande',planning:'Planning',carte:'Carte',resa:'Réservations',spa:'Spa & Bien-être',infos:'Infos pratiques'};
 let _mapInit=false,_map=null,_markers=[],_allPts=[];
+/* ===================== MENU ☰ ===================== */
+function toggleMenu(e){if(e)e.stopPropagation();try{if(navigator.vibrate)navigator.vibrate(6);}catch(_){}
+  const d=document.getElementById('menu-drop'),b=document.getElementById('menu-back');
+  const open=!d.classList.contains('open');d.classList.toggle('open',open);b.classList.toggle('open',open);}
+function closeMenu(){document.getElementById('menu-drop').classList.remove('open');document.getElementById('menu-back').classList.remove('open');}
+function menuGo(what){closeMenu();
+  if(what==='payments')openPayments();
+  else if(what==='infos')showPage('infos',document.getElementById('nav-infos'));
+  else if(what==='drive')window.open('https://drive.google.com/drive/folders/1jRL8ura7cWz0DOfbyEa1wmOhu4ZZ-jCx','_blank','noopener');
+  else if(what==='lock')relock();
+}
 function showPage(name,btn){
   try{if(navigator.vibrate)navigator.vibrate(6);}catch(e){}
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
@@ -1339,7 +1372,7 @@ function renderResaGroups(){
   document.getElementById('resa-count').textContent=withDoc+' / '+total+' réservations avec document';
 }
 /* ===================== VISIONNEUSE DE DOCUMENT (dans l'app) ===================== */
-const APP_V='62'; /* bump à chaque changement de contenu des docs/ */
+const APP_V='63'; /* bump à chaque changement de contenu des docs/ */
 function openDoc(url,title){
   document.getElementById('doc-title').textContent=title||'Document';
   document.getElementById('doc-frame').src=url+(url.indexOf('?')<0?('?v='+APP_V):'');
